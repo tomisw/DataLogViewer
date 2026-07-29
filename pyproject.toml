@@ -1,0 +1,103 @@
+# Raíz del workspace Python de DataLogViewer.
+#
+# Elección de gestor de workspace (F0-02): se usa `uv` con `[tool.uv.workspace]`
+# en vez de `[tool.hatch]` porque `uv` ya es la herramienta elegida para resolver
+# e instalar dependencias del proyecto (está disponible en el entorno de
+# ejecución) y su soporte de workspaces permite un único `uv sync` que instala
+# `dlv-core`, `dlv-api` y `dlv-app` como paquetes editables en un solo entorno
+# virtual, resolviendo las dependencias cruzadas entre ellos mediante
+# `[tool.uv.sources]` con `workspace = true` en cada paquete consumidor. Un
+# workspace de Hatch habría exigido además que esta raíz fuera ella misma un
+# paquete instalable; aquí la raíz es un "proyecto virtual" (sin tabla
+# `[project]`) que solo coordina el workspace y centraliza la configuración de
+# `ruff` y `mypy`, que es justo lo que se necesita.
+#
+# `dlv-ui` no entra en el workspace de `uv`: es un proyecto TypeScript/Vite
+# independiente, gestionado con `npm` desde `dlv-ui/package.json`.
+[tool.uv.workspace]
+members = ["dlv-core", "dlv-api", "dlv-app"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+# `pythonpath` (soporte nativo de pytest >= 7, sin plugin adicional) añade los
+# directorios `src/` de cada paquete Python a `sys.path` durante la recolección
+# de tests. Esto permite ejecutar `python -m pytest` desde la raíz sin haber
+# instalado (`uv sync` / `pip install -e`) ningún paquete primero: útil en
+# cualquier entorno, y necesario en el que se usó para andamiar F0-02, donde el
+# acceso a PyPI está bloqueado por política de red (ver informe de la tarea).
+[tool.pytest.ini_options]
+pythonpath = [
+    "dlv-core/src",
+    "dlv-api/src",
+    "dlv-app/src",
+]
+testpaths = [
+    "dlv-core/tests",
+    "dlv-api/tests",
+    "dlv-app/tests",
+]
+
+# ---------------------------------------------------------------------------
+# ruff (lint + formato)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
+# `docs/`, `state/`, `tools/`, `samples/` son de otras tareas / del orquestador
+# (ver restricciones de F0-02): no se tocan ni se lintan aquí. `dlv-ui` es
+# TypeScript, fuera del alcance de ruff.
+extend-exclude = ["docs", "state", "tools", "samples", "dlv-ui"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # bugbear
+    "C4",  # comprehensions
+    "SIM", # simplificaciones
+    "RUF", # reglas propias de ruff
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*/tests/*" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ---------------------------------------------------------------------------
+# mypy (modo estricto)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+# Layout `src/`: cada paquete vive bajo `<paquete>/src/<modulo>/`, y `src/` no
+# tiene `__init__.py` propio, así que se declaran las bases explícitamente para
+# que mypy resuelva `dlv_core`, `dlv_api`, `dlv_app` como paquetes de nivel
+# superior en vez de intentar adivinarlo por la ruta del fichero.
+explicit_package_bases = true
+mypy_path = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
+exclude = "^(docs|state|tools|samples|dlv-ui)/"
+
+# `polars`, `numpy`, `fastapi`, `uvicorn` y `pywebview` publican tipos propios
+# (`py.typed`) y en una instalación normal mypy los usa sin ayuda. Este
+# override solo entra en juego cuando el paquete no está físicamente instalado
+# (p. ej. este sandbox de F0-02, sin acceso a PyPI: ver informe de la tarea) y
+# evita que `mypy` falle con "Cannot find implementation or library stub" en
+# vez de comprobar el resto del código; con las dependencias instaladas no
+# cambia nada, porque entonces sí se encuentran los tipos reales.
+[[tool.mypy.overrides]]
+module = ["polars.*", "numpy.*", "fastapi.*", "uvicorn.*", "webview.*"]
+ignore_missing_imports = true

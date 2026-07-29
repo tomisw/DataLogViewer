@@ -1,0 +1,21 @@
+[project]
+name = "dlv-app"
+version = "0.1.0"
+description = "Contenedor pywebview de DataLogViewer (ADR-002): arranca el servidor dlv-api en un hilo de fondo y abre una ventana apuntando al frontend dlv-ui. Empaquetado posterior con PyInstaller onedir (ver docs/03-arquitectura.md §3.10)."
+requires-python = ">=3.12"
+dependencies = [
+    "dlv-core",
+    "dlv-api",
+    "pywebview>=5.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dlv_app"]
+
+[tool.uv.sources]
+dlv-core = { workspace = true }
+dlv-api = { workspace = true }
