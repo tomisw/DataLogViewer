@@ -191,6 +191,12 @@ unknown`. Los canales `unknown` se muestran con su valor crudo y una marca
 visual, nunca con una unidad inventada. Esto convierte la calibración
 progresiva en una tarea de datos de bajo coste y evita mentir al usuario.
 
+> Los factores de esta tabla son la **escala de origen hacia la unidad canónica**
+> de cada dimensión, no la unidad que ve el usuario. El usuario elige después
+> entre K, °C y °F, o entre kPa, bar y psi, sin que estos factores cambien.
+> El modelo completo está en [`06-sistema-de-unidades.md`](06-sistema-de-unidades.md);
+> la columna «Unidad» de arriba indica la **canónica** de cada dimensión.
+
 ## 1.9 Presión: no hay canal barométrico
 
 No existe canal barométrico ni de presión ambiente (el único resultado de la

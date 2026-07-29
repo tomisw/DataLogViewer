@@ -1,7 +1,22 @@
 # 04 — Perfiles de análisis, detectores y alertas para ECU tuning y motorsport
 
 > Todos los canales citados existen en el AutoLog de muestra con el nombre
-> indicado. Los perfiles se resuelven por `ID`, no por nombre.
+> indicado. **Los perfiles y detectores se resuelven por rol semántico**
+> (`engine_speed`, `knock_count[n]`, `coolant_temp`…), con reserva al `ID` nativo
+> para los canales muy específicos de Haltech que no tienen equivalente
+> universal. Los nombres de este documento son la lectura humana del rol; el
+> catálogo de roles está en
+> [`07-formatos-y-csv-generico.md`](07-formatos-y-csv-generico.md) §7.7.
+>
+> Esa indirección es lo que hace que estos diez perfiles funcionen igual sobre un
+> log de Haltech, uno de MoTeC o un CSV escrito a mano. Un perfil declara sus
+> roles **requeridos** y **opcionales**, y oculta los paneles sin datos en lugar
+> de fallar.
+>
+> Las unidades de los umbrales de este documento se expresan en la unidad de
+> lectura habitual del tuner, pero **se almacenan en canónica** y se muestran en
+> la unidad que el usuario tenga activa
+> ([`06-sistema-de-unidades.md`](06-sistema-de-unidades.md) §6.3).
 
 ## 4.1 Por qué perfiles y no gráficos a mano
 
