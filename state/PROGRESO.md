@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-29 19:20:35Z
+Actualizado: 2026-07-29 19:21:19Z
 
 **0 / 669 pts cerrados (0.0 %)** · 6 pts esperando revisión humana → 0.9 % entregado
 
@@ -22,8 +22,8 @@ Actualizado: 2026-07-29 19:20:35Z
 
 | Tarea | Estado | Modelo | Puerta | Última nota |
 |---|---|---|---|---|
-| `F0-02` Andamiaje: paquetes `dlv-core`, `dlv-api`, ` | en_curso | Sonnet 5 | G3 | agente en segundo plano |
-| `F0-05` Corpus: los 3 logs reales + generador de sin | en_curso | Sonnet 5 | G3 | agente en segundo plano |
+| `F0-02` Andamiaje: paquetes `dlv-core`, `dlv-api`, ` | en_curso | Sonnet 5 | G3 | Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN C |
+| `F0-05` Corpus: los 3 logs reales + generador de sin | en_curso | Sonnet 5 | G3 | Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN C |
 | `F0-08` Catálogo `units.toml`: dimensiones, canónica | revision_humana | Opus 5 | G1 | data/units.toml: 27 dimensiones, conversiones afin/reciproca/parametri |
 
 ## F0 — 6/54 pts

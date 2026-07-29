@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 19:20:35Z"
+    "actualizado": "2026-07-29 19:21:19Z"
   },
   "tareas": [
     {
@@ -43,6 +43,10 @@
         {
           "fecha": "2026-07-29 19:14:29Z",
           "texto": "agente en segundo plano"
+        },
+        {
+          "fecha": "2026-07-29 19:21:19Z",
+          "texto": "Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN COMMITEAR al cerrar la sesion. Al reanudar: revisar `git status`, verificar contra los criterios de aceptacion del backlog y commitear, o reiniciar la tarea si el resultado es parcial (docs/08 §8.4 paso 3)."
         }
       ]
     },
@@ -104,6 +108,10 @@
         {
           "fecha": "2026-07-29 19:14:29Z",
           "texto": "agente en segundo plano"
+        },
+        {
+          "fecha": "2026-07-29 19:21:19Z",
+          "texto": "Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN COMMITEAR al cerrar la sesion. Al reanudar: revisar `git status`, verificar contra los criterios de aceptacion del backlog y commitear, o reiniciar la tarea si el resultado es parcial (docs/08 §8.4 paso 3)."
         }
       ]
     },
