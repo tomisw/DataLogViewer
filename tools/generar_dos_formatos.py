@@ -229,7 +229,9 @@ CANALES: tuple[Canal, ...] = (
 # aparecer un error de redondeo de un ULP (~1e-13 en estas magnitudes) al
 # encadenar dos redondeos independientes. Ver README.md y
 # `tests/test_dos_formatos.py`.
-ROLES_CON_CONVERSION_ENCADENADA = frozenset({"throttle_position", "coolant_temp", "intake_air_temp"})
+ROLES_CON_CONVERSION_ENCADENADA = frozenset(
+    {"throttle_position", "coolant_temp", "intake_air_temp"}
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -242,7 +244,9 @@ def cargar_catalogo_unidades() -> dict[str, Any]:
         return tomllib.load(fh)
 
 
-def afin_desde_canonica(catalogo: dict[str, Any], dimension: str, unidad: str) -> tuple[Decimal, Decimal]:
+def afin_desde_canonica(
+    catalogo: dict[str, Any], dimension: str, unidad: str
+) -> tuple[Decimal, Decimal]:
     """(a, b) de `desde_canonica` para dimension.unidad: mostrado = a * canonica + b."""
     conv = catalogo["dimensiones"][dimension]["unidades"][unidad]["desde_canonica"]
     if conv["tipo"] != "afin":
@@ -385,7 +389,7 @@ def escribir_generico(
     for c in CANALES:
         etiqueta = catalogo["dimensiones"][c.dimension]["unidades"][c.generico_unidad]["etiqueta"]
         unidades_por_canal.append(etiqueta if etiqueta else c.generico_unidad)
-    unidades = ["s"] + unidades_por_canal
+    unidades = ["s", *unidades_por_canal]
 
     lineas = [";".join(nombres), ";".join(unidades)]
 
@@ -417,9 +421,7 @@ HASH_DECIMALES = 6
 
 
 def canonicas_todas(crudos: dict[str, list[int]]) -> dict[str, list[Decimal]]:
-    return {
-        c.rol: [crudo_a_canonica(v, c.divisor_nativo) for v in crudos[c.rol]] for c in CANALES
-    }
+    return {c.rol: [crudo_a_canonica(v, c.divisor_nativo) for v in crudos[c.rol]] for c in CANALES}
 
 
 def calcular_hash(canonicas: dict[str, list[Decimal]]) -> str:
@@ -521,8 +523,12 @@ def escribir_readme(ruta: Path, hash_hex: str) -> None:
         for i, c in enumerate(CANALES)
     )
 
-    exactos = ", ".join(f"`{c.rol}`" for c in CANALES if c.rol not in ROLES_CON_CONVERSION_ENCADENADA)
-    encadenados = ", ".join(f"`{c.rol}`" for c in CANALES if c.rol in ROLES_CON_CONVERSION_ENCADENADA)
+    exactos = ", ".join(
+        f"`{c.rol}`" for c in CANALES if c.rol not in ROLES_CON_CONVERSION_ENCADENADA
+    )
+    encadenados = ", ".join(
+        f"`{c.rol}`" for c in CANALES if c.rol in ROLES_CON_CONVERSION_ENCADENADA
+    )
 
     contenido = f"""# Log equivalente en dos formatos — fixture de independencia de fabricante (F0-13)
 

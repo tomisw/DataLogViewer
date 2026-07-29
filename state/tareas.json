@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 23:04:03Z"
+    "actualizado": "2026-07-29 23:10:32Z"
   },
   "tareas": [
     {
@@ -307,10 +307,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "haiku",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "613f5f8"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 23:10:32Z",
+          "texto": "data/enums.toml: 77 canales (75 candidatos + 2 mascaras). Verificado por el orquestador reproduciendo el criterio de docs/01 §1.10 por mi cuenta: 75 candidatos, cuadra. Codigos VACIOS en los 77 a proposito (traducirlos es F3-15 y requiere documentacion del fabricante). Los 7 roles usados existen en roles.toml. Idempotente."
+        }
+      ]
     },
     {
       "id": "F0-12",
@@ -354,10 +361,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "613f5f8"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 23:10:32Z",
+          "texto": "samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv (delimitador ';', decimal coma, fila de unidades, nombres distintos, tiempo relativo), mas anotaciones.json y README. tests/test_dos_formatos.py: 9 pruebas que leen los dos ficheros del disco, aplican la escala de cada lado y comparan canonicas fila a fila. 7 de 10 canales exactos bit a bit; los otros 3 con 5,68e-14 (1 ULP) por encadenar dos operaciones frente a una, documentado. MEJORA DEL ORQUESTADOR AL INTEGRAR: el divisor del lado nativo estaba codificado a mano en la prueba; ahora se LEE de data/formats/haltech_nsp.toml, asi que una divergencia entre fixture y descriptor rompe la prueba. Verificado con prueba negativa. REVISAR: las tolerancias declaradas y que el genero use mas decimales de escritura que los 'decimales' de presentacion de units.toml (son cosas distintas: precision de fichero vs redondeo del renderizador)."
+        }
+      ]
     },
     {
       "id": "F0-14",

@@ -4,13 +4,13 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-29 23:04:03Z
+Actualizado: 2026-07-29 23:10:32Z
 
-**28 / 669 pts cerrados (4.2 %)** · 11 pts esperando revisión humana → 5.8 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 14 pts esperando revisión humana → 6.6 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
-| F0 | 28 | 11 | 5 | 4 | 6 | 54 |
+| F0 | 30 | 14 | 0 | 4 | 6 | 54 |
 | F1 | 0 | 0 | 0 | 186 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
@@ -25,10 +25,9 @@ Actualizado: 2026-07-29 23:04:03Z
 | `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | BLOQUEADA sin red: polars, numpy, pyarrow y pandas no estan instalados |
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
-| `F0-11` Esqueleto `enums.toml` con los 75 candidatos | en_curso | Haiku 4.5 | G3 | — |
-| `F0-13` Log equivalente en dos formatos (nativo + ge | en_curso | Sonnet 5 | G1 | — |
+| `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
 
-## F0 — 39/54 pts
+## F0 — 44/54 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -42,9 +41,9 @@ Actualizado: 2026-07-29 23:04:03Z
 | ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
 | ⏳ | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
 | ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `217d88b` |
-| ▶  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | — |
+| ✔  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | `613f5f8` |
 | ✔  | `F0-12` | Corpus de CSV genéricos (matriz de `02-alcance-y-plan.md` §2.9 | Haiku 4.5 | 3 | F0-05 | G4 | `2771a41` |
-| ▶  | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | — |
+| ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
 ## F1 — 0/186 pts
