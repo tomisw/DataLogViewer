@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    name: Python on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          cache: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-packages
+      - name: Lint with ruff (check)
+        run: uv run ruff check .
+      - name: Lint with ruff (format)
+        run: uv run ruff format --check .
+      - name: Type check with mypy
+        run: uv run mypy dlv-core dlv-api
+      - name: Test with pytest
+        run: uv run pytest -q
+
+      # --- Puertas de presupuesto (F0-04) --------------------------------- #
+      # ADR-009: ningún bucle por muestra en Python dentro de dlv-core.
+      # Es inspección estática, así que corre en las tres plataformas.
+      - name: ADR-009 (sin bucles por muestra)
+        run: uv run python tools/banco.py adr009
+
+      # `comprobar` solo falla con INCUMPLE: los presupuestos cuya
+      # funcionalidad aún no existe quedan NO_MEDIBLE y no rompen nada.
+      - name: Puertas de presupuesto
+        run: uv run python tools/banco.py comprobar
+
+  rendimiento:
+    name: Banco de rendimiento
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          cache: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-packages
+
+      # El log de 1 h (~70 MB) se genera, no se versiona.
+      - name: Generar corpus sintético
+        run: uv run python tools/generar_corpus.py autolog-1h
+
+      - name: Línea base sin dependencias
+        run: uv run python tools/banco.py baseline-stdlib
+
+      # F0-01: la medición que confirma o refuta el presupuesto de apertura
+      # y, con él, la viabilidad de la base Python (riesgo R9).
+      - name: Spike de Polars
+        run: uv run python tools/banco.py spike-polars
+
+      - name: Informe
+        run: uv run python tools/banco.py informe
+
+      - name: Puertas de presupuesto
+        run: uv run python tools/banco.py comprobar
+
+      - name: Publicar mediciones
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: banco-rendimiento
+          path: state/banco/
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dlv-ui/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: dlv-ui
+      - name: Build
+        run: npm run build
+        working-directory: dlv-ui
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dlv-ui-dist
+          path: dlv-ui/dist

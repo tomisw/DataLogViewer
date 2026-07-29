@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 19:37:52Z"
+    "actualizado": "2026-07-29 22:08:37Z"
   },
   "tareas": [
     {
@@ -18,10 +18,15 @@
       "deps_backlog": [],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
+      "estado": "bloqueado",
       "agente": null,
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:02:13Z",
+          "texto": "BLOQUEADA sin red: polars, numpy, pyarrow y pandas no estan instalados y pip/uv devuelven 403 host_not_allowed. El entregable de esta tarea es una MEDICION de Polars, que no se puede fabricar. Al reanudar con red: 'uv sync' y luego 'python tools/banco.py spike-polars' (el arnes lo entrega F0-04, ya preparado con el criterio de aceptacion y una linea base de stdlib para comparar)."
+        }
+      ]
     },
     {
       "id": "F0-02",
@@ -71,10 +76,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "haiku",
+      "commits": [
+        "2771a41"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:08:37Z",
+          "texto": "Verificado: matriz de 3 plataformas, comandos identicos a los del pyproject.toml, artefacto de dlv-ui. Integrado por el orquestador: le he anadido las puertas de presupuesto de F0-04 (adr009 + comprobar) y un job 'rendimiento' que genera el sintetico y corre el spike de Polars. OBSERVACION menor: lint-rapido.yml hace 'uv sync', lo que le quita parte de la rapidez; con 'uvx ruff' seria mas rapido."
+        }
+      ]
     },
     {
       "id": "F0-04",
@@ -91,10 +103,21 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "orquestador",
+      "commits": [
+        "2771a41"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:02:13Z",
+          "texto": "Opus 5 en linea; incluye el arnes del spike de F0-01 para que corra en cuanto haya red"
+        },
+        {
+          "fecha": "2026-07-29 22:08:37Z",
+          "texto": "tools/banco.py con los 14 presupuestos de docs/02 §2.6 y tres estados (CUMPLE/INCUMPLE/NO_MEDIBLE): solo INCUMPLE falla la compilacion, asi que el banco puede estar activo desde F0. Detector de ADR-009 por AST. 13 pruebas. Enganchado a CI. LINEA BASE MEDIDA: stdlib parsea el sintetico de 70 MB a 19,2 MB/s, luego Polars debe ser 5,2x mas rapido para cumplir el presupuesto de 100 MB/s. DEFECTO PROPIO CORREGIDO: el detector por regex marcaba los docstrings que citan iterrows() para prohibirlo; rehecho con AST y prueba negativa."
+        }
+      ]
     },
     {
       "id": "F0-05",
@@ -142,8 +165,8 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "haiku",
       "commits": [],
       "notas": []
     },
@@ -180,7 +203,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "orquestador",
       "commits": [
         "b8f1005"
@@ -193,6 +216,10 @@
         {
           "fecha": "2026-07-29 19:20:35Z",
           "texto": "data/units.toml: 27 dimensiones, conversiones afin/reciproca/parametrizada, presets, centinelas y clases de magnitud. 31 pruebas de validacion en verde. REVISAR: los factores numericos y los decimales por unidad."
+        },
+        {
+          "fecha": "2026-07-29 22:01:47Z",
+          "texto": "Propietario: tabla de 14 filas verificada y OK (hoja state/REVISION-F0-08.md)"
         }
       ]
     },
@@ -271,10 +298,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "haiku",
+      "commits": [
+        "2771a41"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:08:37Z",
+          "texto": "Verificado por el orquestador: 14 ficheros, el 02 sin un solo punto decimal, el 01 sin un solo punto-y-coma, el 10 falla UTF-8 como debe, determinismo byte a byte confirmado, ruff limpio. README con la especificacion de comportamiento del importador por fichero."
+        }
+      ]
     },
     {
       "id": "F0-13",

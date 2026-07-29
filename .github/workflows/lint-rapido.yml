@@ -1,0 +1,26 @@
+name: Lint Rápido
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    name: Ruff Lint and Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          cache: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: Sync workspace
+        run: uv sync --all-packages
+      - name: Lint with ruff (check)
+        run: uv run ruff check .
+      - name: Lint with ruff (format)
+        run: uv run ruff format --check .

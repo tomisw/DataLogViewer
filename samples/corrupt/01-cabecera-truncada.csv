@@ -1,0 +1,55 @@
+%DataLog%
+DataLogVersion : 1.1
+Software : Haltech NSP
+SoftwareVersion : 999.999.999.999
+DownloadDateTime : 20260729 06:59:01
+Channel : Target Lambda
+ID : 132
+Type : AFR
+DisplayMaxMin : 1361,476
+Channel : Vehicle Speed Drive Train Sensor
+ID : 463
+Type : Speed
+DisplayMaxMin : 4000,0
+Channel : Oil Pressure
+ID : 236
+Type : Pressure
+DisplayMaxMin : 31013,1013
+Channel : O2 Control Bank 1 Short Term Fuel Trim
+ID : 1400
+Type : Percentage
+DisplayMaxMin : 500,-500
+Channel : Wideband O2 1
+ID : 230
+Type : AFR
+DisplayMaxMin : 1361,-110
+Channel : RPM
+ID : 384
+Type : EngineSpeed
+DisplayMaxMin : 20000,0
+Channel : Throttle Position
+ID : 225
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Manifold Pressure
+ID : 224
+Type : Pressure
+DisplayMaxMin : 6013,13
+Channel : Injection Stage 1 Average Duty Cycle
+ID : 5666
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Ignition Angle
+ID : 518
+Type : Angle
+DisplayMaxMin : 600,-600
+Channel : Knock Sensor 1 Knock Count
+ID : 696
+Type : Raw
+DisplayMaxMin : 50000,0
+Channel : Trigger System Errors
+ID : 1353
+Type : Raw
+DisplayMaxMin : 31,0
+Channel : Knock Sensor 2 Knock Count
+ID : 697

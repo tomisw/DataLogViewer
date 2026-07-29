@@ -1,0 +1,103 @@
+[
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-29 22:06:14Z",
+    "commit": "2771a41",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.11.15",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 11
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 2.0,
+    "unidad": "ocurrencias",
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-29 22:06:14Z",
+    "commit": "2771a41",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.11.15",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [
+        "dlv-core/src/dlv_core/_viol_tmp.py:3: iterrows() recorre fila a fila en Python",
+        "dlv-core/src/dlv_core/_viol_tmp.py:5: apply(lambda) aplica una función Python por elemento"
+      ],
+      "ficheros_inspeccionados": 12
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-29 22:06:14Z",
+    "commit": "2771a41",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.11.15",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 11
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-29 22:07:01Z",
+    "commit": "2771a41",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.11.15",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 11
+    }
+  },
+  {
+    "presupuesto": "parseo_nativo",
+    "valor": 44.87008036882392,
+    "unidad": "MB/s",
+    "estado": "NO_MEDIBLE",
+    "fecha": "2026-07-29 22:07:03Z",
+    "commit": "2771a41",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.11.15",
+      "nucleos": 4
+    },
+    "detalle": {
+      "motor": "stdlib.csv",
+      "es_linea_base": true,
+      "fichero": "samples/synth/autolog-1h.csv",
+      "tamano_mb": 70.13,
+      "segundos": 1.563,
+      "filas": 38698,
+      "celdas": 18381550,
+      "canales": 475,
+      "pico_memoria_mb": 15.3,
+      "factor_necesario_vs_stdlib": 2.23
+    }
+  }
+]
