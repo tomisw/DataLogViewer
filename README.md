@@ -45,6 +45,7 @@ contrapartidas de elegir Python están detallados sin adornos en
 | [`docs/05-backlog-y-asignacion-modelos.md`](docs/05-backlog-y-asignacion-modelos.md) | Backlog completo tarea a tarea con **asignación de modelo de IA**, esfuerzo, dependencias y puertas de revisión. |
 | [`docs/06-sistema-de-unidades.md`](docs/06-sistema-de-unidades.md) | **Unidades intercambiables**: dimensiones canónicas, conversiones afines / recíprocas / parametrizadas, semántica de punto e intervalo, presión absoluta o relativa, presets. |
 | [`docs/07-formatos-y-csv-generico.md`](docs/07-formatos-y-csv-generico.md) | **Escalabilidad a cualquier CSV**: capa de formatos de dos niveles, autodetección, roles semánticos, asistente y perfiles de importación. |
+| [`docs/08-ejecucion-y-reanudacion.md`](docs/08-ejecucion-y-reanudacion.md) | **Protocolo de ejecución**: bucle de orquestación, asignación de agentes, puertas de revisión y cómo reanudar en una sesión nueva cuando se agota el límite. |
 
 ## Plan en una tabla
 
@@ -64,10 +65,26 @@ humana obligatoria.
 
 ## Estado
 
+Progreso vivo en **[`state/PROGRESO.md`](state/PROGRESO.md)** (generado; la fuente
+es `state/tareas.json`).
+
 - [x] Análisis de logs de muestra
 - [x] Alcance y plan de proyecto (rev. 2: base Python, unidades intercambiables,
       CSV genérico)
-- [ ] Fase F0 — Cimientos (pendiente de aprobación del plan)
+- [ ] **Fase F0 — Cimientos** (en ejecución)
+
+### Reanudar el trabajo
+
+El estado vive en el repositorio, así que cualquier sesión nueva puede continuar.
+Pegar esto:
+
+```
+Retoma la ejecución del plan de DataLogViewer en la rama
+claude/log-visualization-app-plan-5lhr8x.
+
+Lee docs/08-ejecucion-y-reanudacion.md y sigue el bucle de la sección 8.4.
+Empieza ejecutando `python tools/estado.py next`.
+```
 
 ## Datos de muestra analizados
 
@@ -77,5 +94,5 @@ humana obligatoria.
 | `20260729_1859_Log2768.csv` | 25 | 449 | 14,11 s | 32,6 kB | Log interno de ECU (disperso, 3 tasas) |
 | `20260729_1859_Log2769.csv` | 25 | 213 | 6,75 s | 16,7 kB | Log interno de ECU (disperso, 3 tasas) |
 
-Ver [`samples/README.md`](samples/README.md) para el corpus de pruebas completo
-que hay que construir en la fase F0.
+Los tres están en [`samples/real/`](samples/real/); el corpus sintético y el de
+casos corruptos se genera en la fase F0 (ver [`samples/README.md`](samples/README.md)).

@@ -1,0 +1,2767 @@
+{
+  "meta": {
+    "version": 1,
+    "plan_rev": 2,
+    "actualizado": "2026-07-29 19:12:55Z"
+  },
+  "tareas": [
+    {
+      "id": "F0-01",
+      "fase": "F0",
+      "titulo": "Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el AutoLog sintético de 1 h: confirma o refuta el presupuesto de apertura antes de comprometer el resto",
+      "entregable": "ADRs firmados + informe del spike",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F0-05"
+      ],
+      "deps_backlog": [],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-02",
+      "fase": "F0",
+      "titulo": "Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app`; `pyproject.toml`, tipado estricto",
+      "entregable": "repo ejecutando en 3 plataformas",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [],
+      "deps_backlog": [
+        "F0-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-03",
+      "fase": "F0",
+      "titulo": "CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint`, artefactos",
+      "entregable": "workflows",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F0-02"
+      ],
+      "deps_backlog": [
+        "F0-02"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-04",
+      "fase": "F0",
+      "titulo": "Banco de rendimiento con publicación de métricas y puertas de presupuesto",
+      "entregable": "banco + informe en CI",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F0-02"
+      ],
+      "deps_backlog": [
+        "F0-02"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-05",
+      "fase": "F0",
+      "titulo": "Corpus: los 3 logs reales + generador de sintéticos (1 h/475 canales, 20 logs internos)",
+      "entregable": "generador + ficheros",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [],
+      "deps_backlog": [],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-06",
+      "fase": "F0",
+      "titulo": "Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.13)",
+      "entregable": "fixtures",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F0-05"
+      ],
+      "deps_backlog": [
+        "F0-05"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-07",
+      "fase": "F0",
+      "titulo": "Log de verdad de referencia con knock y λ pobre anotados",
+      "entregable": "fixture + anotaciones",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F0-05"
+      ],
+      "deps_backlog": [
+        "F0-05"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-08",
+      "fase": "F0",
+      "titulo": "Catálogo `units.toml`: dimensiones, canónicas, unidades alternativas, conversiones afines/recíprocas, presets, decimales, centinelas",
+      "entregable": "fichero de datos",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F0-01"
+      ],
+      "deps_backlog": [
+        "F0-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-09",
+      "fase": "F0",
+      "titulo": "`formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala a canónica, con `confidence` y evidencia",
+      "entregable": "fichero de datos",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F0-08"
+      ],
+      "deps_backlog": [
+        "F0-08"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-10",
+      "fase": "F0",
+      "titulo": "Catálogo `roles.toml`: roles semánticos, dimensión esperada, rango plausible, sinónimos ES/EN",
+      "entregable": "fichero de datos",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F0-08"
+      ],
+      "deps_backlog": [
+        "F0-08"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-11",
+      "fase": "F0",
+      "titulo": "Esqueleto `enums.toml` con los 75 candidatos, sin traducir",
+      "entregable": "fichero de datos",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F0-10"
+      ],
+      "deps_backlog": [
+        "F0-10"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-12",
+      "fase": "F0",
+      "titulo": "Corpus de CSV genéricos (matriz de `02-alcance-y-plan.md` §2.9 punto 6)",
+      "entregable": "fixtures",
+      "modelo": "Haiku 4.5",
+      "pts": 3,
+      "deps": [
+        "F0-05"
+      ],
+      "deps_backlog": [
+        "F0-05"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-13",
+      "fase": "F0",
+      "titulo": "Log equivalente en dos formatos (nativo + genérico) para la prueba de independencia de fabricante",
+      "entregable": "fixture + anotaciones",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F0-12"
+      ],
+      "deps_backlog": [
+        "F0-12"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F0-14",
+      "fase": "F0",
+      "titulo": "Guía de contribución, convenciones y ADR-009 documentado como regla de revisión",
+      "entregable": "`CONTRIBUTING.md`",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F0-02"
+      ],
+      "deps_backlog": [
+        "F0-02"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-01",
+      "fase": "F1",
+      "titulo": "Parser de cabecera Haltech dirigido por descriptor, tolerante a `DisplayMaxMin` ausente y erratas de nombre",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F0-09"
+      ],
+      "deps_backlog": [
+        "F0-09"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-02",
+      "fase": "F1",
+      "titulo": "Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles de Python",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-01"
+      ],
+      "deps_backlog": [
+        "F1-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-03",
+      "fase": "F1",
+      "titulo": "Celda vacía ≠ 0, centinelas de desbordamiento, filas malformadas",
+      "entregable": "reglas + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-02"
+      ],
+      "deps_backlog": [
+        "F1-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-04",
+      "fase": "F1",
+      "titulo": "Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cruce de medianoche",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-01"
+      ],
+      "deps_backlog": [
+        "F1-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-05",
+      "fase": "F1",
+      "titulo": "Almacén columnar con `Storage` por canal y `t` compartido por grupo de muestreo",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-03"
+      ],
+      "deps_backlog": [
+        "F1-03"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-06",
+      "fase": "F1",
+      "titulo": "Detección de grupos de muestreo por patrón de nulos, vectorizada",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-07",
+      "fase": "F1",
+      "titulo": "Indexado: mín/máx/percentiles, clasificación `activo/constante/vacío/fuera de rango`",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-08",
+      "fase": "F1",
+      "titulo": "Detección de huecos de muestreo y marcas de discontinuidad",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-09",
+      "fase": "F1",
+      "titulo": "Pirámide de decimación NumPy vectorizada (`min/max/first/last`, factor 4)",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-10",
+      "fase": "F1",
+      "titulo": "Variantes de agregación: suma de delta, moda de enum, OR de bits — con Numba solo si el banco lo exige",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F1-09"
+      ],
+      "deps_backlog": [
+        "F1-09"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-11",
+      "fase": "F1",
+      "titulo": "Caché Parquet con pirámide persistida e invalidación por versión",
+      "entregable": "módulo + banco",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-09"
+      ],
+      "deps_backlog": [
+        "F1-09"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-12",
+      "fase": "F1",
+      "titulo": "Informe de importación acumulativo, no bloqueante",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-03"
+      ],
+      "deps_backlog": [
+        "F1-03"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-13",
+      "fase": "F1",
+      "titulo": "Motor de conversión: afín y recíproca, con clases punto / intervalo / tasa / varianza obligatorias",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F0-08"
+      ],
+      "deps_backlog": [
+        "F0-08"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-14",
+      "fase": "F1",
+      "titulo": "Conversiones parametrizadas por canal (λ→AFR con la estequiometría del propio log)",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-15",
+      "fase": "F1",
+      "titulo": "Presión absoluta/relativa como cambio de origen combinable con cualquier unidad",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-16",
+      "fase": "F1",
+      "titulo": "Dimensiones compuestas derivadas (`%/kPa` → `%/psi`)",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-17",
+      "fase": "F1",
+      "titulo": "Precedencia canal > dimensión del perfil > preset global > canónica",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-18",
+      "fase": "F1",
+      "titulo": "Presets SI / Métrico / Imperial / Motorsport EU / Motorsport US + presets de usuario",
+      "entregable": "datos + módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-17"
+      ],
+      "deps_backlog": [
+        "F1-17"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-19",
+      "fase": "F1",
+      "titulo": "Umbrales y perfiles en canónica, editados en la unidad activa",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-20",
+      "fase": "F1",
+      "titulo": "Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla de casos conocidos",
+      "entregable": "suite de pruebas",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-21",
+      "fase": "F1",
+      "titulo": "`dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesión, comandos tipados",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-22",
+      "fase": "F1",
+      "titulo": "Transporte binario Arrow IPC / `TypedArray` para series; JSON solo para metadatos",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-21"
+      ],
+      "deps_backlog": [
+        "F1-21"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-23",
+      "fase": "F1",
+      "titulo": "Renderizador WebGL2 de series desde la pirámide",
+      "entregable": "módulo + banco de fps",
+      "modelo": "Opus 5",
+      "pts": 13,
+      "deps": [
+        "F1-09",
+        "F1-22"
+      ],
+      "deps_backlog": [
+        "F1-09",
+        "F1-22"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-24",
+      "fase": "F1",
+      "titulo": "Caché de cubos en el frontend — es lo que hace alcanzable el cursor < 16 ms con Python detrás",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-25",
+      "fase": "F1",
+      "titulo": "Ejes, rejilla y leyenda SVG con ticks calculados en la unidad mostrada",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-23",
+        "F1-17"
+      ],
+      "deps_backlog": [
+        "F1-23",
+        "F1-17"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-26",
+      "fase": "F1",
+      "titulo": "Paneles apilados con eje X compartido y arrastrar canales entre paneles",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-25"
+      ],
+      "deps_backlog": [
+        "F1-25"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-27",
+      "fase": "F1",
+      "titulo": "Múltiples ejes Y, autoescala y bloqueo de escala",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-25"
+      ],
+      "deps_backlog": [
+        "F1-25"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-28",
+      "fase": "F1",
+      "titulo": "Zoom/pan por rueda, teclado y pointer events; historial de zoom",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-29",
+      "fase": "F1",
+      "titulo": "Cursor con tabla de valores, presupuesto < 16 ms",
+      "entregable": "componente + banco",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-24"
+      ],
+      "deps_backlog": [
+        "F1-24"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-30",
+      "fase": "F1",
+      "titulo": "Doble cursor con delta usando la clase intervalo",
+      "entregable": "componente",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-29",
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-29",
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-31",
+      "fase": "F1",
+      "titulo": "Selector de unidad a tres niveles (global, dimensión, canal) con decimales por unidad",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-17"
+      ],
+      "deps_backlog": [
+        "F1-17"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-32",
+      "fase": "F1",
+      "titulo": "Locale numérico ES/EN (separador decimal, agrupación)",
+      "entregable": "módulo",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F1-31"
+      ],
+      "deps_backlog": [
+        "F1-31"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-33",
+      "fase": "F1",
+      "titulo": "Selector de canales con búsqueda difusa y ocultación de inactivos",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-07"
+      ],
+      "deps_backlog": [
+        "F1-07"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-34",
+      "fase": "F1",
+      "titulo": "Arrastrar y soltar ficheros y carpetas; apertura múltiple",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-12"
+      ],
+      "deps_backlog": [
+        "F1-12"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-35",
+      "fase": "F1",
+      "titulo": "Contenedor `pywebview` + PyInstaller `onedir` para desarrollo",
+      "entregable": "módulo + CI",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F0-03",
+        "F1-21"
+      ],
+      "deps_backlog": [
+        "F0-03",
+        "F1-21"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-36",
+      "fase": "F1",
+      "titulo": "Fuzzing de propiedad sobre cabecera y filas (Hypothesis)",
+      "entregable": "suite de pruebas",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-03",
+        "F0-06"
+      ],
+      "deps_backlog": [
+        "F1-03",
+        "F0-06"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-37",
+      "fase": "F1",
+      "titulo": "Presupuestos de F1 como puertas de CI, incluido el de cambio de unidad",
+      "entregable": "configuración del banco",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F0-04",
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F0-04",
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-38",
+      "fase": "F1",
+      "titulo": "Confirmar los 21 tipos `unknown` con análisis de datos y evidencia documentada",
+      "entregable": "datos + informe",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F0-09"
+      ],
+      "deps_backlog": [
+        "F0-09"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-01",
+      "fase": "FG",
+      "titulo": "Sondeo: codificación, fin de línea, delimitador por consistencia de número de campos, comillas",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-02"
+      ],
+      "deps_backlog": [
+        "F1-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-02",
+      "fase": "FG",
+      "titulo": "Separador decimal con verificación cruzada de interpretaciones",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "FG-01"
+      ],
+      "deps_backlog": [
+        "FG-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-03",
+      "fase": "FG",
+      "titulo": "Estructura: preámbulo de metadatos, fila de nombres, fila de unidades, inicio de datos",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "FG-01"
+      ],
+      "deps_backlog": [
+        "FG-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-04",
+      "fase": "FG",
+      "titulo": "Columna de tiempo en las 8 variantes de §7.5, incluida la ausente con frecuencia declarada",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "FG-03"
+      ],
+      "deps_backlog": [
+        "FG-03"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-05",
+      "fase": "FG",
+      "titulo": "Inferencia de tipo por columna: entero, decimal, enum de texto, booleano, constante, vacía",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "FG-03"
+      ],
+      "deps_backlog": [
+        "FG-03"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-06",
+      "fase": "FG",
+      "titulo": "Unidad declarada en el nombre o en la fila de unidades + diccionario de alias",
+      "entregable": "módulo + datos",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "FG-03",
+        "F0-08"
+      ],
+      "deps_backlog": [
+        "FG-03",
+        "F0-08"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-07",
+      "fase": "FG",
+      "titulo": "Valores no numéricos, unidad embebida en la celda, separador de miles",
+      "entregable": "módulo + pruebas",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "FG-05"
+      ],
+      "deps_backlog": [
+        "FG-05"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-08",
+      "fase": "FG",
+      "titulo": "Columnas de texto y booleanas → enum con diccionario autogenerado",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "FG-05"
+      ],
+      "deps_backlog": [
+        "FG-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-09",
+      "fase": "FG",
+      "titulo": "Asignación automática de roles por sinónimos, normalización y difuso como último recurso",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F0-10"
+      ],
+      "deps_backlog": [
+        "F0-10"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-10",
+      "fase": "FG",
+      "titulo": "Informe de plausibilidad por rango declarado de cada rol",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "FG-09"
+      ],
+      "deps_backlog": [
+        "FG-09"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-11",
+      "fase": "FG",
+      "titulo": "Asistente de importación de 3 pasos con previsualización viva",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 8,
+      "deps": [
+        "FG-04",
+        "FG-09"
+      ],
+      "deps_backlog": [
+        "FG-04",
+        "FG-09"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-12",
+      "fase": "FG",
+      "titulo": "Perfil `.dlvimport` con huella de cabecera y reaplicación parcial",
+      "entregable": "módulo + componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "FG-11"
+      ],
+      "deps_backlog": [
+        "FG-11"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-13",
+      "fase": "FG",
+      "titulo": "Descriptores de formato nativo declarativos; migrar Haltech a descriptor puro",
+      "entregable": "refactor + datos",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-01"
+      ],
+      "deps_backlog": [
+        "F1-01"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-14",
+      "fase": "FG",
+      "titulo": "Robustez: filas de longitud variable, columnas duplicadas, cabecera sin nombres",
+      "entregable": "módulo + pruebas",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "FG-05"
+      ],
+      "deps_backlog": [
+        "FG-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-15",
+      "fase": "FG",
+      "titulo": "Fuzzing del importador genérico sobre el corpus de CSV",
+      "entregable": "suite de pruebas",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "FG-14",
+        "F0-12"
+      ],
+      "deps_backlog": [
+        "FG-14",
+        "F0-12"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-16",
+      "fase": "FG",
+      "titulo": "Prueba de independencia de fabricante: el log de F0-13 da resultados idénticos en los dos formatos",
+      "entregable": "suite + informe",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "FG-09",
+        "F0-13"
+      ],
+      "deps_backlog": [
+        "FG-09",
+        "F0-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FG-17",
+      "fase": "FG",
+      "titulo": "Documentación: importar un CSV cualquiera y añadir un formato nativo",
+      "entregable": "guía",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "FG-13"
+      ],
+      "deps_backlog": [
+        "FG-13"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-01",
+      "fase": "F2",
+      "titulo": "Modelo de segmento y eje X virtual",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-02",
+      "fase": "F2",
+      "titulo": "Identidad de canal en capas (rol → `(formato, ID)` → nombre normalizado) y emparejamiento entre logs",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "FG-09"
+      ],
+      "deps_backlog": [
+        "FG-09"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-03",
+      "fase": "F2",
+      "titulo": "Emparejamiento manual con prioridad máxima, persistido en el proyecto",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F2-02"
+      ],
+      "deps_backlog": [
+        "F2-02"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-04",
+      "fase": "F2",
+      "titulo": "Vista paralela: N segmentos superpuestos, color por log",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F2-01",
+        "F1-26"
+      ],
+      "deps_backlog": [
+        "F2-01",
+        "F1-26"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-05",
+      "fase": "F2",
+      "titulo": "Alineación por reloj absoluto y por relativo",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F2-01",
+        "F1-04"
+      ],
+      "deps_backlog": [
+        "F2-01",
+        "F1-04"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-06",
+      "fase": "F2",
+      "titulo": "Desfase manual arrastrando el segmento",
+      "entregable": "interacción",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F2-04"
+      ],
+      "deps_backlog": [
+        "F2-04"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-07",
+      "fase": "F2",
+      "titulo": "Anclaje por evento (primer WOT, primer corte, launch)",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F2-01"
+      ],
+      "deps_backlog": [
+        "F2-01"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-08",
+      "fase": "F2",
+      "titulo": "Autoalineación por correlación cruzada en L4–L6 con refinamiento en L0",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F2-01",
+        "F1-09"
+      ],
+      "deps_backlog": [
+        "F2-01",
+        "F1-09"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-09",
+      "fase": "F2",
+      "titulo": "Vista concatenada: unión por identidad, fronteras visibles, sin interpolar",
+      "entregable": "módulo + componente",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F2-02"
+      ],
+      "deps_backlog": [
+        "F2-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-10",
+      "fase": "F2",
+      "titulo": "Orden por `Log Number` con desfase editable y auditable",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F2-09"
+      ],
+      "deps_backlog": [
+        "F2-09"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-11",
+      "fase": "F2",
+      "titulo": "Estadísticas y detectores que respetan las fronteras de segmento",
+      "entregable": "refactor",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F2-09"
+      ],
+      "deps_backlog": [
+        "F2-09"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-12",
+      "fase": "F2",
+      "titulo": "Eje X alternativo (RPM, velocidad, distancia) con monotonía por tramos",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F2-01"
+      ],
+      "deps_backlog": [
+        "F2-01"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-13",
+      "fase": "F2",
+      "titulo": "Conflictos: mismo rol con unidades de origen distintas → canónica común; escala incoherente → aviso",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F2-02",
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F2-02",
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-14",
+      "fase": "F2",
+      "titulo": "Renderizado progresivo: silueta inmediata, refinamiento de fondo",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-15",
+      "fase": "F2",
+      "titulo": "Banco del caso peor: 8 logs × 30 min, incluido cambio de unidad",
+      "entregable": "banco + informe",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F2-04"
+      ],
+      "deps_backlog": [
+        "F2-04"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F2-16",
+      "fase": "F2",
+      "titulo": "Documentación de usuario de multi-log",
+      "entregable": "guía",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "F2-09"
+      ],
+      "deps_backlog": [
+        "F2-09"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-01",
+      "fase": "F3",
+      "titulo": "Modelo de perfil `.dlvprofile` por rol, con unidades por dimensión y roles requeridos/opcionales",
+      "entregable": "esquema + módulo",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F1-21",
+        "F0-10"
+      ],
+      "deps_backlog": [
+        "F1-21",
+        "F0-10"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-02",
+      "fase": "F3",
+      "titulo": "Aplicación de perfil por rol con degradación elegante y reserva a `ID` nativo",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-01"
+      ],
+      "deps_backlog": [
+        "F3-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-03",
+      "fase": "F3",
+      "titulo": "Los 10 perfiles de fábrica de `04-perfiles-motorsport.md` §4.2, definidos por rol",
+      "entregable": "10 ficheros de datos",
+      "modelo": "Sonnet 5",
+      "pts": 8,
+      "deps": [
+        "F3-02"
+      ],
+      "deps_backlog": [
+        "F3-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-04",
+      "fase": "F3",
+      "titulo": "Autosugerencia por cobertura de roles («7 de 9 disponibles»)",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F3-02",
+        "F1-07"
+      ],
+      "deps_backlog": [
+        "F3-02",
+        "F1-07"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-05",
+      "fase": "F3",
+      "titulo": "Editor de perfiles, duplicado, importación y exportación",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-01"
+      ],
+      "deps_backlog": [
+        "F3-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-06",
+      "fase": "F3",
+      "titulo": "Motor de detectores: las 9 primitivas de §4.3 con histéresis y permanencia mínima (Numba donde el banco lo exija)",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 10,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-07",
+      "fase": "F3",
+      "titulo": "Detectores D1–D18 por rol, como configuración",
+      "entregable": "ficheros de datos",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F3-06",
+        "F0-07"
+      ],
+      "deps_backlog": [
+        "F3-06",
+        "F0-07"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-08",
+      "fase": "F3",
+      "titulo": "Desactivación de detectores críticos cuando su rol proviene de asignación difusa no confirmada (mitigación de R10)",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F3-07",
+        "FG-09"
+      ],
+      "deps_backlog": [
+        "F3-07",
+        "FG-09"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-09",
+      "fase": "F3",
+      "titulo": "Validación contra la verdad de referencia, en formato nativo y en CSV genérico",
+      "entregable": "informe de validación",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F3-07",
+        "F0-13"
+      ],
+      "deps_backlog": [
+        "F3-07",
+        "F0-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-10",
+      "fase": "F3",
+      "titulo": "Topes de alerta: aviso, crítico, banda y curva en función de otro canal",
+      "entregable": "módulo + componente",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F3-06",
+        "F1-19"
+      ],
+      "deps_backlog": [
+        "F3-06",
+        "F1-19"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-11",
+      "fase": "F3",
+      "titulo": "Dibujo de límites y bandas sobre los paneles, en la unidad activa",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F3-10",
+        "F1-25"
+      ],
+      "deps_backlog": [
+        "F3-10",
+        "F1-25"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-12",
+      "fase": "F3",
+      "titulo": "Panel de incidencias por severidad con salto al instante",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-07"
+      ],
+      "deps_backlog": [
+        "F3-07"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-13",
+      "fase": "F3",
+      "titulo": "Carriles de estado para canales enumerados",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-10",
+        "F0-11"
+      ],
+      "deps_backlog": [
+        "F1-10",
+        "F0-11"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-14",
+      "fase": "F3",
+      "titulo": "Decodificación de máscaras de bits en carriles apilados",
+      "entregable": "módulo + componente",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F3-13"
+      ],
+      "deps_backlog": [
+        "F3-13"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-15",
+      "fase": "F3",
+      "titulo": "Ampliar `enums.toml` con los códigos deducidos de las muestras",
+      "entregable": "datos",
+      "modelo": "Haiku 4.5",
+      "pts": 3,
+      "deps": [
+        "F0-11"
+      ],
+      "deps_backlog": [
+        "F0-11"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-16",
+      "fase": "F3",
+      "titulo": "Segmentación automática: WOT, ralentí, arranque, deceleración, calentamiento",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F3-06"
+      ],
+      "deps_backlog": [
+        "F3-06"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-17",
+      "fase": "F3",
+      "titulo": "Panel de tiradas con resumen y superposición entre tiradas",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-16",
+        "F2-12"
+      ],
+      "deps_backlog": [
+        "F3-16",
+        "F2-12"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-18",
+      "fase": "F3",
+      "titulo": "Evaluador de expresiones en canónica, multi-tasa por retención con límite de validez",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-13"
+      ],
+      "deps_backlog": [
+        "F1-13"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-19",
+      "fase": "F3",
+      "titulo": "Biblioteca de fórmulas de §4.5, cada una con su clase de magnitud declarada",
+      "entregable": "datos",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F3-18"
+      ],
+      "deps_backlog": [
+        "F3-18"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-20",
+      "fase": "F3",
+      "titulo": "Detección de marcha por agrupación de velocidad/rpm",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F3-18"
+      ],
+      "deps_backlog": [
+        "F3-18"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F3-21",
+      "fase": "F3",
+      "titulo": "Modo oscuro y modo alto contraste",
+      "entregable": "estilos",
+      "modelo": "Haiku 4.5",
+      "pts": 3,
+      "deps": [
+        "F1-25"
+      ],
+      "deps_backlog": [
+        "F1-25"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-01",
+      "fase": "F4",
+      "titulo": "Malla RPM×MAP configurable, con los ejes mostrados en la unidad activa",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-05"
+      ],
+      "deps_backlog": [
+        "F1-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-02",
+      "fase": "F4",
+      "titulo": "Agregación por celda: media, desviación, mín, máx, número de muestras",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F4-01"
+      ],
+      "deps_backlog": [
+        "F4-01"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-03",
+      "fase": "F4",
+      "titulo": "Filtros de exclusión: transitorio, corte, protección de motor, retardo de transporte del sensor λ",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F4-02",
+        "F3-16"
+      ],
+      "deps_backlog": [
+        "F4-02",
+        "F3-16"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-04",
+      "fase": "F4",
+      "titulo": "Mapa de calor de λ error con detalle por celda",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F4-02"
+      ],
+      "deps_backlog": [
+        "F4-02"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-05",
+      "fase": "F4",
+      "titulo": "Tabla de corrección de combustible, con celdas de confianza insuficiente sin rellenar",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F4-03"
+      ],
+      "deps_backlog": [
+        "F4-03"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-06",
+      "fase": "F4",
+      "titulo": "Exportación de tabla a CSV y portapapeles como malla pegable",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F4-05"
+      ],
+      "deps_backlog": [
+        "F4-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-07",
+      "fase": "F4",
+      "titulo": "Mapas de calor de avance de encendido y de densidad de knock",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F4-02"
+      ],
+      "deps_backlog": [
+        "F4-02"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-08",
+      "fase": "F4",
+      "titulo": "Comparación de dos logs celda a celda",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F4-02",
+        "F2-02"
+      ],
+      "deps_backlog": [
+        "F4-02",
+        "F2-02"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-09",
+      "fase": "F4",
+      "titulo": "Métricas de PID de boost: sobreoscilación, establecimiento, error, saturación",
+      "entregable": "módulo",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F3-16"
+      ],
+      "deps_backlog": [
+        "F3-16"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-10",
+      "fase": "F4",
+      "titulo": "Estadísticas con la clase de magnitud correcta (varianza con `a²`, RMS lineal)",
+      "entregable": "refactor + pruebas",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "F1-13",
+        "F4-02"
+      ],
+      "deps_backlog": [
+        "F1-13",
+        "F4-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-11",
+      "fase": "F4",
+      "titulo": "Informe de sesión HTML autocontenido, con las unidades usadas declaradas",
+      "entregable": "módulo + plantilla",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-12",
+        "F4-04"
+      ],
+      "deps_backlog": [
+        "F3-12",
+        "F4-04"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-12",
+      "fase": "F4",
+      "titulo": "Exportación de vista a PNG/SVG y de datos a CSV/Parquet con unidad declarada por columna",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F4-13",
+      "fase": "F4",
+      "titulo": "Documentación de análisis tabular con las advertencias de fiabilidad",
+      "entregable": "guía",
+      "modelo": "Opus 5",
+      "pts": 3,
+      "deps": [
+        "F4-05"
+      ],
+      "deps_backlog": [
+        "F4-05"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-01",
+      "fase": "F5",
+      "titulo": "Empaquetado `onedir` en ZIP para las 3 plataformas, con exclusión agresiva de módulos para el presupuesto de tamaño",
+      "entregable": "artefactos + CI",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F1-35"
+      ],
+      "deps_backlog": [
+        "F1-35"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-02",
+      "fase": "F5",
+      "titulo": "Modo portable con `portable.txt`: cero escritura fuera de la carpeta",
+      "entregable": "módulo + prueba",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F5-01"
+      ],
+      "deps_backlog": [
+        "F5-01"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-03",
+      "fase": "F5",
+      "titulo": "Detección de WebView2 ausente con descarga guiada",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F5-01"
+      ],
+      "deps_backlog": [
+        "F5-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-04",
+      "fase": "F5",
+      "titulo": "Firma y notarización",
+      "entregable": "CI",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F5-01"
+      ],
+      "deps_backlog": [
+        "F5-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-05",
+      "fase": "F5",
+      "titulo": "Actualizador opcional y desactivable",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F5-01"
+      ],
+      "deps_backlog": [
+        "F5-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-06",
+      "fase": "F5",
+      "titulo": "Despliegue de la versión navegador contra un backend Python (local o de la red del equipo)",
+      "entregable": "artefacto + CI + guía",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F1-21"
+      ],
+      "deps_backlog": [
+        "F1-21"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-07",
+      "fase": "F5",
+      "titulo": "Espacio de trabajo `.dlvproj` persistente, con emparejamientos y unidades",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "F3-01",
+        "F2-03"
+      ],
+      "deps_backlog": [
+        "F3-01",
+        "F2-03"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-08",
+      "fase": "F5",
+      "titulo": "Anotaciones y marcadores exportables",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F5-07"
+      ],
+      "deps_backlog": [
+        "F5-07"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-09",
+      "fase": "F5",
+      "titulo": "Paleta de comandos",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-33"
+      ],
+      "deps_backlog": [
+        "F1-33"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-10",
+      "fase": "F5",
+      "titulo": "i18n ES/EN: extracción de cadenas y catálogos",
+      "entregable": "cadenas + catálogos",
+      "modelo": "Haiku 4.5",
+      "pts": 4,
+      "deps": [
+        "F1-32"
+      ],
+      "deps_backlog": [
+        "F1-32"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-11",
+      "fase": "F5",
+      "titulo": "Onboarding: propuesta de perfil en lugar de lienzo vacío",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F3-04"
+      ],
+      "deps_backlog": [
+        "F3-04"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-12",
+      "fase": "F5",
+      "titulo": "Pruebas de regresión visual del renderizador (obligatorias por ADR-006)",
+      "entregable": "suite",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "F1-23"
+      ],
+      "deps_backlog": [
+        "F1-23"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-13",
+      "fase": "F5",
+      "titulo": "Revisión de seguridad: rutas, deserialización, evaluador de expresiones, token y enlace del servidor local",
+      "entregable": "informe + correcciones",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "F3-18",
+        "F5-07"
+      ],
+      "deps_backlog": [
+        "F3-18",
+        "F5-07"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-14",
+      "fase": "F5",
+      "titulo": "Auditoría final contra los presupuestos de §2.6, incluidos tamaño y arranque en frío",
+      "entregable": "informe",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [],
+      "deps_backlog": [],
+      "dep_todo": true,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-15",
+      "fase": "F5",
+      "titulo": "Corrección de defectos y pulido",
+      "entregable": "varios",
+      "modelo": "Sonnet 5",
+      "pts": 8,
+      "deps": [],
+      "deps_backlog": [],
+      "dep_todo": true,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-16",
+      "fase": "F5",
+      "titulo": "Manual de usuario y notas de la versión",
+      "entregable": "documentación",
+      "modelo": "Haiku 4.5",
+      "pts": 4,
+      "deps": [],
+      "deps_backlog": [],
+      "dep_todo": true,
+      "gate": "G4",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F5-17",
+      "fase": "F5",
+      "titulo": "Asociación de extensiones opcional y reversible",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F5-01"
+      ],
+      "deps_backlog": [
+        "F5-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    }
+  ]
+}
