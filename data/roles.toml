@@ -1,0 +1,474 @@
+#  DataLogViewer — catálogo de roles semánticos
+#
+#  Tarea F0-10.  Especificación: docs/07-formatos-y-csv-generico.md §7.7
+#  PUERTA G1: una asignación de rol equivocada hace que un detector mire el
+#  canal erróneo. No se cambia una entrada sin que una persona lea el diff.
+#
+#  POR QUÉ EXISTE ESTE FICHERO
+#
+#  Los perfiles y detectores NO piden «el canal con ID 696 de Haltech». Piden
+#  «el rol knock_count[1]». El importador decide qué columna cumple cada rol, y
+#  gracias a esa indirección los mismos diez perfiles y dieciocho detectores
+#  funcionan sobre un log de Haltech, uno de MoTeC o un CSV escrito a mano.
+#
+#  Es el cambio que convierte la escalabilidad del proyecto en algo real y no
+#  nominal (docs/07 §7.2 y §7.12).
+#
+#  CAMPOS
+#      dimension   debe existir en data/units.toml
+#      plausible   rango en UNIDAD CANÓNICA de esa dimensión, no en la mostrada.
+#                  Es lo que alimenta el informe de plausibilidad (docs/07 §7.5),
+#                  que atrapa el fallo típico del importador genérico: nombre
+#                  bien mapeado y escala equivocada.
+#      sinonimos   para la asignación automática. Se comparan normalizados:
+#                  minúsculas, sin acentos, sin separadores.
+#      indexado    el rol admite índice (banco, cilindro, sensor, rueda)
+#      monotono    "no_decreciente" en contadores acumulados: habilita el canal
+#                  delta automático (el de knock lo necesita, docs/04 §4.2 P2)
+#      critico     true si algún detector de severidad crítica depende de él.
+#                  Esos detectores se DESACTIVAN si el rol viene de asignación
+#                  difusa no confirmada (docs/07 §7.15, mitigación de R10).
+
+[meta]
+version = 1
+tarea = "F0-10"
+especificacion = "docs/07-formatos-y-csv-generico.md §7.7"
+# Los rangos plausibles son deliberadamente ANCHOS: su función es detectar un
+# error de escala de uno o más órdenes de magnitud, no juzgar si un motor está
+# bien afinado. Un rango estrecho generaría avisos falsos y el usuario los
+# ignoraría, que es peor que no avisar.
+criterio_de_rango = "ancho: detecta errores de escala, no de puesta a punto"
+
+# =========================================================================== #
+#  MOTOR
+# =========================================================================== #
+[roles.engine_speed]
+dimension = "angular_speed"
+plausible = { min = 0.0, max = 20000.0 }          # rpm
+sinonimos = ["RPM", "Engine Speed", "EngineRPM", "Engine RPM", "Filtered RPM",
+             "Régimen", "Regimen", "Revoluciones", "N", "Speed_Engine", "rpm"]
+critico = true   # casi todos los detectores lo usan como contexto
+
+[roles.engine_load]
+dimension = "ratio"
+plausible = { min = 0.0, max = 2.0 }              # fracción; >1 en sobrealimentados
+sinonimos = ["Engine Load", "Load", "Fuel - Load", "Ignition - Load", "Carga"]
+
+[roles.throttle_position]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.0 }              # fracción
+sinonimos = ["Throttle Position", "TPS", "Throttle", "TP", "Mariposa",
+             "Posición mariposa", "Posicion mariposa", "Throttle Position - Cable"]
+critico = true   # D4 (mezcla pobre en carga) condiciona por TPS
+
+[roles.throttle_pedal]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.0 }
+sinonimos = ["Pedal Position", "Accelerator Pedal", "APP", "Pedal Position Source",
+             "Pedal", "Acelerador"]
+
+[roles.manifold_pressure]
+dimension = "pressure"
+# kPa ABSOLUTOS. 0 no es físico pero se admite para no marcar un sensor sin
+# conectar como fuera de rango: eso lo detecta el clasificador de canal muerto.
+plausible = { min = 0.0, max = 600.0 }
+sinonimos = ["Manifold Pressure", "MAP", "Manifold Absolute Pressure", "MAP kPa",
+             "Presión colector", "Presion colector", "Boost", "Manifold Pres"]
+critico = true   # D4, D6, D7 y la malla RPM×MAP dependen de él
+
+[roles.manifold_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 423.15 }        # K  (−40 a 150 °C)
+sinonimos = ["Manifold Temperature", "MAT", "Charge Temp", "Temp. colector"]
+
+[roles.baro_pressure]
+dimension = "pressure"
+plausible = { min = 50.0, max = 110.0 }           # kPa; 50 kPa ≈ 5 500 m
+sinonimos = ["Barometric Pressure", "Baro", "BARO", "Ambient Pressure",
+             "Presión barométrica", "Presion barometrica", "Atmospheric Pressure"]
+# No existe en los logs de muestra (docs/01 §1.9). Si aparece, es la referencia
+# preferida para la presión relativa.
+
+[roles.air_mass_flow]
+dimension = "mass_flow"
+plausible = { min = 0.0, max = 5000.0 }           # kg/h
+sinonimos = ["Mass Air Flow", "MAF", "Air Mass Flow", "Caudal aire",
+             "Mass Air Flow {n}", "Air Flow"]
+indexado = true
+
+# =========================================================================== #
+#  MEZCLA
+# =========================================================================== #
+[roles.lambda_measured]
+dimension = "mixture_ratio"
+# λ. El rango es el del sensor de banda ancha; fuera de él suele significar
+# sonda fría, desconectada, o que la columna trae AFR en lugar de lambda —
+# justo el error que el informe de plausibilidad tiene que cazar.
+plausible = { min = 0.4, max = 1.6 }
+sinonimos = ["Wideband O2", "Wideband O2 {n}", "Lambda", "Lambda 1", "AFR",
+             "Air Fuel Ratio", "O2", "Wideband O2 Overall", "Sonda", "λ"]
+indexado = true
+critico = true   # D4 y D5
+
+[roles.lambda_target]
+dimension = "mixture_ratio"
+plausible = { min = 0.4, max = 1.6 }
+sinonimos = ["Target Lambda", "Lambda Target", "Target AFR", "AFR Target",
+             "Lambda objetivo", "Target Lambda Table Output", "Objetivo lambda"]
+critico = true   # D4 compara contra él
+
+[roles.stoichiometry]
+dimension = "ratio"
+plausible = { min = 5.0, max = 25.0 }             # 14,7 gasolina · 9,77 E85 · 6,4 metanol
+sinonimos = ["Stoichiometry", "Stoich", "Fuel Tuning Current Stoichiometry",
+             "Estequiometría", "Estequiometria", "AFR Stoich"]
+# Es el parámetro de la conversión λ → AFR de units.toml. Sin él se usa el valor
+# del perfil del vehículo y se marca como asumido.
+
+[roles.fuel_trim_short]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }             # fracción, ±100 %
+sinonimos = ["Short Term Fuel Trim", "STFT", "O2 Control Bank {n} Short Term Fuel Trim",
+             "Trim corto", "Short Trim"]
+indexado = true
+
+[roles.fuel_trim_long]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }
+sinonimos = ["Long Term Fuel Trim", "LTFT", "O2 Control Bank {n} Long Term Fuel Trim",
+             "Trim largo", "Long Trim"]
+indexado = true
+
+# =========================================================================== #
+#  COMBUSTIBLE
+# =========================================================================== #
+[roles.injector_duty]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.2 }              # >1 solo por error de escala
+sinonimos = ["Injector Duty Cycle", "Injection Stage {n} Average Duty Cycle",
+             "Inj Duty", "IDC", "Duty inyección", "Duty inyeccion", "Injector {n} Duty Cycle"]
+indexado = true
+critico = true   # D8: saturación de inyectores
+
+[roles.injector_pulsewidth]
+dimension = "time"
+plausible = { min = 0.0, max = 0.1 }              # s (100 ms)
+sinonimos = ["Injector On Time", "Injector {n} On Time", "Pulse Width", "PW",
+             "Tiempo inyección", "Tiempo inyeccion", "Injector Pulse Width"]
+indexado = true
+
+[roles.fuel_pressure]
+dimension = "pressure"
+plausible = { min = 0.0, max = 1500.0 }           # kPa absolutos
+sinonimos = ["Fuel Pressure", "Fuel Pressure Expected", "FP", "Presión combustible",
+             "Presion combustible", "Fuel Rail Pressure"]
+
+[roles.fuel_pressure_differential]
+dimension = "pressure"
+plausible = { min = -200.0, max = 1500.0 }        # kPa; es una DIFERENCIA
+sinonimos = ["Injector Pressure Differential", "Fuel Pressure Differential",
+             "Diferencial combustible"]
+# Ojo: es una diferencia. En el formato Haltech corresponde al tipo AbsPressure,
+# que no lleva referencia de origen (data/formats/haltech_nsp.toml).
+
+[roles.fuel_flow]
+dimension = "mass_flow"
+plausible = { min = 0.0, max = 500.0 }            # kg/h
+sinonimos = ["Fuel Mass Flow", "Fuel Flow", "Fuel Flow Estimated", "Caudal combustible"]
+
+# =========================================================================== #
+#  ENCENDIDO
+# =========================================================================== #
+[roles.ignition_advance]
+dimension = "angle"
+plausible = { min = -30.0, max = 60.0 }           # grados de cigüeñal
+sinonimos = ["Ignition Angle", "Ignition Timing", "Spark Advance", "Timing",
+             "Avance", "Avance encendido", "Ign Angle", "Total Timing"]
+critico = false
+
+[roles.ignition_advance_base]
+dimension = "angle"
+plausible = { min = -30.0, max = 60.0 }
+sinonimos = ["Base Ignition Angle", "Base Timing", "Avance base"]
+
+[roles.ignition_correction_total]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }
+sinonimos = ["Ignition Correction Total", "Timing Correction", "Corrección avance",
+             "Correccion avance"]
+
+[roles.dwell_time]
+dimension = "time"
+plausible = { min = 0.0, max = 0.02 }             # s (20 ms)
+sinonimos = ["Dwell", "Dwell Time", "Ignition {n} On Time", "Coil Charge Time",
+             "Tiempo de carga bobina"]
+indexado = true
+
+# =========================================================================== #
+#  KNOCK
+# =========================================================================== #
+[roles.knock_level]
+dimension = "sound_level"
+plausible = { min = 0.0, max = 60.0 }             # dB
+sinonimos = ["Knock Level", "Knock Sensor {n} Knock Level", "Knock Signal",
+             "Knock Sensor {n} Knock Signal", "Nivel de knock", "Detonación",
+             "Detonacion"]
+indexado = true
+
+[roles.knock_count]
+dimension = "count"
+plausible = { min = 0.0, max = 50000.0 }
+sinonimos = ["Knock Count", "Knock Sensor {n} Knock Count", "KnockCount{n}",
+             "Contador knock", "Knock Events"]
+indexado = true
+# ACUMULADO: es lo que hace que el perfil P2 cree solo el canal delta, y que la
+# decimación use suma del delta en vez de min/max (docs/03 §3.5). Sin esta marca,
+# un evento aislado de knock se pierde al alejar el zoom.
+monotono = "no_decreciente"
+critico = true   # D1: evento de knock
+
+[roles.knock_threshold]
+dimension = "sound_level"
+plausible = { min = 0.0, max = 60.0 }
+sinonimos = ["Knock Threshold", "Umbral knock", "Knock Limit"]
+
+[roles.knock_retard]
+dimension = "angle"
+plausible = { min = -30.0, max = 5.0 }            # negativo: retrasa el avance
+sinonimos = ["Knock Retard", "Knock Control Bank {n} Ignition Correction",
+             "Retardo por knock", "Knock Correction"]
+indexado = true
+
+# =========================================================================== #
+#  SOBREALIMENTACIÓN
+# =========================================================================== #
+[roles.boost_pressure_actual]
+dimension = "pressure"
+plausible = { min = 0.0, max = 600.0 }            # kPa absolutos
+sinonimos = ["Boost Control Actual Pressure", "Boost Pressure", "Boost Actual",
+             "Presión boost", "Presion boost"]
+critico = true   # D6: sobrepresión
+
+[roles.boost_pressure_target]
+dimension = "pressure"
+plausible = { min = 0.0, max = 600.0 }
+sinonimos = ["Boost Control Target Pressure", "Boost Target",
+             "Boost Control Target Pressure (Corrected)", "Boost objetivo"]
+
+[roles.boost_output]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.0 }
+sinonimos = ["Boost Control Output", "Boost Duty", "Boost Control Solenoid Duty Cycle",
+             "Salida boost"]
+
+[roles.wastegate_duty]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.0 }
+sinonimos = ["Wastegate Duty", "WG Duty", "Wastegate", "Duty wastegate"]
+
+# =========================================================================== #
+#  TÉRMICO
+# =========================================================================== #
+[roles.coolant_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 423.15 }        # K  (−40 a 150 °C)
+sinonimos = ["Coolant Temperature", "CLT", "ECT", "Water Temp", "Coolant Temp",
+             "Temp. Refrigerante", "Temperatura refrigerante", "TCoolant", "EngineTemp"]
+critico = true   # D9: sobretemperatura
+
+[roles.oil_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 448.15 }        # K  (−40 a 175 °C)
+sinonimos = ["Oil Temperature", "Oil Temp", "Temp. aceite", "Temperatura aceite", "OilT"]
+# En el AutoLog de muestra está pegada en 253,1 K con el motor a 366 K: sensor
+# no instalado (docs/01 §1.11). El clasificador de canal muerto debe cazarlo.
+
+[roles.intake_air_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 423.15 }
+sinonimos = ["Intake Air Temperature", "IAT", "Air Temp", "Inlet Air Temp",
+             "Temp. aire", "Temperatura aire admisión", "AirT"]
+
+[roles.exhaust_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 1473.15 }       # K  (hasta 1200 °C)
+sinonimos = ["Exhaust Gas Temperature", "EGT", "EGT {n}", "Exhaust Temp",
+             "Temp. escape", "Temperatura escape"]
+indexado = true
+
+[roles.ecu_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 398.15 }        # K  (−40 a 125 °C)
+sinonimos = ["ECU Temperature", "ECU Temp", "Temp. ECU", "Internal Temp"]
+
+[roles.gearbox_temp]
+dimension = "temperature"
+plausible = { min = 233.15, max = 448.15 }
+sinonimos = ["Gearbox Temperature", "Transmission Temp", "Trans Temp",
+             "Temp. caja", "Temperatura transmisión"]
+
+# =========================================================================== #
+#  PRESIONES
+# =========================================================================== #
+[roles.oil_pressure]
+dimension = "pressure"
+plausible = { min = 0.0, max = 1200.0 }           # kPa absolutos
+sinonimos = ["Oil Pressure", "Oil Press", "Presión aceite", "Presion aceite", "OilP"]
+critico = true   # D10: presión de aceite baja, con curva en función del régimen
+
+[roles.brake_pressure]
+dimension = "pressure"
+plausible = { min = 0.0, max = 20000.0 }          # kPa
+sinonimos = ["Brake Pressure", "Presión freno", "Presion freno", "Brake Press"]
+
+[roles.clutch_pressure]
+dimension = "pressure"
+plausible = { min = 0.0, max = 20000.0 }
+sinonimos = ["Clutch Pressure", "Presión embrague", "Presion embrague"]
+
+# =========================================================================== #
+#  VEHÍCULO
+# =========================================================================== #
+[roles.vehicle_speed]
+dimension = "speed"
+plausible = { min = 0.0, max = 500.0 }            # km/h
+sinonimos = ["Vehicle Speed", "Vehicle Speed Drive Train Sensor", "VSS", "Speed",
+             "Velocidad", "Ground Speed", "kph", "km/h"]
+
+[roles.wheel_speed]
+dimension = "speed"
+plausible = { min = 0.0, max = 500.0 }
+sinonimos = ["Wheel Speed", "Wheel Speed {n}", "Velocidad rueda", "WS{n}"]
+indexado = true
+
+[roles.driven_wheel_speed]
+dimension = "speed"
+plausible = { min = 0.0, max = 500.0 }
+sinonimos = ["Driven Wheel Speed", "Velocidad rueda motriz"]
+
+[roles.gear]
+dimension = "enum"
+plausible = { min = -1.0, max = 10.0 }            # −1 marcha atrás, 0 punto muerto
+sinonimos = ["Gear", "Gear Position", "Marcha", "Selected Gear", "Current Gear"]
+# No existe en los logs de muestra: se estima por agrupación de velocidad/rpm
+# (docs/04 §4.5, tarea F3-20).
+
+[roles.distance]
+dimension = "distance"
+plausible = { min = 0.0, max = 1000000.0 }        # m
+sinonimos = ["Distance", "Distance Traveled", "Odometer", "Distancia",
+             "Distance Traveled - Current Run Cycle"]
+# «Lap Distance» NO va aquí: es sinónimo de `lap_distance` y tenerlo en los dos
+# hacía ambigua la asignación automática. Lo cazó la prueba de colisiones.
+monotono = "no_decreciente"
+
+# =========================================================================== #
+#  ELÉCTRICO
+# =========================================================================== #
+[roles.battery_voltage]
+dimension = "voltage"
+plausible = { min = 0.0, max = 32.0 }             # V; 32 cubre sistemas de 24 V
+sinonimos = ["Battery Voltage", "Batt Volt", "VBatt", "Tensión batería",
+             "Tension bateria", "System Voltage", "Voltage"]
+critico = true   # D11: baja tensión con el motor en marcha
+
+[roles.sensor_voltage]
+dimension = "voltage"
+plausible = { min = -10.0, max = 10.0 }           # V; entradas analógicas
+sinonimos = ["AVI{n} Voltage", "Analog Input {n}", "Sensor Voltage", "AN{n}",
+             "Tensión sensor"]
+indexado = true
+
+# =========================================================================== #
+#  ESTADOS  — enumerados y máscaras de bits (data/enums.toml, tarea F0-11)
+# =========================================================================== #
+[roles.limiter_active]
+dimension = "enum"
+plausible = { min = 0.0, max = 1.0 }
+sinonimos = ["RPM Limiter Active", "Engine Limiter Active", "Rev Limiter",
+             "Limitador activo"]
+
+[roles.cut_percentage]
+dimension = "ratio"
+plausible = { min = 0.0, max = 1.0 }
+sinonimos = ["Cut Percentage", "Cut %", "Ignition Cut", "Porcentaje de corte"]
+
+[roles.protection_level]
+dimension = "enum"
+plausible = { min = 0.0, max = 5.0 }
+sinonimos = ["Engine Protection Severity Level", "Protection Level",
+             "Nivel de protección", "Nivel de proteccion"]
+critico = true   # D13: protección de motor activa
+
+[roles.protection_cause]
+dimension = "bitmask"
+plausible = { min = 0.0, max = 65535.0 }
+sinonimos = ["Engine Protection Cause", "Protection Cause", "Causa de protección"]
+# MÁSCARA DE BITS: se decodifica bit a bit y se dibuja como carriles apilados
+# (docs/01 §1.10, tarea F3-14). Dibujarla como línea es inútil.
+
+[roles.trigger_errors]
+dimension = "bitmask"
+plausible = { min = 0.0, max = 31.0 }
+sinonimos = ["Trigger System Errors", "Trigger Errors", "Sync Errors",
+             "Errores de trigger"]
+critico = true   # D12: error de trigger
+
+[roles.launch_state]
+dimension = "enum"
+plausible = { min = -101.0, max = 1.0 }           # códigos negativos (docs/01 §1.10)
+sinonimos = ["Launch Control State", "Launch State", "Estado launch"]
+
+[roles.idle_state]
+dimension = "enum"
+plausible = { min = -8.0, max = 3.0 }
+sinonimos = ["Idle Control State", "Idle State", "Estado ralentí", "Estado ralenti"]
+
+[roles.boost_state]
+dimension = "enum"
+plausible = { min = 0.0, max = 10.0 }
+sinonimos = ["Boost Control State", "Boost State", "Estado boost"]
+
+# =========================================================================== #
+#  DINÁMICA  — sin canales en las muestras; previsto para post-v1 (docs/04 §4.8)
+# =========================================================================== #
+[roles.accel_lateral]
+dimension = "acceleration"
+plausible = { min = -50.0, max = 50.0 }           # m/s² (±5 g)
+sinonimos = ["Lateral G", "Lateral Acceleration", "GLat", "Aceleración lateral"]
+
+[roles.accel_longitudinal]
+dimension = "acceleration"
+plausible = { min = -50.0, max = 50.0 }
+sinonimos = ["Longitudinal G", "Longitudinal Acceleration", "GLong",
+             "Aceleración longitudinal"]
+
+[roles.lap_number]
+dimension = "count"
+plausible = { min = 0.0, max = 1000.0 }
+sinonimos = ["Lap", "Lap Number", "Vuelta", "Lap Count"]
+monotono = "no_decreciente"
+
+[roles.lap_distance]
+dimension = "distance"
+plausible = { min = 0.0, max = 30000.0 }          # m
+sinonimos = ["Lap Distance", "Distance in Lap", "Distancia en vuelta"]
+
+# =========================================================================== #
+#  RESUMEN
+# =========================================================================== #
+[resumen]
+roles_totales = 58
+indexados = 13
+criticos = 13
+con_contador_acumulado = 3
+nota = """
+Los 13 roles marcados `critico` son los que alimentan detectores de severidad
+crítica (D1, D4, D6, D8, D9, D10, D11, D12, D13 de docs/04 §4.3). Si alguno de
+ellos proviene de asignación difusa no confirmada por el usuario, su detector se
+desactiva: preferimos no avisar a avisar en falso, porque una alerta falsa
+repetida enseña al usuario a ignorar las alertas (docs/07 §7.15).
+
+Los rangos plausibles están en unidad CANÓNICA y son anchos a propósito. Su
+trabajo es cazar un error de escala de un orden de magnitud, no opinar sobre la
+puesta a punto del motor."""

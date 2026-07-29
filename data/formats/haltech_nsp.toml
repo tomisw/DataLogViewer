@@ -1,0 +1,470 @@
+#  Descriptor del formato Haltech NSP  ·  %DataLog% 1.1
+#
+#  Tarea F0-09.  Especificación: docs/01-formato-log.md
+#  PUERTA G1: estos factores llegan a decisiones de tuning. No se cambia una
+#  entrada sin que una persona lea el diff.
+#
+#  Este fichero mapea los 34 valores de `Type` del formato a la DIMENSIÓN y la
+#  ESCALA DE ORIGEN hacia la unidad canónica de esa dimensión.  Las dimensiones
+#  y sus unidades canónicas están en data/units.toml (F0-08, aprobado).
+#
+#      entero crudo --a_canonica--> VALOR CANÓNICO --units.toml--> mostrado
+#
+#  `a_canonica` es un factor multiplicativo: canonica = crudo * a.
+#  Ningún tipo de este formato necesita desplazamiento en el origen: la
+#  temperatura viene en deciKelvin y la canónica es el kelvin, así que el
+#  −273,15 vive en units.toml (conversión de presentación), no aquí.
+#  Es la razón de que el modelo tenga tres capas y no dos.
+#
+#  `confianza`:
+#      confirmed  identidad aritmética o rango inequívoco. Se puede mostrar.
+#      inferred   físicamente plausible pero sin prueba. Se muestra con marca.
+#      unknown    no deducible con las muestras disponibles. Se muestra EN CRUDO,
+#                 sin unidad y con el selector desactivado (mitigación de R1).
+#
+#  Los `unknown` son el trabajo de la tarea F1-38.  No se rellenan a ojo.
+
+[meta]
+formato = "haltech_nsp"
+version_datalog = "1.1"
+firma = "%DataLog%"
+software = "Haltech NSP"
+tarea = "F0-09"
+especificacion = "docs/01-formato-log.md"
+# Evidencia: los tres logs de samples/real/. La fila de referencia usada para
+# las identidades es la de MAP máximo del AutoLog: 6715 rpm, MAP 2272 (227,2 kPa
+# absolutos), TPS 563 (56,3 %).
+fila_de_referencia = "AutoLog_20260729_1830.csv, MAP máximo"
+
+[deteccion]
+# La primera línea es la firma; DataLogVersion gobierna la compatibilidad.
+# Una versión mayor desconocida se RECHAZA con error claro (docs/01 §1.1).
+primera_linea = "%DataLog%"
+version_soportada = ["1.1"]
+finales_de_linea = "CRLF nativo; también se acepta LF (docs/01 §1.13)"
+
+[cabecera]
+# Bloques Channel/ID/Type/DisplayMaxMin; DisplayMaxMin es OPCIONAL (13 de los
+# 475 canales del AutoLog no la tienen) y su ausencia no debe desalinear.
+clave_canal = "Channel"
+claves_bloque = ["ID", "Type", "DisplayMaxMin"]
+claves_opcionales = ["DisplayMaxMin"]
+metadatos_cierre = ["Log Source", "Log Number", "Log"]
+# La identidad del canal es el ID, nunca el nombre (docs/01 §1.3).
+identidad = "ID"
+
+# =========================================================================== #
+#  CONFIRMADOS — identidad aritmética o rango inequívoco
+# =========================================================================== #
+
+[tipos.EngineSpeed]
+dimension = "angular_speed"
+a_canonica = 1.0
+confianza = "confirmed"
+evidencia = "DisplayMaxMin 20000,0 = 20 000 rpm; crudo 6715 en tirada"
+canales = 19
+
+[tipos.Percentage]
+dimension = "ratio"
+# Canónica de `ratio` es la FRACCIÓN, no el porcentaje: 1000 crudo = 100 % = 1,0.
+a_canonica = 0.001
+confianza = "confirmed"
+evidencia = "DisplayMaxMin 1000,0 = 100 %; Throttle Position 563 -> 56,3 %"
+canales = 99
+
+[tipos.Angle]
+dimension = "angle"
+a_canonica = 0.1
+confianza = "confirmed"
+evidencia = "DisplayMaxMin 600,-600 = ±60°; Ignition Angle 194 -> 19,4° de avance"
+canales = 34
+
+[tipos.Speed]
+dimension = "speed"
+a_canonica = 0.1
+confianza = "confirmed"
+evidencia = "DisplayMaxMin 4000,0 = 400 km/h; crudo 527 -> 52,7 km/h"
+canales = 6
+
+[tipos.Pressure]
+dimension = "pressure"
+a_canonica = 0.1
+# ABSOLUTA. Pasar a relativa es cosa del modo de referencia de units.toml.
+referencia = "absoluta"
+confianza = "confirmed"
+evidencia = """
+DisplayMaxMin 6013,13 del colector = 601,3 / 1,3 kPa.
+Manifold Pressure 326 -> 32,6 kPa (vacío de ralentí) y 2272 -> 227,2 kPa (boost).
+Oil Pressure 2463 -> 246,3 kPa absolutos en ralentí."""
+canales = 8
+
+[tipos.AbsPressure]
+dimension = "pressure"
+a_canonica = 0.1
+# TRAMPA DEL FORMATO: pese al nombre, este tipo NO es la presión absoluta.
+# Contiene DIFERENCIAS de presión (diferenciales, errores, derivadas), que no
+# tienen origen y por tanto NUNCA se les resta la presión de referencia.
+# `Pressure` es la absoluta; `AbsPressure` es la relativa. Están invertidos
+# respecto a lo que sugieren los nombres.
+referencia = "ninguna"
+clase = "intervalo"
+confianza = "confirmed"
+evidencia = """
+Identidad exacta sobre la fila de referencia:
+  Fuel Pressure Expected (5271, tipo Pressure)
+  - Manifold Pressure    (2272, tipo Pressure)
+  = 2999
+  Injector Pressure Differential = 3000  (tipo AbsPressure)
+Los otros tres canales del tipo son también diferencias:
+Manifold Pressure Derivative, Boost Pressure Error, Boost Control Target Offset."""
+canales = 4
+
+[tipos.Temperature]
+dimension = "temperature"
+# deciKelvin -> kelvin. El −273,15 hacia °C está en units.toml, no aquí.
+a_canonica = 0.1
+confianza = "confirmed"
+evidencia = """
+DisplayMaxMin 4731,2331 = 473,1 K (200 °C) / 233,1 K (−40 °C).
+Coolant Temperature 3663 -> 366,3 K = 93,15 °C con motor caliente.
+Ver docs/01 §1.11: Oil Temperature está pegada en 2531 (−20 °C) en todo el
+AutoLog con el motor a 93 °C -> sensor no instalado, no un fallo de escala."""
+canales = 6
+
+[tipos.BatteryVoltage]
+dimension = "voltage"
+a_canonica = 0.001
+confianza = "confirmed"
+evidencia = "DisplayMaxMin 18000,6500 = 18 / 6,5 V; crudo 12531 -> 12,531 V"
+canales = 25
+
+[tipos.AFR]
+dimension = "mixture_ratio"
+a_canonica = 0.001
+# El tipo se llama AFR pero contiene LAMBDA. Pasar a AFR de verdad es una
+# conversión parametrizada por el canal Stoichiometry (units.toml).
+confianza = "confirmed"
+evidencia = """
+DisplayMaxMin 1361,476 = λ 1,361 / 0,476, rango imposible para un AFR.
+Wideband O2 1 995 -> λ 0,995 en ralentí; 648 -> λ 0,648 a plena carga."""
+canales = 12
+
+[tipos.Stoichiometry]
+dimension = "ratio"
+# Adimensional: es la relación estequiométrica del combustible en uso.
+a_canonica = 0.001
+confianza = "confirmed"
+evidencia = "Fuel Tuning Current Stoichiometry 14700 -> 14,7 (gasolina)"
+canales = 1
+# Este canal es el parámetro de la conversión λ -> AFR de units.toml.
+rol_sugerido = "stoichiometry"
+
+[tipos.Density]
+dimension = "density"
+a_canonica = 0.1
+confianza = "confirmed"
+evidencia = "Fuel - Primary Fuel Density 7372 -> 737,2 kg/m³ (gasolina). Max 10000,100 = 1000 / 10 kg/m³"
+canales = 2
+
+[tipos.Decibel]
+dimension = "sound_level"
+a_canonica = 0.01
+confianza = "confirmed"
+evidencia = """
+DisplayMaxMin 6000,0 = 60 dB.
+Knock Threshold 3400 -> 34 dB en ralentí y 5000 -> 50 dB a plena carga: el
+umbral sube con la carga, que es el comportamiento correcto.
+Knock Sensor 1 Knock Signal 903 -> 9,03 dB."""
+canales = 7
+# Escala logarítmica: units.toml la marca `convertible = false`.
+
+[tipos.Time_us]
+dimension = "time"
+# microsegundos -> segundos
+a_canonica = 0.000001
+confianza = "confirmed"
+evidencia = """
+Identidad exacta sobre la fila de referencia (6715 rpm):
+  Engine Cycle Period crudo = 17868
+  teórico 2 vueltas = 2*60/6715 s = 17 870 µs   -> error 0,01 %
+  Cylinder Period 2978; 17868/2978 = 6,0 -> confirma además 6 cilindros.
+Injector 1 On Time 1748 -> 1,748 ms en ralentí."""
+canales = 65
+
+[tipos.Frequency]
+dimension = "frequency"
+a_canonica = 1.0
+confianza = "confirmed"
+evidencia = """
+Injector 1 Frequency crudo = 55 a 6715 rpm.
+Un inyector de 4 tiempos dispara una vez cada 2 vueltas: 6715/2/60 = 55,96 Hz.
+DisplayMaxMin 20000,0 = 20 kHz."""
+canales = 30
+
+[tipos.ByteCount]
+dimension = "count"
+a_canonica = 1.0
+confianza = "confirmed"
+evidencia = """
+Data Log Total Memory crudo = 8388608 = 2^23 exactamente = 8 MiB.
+Es la memoria de log de la ECU, en bytes."""
+canales = 2
+
+[tipos.Raw]
+dimension = "unknown"
+a_canonica = 1.0
+confianza = "confirmed"
+# `Raw` no es una magnitud: son contadores, enumerados y máscaras de bits.
+# La clasificación fina (enum vs máscara vs contador) es la tarea F0-11
+# (data/enums.toml). Hasta entonces se muestran en crudo, que es lo correcto.
+evidencia = """
+102 canales. 75 de ellos tienen DisplayMaxMin con rango <= 20: son enumerados
+o máscaras, no magnitudes continuas (docs/01 §1.10). Engine Protection Cause
+llega a 65535 y es una MÁSCARA DE BITS: hay que decodificar bits, no valores."""
+canales = 102
+subtipos = "ver data/enums.toml (F0-11)"
+
+# =========================================================================== #
+#  INFERIDOS — plausibles pero sin identidad que los pruebe.
+#  Se muestran con marca visual. Confirmarlos es tarea F1-38.
+# =========================================================================== #
+
+[tipos.Time_ms_as_s]
+dimension = "time"
+a_canonica = 0.001
+confianza = "inferred"
+evidencia = """
+El propio nombre del tipo lo dice: valor en ms, magnitud en s.
+Engine Running Time 283376 -> 283,4 s. El log dura 245,1 s, así que el motor
+llevaba en marcha ~38 s antes de empezar a registrar: coherente.
+Boost Control Delay 737 -> 0,737 s, plausible para un retardo de control."""
+canales = 5
+
+[tipos.Time_s]
+dimension = "time"
+a_canonica = 1.0
+confianza = "inferred"
+evidencia = """
+Accumulated Engine Running Time 967099 -> 268,6 h de motor acumuladas.
+Plausible para un vehículo en uso; no hay identidad que lo pruebe."""
+canales = 1
+
+[tipos.Time_ms]
+dimension = "time"
+a_canonica = 0.001
+confianza = "inferred"
+evidencia = """
+Decel Cut Delay Time 2196, DisplayMaxMin 5000,0.
+Con x1 ms: retardo de 2,2 s y máximo de 5 s, plausible para un corte en
+deceleración. Con /10 saldrían 220 ms y 500 ms, también plausible.
+AMBIGUO: solo hay un canal de este tipo y ninguna identidad que lo fije."""
+canales = 1
+
+[tipos.Resistance]
+dimension = "resistance"
+a_canonica = 1.0
+confianza = "inferred"
+evidencia = """
+Synced Pulse Input 1 Resistance 7257 -> 7,26 kΩ, coherente con un divisor con
+resistencia de polarización. DisplayMaxMin 2000000,0 = 2 MΩ.
+Ojo: el canal 3 vale −2147483639, que es un CENTINELA de sin dato, no una
+medida (docs/01 §1.13)."""
+canales = 7
+
+[tipos.Flow]
+dimension = "volume_flow"
+# cc/min /10 -> L/h  ==  0,1 cc/min * 60/1000
+a_canonica = 0.006
+confianza = "inferred"
+evidencia = """
+Injection Stage 1 Flow Rate 620 -> 62 cc/min por inyector, valor típico.
+DisplayMaxMin 16000,1 -> hasta 1600 cc/min.
+Comprobación cruzada con InjFuelVolume: 62 cc/min durante los 12 326 µs de
+Injector 1 On Time dan 12 737 nL, frente a los 11 794 de Injector 1 Volume.
+Un 7,4 % de diferencia, compatible con el tiempo muerto del inyector, pero
+NO es una identidad: por eso queda inferido y no confirmado."""
+canales = 2
+
+[tipos.InjFuelVolume]
+dimension = "volume"
+# nanolitros -> litros
+a_canonica = 0.000000001
+confianza = "inferred"
+evidencia = """
+Injector 1 Volume 11794 con Injector 1 On Time 12 326 µs y un inyector de
+62 cc/min: el volumen teórico inyectado son 12 737 nL. Coincide dentro del
+7,4 %, atribuible al tiempo muerto. DisplayMaxMin 100000,0 -> 100 µL.
+Misma reserva que Flow: los dos se apoyan mutuamente, ninguno se prueba solo."""
+canales = 13
+
+[tipos.EngineVolume]
+dimension = "volume"
+a_canonica = 0.001
+confianza = "inferred"
+# El nombre del tipo engaña: su único canal es volumen de COMBUSTIBLE, no
+# cilindrada.
+evidencia = """
+Total Fuel Used Since Engine Startup 754 -> 0,754 L consumidos.
+En 283 s de motor con varias tiradas a plena carga es plausible.
+DisplayMaxMin 4000,0 -> 4 L."""
+canales = 1
+
+[tipos.MassPerCyl]
+dimension = "mass_per_cyl"
+a_canonica = 1.0
+confianza = "inferred"
+evidencia = """
+La RELACIÓN entre los dos canales sí es informativa y sale bien:
+  Calculated Air Mass Per Cylinder 924 / Fuel Mass Per Cylinder 88 = 10,5
+  AFR esperado de λ 0,648 x 14,7 = 9,53  -> dentro del 10 %.
+Eso confirma que ambos canales COMPARTEN escala, pero no fija el factor
+absoluto: para eso hace falta la cilindrada, que no está en el log.
+Con x1 mg: 924 mg de aire por cilindro, coherente con ~0,5 L/cil a 227 kPa
+y 332 K con un llenado del ~78 %. Sin confirmar."""
+canales = 3
+
+[tipos.ShortDistance]
+dimension = "distance"
+a_canonica = 0.1
+confianza = "inferred"
+evidencia = """
+Distance Traveled - Current Run Cycle 8692 -> 869,2 m en el ciclo actual.
+Con x1 saldrían 8,7 km, que en 245 s exigirían 128 km/h de media, incompatible
+con el canal de velocidad (máximo 52,7 km/h en el log).
+DisplayMaxMin 10000,0 -> 1 km, coherente con /10."""
+canales = 1
+
+[tipos.FuelEcomony]
+# La errata del nombre es del formato de origen. NO se corrige: la clave debe
+# coincidir literalmente con lo que trae el fichero (docs/01 §1.3).
+dimension = "fuel_economy"
+a_canonica = 0.01
+confianza = "inferred"
+evidencia = """
+Fuel Consumption Instantaneous Economy 2757 -> 27,57 L/100 km a plena carga,
+plausible. DisplayMaxMin 4000,-1 -> hasta 40 L/100 km.
+No hay identidad; podría ser otra unidad de consumo."""
+canales = 1
+
+[tipos.Mileage]
+dimension = "fuel_economy"
+a_canonica = 1.0
+confianza = "inferred"
+evidencia = """
+Fuel Consumption Instantaneous Mileage 3, DisplayMaxMin 4000,-1.
+Con x1 km/L: 3 km/L = 33 L/100 km a plena carga, coherente con el canal de
+Economy de arriba (27,6 L/100 km). Evidencia débil: un solo dígito.
+AVISO: la canónica de fuel_economy es L/100 km y km/L es una conversión
+RECÍPROCA, así que este tipo necesita tratamiento especial. Sin confirmar."""
+canales = 1
+
+# =========================================================================== #
+#  DESCONOCIDOS — no deducibles con las muestras disponibles.
+#  Se muestran EN CRUDO, sin unidad y con el selector desactivado.
+#  Es la mitigación del riesgo R1: mejor sin unidad que con una inventada.
+# =========================================================================== #
+
+[tipos.MassOverTime]
+dimension = "unknown"
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = """
+No cuadra con la lambda medida y es el caso más claro de por qué no se debe
+adivinar una escala:
+  Mass Air Flow 1 = 4001, Fuel Mass Flow = 2958, λ medida 0,648, stq 14,7
+  AFR esperado = 9,53
+  aire/10 y fuel/100 dan AFR 13,53; ninguna combinación probada da 9,53.
+Dos explicaciones posibles, y no se puede distinguir con estas muestras:
+  a) los canales Mass Air Flow no están conectados (el motor es speed-density,
+     por MAP) y arrastran un valor por defecto, como Oil Temperature;
+  b) la escala es otra.
+Hasta resolverlo, los 5 canales se muestran en crudo. Tarea F1-38."""
+canales = 5
+
+[tipos.FuelVolume]
+dimension = "unknown"
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = """
+Transient Throttle Fuel Peak Synchronous Output, DisplayMaxMin 30000,-30000,
+crudo 0 en la fila de referencia. Sin ningún valor distinto de cero con el que
+deducir la escala."""
+canales = 1
+
+[tipos.AngularVelocity]
+dimension = "unknown"
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = """
+Canal `Angular Velocity`, crudo 402, SIN DisplayMaxMin. No hay rango ni
+identidad. A 6715 rpm serían 703 rad/s, que no guarda relación evidente con
+402 en ninguna escala decimal."""
+canales = 1
+
+[tipos.PulsesPerLongDistance]
+dimension = "unknown"
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = """
+Vehicle Speed 0 Calculated Rate, crudo 2123, SIN DisplayMaxMin.
+Es un parámetro de calibración del sensor de velocidad (pulsos por km o por
+milla), no una medida. Sin más muestras no se puede fijar."""
+canales = 1
+
+# --- Dimensiones compuestas: la unidad se DERIVA de las activas (units.toml) --
+
+[tipos.PercentPerRpm]
+dimension = "pct_per_rpm"
+compuesta = true
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = """
+Ganancias P/I/D del control de ralentí. Idle Control Proportional Gain 400,
+DisplayMaxMin 3000,0. La escala de una ganancia no se deduce por plausibilidad
+física: depende de la implementación interna del lazo.
+Se muestra en crudo; para el usuario lo relevante es su evolución, no su valor
+absoluto."""
+canales = 3
+
+[tipos.PercentPerKPa]
+dimension = "pct_per_kPa"
+compuesta = true
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = "Ganancias del control de boost. Misma situación que PercentPerRpm."
+canales = 3
+
+[tipos.PercentPerLambda]
+dimension = "pct_per_lambda"
+compuesta = true
+a_canonica = 1.0
+confianza = "unknown"
+evidencia = "Ganancias del control de O2. Misma situación que PercentPerRpm."
+canales = 3
+
+# =========================================================================== #
+#  RESUMEN — para que el recuento sea auditable
+# =========================================================================== #
+[resumen]
+tipos_totales = 34
+confirmados = 16
+inferidos = 11
+desconocidos = 7
+canales_totales = 475
+canales_confirmados = 422
+canales_inferidos = 36
+canales_desconocidos = 17
+# Matiz importante para no leer el 422 como mejor de lo que es: incluye los 102
+# canales de tipo `Raw`, cuya escala es trivialmente x1 pero que NO tienen unidad
+# física (son contadores, enumerados y máscaras). Canales con una unidad física
+# confirmada: 422 - 102 = 320 de 475, el 67 %.
+canales_con_unidad_fisica_confirmada = 320
+nota = """
+Frente a las 13 escalas confirmadas de docs/01 §1.8, esta revisión confirma tres
+más por identidad aritmética sobre la fila de referencia:
+  · AbsPressure  — resulta ser la presión RELATIVA, no la absoluta.
+  · Frequency    — x1 Hz, vía el disparo del inyector.
+  · Time_us      — x1 µs, vía el periodo de ciclo del motor (y de paso revela
+                   que el motor tiene 6 cilindros).
+Los 7 desconocidos y los 11 inferidos son el trabajo de la tarea F1-38. Ninguno
+se rellena a ojo: se muestran en crudo o con marca, según su confianza."""

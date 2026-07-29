@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 22:10:48Z"
+    "actualizado": "2026-07-29 23:02:13Z"
   },
   "tareas": [
     {
@@ -245,10 +245,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "orquestador",
+      "commits": [
+        "217d88b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:52:00Z",
+          "texto": "Opus 5 en linea"
+        },
+        {
+          "fecha": "2026-07-29 22:58:32Z",
+          "texto": "data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a canonica, con confianza y evidencia. 16 confirmados / 11 inferidos / 7 desconocidos. 19 pruebas, incluidas las identidades aritmeticas. TRES ESCALAS NUEVAS CONFIRMADAS respecto a docs/01: AbsPressure (que resulta ser la presion RELATIVA, no la absoluta: Fuel Pressure Expected - Manifold Pressure = 2999 vs el canal diferencial 3000), Frequency (x1 Hz via disparo de inyector) y Time_us (x1 us via periodo de ciclo, que ademas revela 6 cilindros). REVISAR: los 11 inferidos, y en especial que MassOverTime queda desconocido a proposito porque no cuadra con la lambda medida."
+        }
+      ]
     },
     {
       "id": "F0-10",
@@ -265,10 +276,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "orquestador",
+      "commits": [
+        "217d88b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:52:00Z",
+          "texto": "Opus 5 en linea"
+        },
+        {
+          "fecha": "2026-07-29 23:02:13Z",
+          "texto": "data/roles.toml: 58 roles con dimension, rango plausible en unidad canonica y sinonimos ES/EN. 13 indexados, 13 criticos, 3 contadores acumulados. 11 pruebas, incluida la que cruza los TRES catalogos (units + haltech + roles) contra los valores reales del AutoLog: 24 canales comprobados fila a fila. DOS DEFECTOS PROPIOS CAZADOS POR MIS PRUEBAS: 'Lap Distance' era sinonimo ambiguo en distance y lap_distance, y el resumen decia 52 roles cuando hay 58. REVISAR: los rangos plausibles (son anchos a proposito: cazan errores de escala, no de puesta a punto) y los 13 roles marcados criticos."
+        }
+      ]
     },
     {
       "id": "F0-11",
@@ -332,8 +354,8 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "sonnet",
       "commits": [],
       "notas": []
     },
@@ -352,10 +374,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "haiku",
+      "commits": [
+        "217d88b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:58:32Z",
+          "texto": "Verificado: 9 secciones, comandos comprobados uno a uno por el agente y por el orquestador. Datos extraidos del repo sin invencion."
+        }
+      ]
     },
     {
       "id": "F1-01",
