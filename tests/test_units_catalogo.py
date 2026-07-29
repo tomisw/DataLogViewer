@@ -41,7 +41,7 @@ def mostrar(conv: dict, x: float, *, clase: str = "punto", param: float | None =
         if clase == "punto":
             return a * x + b
         if clase in ("intervalo", "tasa"):
-            return a * x          # sin desplazamiento: la trampa del delta
+            return a * x  # sin desplazamiento: la trampa del delta
         if clase == "varianza":
             return a * a * x
         raise ValueError(clase)
@@ -87,11 +87,7 @@ def test_toda_dimension_declara_su_canonica_y_la_contiene(cat: dict) -> None:
     for dim, dd in cat["dimensiones"].items():
         can = dd["canonica"]
         claves = set(dd["unidades"])
-        alias = {
-            a
-            for ud in dd["unidades"].values()
-            for a in ud.get("alias", [])
-        }
+        alias = {a for ud in dd["unidades"].values() for a in ud.get("alias", [])}
         # La canónica puede aparecer con su clave literal o normalizada
         # (p. ej. kg/m3 -> kg_m3, m/s2 -> m_s2).
         normalizada = can.replace("/", "_").replace("·", "")
@@ -141,9 +137,7 @@ def test_desplazamiento_marcado_de_forma_coherente(cat: dict) -> None:
             continue
         tiene_b = conv["b"] != 0.0
         marcado = ud.get("origen_desplazado", False)
-        assert tiene_b == marcado, (
-            f"{dim}.{uni}: b={conv['b']} pero origen_desplazado={marcado}"
-        )
+        assert tiene_b == marcado, f"{dim}.{uni}: b={conv['b']} pero origen_desplazado={marcado}"
 
 
 def test_no_hay_alias_ambiguos(cat: dict) -> None:
@@ -194,9 +188,13 @@ def test_presion_casos_conocidos(cat: dict) -> None:
 
 def test_mezcla_casos_conocidos(cat: dict) -> None:
     # AFR con la estequiometría del log (14,7 en las muestras de gasolina).
-    assert math.isclose(mostrar(u(cat, "mixture_ratio", "afr"), 1.0, param=14.7), 14.7, abs_tol=1e-9)
+    assert math.isclose(
+        mostrar(u(cat, "mixture_ratio", "afr"), 1.0, param=14.7), 14.7, abs_tol=1e-9
+    )
     # Con E85 la misma lambda da otro AFR: es el motivo de la conversión parametrizada.
-    assert math.isclose(mostrar(u(cat, "mixture_ratio", "afr"), 1.0, param=9.77), 9.77, abs_tol=1e-9)
+    assert math.isclose(
+        mostrar(u(cat, "mixture_ratio", "afr"), 1.0, param=9.77), 9.77, abs_tol=1e-9
+    )
     # phi = 1/lambda
     assert math.isclose(mostrar(u(cat, "mixture_ratio", "phi"), 0.850), 1.176470588, abs_tol=1e-8)
 
@@ -284,9 +282,7 @@ def test_presets_referencian_unidades_existentes(cat: dict) -> None:
             assert dim in dims, f"preset {nombre}: dimensión '{dim}' desconocida"
             claves = set(dims[dim]["unidades"])
             alias = {a for ud in dims[dim]["unidades"].values() for a in ud.get("alias", [])}
-            assert uni in claves or uni in alias, (
-                f"preset {nombre}: '{uni}' no es unidad de {dim}"
-            )
+            assert uni in claves or uni in alias, f"preset {nombre}: '{uni}' no es unidad de {dim}"
 
 
 def test_hay_exactamente_un_preset_por_omision(cat: dict) -> None:
@@ -297,8 +293,7 @@ def test_hay_exactamente_un_preset_por_omision(cat: dict) -> None:
 def test_referencia_de_presion_solo_donde_se_admite(cat: dict) -> None:
     assert cat["dimensiones"]["pressure"].get("admite_referencia") is True
     otras = [
-        d for d, dd in cat["dimensiones"].items()
-        if d != "pressure" and dd.get("admite_referencia")
+        d for d, dd in cat["dimensiones"].items() if d != "pressure" and dd.get("admite_referencia")
     ]
     assert not otras, f"solo la presión admite referencia, no {otras}"
 
@@ -345,11 +340,33 @@ def test_cobertura_minima_de_dimensiones(cat: dict) -> None:
     """Las 34 `Type` del formato Haltech deben tener destino. El mapeo concreto
     es F0-09; aquí solo se comprueba que las dimensiones necesarias existen."""
     necesarias = {
-        "temperature", "pressure", "mixture_ratio", "angular_speed", "speed",
-        "angle", "ratio", "voltage", "time", "frequency", "resistance",
-        "sound_level", "mass_flow", "volume_flow", "volume", "mass",
-        "mass_per_cyl", "density", "distance", "fuel_economy", "torque",
-        "power", "acceleration", "count", "enum", "bitmask", "unknown",
+        "temperature",
+        "pressure",
+        "mixture_ratio",
+        "angular_speed",
+        "speed",
+        "angle",
+        "ratio",
+        "voltage",
+        "time",
+        "frequency",
+        "resistance",
+        "sound_level",
+        "mass_flow",
+        "volume_flow",
+        "volume",
+        "mass",
+        "mass_per_cyl",
+        "density",
+        "distance",
+        "fuel_economy",
+        "torque",
+        "power",
+        "acceleration",
+        "count",
+        "enum",
+        "bitmask",
+        "unknown",
     }
     faltan = necesarias - set(cat["dimensiones"])
     assert not faltan, f"faltan dimensiones: {sorted(faltan)}"

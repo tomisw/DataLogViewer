@@ -22,7 +22,7 @@ import json
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -55,7 +55,7 @@ DEPS_CORREGIDAS = {
 
 
 def ahora() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%SZ")
 
 
 def limpiar(txt: str) -> str:
@@ -66,7 +66,10 @@ def sha_actual() -> str:
     try:
         out = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
-            cwd=RAIZ, capture_output=True, text=True, check=True,
+            cwd=RAIZ,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return out.stdout.strip()
     except Exception:
@@ -82,9 +85,7 @@ def cargar() -> dict:
 def guardar(datos: dict) -> None:
     datos["meta"]["actualizado"] = ahora()
     ESTADO.parent.mkdir(parents=True, exist_ok=True)
-    ESTADO.write_text(
-        json.dumps(datos, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    ESTADO.write_text(json.dumps(datos, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def buscar(datos: dict, tid: str) -> dict:
@@ -140,7 +141,9 @@ def cmd_seed(args: argparse.Namespace) -> None:
         print(f"Resiembra: {conservados} tareas con progreso conservadas.")
 
     guardar({"meta": {"version": 1, "plan_rev": 2, "actualizado": ahora()}, "tareas": tareas})
-    print(f"{len(tareas)} tareas · {sum(t['pts'] for t in tareas)} pts → {ESTADO.relative_to(RAIZ)}")
+    print(
+        f"{len(tareas)} tareas · {sum(t['pts'] for t in tareas)} pts → {ESTADO.relative_to(RAIZ)}"
+    )
     cmd_render(args)
 
 
@@ -178,10 +181,7 @@ def cmd_next(args: argparse.Namespace) -> None:
         faltan = [d for d in t["deps"] if por_id.get(d, {}).get("estado") not in CERRADOS]
         if faltan:
             continue
-        aviso = [
-            d for d in t["deps"]
-            if por_id.get(d, {}).get("estado") == "revision_humana"
-        ]
+        aviso = [d for d in t["deps"] if por_id.get(d, {}).get("estado") == "revision_humana"]
         listas.append((t, aviso))
 
     if not listas:
@@ -238,7 +238,7 @@ def cmd_done(args: argparse.Namespace) -> None:
     guardar(datos)
     print(f"{t['id']} → {t['estado']}" + (f" (commit {sha})" if sha else ""))
     if t["estado"] == "revision_humana":
-        print(f"  ⚠ puerta G1: requiere que una persona lea el diff antes de considerarse hecha.")
+        print("  ⚠ puerta G1: requiere que una persona lea el diff antes de considerarse hecha.")
     cmd_render(args)
 
 
@@ -301,8 +301,10 @@ def cmd_render(_args: argparse.Namespace) -> None:
     L.append("")
     pct = 100 * hechos / total if total else 0
     pct_r = 100 * (hechos + revision) / total if total else 0
-    L.append(f"**{hechos} / {total} pts cerrados ({pct:.1f} %)** · "
-             f"{revision} pts esperando revisión humana → {pct_r:.1f} % entregado")
+    L.append(
+        f"**{hechos} / {total} pts cerrados ({pct:.1f} %)** · "
+        f"{revision} pts esperando revisión humana → {pct_r:.1f} % entregado"
+    )
     L.append("")
 
     L.append("| Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |")
@@ -311,10 +313,14 @@ def cmd_render(_args: argparse.Namespace) -> None:
         f = [t for t in tareas if t["fase"] == fase]
         if not f:
             continue
-        def s(e: str) -> int:
+
+        def s(e: str, f: list[dict] = f) -> int:  # `f` ligada: no se captura del bucle
             return sum(t["pts"] for t in f if t["estado"] == e)
-        L.append(f"| {fase} | {s('hecho')} | {s('revision_humana')} | {s('en_curso')} "
-                 f"| {s('pendiente')} | {s('bloqueado')} | {sum(t['pts'] for t in f)} |")
+
+        L.append(
+            f"| {fase} | {s('hecho')} | {s('revision_humana')} | {s('en_curso')} "
+            f"| {s('pendiente')} | {s('bloqueado')} | {sum(t['pts'] for t in f)} |"
+        )
     L.append("")
 
     activas = [t for t in tareas if t["estado"] in ("en_curso", "bloqueado", "revision_humana")]
@@ -325,8 +331,10 @@ def cmd_render(_args: argparse.Namespace) -> None:
         L.append("|---|---|---|---|---|")
         for t in activas:
             nota = t["notas"][-1]["texto"] if t["notas"] else "—"
-            L.append(f"| `{t['id']}` {t['titulo'][:44]} | {t['estado']} | {t['modelo']} "
-                     f"| {t['gate']} | {nota[:70]} |")
+            L.append(
+                f"| `{t['id']}` {t['titulo'][:44]} | {t['estado']} | {t['modelo']} "
+                f"| {t['gate']} | {nota[:70]} |"
+            )
         L.append("")
 
     for fase in orden:
@@ -347,8 +355,10 @@ def cmd_render(_args: argparse.Namespace) -> None:
             )
         L.append("")
 
-    L.append("Leyenda: ✔ hecho · ⏳ esperando revisión humana (G1) · ▶ en curso · "
-             "· pendiente · ✖ bloqueado")
+    L.append(
+        "Leyenda: ✔ hecho · ⏳ esperando revisión humana (G1) · ▶ en curso · "
+        "· pendiente · ✖ bloqueado"
+    )
     L.append("")
     PROGRESO.parent.mkdir(parents=True, exist_ok=True)
     PROGRESO.write_text("\n".join(L), encoding="utf-8")
@@ -356,8 +366,9 @@ def cmd_render(_args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description=__doc__,
-                               formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("seed", help="siembra o resiembra tareas.json desde el backlog")

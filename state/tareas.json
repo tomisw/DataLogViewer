@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 19:21:19Z"
+    "actualizado": "2026-07-29 19:37:52Z"
   },
   "tareas": [
     {
@@ -36,9 +36,11 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "9c54663"
+      ],
       "notas": [
         {
           "fecha": "2026-07-29 19:14:29Z",
@@ -47,6 +49,10 @@
         {
           "fecha": "2026-07-29 19:21:19Z",
           "texto": "Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN COMMITEAR al cerrar la sesion. Al reanudar: revisar `git status`, verificar contra los criterios de aceptacion del backlog y commitear, o reiniciar la tarea si el resultado es parcial (docs/08 §8.4 paso 3)."
+        },
+        {
+          "fecha": "2026-07-29 19:37:52Z",
+          "texto": "Verificado por el orquestador: ruff check + format, mypy --strict (13 ficheros) y pytest (46 pasan, 1 saltada) en verde sobre todo el repo. PENDIENTE sin red: uv sync y npm install/build de dlv-ui quedan configurados pero sin ejecutar. DEFECTO CORREGIDO al integrar: testpaths no incluia tests/ de raiz y las 31 pruebas del catalogo no corrian."
         }
       ]
     },
@@ -101,9 +107,11 @@
       "deps_backlog": [],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "9c54663"
+      ],
       "notas": [
         {
           "fecha": "2026-07-29 19:14:29Z",
@@ -112,6 +120,10 @@
         {
           "fecha": "2026-07-29 19:21:19Z",
           "texto": "Agente Sonnet lanzado en la sesion de arranque; el trabajo quedo SIN COMMITEAR al cerrar la sesion. Al reanudar: revisar `git status`, verificar contra los criterios de aceptacion del backlog y commitear, o reiniciar la tarea si el resultado es parcial (docs/08 §8.4 paso 3)."
+        },
+        {
+          "fecha": "2026-07-29 19:37:52Z",
+          "texto": "Verificado por el orquestador: autolog-1h 70,13 MB / 38698 filas / 475 canales, dt p50 54 p90 163 p99 221 min 35 max 499 (coincide con docs/01 §1.7 digito a digito), tasa 10,67 Hz. 20 logs internos con epoch ficticia, Log Source 8 y DownloadDateTime no monotono confirmados. DESVIACION CONOCIDA: celdas vacias 58,0-58,6 % frente al 56,4 % real (relojes independientes producen menos coincidencias exactas de marca); conserva el caracter disperso multi-tasa, no bloquea."
         }
       ]
     },

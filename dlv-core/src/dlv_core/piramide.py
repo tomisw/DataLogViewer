@@ -40,14 +40,14 @@ class NivelPiramide:
     """Un nivel de la pirámide: factor de decimación y los cuatro arrays del cubo."""
 
     factor: int
-    minimo: "np.ndarray"
-    maximo: "np.ndarray"
-    primero: "np.ndarray"
-    ultimo: "np.ndarray"
+    minimo: np.ndarray
+    maximo: np.ndarray
+    primero: np.ndarray
+    ultimo: np.ndarray
 
 
 def construir_piramide(
-    valores: "np.ndarray", *, tipo: TipoCanalPiramide, factor_base: int = 4
+    valores: np.ndarray, *, tipo: TipoCanalPiramide, factor_base: int = 4
 ) -> list[NivelPiramide]:
     """Construye todos los niveles de la pirámide sobre el array completo.
 

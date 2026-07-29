@@ -27,7 +27,7 @@ class ExpresionCanal:
     dimension_resultado: str | None
 
 
-def compilar(expresion: ExpresionCanal) -> "object":
+def compilar(expresion: ExpresionCanal) -> object:
     """Compila la fórmula a una forma evaluable (AST propio o `numexpr`).
 
     La representación compilada real se decide al implementar este módulo;
@@ -37,6 +37,6 @@ def compilar(expresion: ExpresionCanal) -> "object":
     raise NotImplementedError
 
 
-def evaluar(compilada: "object", series_por_rol: dict[str, "ChannelSeries"]) -> "np.ndarray":
+def evaluar(compilada: object, series_por_rol: dict[str, ChannelSeries]) -> np.ndarray:
     """Evalúa una expresión compilada sobre las series de entrada, vectorizado."""
     raise NotImplementedError

@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
-import itertools
 import sys
 import traceback
 import types
@@ -52,7 +51,7 @@ class _Raises:
         self.esperada = esperada
         self.value: BaseException | None = None
 
-    def __enter__(self) -> "_Raises":
+    def __enter__(self) -> _Raises:
         return self
 
     def __exit__(self, tipo, valor, tb) -> bool:
@@ -71,6 +70,7 @@ def _construir_pytest() -> types.ModuleType:
         def envolver(f):
             f.__es_fixture__ = True
             return f
+
         return envolver(func) if func is not None else envolver
 
     class _Mark:
@@ -79,11 +79,13 @@ def _construir_pytest() -> types.ModuleType:
             def envolver(f):
                 f.__parametrize__ = (nombres, list(valores))
                 return f
+
             return envolver
 
         def __getattr__(self, _nombre):  # skipif, xfail, etc.: no-op
             def deco(*_a, **_k):
                 return lambda f: f
+
             return deco
 
     def saltar(motivo: str = "") -> None:
@@ -92,13 +94,13 @@ def _construir_pytest() -> types.ModuleType:
     def fallar(motivo: str = "") -> None:
         raise AssertionError(motivo)
 
-    mod.fixture = fixture                     # type: ignore[attr-defined]
-    mod.mark = _Mark()                        # type: ignore[attr-defined]
-    mod.raises = _Raises                      # type: ignore[attr-defined]
-    mod.approx = _Aprox                       # type: ignore[attr-defined]
-    mod.skip = saltar                         # type: ignore[attr-defined]
-    mod.fail = fallar                         # type: ignore[attr-defined]
-    mod.Saltar = _Saltar                      # type: ignore[attr-defined]
+    mod.fixture = fixture  # type: ignore[attr-defined]
+    mod.mark = _Mark()  # type: ignore[attr-defined]
+    mod.raises = _Raises  # type: ignore[attr-defined]
+    mod.approx = _Aprox  # type: ignore[attr-defined]
+    mod.skip = saltar  # type: ignore[attr-defined]
+    mod.fail = fallar  # type: ignore[attr-defined]
+    mod.Saltar = _Saltar  # type: ignore[attr-defined]
     return mod
 
 
@@ -114,8 +116,7 @@ def _cargar(ruta: Path) -> types.ModuleType:
 def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
     mod = _cargar(ruta)
     fixtures = {
-        n: f for n, f in vars(mod).items()
-        if callable(f) and getattr(f, "__es_fixture__", False)
+        n: f for n, f in vars(mod).items() if callable(f) and getattr(f, "__es_fixture__", False)
     }
     cache: dict[str, object] = {}
 
@@ -127,8 +128,7 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
         return cache[nombre]
 
     pruebas = [
-        (n, f) for n, f in sorted(vars(mod).items())
-        if n.startswith("test_") and callable(f)
+        (n, f) for n, f in sorted(vars(mod).items()) if n.startswith("test_") and callable(f)
     ]
 
     ok = fallos = saltadas = 0
@@ -140,7 +140,7 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
         if pnombres:
             claves = [c.strip() for c in pnombres.split(",")]
             casos = [
-                dict(zip(claves, v if isinstance(v, (tuple, list)) else (v,)))
+                dict(zip(claves, v if isinstance(v, (tuple, list)) else (v,), strict=True))
                 for v in pvalores
             ]
         else:

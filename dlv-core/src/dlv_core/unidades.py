@@ -32,11 +32,11 @@ class Afin:
     a: float
     b: float
 
-    def a_canonica(self, valores: "np.ndarray") -> "np.ndarray":
+    def a_canonica(self, valores: np.ndarray) -> np.ndarray:
         """Aplica la conversión a canónica sobre el array completo (sin bucle)."""
         raise NotImplementedError
 
-    def desde_canonica(self, valores: "np.ndarray") -> "np.ndarray":
+    def desde_canonica(self, valores: np.ndarray) -> np.ndarray:
         """Aplica la conversión inversa (canónica -> representación) sobre el array."""
         raise NotImplementedError
 
@@ -54,7 +54,7 @@ class Dimension:
     unidades_disponibles: tuple[str, ...]
 
 
-def cargar_dimensiones(fuente: "object") -> dict[str, Dimension]:
+def cargar_dimensiones(fuente: object) -> dict[str, Dimension]:
     """Carga el catálogo de dimensiones desde `units.toml` ya abierto.
 
     `fuente` es un objeto de lectura de texto (`dlv-core` no abre ficheros por
@@ -64,7 +64,9 @@ def cargar_dimensiones(fuente: "object") -> dict[str, Dimension]:
     raise NotImplementedError
 
 
-def convertir(valores: "np.ndarray", *, origen: str, destino: str, dimension: Dimension) -> "np.ndarray":
+def convertir(
+    valores: np.ndarray, *, origen: str, destino: str, dimension: Dimension
+) -> np.ndarray:
     """Convierte un array completo entre dos unidades de la misma dimensión.
 
     Operación vectorizada de NumPy sobre el array entero (ADR-009): nunca un

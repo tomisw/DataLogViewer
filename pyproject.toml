@@ -43,7 +43,19 @@ testpaths = [
     "dlv-core/tests",
     "dlv-api/tests",
     "dlv-app/tests",
+    # Pruebas de nivel de proyecto, no de paquete: validan los catálogos de
+    # `data/` (F0-08 units.toml, F0-10 roles.toml) y las herramientas de
+    # `tools/`. Sin esta entrada no se ejecutaban, y son la red de los riesgos
+    # R1 y R11 (un factor de escala mal puesto llega a una decisión de tuning).
+    "tests",
 ]
+# Los tres paquetes tienen un `tests/test_smoke.py` (mismo nombre a propósito:
+# cada uno es "el test de humo de este paquete"). Sin `__init__.py` en esos
+# directorios, el modo de importación por defecto de pytest (`prepend`) los
+# trata como el mismo módulo y colisiona. `importlib` importa cada fichero
+# por su ruta completa, sin ese choque, y sin tener que forzarlos a un
+# nombre de fichero único ni añadir paquetes de test.
+addopts = "--import-mode=importlib"
 
 # ---------------------------------------------------------------------------
 # ruff (lint + formato)
@@ -52,10 +64,13 @@ testpaths = [
 target-version = "py312"
 line-length = 100
 src = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
-# `docs/`, `state/`, `tools/`, `samples/` son de otras tareas / del orquestador
-# (ver restricciones de F0-02): no se tocan ni se lintan aquí. `dlv-ui` es
-# TypeScript, fuera del alcance de ruff.
-extend-exclude = ["docs", "state", "tools", "samples", "dlv-ui"]
+# `docs/`, `state/`, `tools/`, `samples/`, `data/` y el `tests/` de nivel raíz
+# son de otras tareas del plan (p. ej. F0-05, F0-08) o del orquestador (ver
+# restricciones de F0-02): no se tocan ni se lintan aquí. Estos nombres solo
+# existen como directorios de nivel raíz en este repo (comprobado con
+# `ruff check --show-settings`), así que no excluyen de paso `dlv-core/tests`
+# ni similares. `dlv-ui` es TypeScript, fuera del alcance de ruff.
+extend-exclude = ["docs", "state", "samples", "data", "dlv-ui"]
 
 [tool.ruff.lint]
 select = [
@@ -71,6 +86,15 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+# `tools/` y `tests/` de raíz se lintan desde la integración de F0-02, pero con
+# tolerancias: son guiones de datos y prosa en español, no código de librería.
+"tools/*.py" = [
+    "E501",    # tablas de datos y cadenas de ayuda: partirlas empeora la lectura
+    "RUF059",  # desempaquetados parciales deliberados al leer tuplas del backlog
+    "RUF002",  # docstrings en español con comillas tipográficas y «»
+]
+"tests/*.py" = ["E501", "RUF059", "RUF002"]
+
 "*/tests/*" = ["S101"]
 
 [tool.ruff.format]
@@ -89,7 +113,13 @@ warn_unused_configs = true
 # superior en vez de intentar adivinarlo por la ruta del fichero.
 explicit_package_bases = true
 mypy_path = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
-exclude = "^(docs|state|tools|samples|dlv-ui)/"
+# Excluye también los `tests/` de cada paquete (no solo el de la raíz): sin
+# `__init__.py`, dos ficheros con el mismo nombre en paquetes distintos
+# (`dlv-core/tests/test_smoke.py` y `dlv-api/tests/test_smoke.py`) colisionan
+# como "mismo módulo" para mypy (ver informe de F0-02). El código de librería
+# (`dlv-core/src`, `dlv-api/src`) es lo que este comando tiene que cubrir; los
+# tests se comprueban con `pytest`, no con `mypy --strict`.
+exclude = "^(docs|state|tools|samples|data|dlv-ui)/|(^|/)tests/"
 
 # `polars`, `numpy`, `fastapi`, `uvicorn` y `pywebview` publican tipos propios
 # (`py.typed`) y en una instalación normal mypy los usa sin ayuda. Este
@@ -99,5 +129,5 @@ exclude = "^(docs|state|tools|samples|dlv-ui)/"
 # vez de comprobar el resto del código; con las dependencias instaladas no
 # cambia nada, porque entonces sí se encuentran los tipos reales.
 [[tool.mypy.overrides]]
-module = ["polars.*", "numpy.*", "fastapi.*", "uvicorn.*", "webview.*"]
+module = ["polars.*", "numpy.*", "fastapi.*", "uvicorn.*", "webview.*", "pytest.*"]
 ignore_missing_imports = true

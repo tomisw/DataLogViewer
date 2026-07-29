@@ -55,7 +55,7 @@ def desfase_efectivo(
 
 
 def correlacionar(
-    referencia: "ChannelSeries", candidata: "ChannelSeries", *, nivel_piramide: int
+    referencia: ChannelSeries, candidata: ChannelSeries, *, nivel_piramide: int
 ) -> float:
     """Argmáx de la correlación cruzada sobre niveles L4-L6 de la pirámide (§3.6).
 
@@ -66,7 +66,9 @@ def correlacionar(
     raise NotImplementedError
 
 
-def concatenar(segmentos: list[Segmento], series_por_segmento: dict[str, list["ChannelSeries"]]) -> "np.ndarray":
+def concatenar(
+    segmentos: list[Segmento], series_por_segmento: dict[str, list[ChannelSeries]]
+) -> np.ndarray:
     """Coloca los segmentos consecutivamente con hueco explícito (vista concatenada).
 
     Reglas duras de §3.6: nunca se dibuja una línea que cruce una frontera de

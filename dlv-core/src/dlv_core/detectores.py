@@ -39,9 +39,9 @@ class Detector(Protocol):
     id: str
     roles_requeridos: tuple[str, ...]
 
-    def ejecutar(self, series_por_rol: dict[str, "ChannelSeries"]) -> list[Incidencia]: ...
+    def ejecutar(self, series_por_rol: dict[str, ChannelSeries]) -> list[Incidencia]: ...
 
 
-def umbral_simple(valores: "np.ndarray", *, minimo: float | None, maximo: float | None) -> "np.ndarray":
+def umbral_simple(valores: np.ndarray, *, minimo: float | None, maximo: float | None) -> np.ndarray:
     """Máscara booleana vectorizada de muestras fuera de `[minimo, maximo]`."""
     raise NotImplementedError

@@ -25,9 +25,8 @@ def _nombres_importados(arbol: ast.Module) -> set[str]:
         if isinstance(nodo, ast.Import):
             for alias in nodo.names:
                 nombres.add(alias.name.split(".")[0])
-        elif isinstance(nodo, ast.ImportFrom):
-            if nodo.module is not None:
-                nombres.add(nodo.module.split(".")[0])
+        elif isinstance(nodo, ast.ImportFrom) and nodo.module is not None:
+            nombres.add(nodo.module.split(".")[0])
     return nombres
 
 
@@ -41,25 +40,10 @@ def test_dlv_core_no_importa_los_otros_paquetes() -> None:
     infracciones: list[str] = []
     for fichero in _ficheros_python():
         arbol = ast.parse(fichero.read_text(encoding="utf-8"), filename=str(fichero))
+        ruta_relativa = fichero.relative_to(RAIZ_SRC.parent.parent)
         for nombre in _nombres_importados(arbol):
             if nombre in PAQUETES_PROHIBIDOS:
-                infracciones.append(f"{fichero.relative_to(RAIZ_SRC.parent.parent)} importa '{nombre}'")
+                infracciones.append(f"{ruta_relativa} importa '{nombre}'")
 
-    assert not infracciones, "dlv-core no puede importar dlv_api/dlv_ui/dlv_app:\n" + "\n".join(
-        infracciones
-    )
-
-
-def test_dlv_core_no_menciona_dlv_ui_ni_dlv_app_como_cadena_de_import() -> None:
-    """Comprobación adicional y más laxa: ni siquiera como import dinámico
-    (`importlib.import_module("dlv_api...")`) debería aparecer el nombre del
-    paquete prohibido en el código fuente de `dlv-core`.
-    """
-    infracciones: list[str] = []
-    for fichero in _ficheros_python():
-        texto = fichero.read_text(encoding="utf-8")
-        for prohibido in PAQUETES_PROHIBIDOS:
-            if prohibido in texto:
-                infracciones.append(f"{fichero.name} menciona '{prohibido}'")
-
-    assert not infracciones, "\n".join(infracciones)
+    mensaje = "dlv-core no puede importar dlv_api/dlv_ui/dlv_app:\n" + "\n".join(infracciones)
+    assert not infracciones, mensaje

@@ -49,15 +49,15 @@ class ChannelSeries:
 
     key: ChannelKey
     role: str | None
-    t: "np.ndarray"  # uint32, ms desde t0 del segmento, compartido por grupo
-    v: "np.ndarray"  # según `storage`
+    t: np.ndarray  # uint32, ms desde t0 del segmento, compartido por grupo
+    v: np.ndarray  # según `storage`
     storage: Storage
     to_canon: Afin
     dimension: str | None  # None => se muestra en crudo, sin unidad
 
 
 def construir_desde_polars(
-    df: "pl.DataFrame", *, columna_tiempo: str, storage_por_columna: dict[str, Storage]
+    df: pl.DataFrame, *, columna_tiempo: str, storage_por_columna: dict[str, Storage]
 ) -> list[ChannelSeries]:
     """Construye una `ChannelSeries` por columna de un `DataFrame` ya parseado.
 
@@ -67,7 +67,7 @@ def construir_desde_polars(
     raise NotImplementedError
 
 
-def indexar(serie: ChannelSeries) -> "np.ndarray":
+def indexar(serie: ChannelSeries) -> np.ndarray:
     """Calcula min/máx/percentiles y clasificación activo/constante/vacío/fuera
     de rango (§3.4 paso 5) sobre el array completo, sin bucle por muestra.
     """

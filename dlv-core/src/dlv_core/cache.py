@@ -47,11 +47,11 @@ def es_valida(clave_almacenada: ClaveInvalidacion, clave_actual: ClaveInvalidaci
     raise NotImplementedError
 
 
-def escribir(destino: Path, tabla: "pl.DataFrame", metadatos: MetadatosCache) -> None:
+def escribir(destino: Path, tabla: pl.DataFrame, metadatos: MetadatosCache) -> None:
     """Escribe la caché: `destino` es la ruta al `.dlvcache` ya resuelta por quien llama."""
     raise NotImplementedError
 
 
-def leer(origen: Path) -> tuple["pl.DataFrame", MetadatosCache]:
+def leer(origen: Path) -> tuple[pl.DataFrame, MetadatosCache]:
     """Lee una caché existente desde `origen`, ruta ya resuelta por quien llama."""
     raise NotImplementedError
