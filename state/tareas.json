@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 19:12:55Z"
+    "actualizado": "2026-07-29 19:20:35Z"
   },
   "tareas": [
     {
@@ -36,10 +36,15 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-07-29 19:14:29Z",
+          "texto": "agente en segundo plano"
+        }
+      ]
     },
     {
       "id": "F0-03",
@@ -92,10 +97,15 @@
       "deps_backlog": [],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-07-29 19:14:29Z",
+          "texto": "agente en segundo plano"
+        }
+      ]
     },
     {
       "id": "F0-06",
@@ -144,18 +154,27 @@
       "entregable": "fichero de datos",
       "modelo": "Opus 5",
       "pts": 6,
-      "deps": [
-        "F0-01"
-      ],
+      "deps": [],
       "deps_backlog": [
         "F0-01"
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "orquestador",
+      "commits": [
+        "b8f1005"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 19:16:20Z",
+          "texto": "Opus 5 en linea; catalogo en data/units.toml"
+        },
+        {
+          "fecha": "2026-07-29 19:20:35Z",
+          "texto": "data/units.toml: 27 dimensiones, conversiones afin/reciproca/parametrizada, presets, centinelas y clases de magnitud. 31 pruebas de validacion en verde. REVISAR: los factores numericos y los decimales por unidad."
+        }
+      ]
     },
     {
       "id": "F0-09",

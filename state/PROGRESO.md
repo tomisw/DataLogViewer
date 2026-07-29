@@ -4,13 +4,13 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-29 19:12:55Z
+Actualizado: 2026-07-29 19:20:35Z
 
-**0 / 669 pts cerrados (0.0 %)** · 0 pts esperando revisión humana → 0.0 % entregado
+**0 / 669 pts cerrados (0.0 %)** · 6 pts esperando revisión humana → 0.9 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
-| F0 | 0 | 0 | 0 | 54 | 0 | 54 |
+| F0 | 0 | 6 | 8 | 40 | 0 | 54 |
 | F1 | 0 | 0 | 0 | 186 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
@@ -18,18 +18,26 @@ Actualizado: 2026-07-29 19:12:55Z
 | F4 | 0 | 0 | 0 | 63 | 0 | 63 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
-## F0 — 0/54 pts
+## Requieren atención
+
+| Tarea | Estado | Modelo | Puerta | Última nota |
+|---|---|---|---|---|
+| `F0-02` Andamiaje: paquetes `dlv-core`, `dlv-api`, ` | en_curso | Sonnet 5 | G3 | agente en segundo plano |
+| `F0-05` Corpus: los 3 logs reales + generador de sin | en_curso | Sonnet 5 | G3 | agente en segundo plano |
+| `F0-08` Catálogo `units.toml`: dimensiones, canónica | revision_humana | Opus 5 | G1 | data/units.toml: 27 dimensiones, conversiones afin/reciproca/parametri |
+
+## F0 — 6/54 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ·  | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | — |
-| ·  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | — |
+| ▶  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | — |
 | ·  | `F0-03` | CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint | Haiku 4.5 | 2 | F0-02 | G4 | — |
 | ·  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | — |
-| ·  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | — |
+| ▶  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | — |
 | ·  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | — |
 | ·  | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | — |
-| ·  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | F0-01 | G1 | — |
+| ⏳ | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
 | ·  | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | — |
 | ·  | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | — |
 | ·  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | — |

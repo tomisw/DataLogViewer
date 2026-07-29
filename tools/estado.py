@@ -47,6 +47,10 @@ FILA = re.compile(
 DEPS_CORREGIDAS = {
     "F0-01": ["F0-05"],
     "F0-02": [],
+    # F0-08 dependía de F0-01 solo porque F0-01 incluía «cerrar los ADR». Los ADR
+    # ya están cerrados en docs/03 rev. 2, y el catálogo de unidades está
+    # especificado por completo en docs/06 §6.7: no necesita el spike de Polars.
+    "F0-08": [],
 }
 
 
