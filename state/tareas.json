@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 23:10:32Z"
+    "actualizado": "2026-07-29 23:15:53Z"
   },
   "tareas": [
     {
@@ -192,10 +192,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
+      "estado": "revision_humana",
       "agente": null,
-      "commits": [],
-      "notas": []
+      "commits": [
+        "02140f8"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 23:15:53Z",
+          "texto": "samples/verdad/ con verdad.csv (log Haltech legitimo, 60 s a 20 Hz, 20 canales), verdad.json (20 eventos: 15 deben disparar, 5 NO deben) y README. Cubre 12 detectores: D1 D2 D3 D4 D8 D9 D10 D11 D12 D13 D14 D18. 22 pruebas que verifican que el fixture cumple sus PROPIAS anotaciones evento por evento. LOS 5 CASOS NEGATIVOS son la mitad del valor: pico de knock de una muestra (bajo la permanencia minima), lambda al 3 % (bajo el umbral del 4 %), duty al 83 %, sobretemperatura de 0,8 s (bajo los 3 s), y presion de aceite baja EN RALENTI pero sobre la curva minima, que es el caso que un umbral plano marcaria en falso. DEFECTO PROPIO CAZADO POR LA PRUEBA: los tres eventos de knock estaban a 2674 rpm, asi que la anotacion de severidad critica (que exige >4000 rpm y >150 kPa) era falsa; movidos a la segunda mitad de la tirada, ahora a 4357/5364/6369 rpm. REVISAR: los umbrales usados (4 % de lambda, 85/95 % de duty, 105 C, curva de aceite 1 bar + 1 bar/1000 rpm) deben coincidir con los que implementen los detectores en F3-07."
+        }
+      ]
     },
     {
       "id": "F0-08",

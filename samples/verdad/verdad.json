@@ -1,0 +1,352 @@
+{
+  "tarea": "F0-07",
+  "especificacion": "docs/04-perfiles-motorsport.md §4.3",
+  "log": "verdad.csv",
+  "formato": "haltech_nsp",
+  "muestreo_hz": 20,
+  "n_filas": 1200,
+  "duracion_s": 60,
+  "canales": [
+    {
+      "nombre": "RPM",
+      "id": 384,
+      "type": "EngineSpeed",
+      "rol": "engine_speed"
+    },
+    {
+      "nombre": "Manifold Pressure",
+      "id": 224,
+      "type": "Pressure",
+      "rol": "manifold_pressure"
+    },
+    {
+      "nombre": "Throttle Position",
+      "id": 225,
+      "type": "Percentage",
+      "rol": "throttle_position"
+    },
+    {
+      "nombre": "Wideband O2 1",
+      "id": 230,
+      "type": "AFR",
+      "rol": "lambda_measured"
+    },
+    {
+      "nombre": "Target Lambda",
+      "id": 132,
+      "type": "AFR",
+      "rol": "lambda_target"
+    },
+    {
+      "nombre": "Fuel Tuning Current Stoichiometry",
+      "id": 14700,
+      "type": "Stoichiometry",
+      "rol": "stoichiometry"
+    },
+    {
+      "nombre": "Knock Sensor 1 Knock Count",
+      "id": 696,
+      "type": "Raw",
+      "rol": "knock_count"
+    },
+    {
+      "nombre": "Knock Sensor 2 Knock Count",
+      "id": 697,
+      "type": "Raw",
+      "rol": "knock_count"
+    },
+    {
+      "nombre": "Knock Sensor 1 Knock Level",
+      "id": 698,
+      "type": "Decibel",
+      "rol": "knock_level"
+    },
+    {
+      "nombre": "Knock Threshold",
+      "id": 699,
+      "type": "Decibel",
+      "rol": "knock_threshold"
+    },
+    {
+      "nombre": "Knock Control Bank 1 Ignition Correction",
+      "id": 700,
+      "type": "Angle",
+      "rol": "knock_retard"
+    },
+    {
+      "nombre": "Ignition Angle",
+      "id": 518,
+      "type": "Angle",
+      "rol": "ignition_advance"
+    },
+    {
+      "nombre": "Injection Stage 1 Average Duty Cycle",
+      "id": 5666,
+      "type": "Percentage",
+      "rol": "injector_duty"
+    },
+    {
+      "nombre": "Coolant Temperature",
+      "id": 229,
+      "type": "Temperature",
+      "rol": "coolant_temp"
+    },
+    {
+      "nombre": "Oil Pressure",
+      "id": 236,
+      "type": "Pressure",
+      "rol": "oil_pressure"
+    },
+    {
+      "nombre": "Battery Voltage",
+      "id": 258,
+      "type": "BatteryVoltage",
+      "rol": "battery_voltage"
+    },
+    {
+      "nombre": "Trigger System Errors",
+      "id": 1353,
+      "type": "Raw",
+      "rol": "trigger_errors"
+    },
+    {
+      "nombre": "Engine Protection Severity Level",
+      "id": 1354,
+      "type": "Raw",
+      "rol": "protection_level"
+    },
+    {
+      "nombre": "Cut Percentage",
+      "id": 1355,
+      "type": "Percentage",
+      "rol": "cut_percentage"
+    },
+    {
+      "nombre": "Boost Control Actual Pressure",
+      "id": 1462,
+      "type": "Pressure",
+      "rol": "boost_pressure_actual"
+    }
+  ],
+  "curva_presion_aceite_minima": {
+    "formula_kpa_abs": "101.3 + 100 + (rpm/1000)*100",
+    "nota": "docs/04 §4.2 P8: un umbral plano da falsos positivos en ralentí"
+  },
+  "resumen": {
+    "eventos_totales": 20,
+    "deben_disparar": 15,
+    "no_deben_disparar": 5,
+    "detectores_cubiertos": [
+      "D1",
+      "D10",
+      "D11",
+      "D12",
+      "D13",
+      "D14",
+      "D18",
+      "D2",
+      "D3",
+      "D4",
+      "D8",
+      "D9"
+    ]
+  },
+  "eventos": [
+    {
+      "detector": "D10",
+      "descripcion": "Presión de aceite baja en ralentí pero SOBRE la curva",
+      "t_inicio_ms": 4000,
+      "t_fin_ms": 6000,
+      "severidad_esperada": "ninguna",
+      "debe_disparar": false,
+      "contexto": {
+        "nota": "el caso que un umbral plano marcaría en falso"
+      }
+    },
+    {
+      "detector": "D2",
+      "descripcion": "Pico de knock de UNA sola muestra: por debajo de la permanencia mínima",
+      "t_inicio_ms": 10000,
+      "t_fin_ms": 10050,
+      "severidad_esperada": "ninguna",
+      "debe_disparar": false,
+      "contexto": {
+        "nota": "50 ms < 100 ms de permanencia mínima (docs/04 §4.3)"
+      }
+    },
+    {
+      "detector": "D9",
+      "descripcion": "Pico de 106,5 °C durante 0,8 s: por debajo de la permanencia de 3 s",
+      "t_inicio_ms": 12000,
+      "t_fin_ms": 12800,
+      "severidad_esperada": "ninguna",
+      "debe_disparar": false,
+      "contexto": {}
+    },
+    {
+      "detector": "D1",
+      "descripcion": "Evento de knock: incremento del contador",
+      "t_inicio_ms": 21500,
+      "t_fin_ms": 21550,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {
+        "nota": "RPM > 4000 y MAP > 150 kPa: la severidad sube a crítica"
+      }
+    },
+    {
+      "detector": "D3",
+      "descripcion": "Retardo por knock activo: corrección de encendido negativa",
+      "t_inicio_ms": 21500,
+      "t_fin_ms": 25100,
+      "severidad_esperada": "media",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D2",
+      "descripcion": "Knock sostenido 600 ms por encima del umbral",
+      "t_inicio_ms": 22000,
+      "t_fin_ms": 22600,
+      "severidad_esperada": "media",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D1",
+      "descripcion": "Evento de knock: incremento del contador",
+      "t_inicio_ms": 23000,
+      "t_fin_ms": 23050,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {
+        "nota": "RPM > 4000 y MAP > 150 kPa: la severidad sube a crítica"
+      }
+    },
+    {
+      "detector": "D1",
+      "descripcion": "Evento de knock: incremento del contador",
+      "t_inicio_ms": 24500,
+      "t_fin_ms": 24550,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {
+        "nota": "RPM > 4000 y MAP > 150 kPa: la severidad sube a crítica"
+      }
+    },
+    {
+      "detector": "D10",
+      "descripcion": "Presión de aceite bajo la curva mínima a alto régimen",
+      "t_inicio_ms": 25000,
+      "t_fin_ms": 25600,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {
+        "nota": "la curva es 1 bar + 1 bar/1000 rpm; aquí queda 40 kPa por debajo"
+      }
+    },
+    {
+      "detector": "D4",
+      "descripcion": "Mezcla pobre en carga: lambda 4,1 % sobre objetivo con TPS 100 %",
+      "t_inicio_ms": 32000,
+      "t_fin_ms": 34000,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D4",
+      "descripcion": "Lambda 3,0 % sobre objetivo: por debajo del umbral del 4 %",
+      "t_inicio_ms": 39000,
+      "t_fin_ms": 41000,
+      "severidad_esperada": "ninguna",
+      "debe_disparar": false,
+      "contexto": {
+        "nota": "y además con TPS 0: la condición de carga tampoco se cumple"
+      }
+    },
+    {
+      "detector": "D8",
+      "descripcion": "Duty de inyección al 88 %",
+      "t_inicio_ms": 43000,
+      "t_fin_ms": 45000,
+      "severidad_esperada": "alta",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D8",
+      "descripcion": "Duty de inyección al 96 %",
+      "t_inicio_ms": 45000,
+      "t_fin_ms": 46000,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D8",
+      "descripcion": "Duty al 83 %: por debajo del umbral del 85 %",
+      "t_inicio_ms": 46500,
+      "t_fin_ms": 47500,
+      "severidad_esperada": "ninguna",
+      "debe_disparar": false,
+      "contexto": {}
+    },
+    {
+      "detector": "D9",
+      "descripcion": "Sobretemperatura de refrigerante 107,5 °C durante 3,5 s",
+      "t_inicio_ms": 48500,
+      "t_fin_ms": 52000,
+      "severidad_esperada": "alta",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D11",
+      "descripcion": "Tensión de batería 11,2 V con el motor en marcha",
+      "t_inicio_ms": 52500,
+      "t_fin_ms": 54500,
+      "severidad_esperada": "media",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D12",
+      "descripcion": "Bit de error de trigger activo",
+      "t_inicio_ms": 55500,
+      "t_fin_ms": 56000,
+      "severidad_esperada": "critica",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D13",
+      "descripcion": "Protección de motor en nivel 2",
+      "t_inicio_ms": 56000,
+      "t_fin_ms": 57000,
+      "severidad_esperada": "alta",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D14",
+      "descripcion": "Corte activo al 25 % durante la protección",
+      "t_inicio_ms": 56000,
+      "t_fin_ms": 57000,
+      "severidad_esperada": "media",
+      "debe_disparar": true,
+      "contexto": {}
+    },
+    {
+      "detector": "D18",
+      "descripcion": "Hueco de muestreo de 400 ms",
+      "t_inicio_ms": 58000,
+      "t_fin_ms": 58400,
+      "severidad_esperada": "informativa",
+      "debe_disparar": true,
+      "contexto": {
+        "nota": "8x el dt nominal de 50 ms"
+      }
+    }
+  ]
+}

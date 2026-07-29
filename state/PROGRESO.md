@@ -4,13 +4,13 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-29 23:10:32Z
+Actualizado: 2026-07-29 23:15:53Z
 
-**30 / 669 pts cerrados (4.5 %)** · 14 pts esperando revisión humana → 6.6 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 18 pts esperando revisión humana → 7.2 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
-| F0 | 30 | 14 | 0 | 4 | 6 | 54 |
+| F0 | 30 | 18 | 0 | 0 | 6 | 54 |
 | F1 | 0 | 0 | 0 | 186 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
@@ -23,11 +23,12 @@ Actualizado: 2026-07-29 23:10:32Z
 | Tarea | Estado | Modelo | Puerta | Última nota |
 |---|---|---|---|---|
 | `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | BLOQUEADA sin red: polars, numpy, pyarrow y pandas no estan instalados |
+| `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | samples/verdad/ con verdad.csv (log Haltech legitimo, 60 s a 20 Hz, 20 |
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
 
-## F0 — 44/54 pts
+## F0 — 48/54 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -37,7 +38,7 @@ Actualizado: 2026-07-29 23:10:32Z
 | ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `2771a41` |
 | ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `9c54663` |
 | ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `4229523` |
-| ·  | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | — |
+| ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `02140f8` |
 | ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
 | ⏳ | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
 | ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `217d88b` |
