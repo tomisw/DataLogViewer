@@ -279,7 +279,7 @@ error en las agregaciones.
 - [ ] Hora de cabecera en 12 h reconciliada módulo 12 h.
 - [ ] Epoch ficticia `19800101` detectada → modo relativo.
 - [ ] Fila truncada o con número de columnas incorrecto → se registra y se salta, sin abortar la carga.
-- [ ] Fichero sin `\n` final, CRLF y LF, BOM UTF-8.
+- [ ] Fichero sin `\n` final, CRLF y LF, BOM UTF-8. **El formato nativo es CRLF**: medido sobre `20260729_1859_Log2768.csv`, 557 CRLF y ningún LF suelto. La variante LF aparece cuando una herramienta reescribe el log en Unix (`samples/corrupt/06-lf-solo.csv`).
 - [ ] Marcas de tiempo no monótonas → se detectan y se avisa.
 - [ ] Enteros que desbordan `i32` (se observa `-2147483645` y `2147483647` como centinelas) → tratados como **valor no válido**, no como dato.
 

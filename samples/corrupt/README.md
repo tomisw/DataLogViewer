@@ -17,7 +17,7 @@ Todos los ficheros son **reproducibles e idempotentes**: ejecutar el script dos 
 | **03-fila-larga.csv** | Una fila en el medio con campos extra (29 en lugar de 26) | 124 | 3,8 kB | **Cargar con aviso:** campos extra ignorados, resto válido |
 | **04-sin-displaymaxmin.csv** | 3 líneas `DisplayMaxMin` eliminadas de la cabecera (22 en lugar de 25) | 554 | 32 kB | **Cargar sin aviso:** la especificación permite ausencia de `DisplayMaxMin` (13 canales en AutoLog real tampoco la tienen) |
 | **05-bom-utf8.csv** | Idéntico al original pero con BOM UTF-8 (`0xEF 0xBB 0xBF`) al principio | 557 | 32 kB | **Cargar sin aviso:** fichero válido, parser debe ignorar BOM |
-| **06-crlf.csv** | Todos los finales de línea en CRLF (`\r\n`) | 557 | 32 kB | **Cargar sin aviso:** variante válida de line ending; parser debe manejar LF, CRLF y mixto |
+| **06-lf-solo.csv** | Todos los finales de línea convertidos a LF (`\n`), sin CR | 557 | 32 kB | **Cargar sin aviso:** el formato nativo es CRLF, así que esta es la variante que falta; el parser debe manejar LF, CRLF y mixto |
 | **07-sin-salto-final.csv** | Idéntico al original pero **sin `\n` (ni `\r\n`) en la última línea** | 557 | 32 kB | **Cargar sin aviso:** fichero válido, última fila se lee aunque no termine en separador |
 | **08-marcas-no-monotonas.csv** | Timestamps de dos filas en el medio (100 y 101) intercambiados → orden invertido | 557 | 32 kB | **Cargar con aviso:** detección de marcas de tiempo no monótonas, se avisa del problema |
 | **09-cruce-medianoche.csv** | Timestamps reescritos para cruzar medianoche (filas ≥400: `23:59:xx` → `00:00:xx`) | 557 | 32 kB | **Cargar sin aviso:** cruce de medianoche es válido y debe detectarse; las filas se alinean correctamente |
@@ -90,3 +90,15 @@ def test_parser_version_desconocida():
 ## Historial
 
 - **2026-07-29**: Generación inicial. 11 ficheros, verificación completa de idempotencia y propiedades.
+
+## Nota sobre finales de línea
+
+El log real (`samples/real/20260729_1859_Log2768.csv`) es **CRLF nativo**: 557
+CRLF y ningún LF suelto. Por tanto los otros diez ficheros de este corpus ya
+cubren el caso CRLF, y un fichero «convertido a CRLF» habría sido byte a byte
+idéntico al original.
+
+El caso que de verdad falta —y el que ejercita `06-lf-solo.csv`— es **LF solo**,
+que es lo que produce cualquier herramienta que reescriba el log en Unix. Que el
+formato nativo sea CRLF es además un dato de la especificación
+(`docs/01-formato-log.md` §1.13).

@@ -121,15 +121,24 @@ def create_05_bom_utf8(header_lines, data_lines, line_sep, has_final_sep, corrup
     write_file(bom_content, "05-bom-utf8.csv", corrupt_dir)
 
 
-def create_06_crlf(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir):
-    """06: Todos los finales de línea en CRLF."""
+def create_06_lf_solo(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir):
+    """06: Todos los finales de línea en LF, sin CR.
+
+    El caso original de la especificación era «todos los finales en CRLF», pero
+    al verificar el corpus se descubrió que **el log real ya es CRLF nativo**
+    (557 CRLF y ningún LF suelto en `20260729_1859_Log2768.csv`). Es decir: los
+    otros diez ficheros de este corpus ya cubren CRLF, y el fichero CRLF era
+    byte a byte idéntico al original, así que no probaba nada.
+
+    La variante que de verdad falta es la contraria: LF solo, que es lo que
+    produce cualquier herramienta que reescriba el log en Unix. Ese es el caso
+    que este fichero ejercita.
+    """
     content = line_sep.join(header_lines) + line_sep + line_sep.join(data_lines)
     if has_final_sep:
         content += line_sep
-    # Si no tiene CRLF, conviértelo
-    if b"\r\n" not in content:
-        content = content.replace(b"\n", b"\r\n")
-    write_file(content, "06-crlf.csv", corrupt_dir)
+    content = content.replace(b"\r\n", b"\n")
+    write_file(content, "06-lf-solo.csv", corrupt_dir)
 
 
 def create_07_sin_salto_final(header_lines, data_lines, line_sep, corrupt_dir):
@@ -255,7 +264,7 @@ def main():
     create_03_fila_larga(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
     create_04_sin_displaymaxmin(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
     create_05_bom_utf8(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
-    create_06_crlf(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
+    create_06_lf_solo(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
     create_07_sin_salto_final(header_lines, data_lines, line_sep, corrupt_dir)
     create_08_marcas_no_monotonas(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)
     create_09_cruce_medianoche(header_lines, data_lines, line_sep, has_final_sep, corrupt_dir)

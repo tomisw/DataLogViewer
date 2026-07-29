@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 22:08:37Z"
+    "actualizado": "2026-07-29 22:10:48Z"
   },
   "tareas": [
     {
@@ -165,10 +165,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "haiku",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "4229523"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-29 22:10:48Z",
+          "texto": "Verificado por el orquestador: 11 ficheros, 04 con 22 DisplayMaxMin (3 menos que el original), 05 con BOM, 07 sin salto final, 10 con version 2.0, idempotencia confirmada, ruff limpio. DEFECTO CORREGIDO al integrar: el fichero 06 iba a ser 'convertido a CRLF', pero el log real YA ES CRLF nativo (557 CRLF, 0 LF sueltos), asi que el fixture era identico al original y no probaba nada. Sustituido por 06-lf-solo.csv, que es la variante que de verdad faltaba. El hallazgo se ha anadido a docs/01 §1.13 como dato del formato."
+        }
+      ]
     },
     {
       "id": "F0-07",
