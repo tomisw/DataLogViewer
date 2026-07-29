@@ -92,8 +92,10 @@ select = [
     "E501",    # tablas de datos y cadenas de ayuda: partirlas empeora la lectura
     "RUF059",  # desempaquetados parciales deliberados al leer tuplas del backlog
     "RUF002",  # docstrings en español con comillas tipográficas y «»
+    "RUF001",  # signo menos tipográfico (−) en cadenas de prosa
+    "RUF003",  # signo menos tipográfico (−) en comentarios
 ]
-"tests/*.py" = ["E501", "RUF059", "RUF002"]
+"tests/*.py" = ["E501", "RUF059", "RUF002", "RUF001", "RUF003"]
 
 "*/tests/*" = ["S101"]
 

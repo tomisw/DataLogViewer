@@ -57,7 +57,7 @@ def test_todo_rol_esta_bien_formado(roles: dict) -> None:
         assert re.fullmatch(r"[a-z][a-z0-9_]*", nombre), f"{nombre}: nombre no canónico"
         assert "dimension" in r, f"{nombre}: falta dimension"
         assert "plausible" in r, f"{nombre}: falta rango plausible"
-        assert "sinonimos" in r and r["sinonimos"], f"{nombre}: sin sinónimos"
+        assert r.get("sinonimos"), f"{nombre}: sin sinónimos"
         p = r["plausible"]
         assert p["min"] < p["max"], f"{nombre}: rango invertido ({p['min']} >= {p['max']})"
 
@@ -130,18 +130,18 @@ def test_los_roles_criticos_de_los_detectores_existen(roles: dict) -> None:
     """Los detectores de severidad crítica de docs/04 §4.3 dependen de estos
     roles. Si falta uno, el detector no se puede definir."""
     necesarios = {
-        "knock_count",           # D1
-        "lambda_measured",       # D4
-        "lambda_target",         # D4
-        "throttle_position",     # D4
-        "engine_speed",          # D4, contexto de casi todos
+        "knock_count",  # D1
+        "lambda_measured",  # D4
+        "lambda_target",  # D4
+        "throttle_position",  # D4
+        "engine_speed",  # D4, contexto de casi todos
         "boost_pressure_actual",  # D6
-        "injector_duty",         # D8
-        "coolant_temp",          # D9
-        "oil_pressure",          # D10
-        "battery_voltage",       # D11
-        "trigger_errors",        # D12
-        "protection_level",      # D13
+        "injector_duty",  # D8
+        "coolant_temp",  # D9
+        "oil_pressure",  # D10
+        "battery_voltage",  # D11
+        "trigger_errors",  # D12
+        "protection_level",  # D13
     }
     faltan = necesarios - set(roles["roles"])
     assert not faltan, f"faltan roles de detectores críticos: {sorted(faltan)}"
