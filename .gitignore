@@ -1,0 +1,21 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+
+# Tauri
+src-tauri/target/
+
+# Caché de parseo de la aplicación
+*.dlvcache
+
+# Corpus generado (se regenera con el guion de F0-05)
+samples/synth/
+
+# Sistema
+.DS_Store
+Thumbs.db
