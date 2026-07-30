@@ -36,6 +36,7 @@ import platform
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -517,6 +518,7 @@ def cmd_spike_polars(args: argparse.Namespace) -> int:
 # `read_csv` crudo del spike de F0-01)
 # --------------------------------------------------------------------------- #
 DESCRIPTOR_HALTECH = RAIZ / "data" / "formats" / "haltech_nsp.toml"
+UNITS_TOML = RAIZ / "data" / "units.toml"
 
 
 def cmd_parseo_cuerpo(args: argparse.Namespace) -> int:
@@ -686,6 +688,93 @@ def cmd_transporte(args: argparse.Namespace) -> int:
     print(f"{args.puntos:,} muestras -> {tam_mb:.2f} MB Arrow IPC")
     print(f"  codificar:   {t_codificar * 1000:.2f} ms  ->  {tam_mb / t_codificar:.1f} MB/s")
     print(f"  decodificar: {t_decodificar * 1000:.2f} ms  ->  {tam_mb / t_decodificar:.1f} MB/s")
+    return 0
+
+
+# --------------------------------------------------------------------------- #
+# cache  (el entregable medible de F1-11: mide el módulo real sobre el
+# escenario del sintético de 1 h -- 475 canales de un log de verdad, no el
+# 16 x 5M de generar_series_sinteticas, que sobrestima con mucho el volumen
+# por canal de un log Haltech real y no sirve para juzgar `segunda_apertura`)
+# --------------------------------------------------------------------------- #
+def cmd_cache(_args: argparse.Namespace) -> int:
+    """F1-11: mide `dlv_core.cache` sobre el sintético de 1 h ya parseado.
+
+    `segunda_apertura` (docs/02 §2.6, <=700 ms) mide reabrir un log YA
+    cacheado: la escritura ocurrió en la primera apertura, así que el
+    presupuesto juzga `lectura_ms`, no `escritura_ms` + `lectura_ms`.
+    """
+    try:
+        from dlv_core.almacen import Storage, construir_desde_polars
+        from dlv_core.cache import construir_clave, medir_ciclo_escritura_lectura
+        from dlv_core.formatos.cuerpo import COLUMNA_MARCA, columna_polars, parsear_cuerpo
+        from dlv_core.formatos.haltech import cargar_descriptor, parsear_cabecera
+        from dlv_core.formatos.limpieza import nulificar_centinelas
+        from dlv_core.piramide import TipoCanalPiramide, construir_piramide
+        from dlv_core.unidades import cargar_catalogo
+    except ImportError as e:
+        print(f"NO_MEDIBLE: no se puede importar dlv_core ({e}).")
+        return 0
+
+    ruta = fichero_grande()
+    if ruta is None:
+        print("NO_MEDIBLE: falta el fichero de trabajo (genera el sintético de 1 h).")
+        return 0
+
+    with DESCRIPTOR_HALTECH.open("rb") as fh:
+        descriptor = cargar_descriptor(fh)
+    with UNITS_TOML.open("rb") as fh:
+        catalogo = cargar_catalogo(fh)
+
+    datos = ruta.read_bytes()
+    cabecera = parsear_cabecera(datos, descriptor)
+    df = parsear_cuerpo(datos, cabecera)
+    limpio = nulificar_centinelas(df, catalogo)
+    storage_por_columna = {
+        columna_polars(c.columna): Storage.INT32_SCALED for c in cabecera.canales
+    }
+    series = construir_desde_polars(
+        limpio, cabecera, columna_tiempo=COLUMNA_MARCA, storage_por_columna=storage_por_columna
+    )
+    # Todos los canales como CONTINUO para esta medición: la asignación real
+    # de variante por canal (enum/contador/bits según rol) es trabajo futuro;
+    # lo que importa aquí es el volumen de datos que pasa por la caché, y
+    # las cuatro variantes escriben un esquema de fila comparable (F1-11).
+    piramides = [construir_piramide(s.v, tipo=TipoCanalPiramide.CONTINUO) for s in series]
+
+    with tempfile.TemporaryDirectory() as directorio_temporal:
+        destino = Path(directorio_temporal) / "log.dlvcache"
+        clave = construir_clave(
+            ruta,
+            tamano_bytes=ruta.stat().st_size,
+            mtime_ns=ruta.stat().st_mtime_ns,
+            version_parser="1",
+            version_descriptor_formato=f"{cabecera.formato}@{cabecera.version}",
+        )
+        resultado = medir_ciclo_escritura_lectura(destino, clave, series, piramides)
+
+    print(f"Fichero: {ruta.relative_to(RAIZ)}  ({len(series)} canales)")
+    print(f"  escritura: {resultado['escritura_ms']:.1f} ms")
+    print(f"  lectura:   {resultado['lectura_ms']:.1f} ms  (esto es lo que juzga el presupuesto)")
+
+    p = POR_ID["segunda_apertura"]
+    registrar(
+        Medicion(
+            presupuesto="segunda_apertura",
+            valor=resultado["lectura_ms"],
+            unidad="ms",
+            estado=p.evalua(resultado["lectura_ms"]),
+            fecha=_ahora(),
+            commit=_commit(),
+            maquina=_maquina(),
+            detalle={
+                "motor": "dlv_core.cache",
+                "fichero": str(ruta.relative_to(RAIZ)),
+                "canales": len(series),
+                "escritura_ms": round(resultado["escritura_ms"], 1),
+            },
+        )
+    )
     return 0
 
 
@@ -878,6 +967,9 @@ def main() -> int:
     s = sub.add_parser("transporte", help="F1-22: mide dlv_core.transporte (Arrow IPC)")
     s.add_argument("--puntos", type=int, default=5_000_000)
     s.set_defaults(func=cmd_transporte)
+
+    s = sub.add_parser("cache", help="F1-11: mide dlv_core.cache (segunda_apertura)")
+    s.set_defaults(func=cmd_cache)
 
     s = sub.add_parser("adr009", help="comprueba el invariante de bucles por muestra")
     s.set_defaults(func=cmd_adr009)

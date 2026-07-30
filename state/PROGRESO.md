@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 13:51:04Z
+Actualizado: 2026-07-30 14:04:45Z
 
-**81 / 669 pts cerrados (12.1 %)** · 62 pts esperando revisión humana → 21.4 % entregado
+**86 / 669 pts cerrados (12.9 %)** · 62 pts esperando revisión humana → 22.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 51 | 38 | 0 | 97 | 0 | 186 |
+| F1 | 56 | 38 | 0 | 92 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -55,7 +55,7 @@ Actualizado: 2026-07-30 13:51:04Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 89/186 pts
+## F1 — 94/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -69,7 +69,7 @@ Actualizado: 2026-07-30 13:51:04Z
 | ✔  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | `4471cbc` |
 | ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `c1296dd` |
 | ✔  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | `a521091` |
-| ·  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | — |
+| ✔  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | `3296f2e` |
 | ✔  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | `4471cbc` |
 | ⏳ | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | `efc4f55` |
 | ·  | `F1-14` | Conversiones parametrizadas por canal (λ→AFR con la estequiome | Opus 5 | 5 | F1-13 | G1 | — |

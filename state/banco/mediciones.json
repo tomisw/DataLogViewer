@@ -1743,5 +1743,199 @@
       "hallazgos": [],
       "ficheros_inspeccionados": 22
     }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 13:56:04Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 23
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 672.8120000334457,
+    "unidad": "ms",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:00:57Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 654.3
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 648.6364000011235,
+    "unidad": "ms",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:01:20Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 653.9
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 674.8444999102503,
+    "unidad": "ms",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:01:31Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 632.3
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 786.3566000014544,
+    "unidad": "ms",
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 14:01:42Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 571.2
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:02:30Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 23
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 638.9211999485269,
+    "unidad": "ms",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:03:16Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 578.1
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 937.0480999350548,
+    "unidad": "ms",
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 14:03:27Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 923.3
+    }
+  },
+  {
+    "presupuesto": "segunda_apertura",
+    "valor": 635.4216999607161,
+    "unidad": "ms",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:03:38Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.cache",
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "canales": 475,
+      "escritura_ms": 543.2
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 14:04:14Z",
+    "commit": "3296f2e",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 23
+    }
   }
 ]
