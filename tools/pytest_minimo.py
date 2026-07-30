@@ -7,14 +7,26 @@ CI); este módulo inyecta un `pytest` de mentira lo bastante completo para
 ejecutarlas y así poder verificar el trabajo sin conexión.
 
 Soporta el subconjunto que usan las pruebas del proyecto:
-    @pytest.fixture (con scope, ignorado)     pytest.raises
-    @pytest.mark.parametrize                  pytest.skip / pytest.fail
-    pytest.approx
+
+    @pytest.fixture             con scope (ignorado) y con fixtures encadenadas
+    @pytest.mark.parametrize    nombres en cadena o en tupla, con `ids=`
+    pytest.approx               escalares y secuencias, con `rel=` y `abs=`
+    pytest.raises               con `match=`
+    pytest.skip / pytest.fail / pytest.importorskip
+    tmp_path                    la única fixture de pytest que se provee
+
+Con esto recoge y ejecuta los mismos ficheros de prueba que `pytest` —comprobado
+en `tests/test_verificar.py`— y salta la de `dlv-api`, que exige FastAPI.
+
+Aun así, **un verde aquí no equivale a un verde con `pytest`**: hay comportamientos
+que no se reproducen. `tools/verificar.py` lo marca en el resumen cuando ha tenido
+que usar el sustituto, en vez de dar un verde indistinguible del de verdad.
 
 Uso:
     python tools/pytest_minimo.py tests/test_units_catalogo.py [...]
 
-Si `pytest` está disponible, usa ese en su lugar y no hagas caso de este fichero.
+Normalmente no se invoca a mano: lo hace `tools/verificar.py` cuando no encuentra
+`pytest`. Si `pytest` está disponible, se usa ese y este fichero no interviene.
 """
 
 from __future__ import annotations
@@ -34,8 +46,12 @@ class _Saltar(Exception):
 
 
 class _Aprox:
-    def __init__(self, valor, rel: float = 1e-6, abs_: float = 1e-12) -> None:
-        self.valor, self.rel, self.abs = valor, rel, abs_
+    # Los nombres de los parámetros son los de pytest (`rel` y `abs`), no unos
+    # propios: las pruebas se escriben para pytest de verdad y este módulo solo
+    # las ejecuta. `abs` tapa el builtin dentro del `__init__` y da igual; que la
+    # firma sea la misma, no.
+    def __init__(self, valor, rel: float = 1e-6, abs: float = 1e-12) -> None:
+        self.valor, self.rel, self.abs = valor, rel, abs
 
     def __eq__(self, otro: object) -> bool:
         import math
@@ -95,9 +111,12 @@ def _construir_pytest() -> types.ModuleType:
 
     class _Mark:
         @staticmethod
-        def parametrize(nombres, valores):
+        def parametrize(nombres, valores, ids=None):
+            # `ids` importa cuando el caso es un diccionario leído de un TOML (la
+            # tabla de F1-20): sin él, la etiqueta del fallo es el `repr` entero
+            # de la fila y no se lee.
             def envolver(f):
-                f.__parametrize__ = (nombres, list(valores))
+                f.__parametrize__ = (nombres, list(valores), list(ids) if ids else None)
                 return f
 
             return envolver
@@ -114,6 +133,19 @@ def _construir_pytest() -> types.ModuleType:
     def fallar(motivo: str = "") -> None:
         raise AssertionError(motivo)
 
+    def importorskip(nombre: str, *_a, **_k):
+        """Salta el fichero entero si el módulo no está instalado.
+
+        Es como `dlv-api/tests/test_salud.py` evita fallar sin FastAPI. Al
+        lanzarse durante la importación del fichero, `ejecutar` lo cuenta como
+        fichero saltado y no como fallo.
+        """
+        try:
+            return importlib.import_module(nombre)
+        except ImportError as e:
+            raise _Saltar(f"no está instalado: {nombre} ({e})") from None
+
+    mod.importorskip = importorskip  # type: ignore[attr-defined]
     mod.fixture = fixture  # type: ignore[attr-defined]
     mod.mark = _Mark()  # type: ignore[attr-defined]
     mod.raises = _Raises  # type: ignore[attr-defined]
@@ -134,17 +166,37 @@ def _cargar(ruta: Path) -> types.ModuleType:
 
 
 def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
-    mod = _cargar(ruta)
+    try:
+        mod = _cargar(ruta)
+    except _Saltar as e:
+        # `pytest.importorskip` en el ámbito del módulo: el fichero entero se
+        # salta. Sin esto, un fichero que exige FastAPI tumbaba toda la ejecución.
+        return 0, 0, 1, [f"SALTADO {ruta}: {e}"]
     fixtures = {
         n: f for n, f in vars(mod).items() if callable(f) and getattr(f, "__es_fixture__", False)
     }
     cache: dict[str, object] = {}
 
     def resolver(nombre: str):
+        # `tmp_path` es de pytest, no del proyecto, así que hay que proveerla. No
+        # se cachea: cada prueba tiene que recibir un directorio propio, o dos
+        # pruebas que escriban el mismo nombre de fichero se pisarían y el fallo
+        # dependería del orden.
+        if nombre == "tmp_path":
+            import tempfile
+
+            return Path(tempfile.mkdtemp(prefix="dlv-prueba-"))
         if nombre not in cache:
             if nombre not in fixtures:
-                raise KeyError(f"fixture desconocida: {nombre}")
-            cache[nombre] = fixtures[nombre]()
+                raise KeyError(
+                    f"fixture desconocida: {nombre}. `tools/pytest_minimo.py` solo "
+                    "provee las fixtures del propio fichero de pruebas y `tmp_path`; "
+                    "con pytest de verdad instalado esto no ocurre."
+                )
+            # Una fixture puede pedir otras fixtures, y pytest las encadena. Sin
+            # esto, `fila_de_referencia(log)` fallaba por falta de argumento.
+            dependencias = {p: resolver(p) for p in inspect.signature(fixtures[nombre]).parameters}
+            cache[nombre] = fixtures[nombre](**dependencias)
         return cache[nombre]
 
     pruebas = [
@@ -156,7 +208,7 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
 
     for nombre, func in pruebas:
         params = inspect.signature(func).parameters
-        pnombres, pvalores = getattr(func, "__parametrize__", (None, [(None,)]))
+        pnombres, pvalores, pids = getattr(func, "__parametrize__", (None, [(None,)], None))
         if pnombres:
             # `parametrize` acepta los nombres como cadena separada por comas o
             # como tupla/lista, y pytest trata las dos igual. La forma de tupla
@@ -174,12 +226,15 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
         else:
             casos = [{}]
 
-        for caso in casos:
+        for indice, caso in enumerate(casos):
             kwargs = dict(caso)
             for p in params:
                 if p not in kwargs:
                     kwargs[p] = resolver(p)
-            etiqueta = nombre + (f"[{','.join(map(str, caso.values()))}]" if caso else "")
+            if pids and indice < len(pids):
+                etiqueta = f"{nombre}[{pids[indice]}]"
+            else:
+                etiqueta = nombre + (f"[{','.join(map(str, caso.values()))}]" if caso else "")
             try:
                 func(**kwargs)
                 ok += 1

@@ -39,28 +39,32 @@ npm run dev
 
 En un contenedor de desarrollo sin acceso a PyPI, los binarios `ruff`, `mypy` y `pytest` pueden no estar disponibles tras `uv sync`. En ese caso:
 
-- Para pruebas: usa `python tools/pytest_minimo.py` en lugar de `pytest`. Es una implementación de sustitución que no requiere `pytest` instalado.
-- Para lint y formato: si `ruff` no está disponible, será reportado al ejecutar la verificación completa (§3).
+- `tools/verificar.sh` ya lo gestiona: si no encuentra `pytest`, cae en `tools/pytest_minimo.py` —un `pytest` de sustitución que solo usa biblioteca estándar— y lo marca en el resumen. Recoge los mismos ficheros de prueba que `pytest`, pero un verde con sustituto no equivale a un verde con `pytest`, y por eso se avisa.
+- `ruff` y `mypy` no tienen sustituto: si faltan, la comprobación cuenta como fallo. Es deliberado.
+- **PyPI está bloqueado en el contenedor remoto** y no es transitorio: `pypi.org` está en `no_proxy` y devuelve 403 en 0,06 s. `polars`, `numpy` y `fastapi` no se pueden instalar allí; lo que dependa de ellos se marca `block` con el motivo. En local no ocurre: ver `docs/09-instrucciones-para-modelos-locales.md` §9.2.
 
 ## 3. Verificación antes de proponer un cambio
 
-Antes de abrir un PR, ejecuta estos cuatro comandos sobre todo el repositorio:
+Una sola orden, sobre todo el repositorio y no solo sobre lo que has tocado:
 
 ```bash
-ruff check .          # lint
-ruff format --check . # formato
-mypy dlv-core dlv-api # tipado estricto
-pytest -q             # pruebas
+bash tools/verificar.sh        # en Windows sin Git Bash: python tools/verificar.py
 ```
 
-Además, si tocas `dlv-core`:
+Ejecuta las seis comprobaciones —`ruff check`, `ruff format --check`,
+`mypy --strict`, `pytest`, ADR-009 y presupuestos—, las resume al final y devuelve
+código de salida distinto de cero si algo está en rojo.
 
-```bash
-python tools/banco.py comprobar  # puertas de rendimiento
-python tools/banco.py adr009     # regla de cero bucles por muestra
-```
+**No ejecutes las herramientas a mano en su lugar.** No es una preferencia de
+estilo: `ruff check` imprime «No fixes available…» *después* de «Found N errors»,
+así que mirar el final de su salida engaña, y ya dejó pasar dos commits con el
+lint en rojo. El guion usa códigos de salida, que no admiten interpretación.
 
-**Todos los comandos deben pasar.** Si alguno falla, corrige el código antes de hacer commit.
+Si no encuentra una herramienta pero hay `uv`, la ejecuta con `uv run` y lo dice
+en el resumen. Una herramienta ausente cuenta como **fallo**, no como
+comprobación omitida: no haber podido mirar no es estar en verde.
+
+**Todo tiene que estar en verde antes de hacer commit.**
 
 ## 4. ADR-009: Cero bucles por muestra en Python
 

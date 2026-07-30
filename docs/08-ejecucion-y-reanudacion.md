@@ -44,6 +44,10 @@ Empieza ejecutando `python tools/estado.py next`.
 No hace falta más contexto: el protocolo, el estado y las especificaciones están
 en el repositorio.
 
+**Si la sesión es local**, en la máquina del propietario, hay además
+`docs/09-instrucciones-para-modelos-locales.md`: lo que cambia con red disponible,
+la puesta en marcha con `uv`, las reglas no negociables y las trampas ya pagadas.
+
 ## 8.4 Bucle de orquestación
 
 ```
@@ -163,12 +167,19 @@ Antes de cerrar cualquier tarea, y siempre sobre todo el repositorio, no solo
 sobre lo tocado:
 
 ```bash
-bash tools/verificar.sh
+bash tools/verificar.sh          # en Windows sin Git Bash: python tools/verificar.py
 ```
 
 Ejecuta las seis comprobaciones (`ruff check`, `ruff format --check`,
 `mypy --strict`, `pytest`, ADR-009 y presupuestos), resume al final y devuelve
 código de salida distinto de cero si algo está en rojo.
+
+La implementación está en `tools/verificar.py`; el guion de bash solo delega, así
+que la comprobación obligatoria también funciona en la máquina del propietario, que
+es Windows. Una regla que no se puede ejecutar donde trabaja el propietario no es
+una regla. Si no encuentra una herramienta en el `PATH` pero hay `uv`, la ejecuta
+con `uv run` y lo dice en el resumen; **una herramienta ausente cuenta como fallo**,
+no como comprobación omitida.
 
 **Úsalo en lugar de ejecutar las herramientas a mano.** Se escribió después de
 que dos commits salieran con el lint en rojo por la misma razón las dos veces:
@@ -177,8 +188,11 @@ mirar la última línea de su salida engaña. El guion usa códigos de salida, q
 se pueden malinterpretar.
 
 En un contenedor sin red no hay `pip`, pero `ruff`, `mypy` y `pytest` pueden
-estar disponibles como binarios aislados en `~/.local/bin`. Si no lo están,
-`python tools/pytest_minimo.py` ejecuta las pruebas con un `pytest` de sustitución.
+estar disponibles como binarios aislados en `~/.local/bin`. Si `pytest` no lo está,
+`tools/verificar.py` cae solo en `tools/pytest_minimo.py`, que recoge los mismos
+ficheros de prueba, y lo marca en el resumen: un verde con sustituto no es
+indistinguible de un verde de verdad. `ruff` y `mypy` no tienen sustituto y su
+ausencia pone la comprobación en rojo.
 
 **PyPI está bloqueado en este entorno** y no es un fallo transitorio:
 `curl https://pypi.org/simple/polars/` devuelve 403 en 0,06 s, un rechazo local

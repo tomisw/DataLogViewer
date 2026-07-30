@@ -46,6 +46,7 @@ contrapartidas de elegir Python están detallados sin adornos en
 | [`docs/06-sistema-de-unidades.md`](docs/06-sistema-de-unidades.md) | **Unidades intercambiables**: dimensiones canónicas, conversiones afines / recíprocas / parametrizadas, semántica de punto e intervalo, presión absoluta o relativa, presets. |
 | [`docs/07-formatos-y-csv-generico.md`](docs/07-formatos-y-csv-generico.md) | **Escalabilidad a cualquier CSV**: capa de formatos de dos niveles, autodetección, roles semánticos, asistente y perfiles de importación. |
 | [`docs/08-ejecucion-y-reanudacion.md`](docs/08-ejecucion-y-reanudacion.md) | **Protocolo de ejecución**: bucle de orquestación, asignación de agentes, puertas de revisión y cómo reanudar en una sesión nueva cuando se agota el límite. |
+| [`docs/09-instrucciones-para-modelos-locales.md`](docs/09-instrucciones-para-modelos-locales.md) | **Ejecución en local**: puesta en marcha con `uv`, la orden de verificación obligatoria, reglas no negociables, qué desbloquea la red y trampas ya pagadas. |
 
 ## Plan en una tabla
 
@@ -85,6 +86,11 @@ claude/log-visualization-app-plan-5lhr8x.
 Lee docs/08-ejecucion-y-reanudacion.md y sigue el bucle de la sección 8.4.
 Empieza ejecutando `python tools/estado.py next`.
 ```
+
+Para continuar **en local**, en la máquina del propietario, el texto de arranque y
+lo que cambia (red disponible, `uv sync`, aprobación de puertas G1 en el momento)
+están en [`docs/09-instrucciones-para-modelos-locales.md`](docs/09-instrucciones-para-modelos-locales.md).
+`CLAUDE.md` recoge las reglas no negociables en una página.
 
 ## Datos de muestra analizados
 
