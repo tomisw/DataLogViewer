@@ -313,3 +313,28 @@ def test_medir_ciclo_escritura_lectura_hace_round_trip_correcto(tmp_path: Path) 
     assert len(series_leidas) == 4
     for original, reconstruida in zip(series, series_leidas, strict=True):
         assert np.array_equal(reconstruida.v, original.v)
+
+
+def test_lectura_cumple_presupuesto_segunda_apertura_a_escala_realista(tmp_path: Path) -> None:
+    """Sí juzga el presupuesto `segunda_apertura` (`docs/02-alcance-y-plan.md`
+    §2.6, <= 700 ms), a la escala de su escenario de referencia ("apertura de
+    66 MB / 475 canales"): con la tasa de muestreo del AutoLog real (samples/
+    real/AutoLog_20260729_1830.csv, 2636 filas / 4.47 MB), un log de 66 MB
+    tiene del orden de 39 000 muestras por canal, no los 5 000 000 de
+    `docs/02` §2.6 para `fps_pan_zoom` (ese es un presupuesto de
+    renderizado en memoria, no de E/S de caché).
+
+    El presupuesto es sobre la SEGUNDA apertura (leer), no sobre escribir: el
+    paso 8 de §3.4 ("Caché") ocurre en segundo plano durante la PRIMERA
+    apertura (presupuesto de 4 s), después de que el primer gráfico ya se
+    pudo pintar tras el paso 4 -- por eso solo `lectura_ms` se compara aquí
+    contra el límite; `escritura_ms` se registra pero no se le exige nada.
+    """
+    series, piramides = generar_series_sinteticas(n_canales=475, n_muestras=39_000, semilla=3)
+    destino = tmp_path / "realista.dlvcache"
+    clave = _clave(tmp_path / "realista.csv")
+
+    tiempos = medir_ciclo_escritura_lectura(destino, clave, series, piramides)
+
+    print(f"\nescritura: {tiempos['escritura_ms']:.1f} ms  lectura: {tiempos['lectura_ms']:.1f} ms")
+    assert tiempos["lectura_ms"] <= 700.0

@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 14:05:37Z"
+    "actualizado": "2026-07-30 14:13:03Z"
   },
   "tareas": [
     {
@@ -710,12 +710,17 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "3296f2e"
+        "3296f2e",
+        "b15f5b9"
       ],
       "notas": [
         {
           "fecha": "2026-07-30 14:04:45Z",
           "texto": "dlv_core/cache.py: escribir/leer/es_valida sobre ChannelSeries+piramides (F1-05/09/10), no un pl.DataFrame suelto -- CAMBIO DE FIRMA respecto al stub, mismo motivo que F1-05. ClaveInvalidacion gana version_esquema_cache (no estaba en el stub): protege contra un cambio de FORMA de ChannelSeries/NivelPiramide, no solo del log origen. L0 de la piramide guarda el valor bruto sin perdida (primero/moda/or_bits segun variante), asi que v NO se persiste por separado -- evita duplicar el volumen de datos mas grande. Columnas anchas por canal (id_canal__campo) y un fichero de tiempos/piramide POR GRUPO de muestreo, tras un rediseño del propio agente durante la tarea (senal de que el formato 'largo' inicial no rendia bien). -- HALLAZGO NUEVO Y LIMITROFE (revisar): 'segunda_apertura' (presupuesto <=700ms, nunca medido hasta ahora) da entre 630 y 940 ms en 6 ejecuciones sobre el sintetico de 1h real (475 canales) -- cruza el presupuesto en ambas direcciones segun el ruido de E/S de disco de esta maquina. No es un fallo claro ni un exito comodo. No se ajusto el presupuesto ni se reintento hasta obtener un numero favorable; queda registrado el ultimo valor medido (CUMPLE, 638ms) pero la nota deja constancia del rango real. El presupuesto solo juzga LECTURA (la escritura ya paso en la primera apertura). Banco anadido por el orquestador: 'python tools/banco.py cache' (el agente dejo medir_ciclo_escritura_lectura listo pero no lo integro con banco.py a proposito, para no arriesgar chocar con otro trabajo en paralelo). -- 12 tests, round-trip de las 4 variantes en 2 grupos, invalidacion por tamaño/mtime/version de parser/version de esquema, es_valida no falla sin cache previa. Verificado de forma independiente (incluida una relectura completa tras el rediseño): ruff/mypy/pytest en verde, 530 tests sin regresiones."
+        },
+        {
+          "fecha": "2026-07-30 14:13:03Z",
+          "texto": "SEGUIMIENTO: el hallazgo limitrofe de segunda_apertura (630-940ms) queda RESUELTO. El agente en segundo plano detecto el mismo problema de forma independiente (sin saber que ya habia un commit) y lo arreglo: el .astype(dtype, copy=False) se aplicaba una vez POR NIVEL de piramide (~8-12 veces) en vez de una vez por columna completa antes de trocear -- el troceo posterior es una vista de NumPy sin coste, asi que repetir el cast por nivel multiplicaba por 8-12 un coste ya innecesario; media el propio agente que esto era ~40% del tiempo de leer(). Remedido con el pipeline real (parsear_cabecera+cuerpo+limpieza+almacen sobre samples/synth/autolog-1h.csv, 475 canales): lectura 328-405 ms en 3 ejecuciones, CUMPLE con margen comodo (antes 630-940ms, limitrofe). Tambien se añadio un test dedicado (test_lectura_cumple_presupuesto_segunda_apertura_a_escala_realista) que afirma lectura_ms<=700 a escala realista (475 canales x 39000 muestras, la tasa del AutoLog real para un log de 66MB, no el 5M/canal de fps_pan_zoom que es un presupuesto distinto). 531 tests, todo verde salvo memoria_residente (ya conocido, sin cambios)."
         }
       ]
     },

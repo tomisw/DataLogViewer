@@ -520,49 +520,61 @@ def _reconstruir_piramide_empaquetada(
         limites.append((factor, inicio, n_cubos))
         inicio += n_cubos
 
+    # El `.astype(..., copy=False)` se hace UNA vez por columna completa, no
+    # una vez por nivel: Parquet/Arrow ya devuelve el dtype exacto que se
+    # escribió (comprobado: `ndarray.astype(mismo_dtype, copy=False)` es
+    # entonces un no-op, sin copia), así que repetirlo por nivel (~8 niveles)
+    # solo multiplicaba por 8 un coste que ya era innecesario. El primer
+    # intento de esta función lo hacía por nivel y eso por sí solo suponía
+    # ~40 % del tiempo de `leer()` medido con el banco a escala de
+    # `docs/02-alcance-y-plan.md` §2.6 (66 MB / 475 canales). El *slice* por
+    # nivel de un array ya en el dtype correcto es una vista de NumPy, sin
+    # coste.
     if tipo is TipoCanalPiramide.CONTINUO:
-        minimo = tabla[f"{id_canal}__minimo"].to_numpy()
-        maximo = tabla[f"{id_canal}__maximo"].to_numpy()
-        primero = tabla[f"{id_canal}__primero"].to_numpy()
-        ultimo = tabla[f"{id_canal}__ultimo"].to_numpy()
+        minimo = tabla[f"{id_canal}__minimo"].to_numpy().astype(dtype_valor, copy=False)
+        maximo = tabla[f"{id_canal}__maximo"].to_numpy().astype(dtype_valor, copy=False)
+        primero = tabla[f"{id_canal}__primero"].to_numpy().astype(dtype_valor, copy=False)
+        ultimo = tabla[f"{id_canal}__ultimo"].to_numpy().astype(dtype_valor, copy=False)
         return [
             NivelPiramide(
                 factor=factor,
-                minimo=minimo[inicio : inicio + n].astype(dtype_valor),
-                maximo=maximo[inicio : inicio + n].astype(dtype_valor),
-                primero=primero[inicio : inicio + n].astype(dtype_valor),
-                ultimo=ultimo[inicio : inicio + n].astype(dtype_valor),
+                minimo=minimo[inicio : inicio + n],
+                maximo=maximo[inicio : inicio + n],
+                primero=primero[inicio : inicio + n],
+                ultimo=ultimo[inicio : inicio + n],
             )
             for factor, inicio, n in limites
         ]
     if tipo is TipoCanalPiramide.CONTADOR:
-        suma_delta = tabla[f"{id_canal}__suma_delta"].to_numpy()
-        primero = tabla[f"{id_canal}__primero"].to_numpy()
-        ultimo = tabla[f"{id_canal}__ultimo"].to_numpy()
+        suma_delta = tabla[f"{id_canal}__suma_delta"].to_numpy().astype(np.int64, copy=False)
+        primero = tabla[f"{id_canal}__primero"].to_numpy().astype(dtype_valor, copy=False)
+        ultimo = tabla[f"{id_canal}__ultimo"].to_numpy().astype(dtype_valor, copy=False)
         return [
             NivelContador(
                 factor=factor,
-                suma_delta=suma_delta[inicio : inicio + n].astype(np.int64),
-                primero=primero[inicio : inicio + n].astype(dtype_valor),
-                ultimo=ultimo[inicio : inicio + n].astype(dtype_valor),
+                suma_delta=suma_delta[inicio : inicio + n],
+                primero=primero[inicio : inicio + n],
+                ultimo=ultimo[inicio : inicio + n],
             )
             for factor, inicio, n in limites
         ]
     if tipo is TipoCanalPiramide.ENUM:
-        moda = tabla[f"{id_canal}__moda"].to_numpy()
-        hubo_transicion = tabla[f"{id_canal}__hubo_transicion"].to_numpy()
+        moda = tabla[f"{id_canal}__moda"].to_numpy().astype(dtype_valor, copy=False)
+        hubo_transicion = (
+            tabla[f"{id_canal}__hubo_transicion"].to_numpy().astype(np.bool_, copy=False)
+        )
         return [
             NivelEnum(
                 factor=factor,
-                moda=moda[inicio : inicio + n].astype(dtype_valor),
-                hubo_transicion=hubo_transicion[inicio : inicio + n].astype(np.bool_),
+                moda=moda[inicio : inicio + n],
+                hubo_transicion=hubo_transicion[inicio : inicio + n],
             )
             for factor, inicio, n in limites
         ]
     if tipo is TipoCanalPiramide.BITS:
-        or_bits = tabla[f"{id_canal}__or_bits"].to_numpy()
+        or_bits = tabla[f"{id_canal}__or_bits"].to_numpy().astype(dtype_valor, copy=False)
         return [
-            NivelBits(factor=factor, or_bits=or_bits[inicio : inicio + n].astype(dtype_valor))
+            NivelBits(factor=factor, or_bits=or_bits[inicio : inicio + n])
             for factor, inicio, n in limites
         ]
     raise AssertionError(f"TipoCanalPiramide no cubierto: {tipo!r}")  # exhaustivo
@@ -604,7 +616,7 @@ def leer(origen: Path) -> tuple[list[ChannelSeries], list[Piramide], MetadatosCa
     for m in metadatos.canales:
         if m.grupo not in t_por_grupo:
             tabla_t = pl.read_parquet(_ruta_tiempos(origen, m.grupo))
-            t_por_grupo[m.grupo] = tabla_t["t"].to_numpy().astype(np.uint32)
+            t_por_grupo[m.grupo] = tabla_t["t"].to_numpy().astype(np.uint32, copy=False)
         if m.grupo not in tabla_piramide_por_grupo:
             tabla_piramide_por_grupo[m.grupo] = pl.read_parquet(_ruta_piramide(origen, m.grupo))
 
@@ -617,7 +629,9 @@ def leer(origen: Path) -> tuple[list[ChannelSeries], list[Piramide], MetadatosCa
         )
         piramides.append(niveles)
 
-        v = _valor_bruto_de_nivel0(tipo, niveles[0]).astype(dtype_valor)
+        # `niveles[0]` ya viene en `dtype_valor` (construido así en
+        # `_reconstruir_piramide_empaquetada`): sin `.astype` de más aquí.
+        v = _valor_bruto_de_nivel0(tipo, niveles[0])
         key = ChannelKey(
             rol=m.key_rol,
             formato=m.formato,
