@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 13:04:55Z"
+    "actualizado": "2026-07-30 13:10:42Z"
   },
   "tareas": [
     {
@@ -632,10 +632,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "c1296dd"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:10:42Z",
+          "texto": "construir_piramide(valores, *, tipo, factor_base=4) y elegir_nivel(niveles, *, ancho_px) en dlv_core/piramide.py, solo TipoCanalPiramide.CONTINUO (min/max/first/last); CONTADOR/ENUM/BITS levantan NotImplementedError explicito con el motivo -- son F1-10 (tarea separada, ya en el backlog, dependiente de esta), no un olvido. Cada nivel decima el nivel ANTERIOR (no los datos originales cada vez): min-de-mins y max-de-maxes de un grupo de cubos es exacto (asociatividad), asi que el coste total es ~1/3 del nivel base, tal como dice docs/03 SS3.5, no un multiplo. Parada: mientras el nivel tenga al menos un grupo completo (len >= factor_base); con array vacio o mas corto que el factor, se devuelve solo L0 sin reventar. -- Banco nuevo: 'python tools/banco.py piramide' mide sobre 5M muestras sinteticas (el escenario de docs/03 SS3.5): 103 ms, 48.3 M muestras/s, 12 niveles, 6.666.663 cubos totales (coincide con el ~1/3 extra estimado en la spec). Es diagnostico, no ata a ninguno de los 14 presupuestos de docs/02 SS2.6 -- ninguno mide construccion de piramide en si (fps_pan_zoom mide el renderizador WebGL2, que todavia no existe, F1-23). -- 14 tests nuevos (dlv-core/tests/test_piramide.py), con la propiedad que mas importa de la spec verificada explicitamente: un pico de una sola muestra aislado sigue visible en minimo/maximo del ULTIMO nivel (maximo zoom-out), frente a una referencia de NumPy calculada de forma independiente, no reutilizando la logica de produccion. 386 tests en total, todo verde salvo memoria_residente (ya conocido, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-10",

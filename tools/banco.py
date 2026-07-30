@@ -616,6 +616,37 @@ def cmd_parseo_cuerpo(args: argparse.Namespace) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# piramide  (el entregable medible de F1-09; diagnóstico, no ata a ningún
+# presupuesto de docs/02 §2.6: ninguno de los 14 mide construcción de
+# pirámide en sí -- fps_pan_zoom mide el renderizador, que todavía no existe)
+# --------------------------------------------------------------------------- #
+def cmd_piramide(args: argparse.Namespace) -> int:
+    """F1-09: mide `dlv_core.piramide.construir_piramide` sobre un canal
+    sintético de `--puntos` muestras (5 000 000 por omisión, el escenario de
+    docs/03 §3.5)."""
+    try:
+        import numpy as np
+
+        from dlv_core.piramide import TipoCanalPiramide, construir_piramide
+    except ImportError as e:
+        print(f"NO_MEDIBLE: no se puede importar dlv_core/numpy ({e}).")
+        return 0
+
+    rng = np.random.default_rng(0)
+    valores = rng.integers(-32768, 32767, size=args.puntos).astype(np.int32)
+
+    t0 = time.perf_counter()
+    niveles = construir_piramide(valores, tipo=TipoCanalPiramide.CONTINUO)
+    t = time.perf_counter() - t0
+
+    total_cubos = sum(len(n.minimo) for n in niveles)
+    print(f"{args.puntos:,} muestras -> {len(niveles)} niveles, {total_cubos:,} cubos en total")
+    print(f"  {t * 1000:.2f} ms  ->  {args.puntos / t / 1e6:.1f} M muestras/s")
+    print(f"  factores: {[n.factor for n in niveles]}")
+    return 0
+
+
+# --------------------------------------------------------------------------- #
 # ADR-009: bucles por muestra, por inspección estática
 # --------------------------------------------------------------------------- #
 # Métodos que recorren los datos elemento a elemento en el intérprete.
@@ -795,6 +826,10 @@ def main() -> int:
     s = sub.add_parser("parseo-cuerpo", help="F1-02: mide dlv_core.formatos.cuerpo.parsear_cuerpo")
     s.add_argument("--repeticiones", type=int, default=3)
     s.set_defaults(func=cmd_parseo_cuerpo)
+
+    s = sub.add_parser("piramide", help="F1-09: mide dlv_core.piramide.construir_piramide")
+    s.add_argument("--puntos", type=int, default=5_000_000)
+    s.set_defaults(func=cmd_piramide)
 
     s = sub.add_parser("adr009", help="comprueba el invariante de bucles por muestra")
     s.set_defaults(func=cmd_adr009)
