@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 04:55:04Z"
+    "actualizado": "2026-07-30 08:59:52Z"
   },
   "tareas": [
     {
@@ -426,10 +426,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "orquestador",
+      "commits": [
+        "0cac953"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 08:59:52Z",
+          "texto": "dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido por el descriptor de F0-09. Las escalas NO estan en el codigo: se resuelven contra data/formats/haltech_nsp.toml, asi que anadir un tipo o corregir un factor no toca este fichero. Distingue error de aviso segun la regla de docs/02 E1.7: rechaza cabecera incompleta y version desconocida, avisa de tipo desconocido, escala sin confirmar, DisplayMaxMin mal formada, nombre o ID duplicado. 37 pruebas, validadas contra los 3 logs reales, el de verdad de referencia y LOS 11 FICHEROS DEL CORPUS DE CORRUPTOS, cuyo README es la especificacion ejecutable: los 5 validos cargan identicos al original, los 2 invalidos se rechazan con mensaje claro, y los 4 que estropean filas dejan la cabecera intacta. DEFECTO DE API CORREGIDO: offset_datos era relativo a los bytes SIN BOM, asi que datos[offset:] sobre el fichero original quedaba desplazado 3 bytes; ahora es relativo a lo que se pasa. Verificado el invariante sobre los 12 ficheros del corpus."
+        }
+      ]
     },
     {
       "id": "F1-02",

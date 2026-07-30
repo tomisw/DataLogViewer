@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 04:55:04Z
+Actualizado: 2026-07-30 08:59:52Z
 
-**30 / 669 pts cerrados (4.5 %)** · 26 pts esperando revisión humana → 8.4 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 31 pts esperando revisión humana → 9.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 18 | 0 | 0 | 6 | 54 |
-| F1 | 0 | 8 | 0 | 178 | 0 | 186 |
+| F1 | 0 | 13 | 0 | 173 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 118 | 0 | 118 |
@@ -27,6 +27,7 @@ Actualizado: 2026-07-30 04:55:04Z
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
+| `F1-01` Parser de cabecera Haltech dirigido por desc | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido |
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
 
 ## F0 — 48/54 pts
@@ -48,11 +49,11 @@ Actualizado: 2026-07-30 04:55:04Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 8/186 pts
+## F1 — 13/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ·  | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | — |
+| ⏳ | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `0cac953` |
 | ·  | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | — |
 | ·  | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | — |
 | ·  | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | — |
