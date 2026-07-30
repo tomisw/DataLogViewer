@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 14:59:03Z"
+    "actualizado": "2026-07-30 15:11:08Z"
   },
   "tareas": [
     {
@@ -1291,10 +1291,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "a26fb1b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 15:11:08Z",
+          "texto": "dlv_app/main.py: iniciar_api_en_hilo() arranca dlv-api con preparar_servidor (F1-21) en un hilo daemon y espera a /salud; detener_servidor_de_fondo() cierra limpio (should_exit + join, verificado con test real de que el hilo termina); main() orquesta. dlv_app.spec para PyInstaller onedir (nunca onefile, siguiendo ADR-002/SS3.10 al pie de la letra), con data/ como datas y collect_data_files('webview') para los JS que pywebview necesita (verificado en el .venv, es requisito real). -- TOKEN AL FRONTEND: por query string (?puerto_api=...&token=...). Decision razonada: la alternativa mas segura de pywebview (js_api, sin tocar la URL) solo funciona dentro de la ventana pywebview, no en un navegador normal, y ADR-002 exige mantener abierta la via navegador/movil -- bifurcar el contrato del frontend segun quien abre la ventana se juzgo peor que aceptar la exposicion. Implicacion documentada en el modulo: el token queda visible en URL/historial/capturas; mitigado por ser aleatorio, de un solo proceso y escuchar solo en 127.0.0.1. REVISAR si prefieres la otra decision. -- NO QUEDA DE EXTREMO A EXTREMO (por falta de herramientas en esta maquina, no por fallo del agente): (a) sin Node/npm no hay dlv-ui/dist ni dev server, asi que la ventana usa una pagina placeholder embebida marcada inequivocamente 'PLACEHOLDER PROVISIONAL (F1-35)' -- no se invento UI; con url_frontend explicito apunta al dev server real cuando haya Node. (b) PyInstaller NO esta instalado y NO se añadio a ningun pyproject.toml (regla de dependencias): el .spec se escribio pero no se ejecuto, asi que hiddenimports de backends de pywebview siguen sin verificar con un build real. (c) El aviso que ya dejo F1-21 se confirma desde el otro lado: dlv_api.main._RAIZ_REPO usa Path(__file__).parents[3], invalido bajo un arbol congelado de PyInstaller; meter data/ en el bundle NO lo arregla, hace falta un cambio en dlv-api que es de F5-01. -- CI: mypy pasa a incluir dlv-app (la config raiz ya lo soportaba) y se añade un paso barato de py_compile sobre el .spec; NO se añadio job de build real de PyInstaller, razonando que es F5-01 (necesita la dependencia, mide presupuestos de SS2.6 y en Linux necesitaria pantalla virtual). Verificado por el orquestador que los dos comandos nuevos de CI pasan localmente. 6 tests (5 nuevos), ninguno abre una ventana real."
+        }
+      ]
     },
     {
       "id": "F1-36",
@@ -1537,10 +1544,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "a26fb1b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 15:09:57Z",
+          "texto": "REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asignar_rol devuelve Asignacion con un campo 'confianza' (EXACTA / INDEXADA / DIFUSA), no solo el id del rol. La cuarta mitigacion obligatoria de docs/07 SS7.15 -- desactivar los detectores criticos D4/D10/D12 cuando sus roles vienen de asignacion difusa no confirmada -- depende ENTERAMENTE de esa distincion; un resolver_rol que devolviera solo str|None la haria imposible de implementar aguas abajo. resolver_rol se conserva como atajo, con un aviso en su docstring de que no sirve para decidir si un detector critico puede activarse. (2) BUG ENCONTRADO Y ARREGLADO durante la tarea, con test de regresion: los sinonimos indexados con marca {n} (p.ej. 'Knock Sensor {n} Knock Count') no casaban nunca, porque normalizar() elimina las llaves como separadores y {n} se convertia en una 'n' suelta. Sintoma: TODOS los canales indexados caian en DIFUSA con parecido ~0.95 en vez de INDEXADA -- es decir, se marcaban 'requiere confirmacion' y desactivarian detectores criticos sin motivo, que es exactamente el fallo que SS7.15 quiere evitar. Arreglado partiendo por la marca ANTES de normalizar. Verificado sobre el catalogo real: 'Knock Sensor 2 Knock Count' -> knock_count indice 2 INDEXADA. (3) CAMBIOS DE FIRMA respecto al andamiaje: cargar_catalogo_roles pasa de IO[str] a IO[bytes] (tomllib lo exige, y queda consistente con cargar_catalogo/cargar_descriptor); Rol gana plausible_min/plausible_max/indexado/monotono/critico, campos que roles.toml YA declaraba y sin los cuales no se pueden implementar ni el informe de plausibilidad (SS7.5) ni la desactivacion de criticos. (4) Umbral difuso 0.85 por omision, parametrizable, deliberadamente alto: una lista larga de propuestas malas se ignora entera (mismo razonamiento que roles.toml da para los rangos anchos). 29 tests nuevos contra data/roles.toml real (58 roles), incluidos los nombres literales del AutoLog del propietario con asercion explicita de que no caen en difusa."
+        }
+      ]
     },
     {
       "id": "FG-10",

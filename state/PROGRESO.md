@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 14:59:03Z
+Actualizado: 2026-07-30 15:11:08Z
 
-**89 / 669 pts cerrados (13.3 %)** · 80 pts esperando revisión humana → 25.3 % entregado
+**93 / 669 pts cerrados (13.9 %)** · 88 pts esperando revisión humana → 27.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 59 | 56 | 0 | 71 | 0 | 186 |
-| FG | 0 | 0 | 0 | 92 | 0 | 92 |
+| F1 | 63 | 56 | 0 | 67 | 0 | 186 |
+| FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
 | F4 | 0 | 0 | 0 | 63 | 0 | 63 |
@@ -38,6 +38,7 @@ Actualizado: 2026-07-30 14:59:03Z
 | `F1-18` Presets SI / Métrico / Imperial / Motorsport | revision_humana | Sonnet 5 | G1 | REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_ |
 | `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
+| `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 
 ## F0 — 54/54 pts
@@ -59,7 +60,7 @@ Actualizado: 2026-07-30 14:59:03Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 115/186 pts
+## F1 — 119/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -97,12 +98,12 @@ Actualizado: 2026-07-30 14:59:03Z
 | ·  | `F1-32` | Locale numérico ES/EN (separador decimal, agrupación) | Haiku 4.5 | 2 | F1-31 | G4 | — |
 | ·  | `F1-33` | Selector de canales con búsqueda difusa y ocultación de inacti | Sonnet 5 | 4 | F1-07 | G3 | — |
 | ✔  | `F1-34` | Arrastrar y soltar ficheros y carpetas; apertura múltiple | Sonnet 5 | 3 | F1-12 | G3 | `dcb9944` |
-| ·  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | — |
+| ✔  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | `a26fb1b` |
 | ·  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | — |
 | ·  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | — |
 | ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
 
-## FG — 0/92 pts
+## FG — 8/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -114,7 +115,7 @@ Actualizado: 2026-07-30 14:59:03Z
 | ·  | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | — |
 | ·  | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | — |
 | ·  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | — |
-| ·  | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | — |
+| ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `a26fb1b` |
 | ·  | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
