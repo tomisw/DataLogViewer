@@ -28,9 +28,19 @@ jobs:
       - name: Lint with ruff (format)
         run: uv run ruff format --check .
       - name: Type check with mypy
-        run: uv run mypy dlv-core dlv-api
+        run: uv run mypy dlv-core dlv-api dlv-app
       - name: Test with pytest
         run: uv run pytest -q
+
+      # F1-35: el `.spec` de PyInstaller (empaquetado `onedir` de dlv-app,
+      # ADR-002) no se ejecuta en CI -- PyInstaller no es una dependencia
+      # instalada del proyecto todavía, y generar el paquete real (medir
+      # arranque en frío y tamaño contra docs/02-alcance-y-plan.md §2.6) es
+      # trabajo de F5-01, no de esta tarea. Esta comprobación es deliberada-
+      # mente barata: solo confirma que el fichero sigue siendo Python
+      # sintácticamente válido, para detectar una errata antes de F5-01.
+      - name: Sintaxis del .spec de PyInstaller (dlv-app)
+        run: uv run python -m py_compile dlv-app/dlv_app.spec
 
       # --- Puertas de presupuesto (F0-04) --------------------------------- #
       # ADR-009: ningún bucle por muestra en Python dentro de dlv-core.
