@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 13:28:48Z
+Actualizado: 2026-07-30 13:30:44Z
 
-**61 / 669 pts cerrados (9.1 %)** · 62 pts esperando revisión humana → 18.4 % entregado
+**67 / 669 pts cerrados (10.0 %)** · 62 pts esperando revisión humana → 19.3 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 31 | 38 | 0 | 117 | 0 | 186 |
+| F1 | 37 | 38 | 0 | 111 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -55,7 +55,7 @@ Actualizado: 2026-07-30 13:28:48Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 69/186 pts
+## F1 — 75/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -66,11 +66,11 @@ Actualizado: 2026-07-30 13:28:48Z
 | ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
 | ✔  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | `815a8e4` |
 | ·  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | — |
-| ·  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | — |
+| ✔  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | `4471cbc` |
 | ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `c1296dd` |
 | ✔  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | `a521091` |
 | ·  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | — |
-| ·  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | — |
+| ✔  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | `4471cbc` |
 | ⏳ | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | `efc4f55` |
 | ·  | `F1-14` | Conversiones parametrizadas por canal (λ→AFR con la estequiome | Opus 5 | 5 | F1-13 | G1 | — |
 | ·  | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | — |

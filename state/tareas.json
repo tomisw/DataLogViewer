@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 13:28:48Z"
+    "actualizado": "2026-07-30 13:30:44Z"
   },
   "tareas": [
     {
@@ -619,10 +619,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "4471cbc"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:30:17Z",
+          "texto": "Modulo dlv_core/huecos.py: detectar_huecos(t, factor_umbral=3.0, periodo_ms=None) y detectar_discontinuidades(t), mas variantes _de_serie(ChannelSeries) y adaptadores a Incidencia (huecos_a_incidencias/discontinuidades_a_incidencias). Umbral no inventado: es el detector D18 de docs/04-perfiles-motorsport.md SS4.3 (dt > 3x mediana, informativa) y coincide con docs/01 SS1.7. Periodo tipico = mediana de los dt positivos (verificado: 54ms sobre el AutoLog real, coincide con la spec digito a digito). Discontinuidades: dt<0 vectorizado sobre t, independiente de reloj.py (no lo toco); razona que ChannelSeries.t ya llega desenrollado de F1-04, asi que cualquier retroceso que quede es uno de los retrocesos_anomalos que Desenrollado cuenta pero no localiza -- sugerencia para el futuro (no bloqueante): que reloj.py exponga los indices directamente. Trampa evitada y con test dedicado: t es uint32, restar sin castear a int64 antes envolveria un retroceso pequeño a un entero enorme. 28 tests, incluidos los 3 logs reales (el AutoLog reproduce mediana 54ms / hueco maximo 499ms de la spec). No implementa el Detector D18 en si (el Protocol de detectores.py sigue stub) -- es alcance de otra tarea, resolver series por rol y perfiles activos. Verificado de forma independiente por el orquestador: ruff/mypy/pytest en verde, sin tocar almacen.py/reloj.py/piramide.py/banco.py/formatos//data/."
+        }
+      ]
     },
     {
       "id": "F1-09",
@@ -713,10 +720,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "4471cbc"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:30:44Z",
+          "texto": "Modulo dlv_core/informe_importacion.py (no en informes.py: importar Desenrollado de reloj.py alli crearia un ciclo, reloj.py ya importa Aviso de informes.py -- documentado en el docstring). InformeImportacion.agregar(avisos) acumula de cualquier iterable de Aviso sin ceremonia; resumen() agrupa por codigo (cantidad descendente, luego alfabetico) para no repetir 300 veces el mismo aviso; a_lineas()/a_dict() para mostrar o serializar. severidad_de_codigo(codigo) clasifica los ~15 codigos existentes entre informativa/advertencia (codigo desconocido cae en advertencia por omision -- REVISAR: si se anaden codigos nuevos en haltech.py/reloj.py/limpieza.py sin actualizar la tabla _SEVERIDAD_POR_CODIGO, quedan en advertencia hasta que alguien la revise; documentado y testeado, pero es una tabla estatica que puede desincronizarse). aviso_de_retrocesos_anomalos(desenrollado) envuelve Desenrollado.retrocesos_anomalos (docstring de reloj.py ya decia 'se cuentan para el informe de importacion'); deliberadamente NO envuelve cruces_de_medianoche (un cruce genuino ya se resuelve, no es una anomalia). Nunca lanza: codigo/mensaje vacios se normalizan sin perderse, elementos que no son Aviso se cuentan en elementos_descartados. 42 tests, incluido uno de integracion real que junta Cabecera.avisos + detectar_filas_malformadas + Reconciliacion.avisos en un solo informe sin adaptadores. Verificado de forma independiente: ruff/mypy/pytest en verde, sin tocar almacen.py/piramide.py/reloj.py/banco.py/formatos/(solo lectura)/data/."
+        }
+      ]
     },
     {
       "id": "F1-13",
