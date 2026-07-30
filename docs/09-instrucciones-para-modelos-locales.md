@@ -279,23 +279,76 @@ una ronda.
 
 ## 9.12 Texto para empezar una sesión local
 
+Este es el texto que el propietario pega al abrir la sesión. Lleva a propósito
+más de lo estrictamente necesario —el modelo va a leer `CLAUDE.md` de todas
+formas— porque las tres cosas que no puede deducir del repositorio son **qué hacer
+primero**, **qué no hacer sin preguntar** y **cómo informar**.
+
 ```
-Continúa el desarrollo de DataLogViewer en esta máquina, en la rama
-claude/log-visualization-app-plan-5lhr8x.
+Continúa el desarrollo de DataLogViewer en esta máquina.
+Rama de trabajo: claude/log-visualization-app-plan-5lhr8x
 
-Lee docs/09-instrucciones-para-modelos-locales.md y docs/08-ejecucion-y-reanudacion.md.
-Sigue el bucle de la sección 9.5.
+Antes de tocar nada, lee en este orden:
+  1. CLAUDE.md                                      una página: reglas y verificación
+  2. docs/09-instrucciones-para-modelos-locales.md  qué cambia al ejecutar en local
+  3. docs/08-ejecucion-y-reanudacion.md §8.4        el bucle de trabajo
 
-Empieza con:
-    uv sync --all-packages
-    python tools/estado.py next
+Luego ejecuta esto y dime qué sale ANTES de empezar ninguna tarea:
+
+    git status && git log --oneline -5
+    uv sync --all-packages          (si no tienes uv: https://docs.astral.sh/uv/)
     python tools/verificar.py
+    python tools/estado.py next
 
-Si `uv sync` funciona, la primera tarea es F0-01: está bloqueada desde el arranque
-porque el contenedor remoto no tiene acceso a PyPI, y es la única del plan que no
-puede avanzar de otra manera.
+DÓNDE ESTÁ EL PROYECTO
+136 tareas, 669 puntos. Se arrancó en un contenedor remoto SIN acceso a PyPI, así
+que está hecho todo lo que no necesitaba dependencias —catálogos de datos, motor
+de unidades, parser de cabecera, reconciliación de reloj— y nada de lo que sí:
+parseo con Polars, almacén columnar, pirámide de decimación, API, frontend. 13 de
+los 14 presupuestos de rendimiento están sin medir.
+
+TU PRIMERA TAREA ES F0-01, Y SOLO ESA
+Confirma o refuta la viabilidad de la base Python, lleva bloqueada desde el
+arranque y es la única del plan que no puede avanzar de ninguna otra manera.
+
+    python tools/estado.py show F0-01
+    python tools/banco.py spike-polars    # mide sobre samples/synth/autolog-1h.csv (67 MB)
+    python tools/banco.py presupuestos
+
+Decide el presupuesto `parseo_nativo` >= 100 MB/s agregado (docs/02 §2.6).
+
+  - Si Polars lo cumple: dímelo con el número medido y sigue el bucle de §8.4. El
+    camino natural después es F1-02, F1-03, F1-05 y F1-09, que es la cadena que
+    sostiene todos los demás presupuestos.
+  - Si NO lo cumple: no ajustes el presupuesto para que pase. Es el riesgo R9 de
+    docs/02 §2.8. Mide dónde se va el tiempo, escríbelo y pregúntame: esa
+    medición cambia decisiones de arquitectura, y esas son mías.
+
+REGLAS QUE NO SE SALTAN  (el motivo de cada una, en docs/09 §9.7)
+  - ADR-009: cero bucles por muestra en Python. Polars o NumPy hacen el trabajo;
+    si algo no se puede vectorizar, va a Numba, nunca a un `for`.
+  - data/*.toml son datos, no código. No traslades sus valores al código ni
+    reformatees los ficheros: los comentarios son lo que hace revisable la G1.
+  - samples/real/ no se toca. Son mis tres logs y la evidencia de todo el formato.
+  - state/PROGRESO.md se genera. Toda transición pasa por tools/estado.py.
+  - Una puerta G1 no la cierras tú: la dejas en `revision_humana` con una nota que
+    diga qué tengo que revisar, ordenada por consecuencia si el número está mal.
+  - `python tools/verificar.py` en verde antes de cada commit, las seis
+    comprobaciones. No ejecutes las herramientas a mano en su lugar.
+
+NO HAGAS NADA DE ESTO SIN PREGUNTARME
+Ajustar un presupuesto para que pase; rellenar un `confianza = "unknown"` de
+data/formats/haltech_nsp.toml con un valor plausible; cambiar un umbral por
+omisión de data/umbrales.toml; añadir una dependencia a pyproject.toml;
+reescribir la historia de la rama.
+
+CÓMO QUIERO QUE ME INFORMES
+Al terminar cada tarea: qué quedó hecho, qué no, y qué necesitas de mí, en dos o
+tres líneas. Si es G1, dime exactamente qué números tengo que revisar y por qué
+importan. Hay ocho puertas G1 esperando de la etapa remota (40 pts, listadas en
+state/PROGRESO.md); si te estorban sin aprobar, pídemelas.
 ```
 
-No hace falta más contexto. El protocolo, el estado y las especificaciones están
-en el repositorio, que es justamente el motivo de que estén ahí y no en una
+Lo demás no hace falta ponerlo: el protocolo, el estado y las especificaciones
+están en el repositorio, que es justamente el motivo de que estén ahí y no en una
 conversación.
