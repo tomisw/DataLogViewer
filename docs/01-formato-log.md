@@ -270,17 +270,17 @@ error en las agregaciones.
 
 ## 1.13 Lista de verificación del parser
 
-- [ ] Firma `%DataLog%` y `DataLogVersion` validadas; versión mayor desconocida → error claro.
-- [ ] Bloques `Channel` con `DisplayMaxMin` ausente no desalinean.
-- [ ] Identidad de canal por `ID`; nombre solo para mostrar.
+- [x] Firma `%DataLog%` y `DataLogVersion` validadas; versión mayor desconocida → error claro. *(F1-01)*
+- [x] Bloques `Channel` con `DisplayMaxMin` ausente no desalinean. *(F1-01)*
+- [x] Identidad de canal por `ID`; nombre solo para mostrar. *(F1-01)*
 - [ ] Celda vacía ≠ 0 ≠ ausente.
 - [ ] Serie temporal independiente por canal (multi-tasa).
-- [ ] Cruce de medianoche en las marcas `HH:MM:SS.mmm` (log que pasa de 23:59 a 00:00).
-- [ ] Hora de cabecera en 12 h reconciliada módulo 12 h.
-- [ ] Epoch ficticia `19800101` detectada → modo relativo.
+- [x] Cruce de medianoche en las marcas `HH:MM:SS.mmm` (log que pasa de 23:59 a 00:00). *(F1-04, `desenrollar_medianoche`)*
+- [x] Hora de cabecera en 12 h reconciliada módulo 12 h. *(F1-04, `reconciliar`)*
+- [x] Epoch ficticia `19800101` detectada → modo relativo. *(F1-04; se comprueba **antes** que el desfase de 12 h, ver §1.5)*
 - [ ] Fila truncada o con número de columnas incorrecto → se registra y se salta, sin abortar la carga.
-- [ ] Fichero sin `\n` final, CRLF y LF, BOM UTF-8. **El formato nativo es CRLF**: medido sobre `20260729_1859_Log2768.csv`, 557 CRLF y ningún LF suelto. La variante LF aparece cuando una herramienta reescribe el log en Unix (`samples/corrupt/06-lf-solo.csv`).
-- [ ] Marcas de tiempo no monótonas → se detectan y se avisa.
+- [x] Fichero sin `\n` final, CRLF y LF, BOM UTF-8. *(F1-01)* **El formato nativo es CRLF**: medido sobre `20260729_1859_Log2768.csv`, 557 CRLF y ningún LF suelto. La variante LF aparece cuando una herramienta reescribe el log en Unix (`samples/corrupt/06-lf-solo.csv`).
+- [x] Marcas de tiempo no monótonas → se detectan y se avisa. *(F1-04, `Desenrollado.retrocesos_anomalos`: un retroceso pequeño se cuenta y NO se corrige sumando un día)*
 - [ ] Enteros que desbordan `i32` (se observa `-2147483645` y `2147483647` como centinelas) → tratados como **valor no válido**, no como dato.
 
 > El último punto es importante: en el AutoLog aparecen `2147483647`,

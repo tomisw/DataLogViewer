@@ -54,6 +54,43 @@ metadatos_cierre = ["Log Source", "Log Number", "Log"]
 identidad = "ID"
 
 # =========================================================================== #
+#  RELOJ  (tarea F1-04 · docs/01 §1.4 y §1.5)
+# =========================================================================== #
+#  Los nombres de estas claves y las épocas de fábrica son propios del formato,
+#  así que viven aquí y no en el código: otro fabricante sella la hora con otras
+#  claves y otra época falsa, y añadirlo no debe tocar `dlv_core/reloj.py`.
+[reloj]
+# `Log : YYYYMMDD HH:MM:SS`. La FECHA es fiable; la HORA está en 12 h sin
+# indicador AM/PM, mientras que las marcas de las filas están en 24 h
+# (docs/01 §1.4). Por eso la hora del día se toma siempre de la primera fila y
+# esta solo sirve para validar el desfase módulo 12 h.
+clave_inicio = "Log"
+hora_en_12h = true
+# También en 12 h. Y está INVERTIDA respecto a `Log Number` en los dos logs
+# internos de samples/real/ (06:59:01 para el 2768 y 06:59:00 para el 2769), así
+# que no sirve para ordenar. Solo se usa como comprobación de coherencia.
+clave_descarga = "DownloadDateTime"
+# Monótono creciente. Es lo ÚNICO que ordena los logs internos.
+clave_numero = "Log Number"
+clave_origen = "Log Source"
+
+# La ECU no tiene reloj de tiempo real: sella los logs internos con una fecha
+# fija (docs/01 §1.5). `Log2768` y `Log2769` declaran los dos `19800101
+# 01:01:01` y los dos empiezan en `01:01:01.005`, con lo que el desfase de la
+# comprobación de 12 h sale 0 y la validación PASA. Es la razón de que la época
+# se compruebe antes y por separado: un log sin tiempo absoluto que aparenta
+# tenerlo es peor que uno que no lo declara.
+epocas_ficticias = ["19800101", "19700101", "20000101", "20010101"]
+# Red por debajo de la lista anterior, para épocas de fábrica no catalogadas.
+fecha_minima_plausible = "20050101"
+# Holgura de la comprobación de 12 h. En el AutoLog real el residuo es 0,506 s
+# (cabecera 06:30:35, primera fila 18:30:35.506). Un minuto es mucho más que
+# cualquier retardo plausible de escritura y muchísimo menos que las 12 h que
+# esta comprobación tiene que distinguir, así que la holgura no puede dejar
+# pasar un reloj de verdad equivocado.
+tolerancia_desfase_s = 60.0
+
+# =========================================================================== #
 #  CONFIRMADOS — identidad aritmética o rango inequívoco
 # =========================================================================== #
 

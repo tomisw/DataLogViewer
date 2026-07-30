@@ -31,6 +31,19 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import IO, Any
 
+from dlv_core.informes import Aviso
+
+__all__ = [
+    "Aviso",
+    "Cabecera",
+    "Canal",
+    "Descriptor",
+    "ErrorDeFormato",
+    "cargar_descriptor",
+    "parsear_cabecera",
+    "sondear_formato",
+]
+
 FIRMA = b"%DataLog%"
 BOM_UTF8 = b"\xef\xbb\xbf"
 
@@ -45,19 +58,6 @@ _OBLIGATORIAS = ("ID", "Type")
 
 class ErrorDeFormato(ValueError):
     """El fichero no se puede leer sin arriesgar resultados equivocados."""
-
-
-@dataclass(slots=True, frozen=True)
-class Aviso:
-    """Anomalía que no impide cargar. Va al informe de importación (E1.7)."""
-
-    codigo: str
-    mensaje: str
-    linea: int | None = None
-
-    def __str__(self) -> str:
-        donde = f" (línea {self.linea})" if self.linea is not None else ""
-        return f"[{self.codigo}]{donde} {self.mensaje}"
 
 
 @dataclass(slots=True, frozen=True)
@@ -99,6 +99,10 @@ class Descriptor:
     clave_canal: str
     claves_opcionales: frozenset[str]
     tipos: Mapping[str, Mapping[str, Any]]
+    reloj: Mapping[str, Any] = field(default_factory=dict)
+    """Sección `[reloj]` del descriptor, sin interpretar. La interpreta
+    `dlv_core.reloj.PoliticaReloj.desde_mapa` (F1-04); aquí solo se transporta,
+    para que este módulo no tenga que saber nada de husos ni de épocas."""
 
     def resuelve(self, tipo: str) -> tuple[str | None, float, str]:
         """(dimension, a_canonica, confianza) para un `Type` de la cabecera."""
@@ -121,6 +125,7 @@ def cargar_descriptor(fuente: IO[bytes]) -> Descriptor:
         clave_canal=str(cab.get("clave_canal", "Channel")),
         claves_opcionales=frozenset(str(k) for k in cab.get("claves_opcionales", ())),
         tipos=bruto["tipos"],
+        reloj=bruto.get("reloj", {}),
     )
 
 

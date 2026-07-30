@@ -34,12 +34,22 @@ class _Saltar(Exception):
 
 
 class _Aprox:
-    def __init__(self, valor: float, rel: float = 1e-6, abs_: float = 1e-12) -> None:
+    def __init__(self, valor, rel: float = 1e-6, abs_: float = 1e-12) -> None:
         self.valor, self.rel, self.abs = valor, rel, abs_
 
     def __eq__(self, otro: object) -> bool:
         import math
 
+        # `approx` de pytest compara también secuencias elemento a elemento. Sin
+        # esto, una prueba que compara dos series (p. ej. el eje desenrollado de
+        # F1-04) fallaba con un TypeError en vez de comparar.
+        if isinstance(self.valor, (list, tuple)):
+            if not isinstance(otro, (list, tuple)) or len(otro) != len(self.valor):
+                return False
+            return all(
+                math.isclose(float(b), float(a), rel_tol=self.rel, abs_tol=self.abs)
+                for a, b in zip(self.valor, otro, strict=True)
+            )
         return math.isclose(float(otro), self.valor, rel_tol=self.rel, abs_tol=self.abs)  # type: ignore[arg-type]
 
     def __repr__(self) -> str:
@@ -47,8 +57,13 @@ class _Aprox:
 
 
 class _Raises:
-    def __init__(self, esperada: type[BaseException] | tuple[type[BaseException], ...]) -> None:
+    def __init__(
+        self,
+        esperada: type[BaseException] | tuple[type[BaseException], ...],
+        match: str | None = None,
+    ) -> None:
         self.esperada = esperada
+        self.match = match
         self.value: BaseException | None = None
 
     def __enter__(self) -> _Raises:
@@ -59,6 +74,11 @@ class _Raises:
             raise AssertionError(f"no se lanzó {self.esperada}")
         if not issubclass(tipo, self.esperada):
             return False
+        if self.match is not None:
+            import re
+
+            if not re.search(self.match, str(valor)):
+                raise AssertionError(f"{valor!r} no encaja con el patrón {self.match!r}")
         self.value = valor
         return True
 
@@ -138,7 +158,15 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
         params = inspect.signature(func).parameters
         pnombres, pvalores = getattr(func, "__parametrize__", (None, [(None,)]))
         if pnombres:
-            claves = [c.strip() for c in pnombres.split(",")]
+            # `parametrize` acepta los nombres como cadena separada por comas o
+            # como tupla/lista, y pytest trata las dos igual. La forma de tupla
+            # es la que ruff (RUF captura los argumentos sueltos) y la propia
+            # documentación de pytest prefieren cuando hay más de un parámetro.
+            claves = (
+                [str(c).strip() for c in pnombres]
+                if isinstance(pnombres, (tuple, list))
+                else [c.strip() for c in pnombres.split(",")]
+            )
             casos = [
                 dict(zip(claves, v if isinstance(v, (tuple, list)) else (v,), strict=True))
                 for v in pvalores

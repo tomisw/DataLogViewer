@@ -306,6 +306,28 @@ naturales a Numba si NumPy no llega; la decisión la toma el banco de F0.
 Cada log cargado es un **segmento**:
 `{ id, t0_absoluto: datetime | None, offset_usuario, fiabilidad_reloj, orden }`.
 
+Quien rellena esos campos es la **reconciliación de reloj** (`dlv_core/reloj.py`,
+F1-04), que resuelve las tres averías de reloj de `01-formato-log.md` §1.4, §1.5
+y §1.13 en este orden, que no es negociable:
+
+1. **Época ficticia primero.** Los dos logs internos reales declaran
+   `Log : 19800101 01:01:01` y empiezan en `01:01:01.005`, así que el desfase
+   sale de 5 ms y la comprobación de 12 h *pasa*. Comprobar el desfase antes
+   marcaría como fiables dos logs sin reloj y los superpondría en el mismo
+   instante de 1980.
+2. **Ambigüedad de 12 h**, resolviendo a la vez el AM/PM y si la primera fila ya
+   es del día siguiente. Con una sola incógnita, una cabecera escrita justo antes
+   de medianoche se rechaza o se fecha un día tarde.
+3. **Desenrollado de medianoche** sobre el vector de instantes, vectorizado
+   (`diff` → comparación → `cumsum` → `concatenate`). Un retroceso de más de 12 h
+   es un cruce de día; uno pequeño es una marca no monótona que se **cuenta y se
+   avisa**, no se corrige sumando 24 h.
+
+`t0_absoluto` solo se rellena cuando el reloj es fiable; lo que el log *declara*
+viaja aparte en `t0_declarado`, para enseñarlo sin que nadie calcule con él. Los
+nombres de las claves de metadatos y las épocas de fábrica son datos del
+descriptor (`[reloj]`, ADR-008), no constantes del código.
+
 **Vista paralela**: eje X virtual; `x = t_local + offset_efectivo`, con
 `offset_efectivo` según el modo:
 
