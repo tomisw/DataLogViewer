@@ -174,6 +174,26 @@ Todos los detectores comparten el mismo motor y el mismo modelo de resultado
 (`{ tipo, severidad, t_inicio, t_fin, valor_pico, contexto }`), así que añadir
 uno nuevo es un fichero de configuración, no código.
 
+### Los umbrales son configurables, no constantes
+
+**Todos los números de esta sección son valores por omisión**, no límites fijos.
+Viven en `data/umbrales.toml` y se sustituyen con esta precedencia, la misma que
+las unidades (`06-sistema-de-unidades.md` §6.9) y por el mismo motivo:
+
+1. **Anulación por canal** — «este canal con este límite y no otro».
+2. **Perfil activo** (`.dlvprofile`) — es donde un equipo fija sus criterios y
+   los comparte como un fichero suelto.
+3. **Preferencias de usuario.**
+4. **`data/umbrales.toml`** — por omisión.
+
+El criterio de cuándo un motor está en problemas depende del motor, del
+combustible y de para qué se usa. Un umbral cableado en el código sería una
+opinión disfrazada de física, y además convertiría cada ajuste en un cambio de
+código con su ciclo de revisión.
+
+Los umbrales se guardan en **unidad canónica**, así que se pueden editar en la
+unidad que el usuario tenga activa sin reescribir nada (§6.11).
+
 ### Primitivas
 
 | Primitiva | Parámetros | Uso |
@@ -204,7 +224,7 @@ función. Por omisión, 3 muestras o 100 ms, el mayor de los dos.
 | D6 | Sobrepresión | `Boost Control Actual Pressure` > `Overboost Cut Max Pressure` × 0,97 | alta |
 | D7 | Sobreoscilación de boost | pico > objetivo + 5 % tras subida | media |
 | D8 | Saturación de inyectores | *duty* > 85 % | alta; crítica > 95 % |
-| D9 | Sobretemperatura de refrigerante | curva de umbral, permanencia 3 s | alta |
+| D9 | Sobretemperatura de refrigerante | umbral con permanencia de 3 s | alta |
 | D10 | Presión de aceite baja | por debajo de la curva mínima en función de RPM | **crítica** |
 | D11 | Baja tensión de batería | < 11,5 V con motor en marcha | media |
 | D12 | Error de trigger | cualquier bit de `Trigger System Errors`, o incremento de `Trigger System Error Count` | **crítica** |

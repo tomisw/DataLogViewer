@@ -25,11 +25,23 @@ LOG = DIR / "verdad.csv"
 VERDAD = DIR / "verdad.json"
 DESCRIPTOR = RAIZ / "data" / "formats" / "haltech_nsp.toml"
 ROLES = RAIZ / "data" / "roles.toml"
+UMBRALES = RAIZ / "data" / "umbrales.toml"
 
 
 def _toml(ruta: Path) -> dict:
     with ruta.open("rb") as fh:
         return tomllib.load(fh)
+
+
+@pytest.fixture(scope="module")
+def umbrales() -> dict:
+    """Los umbrales son configurables (data/umbrales.toml).
+
+    La prueba los LEE en lugar de cablearlos: si el usuario los cambia, el
+    fixture se regenera y esta prueba sigue verificando lo correcto. Cablearlos
+    aquí habría creado una tercera fuente de verdad.
+    """
+    return _toml(UMBRALES)["detectores"]
 
 
 @pytest.fixture(scope="module")
@@ -167,7 +179,9 @@ def test_los_contadores_acumulados_no_decrecen(serie: dict) -> None:
 # --------------------------------------------------------------------------- #
 # Cada evento anotado se cumple de verdad
 # --------------------------------------------------------------------------- #
-def test_d1_los_eventos_de_knock_incrementan_el_contador(verdad: dict, serie: dict) -> None:
+def test_d1_los_eventos_de_knock_incrementan_el_contador(
+    verdad: dict, serie: dict, umbrales: dict
+) -> None:
     cuenta = serie["datos"]["Knock Sensor 1 Knock Count"]
     for e in eventos_de(verdad, "D1", True):
         idxs = ventana(serie, e["t_inicio_ms"], e["t_fin_ms"])
@@ -179,8 +193,9 @@ def test_d1_los_eventos_de_knock_incrementan_el_contador(verdad: dict, serie: di
         )
         # La severidad crítica exige contexto de carga (docs/04 §4.3).
         if e["severidad_esperada"] == "critica":
-            assert serie["datos"]["RPM"][i] > 4000
-            assert serie["datos"]["Manifold Pressure"][i] > 150
+            esc = umbrales["D1"]["escalada_critica"]
+            assert serie["datos"]["RPM"][i] > float(esc["engine_speed_min"])
+            assert serie["datos"]["Manifold Pressure"][i] > float(esc["manifold_pressure_min"])
 
 
 def test_d2_positivo_knock_sostenido_sobre_umbral(verdad: dict, serie: dict) -> None:
@@ -212,7 +227,11 @@ def test_d2_negativo_el_pico_aislado_dura_una_sola_muestra(verdad: dict, serie: 
         )
 
 
-def test_d4_positivo_mezcla_pobre_en_carga(verdad: dict, serie: dict) -> None:
+def test_d4_positivo_mezcla_pobre_en_carga(verdad: dict, serie: dict, umbrales: dict) -> None:
+    d4 = umbrales["D4"]
+    maximo = float(d4["desviacion_relativa_max"])
+    tps_min = float(d4["condiciones"]["throttle_position_min"])
+    rpm_min = float(d4["condiciones"]["engine_speed_min"])
     for e in eventos_de(verdad, "D4", True):
         med = vals(serie, "Wideband O2 1", e["t_inicio_ms"], e["t_fin_ms"])
         obj = vals(serie, "Target Lambda", e["t_inicio_ms"], e["t_fin_ms"])
@@ -220,48 +239,54 @@ def test_d4_positivo_mezcla_pobre_en_carga(verdad: dict, serie: dict) -> None:
         rpm = vals(serie, "RPM", e["t_inicio_ms"], e["t_fin_ms"])
         assert med, "ventana vacía"
         for m, o, tp, r in zip(med, obj, tps, rpm, strict=True):
-            assert m / o - 1 > 0.04, f"desviación {m / o - 1:.4f} no supera el 4 %"
-            assert tp > 0.70, f"TPS {tp} no cumple la condición de carga"
-            assert r > 3000, f"RPM {r} no cumple la condición de régimen"
+            assert m / o - 1 > maximo, f"desviación {m / o - 1:.4f} no supera {maximo}"
+            assert tp > tps_min, f"TPS {tp} no cumple la condición de carga"
+            assert r > rpm_min, f"RPM {r} no cumple la condición de régimen"
 
 
-def test_d4_negativo_desviacion_por_debajo_del_umbral(verdad: dict, serie: dict) -> None:
+def test_d4_negativo_desviacion_por_debajo_del_umbral(
+    verdad: dict, serie: dict, umbrales: dict
+) -> None:
+    maximo = float(umbrales["D4"]["desviacion_relativa_max"])
     for e in eventos_de(verdad, "D4", False):
         med = vals(serie, "Wideband O2 1", e["t_inicio_ms"], e["t_fin_ms"])
         obj = vals(serie, "Target Lambda", e["t_inicio_ms"], e["t_fin_ms"])
         assert med, "ventana vacía"
         for m, o in zip(med, obj, strict=True):
-            assert m / o - 1 < 0.04, (
-                f"desviación {m / o - 1:.4f} SÍ supera el 4 %: el caso negativo es inválido"
+            assert m / o - 1 < maximo, (
+                f"desviación {m / o - 1:.4f} SÍ supera {maximo}: el caso negativo es inválido"
             )
 
 
-def test_d8_duty_de_inyeccion(verdad: dict, serie: dict) -> None:
+def test_d8_duty_de_inyeccion(verdad: dict, serie: dict, umbrales: dict) -> None:
+    aviso = float(umbrales["D8"]["umbral_aviso"])
+    critico = float(umbrales["D8"]["umbral_critico"])
     for e in eventos_de(verdad, "D8", True):
         duty = vals(serie, "Injection Stage 1 Average Duty Cycle", e["t_inicio_ms"], e["t_fin_ms"])
         assert duty, "ventana vacía"
-        limite = 0.95 if e["severidad_esperada"] == "critica" else 0.85
+        limite = critico if e["severidad_esperada"] == "critica" else aviso
         for d in duty:
             assert d > limite, f"duty {d} no supera {limite}"
     for e in eventos_de(verdad, "D8", False):
         duty = vals(serie, "Injection Stage 1 Average Duty Cycle", e["t_inicio_ms"], e["t_fin_ms"])
         for d in duty:
-            assert d < 0.85, f"duty {d} SÍ supera el 85 %: el caso negativo es inválido"
+            assert d < aviso, f"duty {d} SÍ supera {aviso}: el caso negativo es inválido"
 
 
-def test_d9_sobretemperatura_y_su_permanencia(verdad: dict, serie: dict) -> None:
-    UMBRAL_K = 105.0 + 273.15
+def test_d9_sobretemperatura_y_su_permanencia(verdad: dict, serie: dict, umbrales: dict) -> None:
+    UMBRAL_K = float(umbrales["D9"]["umbral_max_k"])
+    permanencia_ms = float(umbrales["D9"]["permanencia_s"]) * 1000
     for e in eventos_de(verdad, "D9", True):
         temp = vals(serie, "Coolant Temperature", e["t_inicio_ms"], e["t_fin_ms"])
         assert temp, "ventana vacía"
         for t in temp:
             assert t > UMBRAL_K, f"{t - 273.15:.1f} °C no supera el umbral"
-        assert e["t_fin_ms"] - e["t_inicio_ms"] >= 3000, (
-            "el positivo debe superar la permanencia de 3 s"
+        assert e["t_fin_ms"] - e["t_inicio_ms"] >= permanencia_ms, (
+            f"el positivo debe superar la permanencia de {permanencia_ms / 1000} s"
         )
     for e in eventos_de(verdad, "D9", False):
-        assert e["t_fin_ms"] - e["t_inicio_ms"] < 3000, (
-            "el negativo debe durar MENOS que la permanencia de 3 s"
+        assert e["t_fin_ms"] - e["t_inicio_ms"] < permanencia_ms, (
+            f"el negativo debe durar MENOS que la permanencia de {permanencia_ms / 1000} s"
         )
         temp = vals(serie, "Coolant Temperature", e["t_inicio_ms"], e["t_fin_ms"])
         # Sí está por encima del umbral: lo que lo salva es la duración, y eso es
@@ -296,13 +321,15 @@ def test_d10_presion_de_aceite_contra_la_curva(verdad: dict, serie: dict) -> Non
             assert p < 400.0, f"{p} kPa no es lo bastante bajo para ser un casi-positivo"
 
 
-def test_d11_baja_tension_con_motor_en_marcha(verdad: dict, serie: dict) -> None:
+def test_d11_baja_tension_con_motor_en_marcha(verdad: dict, serie: dict, umbrales: dict) -> None:
+    minimo = float(umbrales["D11"]["umbral_min_v"])
+    rpm_min = float(umbrales["D11"]["condiciones"]["engine_speed_min"])
     for e in eventos_de(verdad, "D11", True):
         idxs = ventana(serie, e["t_inicio_ms"], e["t_fin_ms"])
         assert idxs, "ventana vacía"
         for i in idxs:
-            assert serie["datos"]["Battery Voltage"][i] < 11.5
-            assert serie["datos"]["RPM"][i] > 500, "el motor debe estar en marcha"
+            assert serie["datos"]["Battery Voltage"][i] < minimo
+            assert serie["datos"]["RPM"][i] > rpm_min, "el motor debe estar en marcha"
 
 
 def test_d12_bit_de_error_de_trigger(verdad: dict, serie: dict) -> None:
@@ -329,11 +356,12 @@ def test_d13_y_d14_proteccion_y_corte(verdad: dict, serie: dict) -> None:
         assert v and all(x > 0 for x in v)
 
 
-def test_d18_hueco_de_muestreo(verdad: dict, serie: dict) -> None:
+def test_d18_hueco_de_muestreo(verdad: dict, serie: dict, umbrales: dict) -> None:
+    factor = float(umbrales["D18"]["factor_sobre_dt_mediano"])
     marcas = serie["marcas"]
     dts = [marcas[i + 1] - marcas[i] for i in range(len(marcas) - 1)]
     mediana = statistics.median(dts)
-    huecos = [marcas[i] for i, d in enumerate(dts) if d > 3 * mediana]
+    huecos = [marcas[i] for i, d in enumerate(dts) if d > factor * mediana]
     anotados = [e["t_inicio_ms"] for e in eventos_de(verdad, "D18", True)]
     assert len(huecos) == len(anotados), (
         f"{len(huecos)} huecos reales frente a {len(anotados)} anotados: {huecos}"
@@ -342,11 +370,12 @@ def test_d18_hueco_de_muestreo(verdad: dict, serie: dict) -> None:
         assert abs(h - a) <= 50, f"hueco real en {h} ms, anotado en {a} ms"
 
 
-def test_d3_retardo_por_knock_activo(verdad: dict, serie: dict) -> None:
+def test_d3_retardo_por_knock_activo(verdad: dict, serie: dict, umbrales: dict) -> None:
+    umbral = float(umbrales["D3"]["umbral_max_grados"])
     for e in eventos_de(verdad, "D3", True):
         v = vals(serie, "Knock Control Bank 1 Ignition Correction", e["t_inicio_ms"], e["t_fin_ms"])
         assert v, "ventana vacía"
-        assert min(v) < -1.0, f"la corrección mínima es {min(v)}°, no llega a −1°"
+        assert min(v) < umbral, f"la corrección mínima es {min(v)}°, no llega a {umbral}°"
 
 
 # --------------------------------------------------------------------------- #

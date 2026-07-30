@@ -128,9 +128,21 @@
       "rol": "boost_pressure_actual"
     }
   ],
-  "curva_presion_aceite_minima": {
-    "formula_kpa_abs": "101.3 + 100 + (rpm/1000)*100",
-    "nota": "docs/04 §4.2 P8: un umbral plano da falsos positivos en ralentí"
+  "umbrales": {
+    "origen": "data/umbrales.toml",
+    "nota": "Los umbrales son configurables (perfil > usuario > por omisión). El fixture sitúa cada evento a un lado del umbral vigente y cada casi-evento al otro, en proporción, no con valores fijos.",
+    "vigentes": {
+      "D4_desviacion_relativa_max": 0.04,
+      "D8_umbral_aviso": 0.85,
+      "D8_umbral_critico": 0.95,
+      "D9_umbral_max_c": 105.0,
+      "D11_umbral_min_v": 11.5,
+      "D10_curva": {
+        "tipo": "lineal_por_regimen",
+        "base_kpa": 201.3,
+        "pendiente_kpa_por_1000rpm": 100.0
+      }
+    }
   },
   "resumen": {
     "eventos_totales": 20,

@@ -111,7 +111,7 @@ uno en uno es inviable.
 
 ### E5 — Detección de eventos y alertas *(prioridad del cliente)*
 - E5.1 Detección de picos con histéresis y tiempo de permanencia mínimo (evita falsos positivos por una muestra de ruido).
-- E5.2 **Topes de alerta** por canal: umbral, banda, y condicionales compuestos (`λ > objetivo+5 % AND TPS > 80 % AND RPM > 4000`).
+- E5.2 **Topes de alerta** por canal: umbral, banda, y condicionales compuestos (`λ > objetivo+5 % AND TPS > 80 % AND RPM > 4000`). **Todos los umbrales son configurables**: valores por omisión en `data/umbrales.toml`, sustituibles por canal, por perfil o por preferencia de usuario, en esa precedencia (`04-perfiles-motorsport.md` §4.3). Ningún límite va cableado en el código.
 - E5.3 Detectores derivados: derivada, media móvil, tiempo por encima de umbral, conteo de cruces.
 - E5.4 Detectores específicos de motorsport: knock, sobreoscilación de boost, corte, protección de motor, error de trigger, λ pobre en carga (ver `04-perfiles-motorsport.md`).
 - E5.5 **Panel de incidencias**: lista ordenada por severidad con salto al instante y al contexto.

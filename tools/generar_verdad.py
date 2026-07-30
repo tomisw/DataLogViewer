@@ -37,11 +37,38 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 SALIDA_POR_OMISION = RAIZ / "samples" / "verdad"
+UMBRALES_TOML = RAIZ / "data" / "umbrales.toml"
+
+
+def cargar_umbrales() -> dict:
+    """Los umbrales son DATOS configurables, no constantes de este guion.
+
+    El fixture coloca cada evento justo a un lado del umbral y cada casi-evento
+    justo al otro, así que tiene que leer los mismos valores que leerán los
+    detectores. Cablearlos aquí habría creado dos fuentes de verdad que se
+    desincronizan en el primer ajuste.
+    """
+    with UMBRALES_TOML.open("rb") as fh:
+        return tomllib.load(fh)
+
+
+UMBRALES = cargar_umbrales()
+DET = UMBRALES["detectores"]
+
+# Derivados de los umbrales configurados: el fixture sitúa cada evento a un lado
+# y cada casi-evento al otro, en proporción al umbral y no con números fijos, así
+# que sigue siendo válido si el usuario los cambia.
+D4_MAX = float(DET["D4"]["desviacion_relativa_max"])
+D8_AVISO = float(DET["D8"]["umbral_aviso"])
+D8_CRITICO = float(DET["D8"]["umbral_critico"])
+D9_MAX_C = float(DET["D9"]["umbral_max_k"]) - 273.15
+D11_MIN_V = float(DET["D11"]["umbral_min_v"])
 
 HZ = 20
 DT_MS = 1000 // HZ
@@ -92,14 +119,14 @@ class Evento:
 
 
 def presion_aceite_minima_kpa(rpm: float) -> float:
-    """Curva mínima de presión de aceite en función del régimen (docs/04 §4.2 P8).
+    """Curva mínima de presión de aceite en función del régimen (D10).
 
     Un umbral plano da falsos positivos en ralentí y falsos negativos a alto
-    régimen; de ahí que el detector D10 use una curva. Aquí se usa la misma para
-    situar el positivo y el casi-positivo a cada lado de ella.
-        1 bar + 1 bar por cada 1 000 rpm, en absolutos.
+    régimen; de ahí que D10 use una curva. Los coeficientes salen de
+    `data/umbrales.toml`, que es donde el usuario los puede cambiar.
     """
-    return 101.3 + 100.0 + (rpm / 1000.0) * 100.0
+    c = DET["D10"]["curva_minima"]
+    return float(c["base_kpa"]) + (rpm / 1000.0) * float(c["pendiente_kpa_por_1000rpm"])
 
 
 # --------------------------------------------------------------------------- #
@@ -197,9 +224,9 @@ def construir(rng: random.Random) -> tuple[list[list[int | None]], list[Evento],
         target = 0.88 if tps > 700 else 1.00
         lam = target + rng.uniform(-0.004, 0.004)
         if POBRE_MS[0] <= t_ms < POBRE_MS[1]:
-            lam = target * 1.041  # por encima del 4 %: D4 dispara
+            lam = target * (1.0 + D4_MAX * 1.025)  # justo por encima: D4 dispara
         elif CASI_POBRE_MS[0] <= t_ms < CASI_POBRE_MS[1]:
-            lam = target * 1.030  # por debajo del 4 %: D4 NO dispara
+            lam = target * (1.0 + D4_MAX * 0.75)  # justo por debajo: D4 NO dispara
 
         # --- knock ---
         umbral_db = 34.0 + (map_kpa - 33.0) * 0.07
@@ -217,16 +244,16 @@ def construir(rng: random.Random) -> tuple[list[list[int | None]], list[Evento],
         # --- duty de inyección ---
         duty_pct = 18.0 if tps == 0 else 30.0 + (map_kpa / 230.0) * 45.0
         if DUTY_ALTO_MS[0] <= t_ms < DUTY_ALTO_MS[1]:
-            duty_pct = 88.0
+            duty_pct = (D8_AVISO + 0.03) * 100.0
         elif DUTY_CRITICO_MS[0] <= t_ms < DUTY_CRITICO_MS[1]:
-            duty_pct = 96.0
+            duty_pct = (D8_CRITICO + 0.01) * 100.0
         elif DUTY_CASI_MS[0] <= t_ms < DUTY_CASI_MS[1]:
-            duty_pct = 83.0
+            duty_pct = (D8_AVISO - 0.02) * 100.0
 
         # --- refrigerante ---
         coolant_c = 92.0 + rng.uniform(-0.3, 0.3)
         if SOBRETEMP_MS[0] <= t_ms < SOBRETEMP_MS[1]:
-            coolant_c = 107.5
+            coolant_c = D9_MAX_C + 2.5
         elif TEMP_PICO_MS[0] <= t_ms < TEMP_PICO_MS[1]:
             coolant_c = 106.5  # solo 0,8 s: D9 NO dispara
 
@@ -240,7 +267,7 @@ def construir(rng: random.Random) -> tuple[list[list[int | None]], list[Evento],
         # --- tensión, trigger, protección, corte ---
         vbat = 13.9 + rng.uniform(-0.05, 0.05)
         if TENSION_BAJA_MS[0] <= t_ms < TENSION_BAJA_MS[1]:
-            vbat = 11.2
+            vbat = D11_MIN_V - 0.3
         trig = 1 if TRIGGER_MS[0] <= t_ms < TRIGGER_MS[1] else 0
         prot = 2 if PROTECCION_MS[0] <= t_ms < PROTECCION_MS[1] else 0
         corte_pct = 25.0 if prot else 0.0
@@ -497,9 +524,21 @@ def escribir_verdad(ruta: Path, eventos: list[Evento], filas: list[list[int | No
         "n_filas": len(filas),
         "duracion_s": DURACION_S,
         "canales": [{"nombre": n, "id": i, "type": t, "rol": r} for n, i, t, _mm, r in CANALES],
-        "curva_presion_aceite_minima": {
-            "formula_kpa_abs": "101.3 + 100 + (rpm/1000)*100",
-            "nota": "docs/04 §4.2 P8: un umbral plano da falsos positivos en ralentí",
+        "umbrales": {
+            "origen": "data/umbrales.toml",
+            "nota": (
+                "Los umbrales son configurables (perfil > usuario > por omisión). "
+                "El fixture sitúa cada evento a un lado del umbral vigente y cada "
+                "casi-evento al otro, en proporción, no con valores fijos."
+            ),
+            "vigentes": {
+                "D4_desviacion_relativa_max": D4_MAX,
+                "D8_umbral_aviso": D8_AVISO,
+                "D8_umbral_critico": D8_CRITICO,
+                "D9_umbral_max_c": round(D9_MAX_C, 2),
+                "D11_umbral_min_v": D11_MIN_V,
+                "D10_curva": DET["D10"]["curva_minima"],
+            },
         },
         "resumen": {
             "eventos_totales": len(eventos),
