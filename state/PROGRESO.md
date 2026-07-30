@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-29 23:15:53Z
+Actualizado: 2026-07-30 04:55:04Z
 
-**30 / 669 pts cerrados (4.5 %)** · 18 pts esperando revisión humana → 7.2 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 26 pts esperando revisión humana → 8.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 18 | 0 | 0 | 6 | 54 |
-| F1 | 0 | 0 | 0 | 186 | 0 | 186 |
+| F1 | 0 | 8 | 0 | 178 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 118 | 0 | 118 |
@@ -22,11 +22,12 @@ Actualizado: 2026-07-29 23:15:53Z
 
 | Tarea | Estado | Modelo | Puerta | Última nota |
 |---|---|---|---|---|
-| `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | BLOQUEADA sin red: polars, numpy, pyarrow y pandas no estan instalados |
+| `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | CONFIRMADO 2026-07-29: la politica de red del entorno bloquea PyPI. 'c |
 | `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | samples/verdad/ con verdad.csv (log Haltech legitimo, 60 s a 20 Hz, 20 |
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
+| `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
 
 ## F0 — 48/54 pts
 
@@ -47,7 +48,7 @@ Actualizado: 2026-07-29 23:15:53Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 0/186 pts
+## F1 — 8/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -63,7 +64,7 @@ Actualizado: 2026-07-29 23:15:53Z
 | ·  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | — |
 | ·  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | — |
 | ·  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | — |
-| ·  | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | — |
+| ⏳ | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | `efc4f55` |
 | ·  | `F1-14` | Conversiones parametrizadas por canal (λ→AFR con la estequiome | Opus 5 | 5 | F1-13 | G1 | — |
 | ·  | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | — |
 | ·  | `F1-16` | Dimensiones compuestas derivadas (`%/kPa` → `%/psi`) | Opus 5 | 4 | F1-13 | G1 | — |

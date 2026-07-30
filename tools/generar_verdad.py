@@ -165,7 +165,7 @@ def construir(rng: random.Random) -> tuple[list[list[int | None]], list[Evento],
     HUECO_MS = 58_000  # D18: hueco de muestreo
 
     t_ms = 0
-    for i in range(N_FILAS):
+    for _ in range(N_FILAS):
         # Hueco de muestreo deliberado: un salto de 400 ms (docs/01 §1.7).
         if t_ms == HUECO_MS:
             t_ms += 400 - DT_MS
@@ -250,7 +250,8 @@ def construir(rng: random.Random) -> tuple[list[list[int | None]], list[Evento],
         # --- a enteros crudos, con las escalas del descriptor -------------
         fila: list[int | None] = [0] * len(CANALES)
 
-        def pon(nombre: str, valor: int) -> None:
+        def pon(nombre: str, valor: int, fila: list[int | None] = fila) -> None:
+            # `fila` ligada por argumento: no se captura la del bucle (B023).
             fila[NOMBRE_A_INDICE[nombre]] = valor
 
         pon("RPM", round(rpm))

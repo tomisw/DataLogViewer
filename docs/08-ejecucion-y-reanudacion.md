@@ -163,15 +163,29 @@ Antes de cerrar cualquier tarea, y siempre sobre todo el repositorio, no solo
 sobre lo tocado:
 
 ```bash
-ruff check .          # lint
-ruff format --check . # formato
-mypy dlv-core dlv-api # tipado estricto
-pytest -q             # pruebas
+bash tools/verificar.sh
 ```
+
+Ejecuta las seis comprobaciones (`ruff check`, `ruff format --check`,
+`mypy --strict`, `pytest`, ADR-009 y presupuestos), resume al final y devuelve
+código de salida distinto de cero si algo está en rojo.
+
+**Úsalo en lugar de ejecutar las herramientas a mano.** Se escribió después de
+que dos commits salieran con el lint en rojo por la misma razón las dos veces:
+`ruff check` imprime «No fixes available…» *después* de «Found N errors», así que
+mirar la última línea de su salida engaña. El guion usa códigos de salida, que no
+se pueden malinterpretar.
 
 En un contenedor sin red no hay `pip`, pero `ruff`, `mypy` y `pytest` pueden
 estar disponibles como binarios aislados en `~/.local/bin`. Si no lo están,
 `python tools/pytest_minimo.py` ejecuta las pruebas con un `pytest` de sustitución.
+
+**PyPI está bloqueado en este entorno** y no es un fallo transitorio:
+`curl https://pypi.org/simple/polars/` devuelve 403 en 0,06 s, un rechazo local
+de la política de red, y `pypi.org` está en `no_proxy`, así que no es cuestión de
+configurar el proxy. `polars`, `numpy` y `fastapi` no se pueden instalar. No
+merece la pena reintentarlo: lo que dependa de ellos se marca `block` con el
+motivo (es el caso de F0-01).
 
 **El informe de un agente no es evidencia.** Al integrar F0-02 el informe decía
 —con razón— que todo estaba verde, y lo estaba; pero `pytest` solo recogía 4

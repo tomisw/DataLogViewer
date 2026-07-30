@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-29 23:15:53Z"
+    "actualizado": "2026-07-30 04:55:04Z"
   },
   "tareas": [
     {
@@ -25,6 +25,10 @@
         {
           "fecha": "2026-07-29 22:02:13Z",
           "texto": "BLOQUEADA sin red: polars, numpy, pyarrow y pandas no estan instalados y pip/uv devuelven 403 host_not_allowed. El entregable de esta tarea es una MEDICION de Polars, que no se puede fabricar. Al reanudar con red: 'uv sync' y luego 'python tools/banco.py spike-polars' (el arnes lo entrega F0-04, ya preparado con el criterio de aceptacion y una linea base de stdlib para comparar)."
+        },
+        {
+          "fecha": "2026-07-30 04:48:28Z",
+          "texto": "CONFIRMADO 2026-07-29: la politica de red del entorno bloquea PyPI. 'curl https://pypi.org/simple/polars/' devuelve http 403 en 0,061 s (rechazo local, no timeout), y pypi.org esta en no_proxy asi que no es cuestion de configurar el proxy. No es un fallo transitorio ni se puede rodear. NO REINTENTAR sin que cambie la politica del entorno. Al reanudar con red: 'uv sync --all-packages && python tools/banco.py spike-polars'; el job 'rendimiento' de CI lo hace solo en el primer push."
         }
       ]
     },
@@ -662,10 +666,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "orquestador",
+      "commits": [
+        "efc4f55"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 04:55:04Z",
+          "texto": "dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin (con la parte lineal separada para intervalos), Reciproca (que RECHAZA convertir diferencias en vez de devolver un numero aproximado) y Parametrizada (lambda->AFR con la estequiometria del log). Clase obligatoria sin valor por omision: quien convierte tiene que declarar punto/intervalo/tasa/varianza. Carga del catalogo con comprobacion de coherencia (origen_desplazado debe coincidir con b!=0) al cargar, no en produccion. Presion absoluta/relativa como cambio de origen que solo afecta a los puntos. 38 pruebas, incluida una que DEMUESTRA ADR-009 con un array falso que estalla si alguien lo recorre elemento a elemento, y que cuenta las pasadas sobre el array. OPTIMIZACION: se omite el '+b' cuando b==0, que ahorra una pasada completa sobre el array en la mayoria de unidades. Sin numpy: el mismo codigo es escalar y vectorizado por duck typing, asi que se prueba sin dependencias. REVISAR: que la Clase sea obligatoria en toda la API, y el mensaje de error de la reciproca."
+        }
+      ]
     },
     {
       "id": "F1-14",

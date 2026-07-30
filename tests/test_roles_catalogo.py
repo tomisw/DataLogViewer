@@ -11,6 +11,7 @@ Solo biblioteca estándar.
 
 from __future__ import annotations
 
+import contextlib
 import re
 import tomllib
 from pathlib import Path
@@ -234,10 +235,8 @@ def muestras() -> dict[str, list[int]]:
         for n in out:
             crudo = campos[1 + idx[n]].strip()
             if crudo:
-                try:
+                with contextlib.suppress(ValueError):
                     out[n].append(int(crudo))
-                except ValueError:
-                    pass
     out["__tipos__"] = tipos  # type: ignore[assignment]
     return out
 

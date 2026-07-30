@@ -96,6 +96,10 @@ select = [
     "RUF003",  # signo menos tipográfico (−) en comentarios
 ]
 "tests/*.py" = ["E501", "RUF059", "RUF002", "RUF001", "RUF003"]
+# La prosa de `dlv-core` y `dlv-api` está en español y usa el signo menos
+# tipográfico (−) y las comillas «», que ruff marca como ambiguos. Es deliberado.
+"dlv-core/**/*.py" = ["RUF001", "RUF002", "RUF003"]
+"dlv-api/**/*.py" = ["RUF001", "RUF002", "RUF003"]
 
 "*/tests/*" = ["S101"]
 
