@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 14:13:03Z"
+    "actualizado": "2026-07-30 14:57:52Z"
   },
   "tareas": [
     {
@@ -820,10 +820,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "f34c90c"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 14:57:15Z",
+          "texto": "REVISAR (G1, ordenado por consecuencia): (1) DISCREPANCIA ENTRE ESPECIFICACIONES que resolvi con criterio y necesita tu confirmacion: docs/01 SS1.9 dice 'mediana de Manifold Pressure con RPM=0 AL INICIO DEL LOG'; data/units.toml [presion_referencia] dice solo auto_condicion='engine_speed == 0', sin restringir al inicio. Segui el fichero de datos (mas amplio) razonando que la presion de colector iguala a la ambiente SIEMPRE que el motor no gira, no solo al arrancar, asi que la mediana sobre todas las muestras con motor parado usa mas evidencia y es mas robusta. Si prefieres la lectura literal de SS1.9 (solo el inicio), es un cambio de una linea. (2) El flag 'estimada' es lo que impide presentar como medido un boost que se supuso: con la constante 101,325 kPa un boost de '1,2 bar' puede ser 1,15 o 1,25 segun altitud, y eso llega a una decision de tuning. Comprueba que la cascada es la que quieres: declarada por usuario > autodeteccion > constante estimada. (3) El MECANISMO ya existia de F1-13 (referencia_kpa se resta en canonica antes de convertir unidad, y solo a Clase.PUNTO); esta tarea solo resuelve de donde sale el numero. Verificado con test que la misma referencia da el mismo boost fisico en kPa/bar/psi, y que a un INTERVALO no se le resta nada. (4) modo 'canal' lanza NotImplementedError explicito: estos logs no traen canal barometrico (SS1.9), el modo existe en el catalogo para formatos que si. 14 tests nuevos. 589 tests en total, todo verde salvo memoria_residente (ya conocido)."
+        }
+      ]
     },
     {
       "id": "F1-16",
@@ -840,10 +847,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "f34c90c"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 14:57:33Z",
+          "texto": "REVISAR (G1, ordenado por consecuencia): (1) LA ARITMETICA ES a_num/a_den, NO a_num*a_den. Un valor compuesto en canonica es delta_num/delta_den; al pasar el denominador a su unidad activa el propio denominador se multiplica por a_den, pero esta DIVIDIENDO, asi que el cociente se multiplica por 1/a_den. Invertir esto da un numero con la forma correcta y la magnitud equivocada por un factor de ~14,5 en %/psi, y nada en la interfaz lo delataria. Verificado contra el valor fisico razonado, no contra la implementacion: 1 psi = 6,894757 kPa, asi que 100 %/kPa son 689,48 %/psi (por cada psi hay 6,894757 veces mas cambio que por cada kPa); mas un test de SENTIDO que exige factor(psi) > factor(kPa). (2) Se rechaza con ErrorDeUnidad, en vez de dar un numero plausible, cuando numerador o denominador usan conversion no afin (Reciproca lambda->phi, Parametrizada lambda->AFR): el cociente no es un factor constante, 'por phi' no es la pendiente escalada sino otra funcion. (3) Solo se usa la parte lineal 'a', nunca el desplazamiento 'b': una pendiente 'por grado' vale lo mismo en degC que en K. Es la misma regla que Clase.TASA de F1-13 aplica al numerador; esta tarea la completa con el denominador, que Clase.TASA por si sola no puede conocer. (4) cargar_compuestas va aparte de cargar_catalogo a proposito (Catalogo describe dimensiones simples y no deberia crecer un concepto nuevo por una tarea posterior) -- si prefieres consolidarlo en Catalogo, es refactor mecanico. Las 3 compuestas salen de data/units.toml [compuestas.*], no de una tabla en el codigo. 12 tests nuevos."
+        }
+      ]
     },
     {
       "id": "F1-17",
@@ -914,10 +928,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "f34c90c"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 14:57:52Z",
+          "texto": "REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas costaria si fallara: CAMBIAR DE UNIDAD NO REESCRIBE EL UMBRAL GUARDADO (docs/06 SS6.11: cambiar de unidad es un repintado, no una recarga). Si esto se rompiera, el fichero de umbrales del usuario se corrompe solo con mirarlo en otra unidad. UmbralEditable lleva 'valor' (unidad activa) y 'canonico' (lo persistido) juntos, y hay test explicito de que canonico queda intacto en K/degC/degF. (2) 'clase' es OBLIGATORIA sin valor por omision, igual que en el motor de F1-13: un umbral puede ser PUNTO ('temperatura sobre 373,15 K') o INTERVALO ('una subida de mas de 10 K'), y editar el segundo como el primero convierte '10 K de subida' en '-263,15 degC' -- la trampa del delta entrando por el campo de edicion. Test que exige que el mismo numero canonico de valores DISTINTOS segun la clase. (3) Ida y vuelta exacta (docs/06 SS6.12, <1 ULP) verificada en 6 combinaciones dimension/unidad: abrir el editor y cerrarlo sin tocar nada no cambia el fichero. (4) Compone con F1-15: un umbral de presion guardado absoluto (201,325 kPa) se edita como '1 bar de boost' si hay referencia_kpa, y la etiqueta lo marca 'rel'. (5) Umbrales adimensionales (histeresis_relativa, muestras_minimas) pasan sin convertir pero se siguen formateando. Los decimales salen de data/units.toml (SS6.10: lambda lleva 3 porque 0,995 con uno destruye la informacion). Probado contra un umbral REAL de data/umbrales.toml (D1.escalada_critica.manifold_pressure_min, 150 kPa abs). 18 tests nuevos."
+        }
+      ]
     },
     {
       "id": "F1-20",
