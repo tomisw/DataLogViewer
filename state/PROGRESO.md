@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 13:30:44Z
+Actualizado: 2026-07-30 13:44:19Z
 
-**67 / 669 pts cerrados (10.0 %)** · 62 pts esperando revisión humana → 19.3 % entregado
+**76 / 669 pts cerrados (11.4 %)** · 62 pts esperando revisión humana → 20.6 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 37 | 38 | 0 | 111 | 0 | 186 |
+| F1 | 46 | 38 | 0 | 102 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -55,7 +55,7 @@ Actualizado: 2026-07-30 13:30:44Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 75/186 pts
+## F1 — 84/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -65,7 +65,7 @@ Actualizado: 2026-07-30 13:30:44Z
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
 | ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
 | ✔  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | `815a8e4` |
-| ·  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | — |
+| ✔  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | `d05c389` |
 | ✔  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | `4471cbc` |
 | ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `c1296dd` |
 | ✔  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | `a521091` |
@@ -79,7 +79,7 @@ Actualizado: 2026-07-30 13:30:44Z
 | ⏳ | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `815a8e4` |
 | ·  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | — |
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
-| ·  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | — |
+| ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `d05c389` |
 | ·  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | — |
 | ·  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | — |
 | ·  | `F1-24` | Caché de cubos en el frontend — es lo que hace alcanzable el c | Opus 5 | 5 | F1-23 | G2 | — |

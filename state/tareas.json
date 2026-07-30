@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 13:30:44Z"
+    "actualizado": "2026-07-30 13:44:19Z"
   },
   "tareas": [
     {
@@ -599,10 +599,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "d05c389"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:43:57Z",
+          "texto": "indexar(serie, *, display_min=None, display_max=None, percentiles=(1,5,50,95,99)) -> IndiceCanal en almacen.py. CAMBIO DE FIRMA (mismo motivo que F1-05/construir_desde_polars): un solo np.ndarray no puede cargar min+max+percentiles+clasificacion categorica. IndiceCanal: minimo/maximo/percentiles/vacio/constante/fuera_de_rango, mas 'activo' como property calculada (nunca desincroniza). display_min/display_max se comparan contra v CRUDO (no to_canon): confirmado en docs/01 SS1.3/1.5 que DisplayMaxMin esta en la escala nativa del canal. Clasificacion NO excluyente (constante y fuera_de_rango pueden ser ambas True). Sin DisplayMaxMin (13 de 475 canales del AutoLog real), fuera_de_rango es False = 'no aplica', no 'desconocido'. Percentiles p1/p5/p50/p95/p99 (colas + mediana, sin media que un canal en reposo distorsiona). REVISAR (duda del agente, no bloqueante): percentiles como Mapping[float,float] (flexible) en vez de campos fijos p1/p5/p50/p95/p99 (mas tipado) -- decision de diseño menor, cualquiera de las dos es defendible. Centinelas/huecos no se tocan (se pierden rio arriba en F1-03 / son F1-08 ya implementado). 12 tests nuevos (19 total en test_almacen.py), incluidos 3 contra el AutoLog real y un barrido de humo sobre los 475 canales reales. Arregle yo mismo dos detalles menores de lint tras el informe del agente (zip sin strict=, formato). Verificado de forma independiente: mypy/pytest/ruff en verde, 503 tests en total sin regresiones."
+        }
+      ]
     },
     {
       "id": "F1-08",
@@ -935,10 +942,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "d05c389"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:44:19Z",
+          "texto": "verificar_token(request, authorization=Header) en dlv_api/main.py: exige Authorization: Bearer <token_sesion> via Depends(), comparado contra request.app.state.token_sesion. Primer comando protegido: POST /comandos/abrir-cabecera (Pydantic ComandoAbrirCabecera/RespuestaAbrirCabecera/InfoCanal), deliberadamente SOLO metadatos de cabecera (canales + avisos via InformeImportacion F1-12), NO series de datos (ADR-007: las series nunca viajan en JSON, eso es F1-22 -- transporte binario, tarea separada que ya depende de esta). /salud sigue sin exigir token (a proposito, verificado con test explicito de no-regresion). Errores tipados: 404 fichero inexistente, 422 firma invalida (ErrorDeFormato), 401 sin token o token incorrecto. -- NOTA PARA F5-01 (empaquetado): el descriptor data/formats/haltech_nsp.toml se localiza hoy por ruta relativa al fichero fuente (_RAIZ_REPO), funciona en el repo de desarrollo pero NO en un dlv-app empaquetado -- documentado en el docstring del modulo para que esa tarea no lo redescubra desde cero; requerira embeber el dato en el ZIP portable. 6 tests nuevos (dlv-api/tests/test_abrir_cabecera.py): sin token, token incorrecto, token correcto sobre el AutoLog real (475 canales), fichero inexistente, firma invalida, y no-regresion de /salud. 503 tests en el repo, todo verde salvo memoria_residente (ya conocido, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-22",
