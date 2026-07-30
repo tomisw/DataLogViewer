@@ -22,6 +22,10 @@ dev = [
     "pytest>=8.0",
     "ruff>=0.6",
     "mypy>=1.11",
+    # `starlette.testclient` (vía `fastapi.testclient`, usado en
+    # dlv-api/tests/test_salud.py) exige httpx2 desde starlette 1.x; solo de
+    # test, no entra en el ZIP portable de dlv-app.
+    "httpx2",
 ]
 
 # ---------------------------------------------------------------------------

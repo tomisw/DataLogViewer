@@ -105,6 +105,7 @@ Para máquinas de estado con histéresis, decimación por moda con longitud de r
 ```python
 from numba import njit
 
+
 @njit(cache=True)
 def state_machine(samples: np.ndarray) -> np.ndarray:
     # ...

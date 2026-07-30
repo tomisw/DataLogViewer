@@ -19,11 +19,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import platform
 import re
 import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+
+if platform.system() == "Windows":
+    # La consola de Windows no usa UTF-8 por omisión (cp1252), y este guion
+    # imprime ≥/✔/✖ en la salida de `next`/`show`.
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 RAIZ = Path(__file__).resolve().parent.parent
 BACKLOG = RAIZ / "docs" / "05-backlog-y-asignacion-modelos.md"

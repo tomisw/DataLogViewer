@@ -33,7 +33,6 @@ import csv
 import json
 import platform
 import re
-import resource
 import subprocess
 import sys
 import time
@@ -41,6 +40,14 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
+
+if platform.system() != "Windows":
+    import resource
+else:
+    # La consola de Windows no usa UTF-8 por omisión (cp1252), y este guion
+    # imprime ✔/✖/· en `registrar()`.
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 RAIZ = Path(__file__).resolve().parent.parent
 BANCO = RAIZ / "state" / "banco"
@@ -197,7 +204,46 @@ def _maquina() -> dict[str, Any]:
 
 def _pico_memoria_mb() -> float:
     """Pico de memoria residente del proceso. `ru_maxrss` está en kB en Linux
-    y en bytes en macOS."""
+    y en bytes en macOS. Windows no tiene `resource`; se usa el contador de
+    pico del working set vía `psapi` (solo biblioteca estándar, `ctypes`)."""
+    if platform.system() == "Windows":
+        import ctypes
+        from ctypes import wintypes
+
+        class ContadoresMemoria(ctypes.Structure):
+            _fields_ = [
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
+                ("PeakWorkingSetSize", ctypes.c_size_t),
+                ("WorkingSetSize", ctypes.c_size_t),
+                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                ("PagefileUsage", ctypes.c_size_t),
+                ("PeakPagefileUsage", ctypes.c_size_t),
+            ]
+
+        # `ctypes.windll` no fija argtypes/restype por sí solo, y sin ellos el
+        # HANDLE (pseudo-handle de 64 bits) de GetCurrentProcess se trunca a
+        # int y GetProcessMemoryInfo falla en silencio (devuelve 0, pico 0 MB).
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+        psapi.GetProcessMemoryInfo.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(ContadoresMemoria),
+            wintypes.DWORD,
+        ]
+        psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+
+        contadores = ContadoresMemoria()
+        contadores.cb = ctypes.sizeof(ContadoresMemoria)
+        proceso = kernel32.GetCurrentProcess()
+        if not psapi.GetProcessMemoryInfo(proceso, ctypes.byref(contadores), contadores.cb):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return contadores.PeakWorkingSetSize / (1024 * 1024)
+
     pico = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return pico / 1024 if platform.system() == "Linux" else pico / (1024 * 1024)
 
@@ -370,6 +416,7 @@ def cmd_spike_polars(args: argparse.Namespace) -> int:
 
     tiempos: list[float] = []
     df = None
+    pico = 0.0
     for i in range(args.repeticiones):
         t0 = time.perf_counter()
         with ruta.open("rb") as fh:
@@ -385,10 +432,18 @@ def cmd_spike_polars(args: argparse.Namespace) -> int:
             )
         tiempos.append(time.perf_counter() - t0)
         print(f"  repetición {i + 1}: {tiempos[-1]:.2f} s")
+        if i == 0:
+            # El pico de memoria del proceso (ru_maxrss / working set) es un
+            # máximo histórico que nunca baja: si se mide tras varias
+            # repeticiones, la lectura anterior aún no liberada infla el pico
+            # muy por encima de lo que cuesta abrir el fichero una vez, que es
+            # lo que describe el presupuesto `memoria_residente`. Se captura
+            # tras la primera lectura limpia; las repeticiones siguientes solo
+            # sirven para el `mejor` tiempo.
+            pico = _pico_memoria_mb()
 
     mejor = min(tiempos)
     mbs = tam_mb / mejor
-    pico = _pico_memoria_mb()
     filas = 0 if df is None else df.height
     columnas = 0 if df is None else df.width
 

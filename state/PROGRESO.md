@@ -4,13 +4,13 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 09:45:43Z
+Actualizado: 2026-07-30 11:42:45Z
 
-**30 / 669 pts cerrados (4.5 %)** · 40 pts esperando revisión humana → 10.5 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 46 pts esperando revisión humana → 11.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
-| F0 | 30 | 18 | 0 | 0 | 6 | 54 |
+| F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 0 | 22 | 0 | 164 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
@@ -22,7 +22,7 @@ Actualizado: 2026-07-30 09:45:43Z
 
 | Tarea | Estado | Modelo | Puerta | Última nota |
 |---|---|---|---|---|
-| `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | CONFIRMADO 2026-07-29: la politica de red del entorno bloquea PyPI. 'c |
+| `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | revision_humana | Opus 5 | G1 | REVISAR: memoria_residente INCUMPLE 4.42x el CSV (310 MB pico / 70.13  |
 | `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | RESUELTO el punto de REVISAR de la nota anterior: los umbrales ya no s |
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
@@ -32,11 +32,11 @@ Actualizado: 2026-07-30 09:45:43Z
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
 
-## F0 — 48/54 pts
+## F0 — 54/54 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ✖  | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | — |
+| ⏳ | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | `4699545` |
 | ✔  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | `9c54663` |
 | ✔  | `F0-03` | CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint | Haiku 4.5 | 2 | F0-02 | G4 | `2771a41` |
 | ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `2771a41` |

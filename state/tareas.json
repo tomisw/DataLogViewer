@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 09:45:43Z"
+    "actualizado": "2026-07-30 11:42:45Z"
   },
   "tareas": [
     {
@@ -18,9 +18,11 @@
       "deps_backlog": [],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "bloqueado",
-      "agente": null,
-      "commits": [],
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "4699545"
+      ],
       "notas": [
         {
           "fecha": "2026-07-29 22:02:13Z",
@@ -29,6 +31,10 @@
         {
           "fecha": "2026-07-30 04:48:28Z",
           "texto": "CONFIRMADO 2026-07-29: la politica de red del entorno bloquea PyPI. 'curl https://pypi.org/simple/polars/' devuelve http 403 en 0,061 s (rechazo local, no timeout), y pypi.org esta en no_proxy asi que no es cuestion de configurar el proxy. No es un fallo transitorio ni se puede rodear. NO REINTENTAR sin que cambie la politica del entorno. Al reanudar con red: 'uv sync --all-packages && python tools/banco.py spike-polars'; el job 'rendimiento' de CI lo hace solo en el primer push."
+        },
+        {
+          "fecha": "2026-07-30 11:42:45Z",
+          "texto": "REVISAR: memoria_residente INCUMPLE 4.42x el CSV (310 MB pico / 70.13 MB) frente a presupuesto <=3.5x; medido con pl.read_csv eager, sin optimizar. Es hallazgo de R9 (docs/02 SS2.8, que ya contempla memoria ademas de throughput): no se toca el presupuesto, se documenta como restriccion de diseno para F1-02 (proyeccion de columnas / tipos mas estrechos / streaming para bajar el pico). tools/verificar.py mostrara FALLA en 'presupuestos' hasta que F1-02 lo resuelva; es esperado, no una regresion. -- parseo_nativo CUMPLE con margen amplio: 247-260 MB/s (mejor de 3 repeticiones) frente a presupuesto >=100 MB/s; linea base stdlib 47.0 MB/s (Polars ~5.3x mas rapido). Confirma ADR-001 (Polars como motor de parseo) en throughput. -- Se corrigieron 3 bugs de portabilidad Windows en tools/banco.py que bloqueaban el banco entero en esta maquina: (1) 'import resource' a nivel de modulo, modulo Unix-only, rompia spike-polars/adr009/comprobar/presupuestos; (2) simbolos Unicode (check/cross) sin forzar UTF-8 en stdout, cp1252 por omision en consola Windows; (3) medicion de memoria con ctypes/psapi: el HANDLE de GetCurrentProcess se pasaba sin argtypes/restype y GetProcessMemoryInfo fallaba en silencio devolviendo 0. -- Bug de metodologia adicional en el propio spike: media el pico de memoria DESPUES de 3 repeticiones de lectura sin liberar el DataFrame anterior, inflando la cifra a 7.01x (casi el doble de 4.42x real); ya corregido para capturar el pico tras la primera lectura limpia. -- Tambien se anadio httpx2 a [dependency-groups].dev (aprobado explicitamente): fastapi.testclient/starlette.testclient lo exige desde starlette 1.x y no estaba declarado, rompiendo la coleccion de pytest en dlv-api/tests/test_salud.py. -- Generado samples/synth/autolog-1h.csv (70.13 MB/38698 filas/475 canales, gitignorado, regenerable con tools/generar_corpus.py autolog-1h). -- ADR-001..009 (docs/03) confirmadas por el spike sin necesitar cambios de texto."
         }
       ]
     },
