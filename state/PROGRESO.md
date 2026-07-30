@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 08:59:52Z
+Actualizado: 2026-07-30 09:23:19Z
 
 **30 / 669 pts cerrados (4.5 %)** · 31 pts esperando revisión humana → 9.1 % entregado
 
@@ -23,7 +23,7 @@ Actualizado: 2026-07-30 08:59:52Z
 | Tarea | Estado | Modelo | Puerta | Última nota |
 |---|---|---|---|---|
 | `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | bloqueado | Opus 5 | G1 | CONFIRMADO 2026-07-29: la politica de red del entorno bloquea PyPI. 'c |
-| `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | samples/verdad/ con verdad.csv (log Haltech legitimo, 60 s a 20 Hz, 20 |
+| `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | RESUELTO el punto de REVISAR de la nota anterior: los umbrales ya no s |
 | `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
@@ -40,7 +40,7 @@ Actualizado: 2026-07-30 08:59:52Z
 | ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `2771a41` |
 | ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `9c54663` |
 | ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `4229523` |
-| ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `02140f8` |
+| ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `02140f8`, `7b995a3` |
 | ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
 | ⏳ | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
 | ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `217d88b` |
