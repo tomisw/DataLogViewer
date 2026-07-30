@@ -1,11 +1,14 @@
-"""Pruebas de la pirámide de decimación (tarea F1-09, docs/03 §3.5).
+"""Pruebas de la pirámide de decimación (tareas F1-09 y F1-10, docs/03 §3.5).
 
-La propiedad que importa más que ninguna otra (§3.5): "es exacto en los
-extremos, un pico de una sola muestra sigue visible al máximo zoom-out". Un
-decimado por muestreo simple lo perdería; estas pruebas comprueban que
-`min`/`max` de cada nivel son exactos frente a una referencia de NumPy
-calculada de forma independiente (no reutilizando la lógica de producción),
-no solo que "el código no revienta".
+La propiedad que importa más que ninguna otra en `CONTINUO` (§3.5): "es
+exacto en los extremos, un pico de una sola muestra sigue visible al máximo
+zoom-out". Un decimado por muestreo simple lo perdería; estas pruebas
+comprueban que `min`/`max` de cada nivel son exactos frente a una referencia
+de NumPy calculada de forma independiente (no reutilizando la lógica de
+producción), no solo que "el código no revienta". Las variantes de F1-10
+(`CONTADOR`, `ENUM`, `BITS`) tienen la propiedad análoga: la suma de deltas y
+el OR de bits son exactos y asociativos por construcción (igual que
+min/max), así que se comprueban también contra una referencia independiente.
 """
 
 from __future__ import annotations
@@ -16,9 +19,15 @@ import numpy as np
 import pytest
 
 from dlv_core.piramide import (
+    NivelBits,
+    NivelContador,
+    NivelEnum,
     NivelPiramide,
     TipoCanalPiramide,
     construir_piramide,
+    construir_piramide_bits,
+    construir_piramide_contador,
+    construir_piramide_enum,
     elegir_nivel,
 )
 
@@ -117,13 +126,110 @@ def test_factor_base_menor_que_2_es_un_error() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    "tipo", [TipoCanalPiramide.CONTADOR, TipoCanalPiramide.ENUM, TipoCanalPiramide.BITS]
-)
-def test_variantes_no_continuas_no_estan_implementadas_todavia(tipo: TipoCanalPiramide) -> None:
-    """Son F1-10 (suma de delta / moda de enum / OR de bits), no F1-09."""
-    with pytest.raises(NotImplementedError):
-        construir_piramide(np.arange(10, dtype=np.float32), tipo=tipo)
+def test_construir_piramide_despacha_segun_tipo() -> None:
+    v_continuo = np.arange(20, dtype=np.float32)
+    v_bits = np.arange(20, dtype=np.uint32)
+
+    assert isinstance(
+        construir_piramide(v_continuo, tipo=TipoCanalPiramide.CONTINUO)[0], NivelPiramide
+    )
+    assert isinstance(
+        construir_piramide(v_continuo, tipo=TipoCanalPiramide.CONTADOR)[0], NivelContador
+    )
+    assert isinstance(construir_piramide(v_continuo, tipo=TipoCanalPiramide.ENUM)[0], NivelEnum)
+    assert isinstance(construir_piramide(v_bits, tipo=TipoCanalPiramide.BITS)[0], NivelBits)
+
+
+# --------------------------------------------------------------------------- #
+# CONTADOR: suma del delta
+# --------------------------------------------------------------------------- #
+def test_contador_suma_delta_es_exacta_frente_a_referencia_independiente() -> None:
+    rng = np.random.default_rng(1)
+    incrementos = rng.integers(0, 5, size=10_000).astype(np.int64)
+    v = np.cumsum(incrementos).astype(np.uint32)  # contador monótono creciente
+
+    niveles = construir_piramide_contador(v)
+
+    for nivel in niveles[1:3]:
+        factor = nivel.factor
+        n = (len(v) // factor) * factor
+        # Referencia: suma total de incrementos dentro de cada bloque de
+        # `factor` muestras, calculada directamente sobre el array original.
+        deltas_originales = np.diff(v[:n].astype(np.int64), prepend=v[:1].astype(np.int64))
+        ref_suma = deltas_originales.reshape(-1, factor).sum(axis=1)
+        assert np.array_equal(nivel.suma_delta, ref_suma)
+
+
+def test_contador_un_incremento_aislado_no_se_pierde_en_el_ultimo_nivel() -> None:
+    v = np.zeros(20_000, dtype=np.uint32)
+    v[5000:] = 1  # un único incremento de +1 en toda la serie, el resto plano
+
+    niveles = construir_piramide_contador(v)
+
+    assert niveles[-1].suma_delta.sum() == 1
+
+
+def test_contador_uint32_no_envuelve_en_un_delta_negativo() -> None:
+    """`v` es uint32: si el `diff` no castea a un tipo con signo antes de
+    restar, un descenso (aquí no lo hay, pero el cast tiene que existir para
+    cuando SÍ lo haya) envolvería a un entero gigantesco en vez de dar un
+    número negativo pequeño."""
+    v = np.array([10, 10, 10], dtype=np.uint32)
+    (l0,) = construir_piramide_contador(v)[:1]
+    assert l0.suma_delta.tolist() == [0, 0, 0]
+    assert l0.suma_delta.dtype == np.int64
+
+
+# --------------------------------------------------------------------------- #
+# ENUM: moda + marca de transición
+# --------------------------------------------------------------------------- #
+def test_enum_moda_es_el_valor_mas_frecuente_del_cubo() -> None:
+    v = np.array([1, 1, 1, 2] * 100, dtype=np.int32)  # moda = 1 en cada cubo de 4
+    (_l0, l1) = construir_piramide_enum(v)[:2]
+    assert l1.factor == 4
+    assert (l1.moda == 1).all()
+
+
+def test_enum_marca_transicion_cuando_el_cubo_no_es_uniforme() -> None:
+    v = np.array([5, 5, 5, 5] * 50 + [1, 2, 3, 4] * 50, dtype=np.int32)
+    niveles = construir_piramide_enum(v)
+    l1 = niveles[1]
+
+    assert not l1.hubo_transicion[:50].any()  # cubos uniformes de 5
+    assert l1.hubo_transicion[50:].all()  # cubos con 4 valores distintos
+
+
+def test_enum_transicion_se_propaga_con_or_aunque_la_moda_no_cambie() -> None:
+    """Un cambio real en L0 no debe desaparecer en niveles altos solo porque
+    la moda del nivel siguiente vuelva a ser uniforme."""
+    v = np.array([7, 7, 7, 9] + [7] * 9996, dtype=np.int32)  # un único "9" al principio
+    niveles = construir_piramide_enum(v)
+    assert niveles[-1].hubo_transicion.any()
+
+
+# --------------------------------------------------------------------------- #
+# BITS: OR de bits
+# --------------------------------------------------------------------------- #
+def test_bits_or_es_exacto_frente_a_referencia_independiente() -> None:
+    rng = np.random.default_rng(2)
+    v = rng.integers(0, 2**16, size=10_000, dtype=np.uint32)
+
+    niveles = construir_piramide_bits(v)
+
+    for nivel in niveles[1:3]:
+        factor = nivel.factor
+        n = (len(v) // factor) * factor
+        ref = np.bitwise_or.reduce(v[:n].reshape(-1, factor), axis=1)
+        assert np.array_equal(nivel.or_bits, ref)
+
+
+def test_bits_un_bit_activado_una_vez_sigue_visible_en_el_ultimo_nivel() -> None:
+    v = np.zeros(20_000, dtype=np.uint32)
+    v[9999] = 1 << 5  # un único bit, una única muestra, en medio de la serie
+
+    niveles = construir_piramide_bits(v)
+
+    assert (niveles[-1].or_bits & (1 << 5)).any()
 
 
 # --------------------------------------------------------------------------- #

@@ -621,9 +621,9 @@ def cmd_parseo_cuerpo(args: argparse.Namespace) -> int:
 # pirámide en sí -- fps_pan_zoom mide el renderizador, que todavía no existe)
 # --------------------------------------------------------------------------- #
 def cmd_piramide(args: argparse.Namespace) -> int:
-    """F1-09: mide `dlv_core.piramide.construir_piramide` sobre un canal
+    """F1-09/F1-10: mide `dlv_core.piramide.construir_piramide` sobre un canal
     sintético de `--puntos` muestras (5 000 000 por omisión, el escenario de
-    docs/03 §3.5)."""
+    docs/03 §3.5), para la variante `--tipo` (`continuo` por omisión)."""
     try:
         import numpy as np
 
@@ -632,15 +632,21 @@ def cmd_piramide(args: argparse.Namespace) -> int:
         print(f"NO_MEDIBLE: no se puede importar dlv_core/numpy ({e}).")
         return 0
 
+    tipo = TipoCanalPiramide[args.tipo.upper()]
     rng = np.random.default_rng(0)
-    valores = rng.integers(-32768, 32767, size=args.puntos).astype(np.int32)
+    if tipo is TipoCanalPiramide.BITS:
+        valores = rng.integers(0, 2**16, size=args.puntos, dtype=np.uint32)
+    elif tipo is TipoCanalPiramide.ENUM:
+        valores = rng.integers(0, 10, size=args.puntos).astype(np.int32)
+    else:
+        valores = rng.integers(-32768, 32767, size=args.puntos).astype(np.int32)
 
     t0 = time.perf_counter()
-    niveles = construir_piramide(valores, tipo=TipoCanalPiramide.CONTINUO)
+    niveles = construir_piramide(valores, tipo=tipo)
     t = time.perf_counter() - t0
 
-    total_cubos = sum(len(n.minimo) for n in niveles)
-    print(f"{args.puntos:,} muestras -> {len(niveles)} niveles, {total_cubos:,} cubos en total")
+    total_cubos = sum(n.n_cubos for n in niveles)
+    print(f"{tipo.name}: {args.puntos:,} muestras -> {len(niveles)} niveles, {total_cubos:,} cubos")
     print(f"  {t * 1000:.2f} ms  ->  {args.puntos / t / 1e6:.1f} M muestras/s")
     print(f"  factores: {[n.factor for n in niveles]}")
     return 0
@@ -827,8 +833,9 @@ def main() -> int:
     s.add_argument("--repeticiones", type=int, default=3)
     s.set_defaults(func=cmd_parseo_cuerpo)
 
-    s = sub.add_parser("piramide", help="F1-09: mide dlv_core.piramide.construir_piramide")
+    s = sub.add_parser("piramide", help="F1-09/F1-10: mide dlv_core.piramide.construir_piramide")
     s.add_argument("--puntos", type=int, default=5_000_000)
+    s.add_argument("--tipo", choices=["continuo", "contador", "enum", "bits"], default="continuo")
     s.set_defaults(func=cmd_piramide)
 
     s = sub.add_parser("adr009", help="comprueba el invariante de bucles por muestra")

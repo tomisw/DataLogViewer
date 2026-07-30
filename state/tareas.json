@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 13:17:41Z"
+    "actualizado": "2026-07-30 13:28:48Z"
   },
   "tareas": [
     {
@@ -666,10 +666,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "a521091"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:28:48Z",
+          "texto": "Tres variantes nuevas en dlv_core/piramide.py, cada una con su propio tipo de nivel (NivelContador/NivelEnum/NivelBits) en vez de forzar min/max/first/last: CONTADOR (suma_delta, exacta y asociativa via diff+sum, casteado a int64 para no envolver si el canal es uint32 estrecho), BITS (or_bits via np.bitwise_or.reduce, exacto y asociativo), ENUM (moda + hubo_transicion). -- CAVEAT DOCUMENTADO: la moda de ENUM en niveles > L1 es 'moda de modas' (recalculada sobre las modas del nivel anterior, no sobre las muestras originales) -- es una aproximacion razonable para el objetivo declarado (evitar parpadeo mostrando el estado dominante), no la moda matematicamente exacta del rango completo; hubo_transicion en cambio SI es exacto (se propaga con OR, ningun cambio real se pierde en ningun nivel). No se maneja wraparound/reinicio en CONTADOR (fuera de alcance, lo dice el docstring). -- No hizo falta Numba: banco (tools/banco.py piramide --tipo {continuo,contador,enum,bits}) sobre 5M muestras sinteticas: continuo 149ms/33.5M muestras-s, contador 163ms/30.7M, bits 29ms/171.7M, enum 811ms/6.2M (la mas lenta, por el bucle interno de _moda_por_fila sobre factor_base columnas en cada uno de los 12 niveles -- sigue siendo un bucle acotado por factor_base=4, no por muestras, y 811ms es aceptable para una operacion de importacion que se hace una vez, no por fotograma). construir_piramide ahora despacha segun tipo con tipo de retorno Union; quien conoce su tipo de antemano puede llamar directamente a construir_piramide_continuo/_contador/_enum/_bits. elegir_nivel generico via Protocol+PEP695 (funciona con las 4 variantes). -- 8 tests nuevos, cada aggregacion exacta comprobada contra una referencia de NumPy independiente (no reutilizando la logica de produccion), igual que ya hacia F1-09 con CONTINUO. Se elimino un test obsoleto de F1-09 que esperaba NotImplementedError para estas variantes. 485 tests en total, todo verde salvo memoria_residente (ya conocido, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-11",
