@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 09:23:19Z"
+    "actualizado": "2026-07-30 09:40:00Z"
   },
   "tareas": [
     {
@@ -498,10 +498,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
+      "estado": "revision_humana",
       "agente": null,
-      "commits": [],
-      "notas": []
+      "commits": [
+        "ad4ada0"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 09:40:00Z",
+          "texto": "dlv_core/reloj.py + dlv-core/tests/test_reloj.py (50 pruebas). Tres averias de reloj resueltas en orden: (1) epoca ficticia ANTES del desfase, porque 01:01:01 contra 01:01:01.005 hace que la comprobacion de 12 h pase y dos logs sin reloj quedarian marcados como fiables y superpuestos en 1980; (2) ambigüedad de 12 h resuelta con DOS incognitas (AM/PM y dia) sobre cuatro candidatos; (3) desenrollado de medianoche vectorizado, con los retrocesos pequenos contados y NO corregidos. DEFECTO PROPIO CAZADO POR UNA PRUEBA: la primera version resolvia el PM sumando 12 h sin modulo de 24 h, asi que una cabecera de 12:30 se fechaba un dia tarde, en silencio y con el log marcado como fiable. t0_absoluto es None salvo reloj fiable; lo declarado va aparte en t0_declarado. Nueva seccion [reloj] en data/formats/haltech_nsp.toml (claves, epocas de fabrica, tolerancia): datos, no constantes. Aviso se muda a dlv_core/informes.py y haltech.py lo reexporta. REVISAR: (a) la seccion [reloj] del descriptor, que es dato G1; (b) la tolerancia de 60 s del desfase de cabecera; (c) el umbral de 12 h que separa cruce de medianoche de marca no monotona."
+        }
+      ]
     },
     {
       "id": "F1-05",
