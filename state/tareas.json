@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 14:57:52Z"
+    "actualizado": "2026-07-30 14:59:03Z"
   },
   "tareas": [
     {
@@ -1262,10 +1262,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "dcb9944"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 14:59:03Z",
+          "texto": "resolver_rutas_soltadas(rutas, descriptores) -> ResolucionArrastre(nativos, genericos, informe) en dlv-api/src/dlv_api/arrastrar_soltar.py. UBICACION razonada (la parte interesante de la tarea): va en dlv-api, no dlv-core, porque 'expandir una carpeta a los ficheros que contiene' es acceso al sistema de ficheros y ADR-002 traza la linea justo ahi -- reutiliza sondear_formato de dlv-core (que solo acepta bytes) para la clasificacion pura y añade solo el recorrido de directorios que dlv-core no puede tener. -- Decisiones documentadas: recursivo (rglob), razonando que una carpeta de sesion de banco se organiza por dia/tirada en subcarpetas y un escaneo de un nivel se saltaria los logs mas nuevos en silencio; .dlvproj/.dlvprofile/.dlvimport/.dlvcache siempre descartados con Aviso explicito (soltar un fichero de proyecto junto a logs es plausible y merece mensaje, no desaparicion silenciosa); un .csv no reconocido pasa a 'genericos' (candidato a la fase FG, no implementada); orden alfabetico por ruta resuelta -- el unico de los tres candidatos (alfabetico / orden de soltado / orden del sistema de ficheros) estable entre soltados repetidos, para que la lista de la interfaz no baile; deduplicacion por Path.resolve() (pathlib ya compara sin distinguir mayusculas en Windows). Nunca lanza por un fichero individual malo: rutas inexistentes, carpetas ilegibles y ficheros vacios se convierten en Aviso (E1.7). -- PENDIENTE (decision mia, no del agente): NO se expuso endpoint HTTP en dlv-api/main.py; el agente lo señalo y estoy de acuerdo en dejarlo para cuando el frontend lo necesite, es un envoltorio mecanico sobre el patron de abrir_cabecera. 14 tests, incluidos los 3 logs reales (3/3 reconocidos) y los 11 de samples/corrupt (todos reconocidos a nivel de firma, aunque 2 fallen despues en parsear_cabecera -- correctamente fuera del alcance de este modulo). Verificado de forma independiente: samples/ intacto (git diff vacio), ruff/mypy/pytest en verde."
+        }
+      ]
     },
     {
       "id": "F1-35",
