@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 12:48:38Z
+Actualizado: 2026-07-30 13:04:55Z
 
-**34 / 669 pts cerrados (5.1 %)** · 59 pts esperando revisión humana → 13.9 % entregado
+**42 / 669 pts cerrados (6.3 %)** · 59 pts esperando revisión humana → 15.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 4 | 35 | 0 | 147 | 0 | 186 |
+| F1 | 12 | 35 | 0 | 139 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -54,7 +54,7 @@ Actualizado: 2026-07-30 12:48:38Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 39/186 pts
+## F1 — 47/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -62,7 +62,7 @@ Actualizado: 2026-07-30 12:48:38Z
 | ⏳ | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `a7cd93a` |
 | ⏳ | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | `9c80a89` |
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
-| ·  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | — |
+| ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
 | ·  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | — |
 | ·  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | — |
 | ·  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | — |

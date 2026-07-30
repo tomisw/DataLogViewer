@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 12:48:38Z"
+    "actualizado": "2026-07-30 13:04:55Z"
   },
   "tareas": [
     {
@@ -545,10 +545,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "21a701f"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:04:55Z",
+          "texto": "construir_desde_polars(df, cabecera, *, columna_tiempo, storage_por_columna) -> list[ChannelSeries] implementado en dlv_core/almacen.py. CAMBIO DE FIRMA respecto al stub original: se anadio el parametro posicional 'cabecera' (Cabecera de F1-01) porque el stub original (df, columna_tiempo, storage_por_columna) no tenia forma de construir ChannelKey/Afin/dimension por canal -- esos datos solo existen en Cabecera.canales, no en el DataFrame. REVISAR: la firma cambio, cualquier llamador futuro (aun no existe ninguno) tiene que pasar la cabecera. -- Parsea la marca de tiempo (texto HH:MM:SS.mmm) a segundos-del-dia con pl.Series.str.strptime(pl.Time) + cast a Int64 (vectorizado), lo pasa a dlv_core.reloj.desenrollar_medianoche (F1-04, ya implementado) para el eje monotono, y fija t relativo a t0 = primera marca. -- Agrupa canales por patron de nulos EXACTO (mascara completa, no solo el recuento: dos canales con las mismas muestras pero en filas distintas van a grupos distintos, cubierto por test) con un diccionario Python sobre el numero de CANALES (cientos), no sobre las 38M de muestras -- es una deteccion directa, no la 'version vectorizada' que pide F1-06 como tarea aparte (5 pts, dependiente de esta); dejo la puerta abierta para que F1-06 la sustituya si el banco lo exige. Dentro de cada grupo, t es el mismo array de NumPy por referencia para todos los canales (verificado con 'is', no solo con valores iguales). -- CAMBIO respecto al docstring original del stub: no se pudo usar to_numpy(allow_copy=False) (antes zero_copy_only=True) como prometia el stub -- sobre el AutoLog real, filter() deja el resultado en mas de un chunk interno de Polars y ni siquiera un Series sin nulos admite entonces una vista sin copia; exigirlo rompia sobre datos reales. Se dejo con el allow_copy=True por omision (la copia la hace Polars de una vez, vectorizada, no esta funcion fila a fila: ADR-009 sigue intacto). -- indexar() SIGUE sin implementar: es F1-07 (tarea separada en el backlog, Sonnet, min/max/percentiles/clasificacion), no F1-05. -- 7 tests nuevos (dlv-core/tests/test_almacen.py): grupos identicos comparten t, patrones distintos no se confunden, mismo-recuento-filas-distintas no se confunden, identidad/storage/conversion/dimension vienen de Canal, y dos contra el AutoLog real (dtype uint32, t monotono, grupo unico compartido). 372 tests en total, todo verde salvo memoria_residente (ya conocido)."
+        }
+      ]
     },
     {
       "id": "F1-06",
