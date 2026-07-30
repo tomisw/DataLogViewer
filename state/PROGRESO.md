@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 11:42:45Z
+Actualizado: 2026-07-30 12:23:45Z
 
-**30 / 669 pts cerrados (4.5 %)** · 46 pts esperando revisión humana → 11.4 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 54 pts esperando revisión humana → 12.6 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 0 | 22 | 0 | 164 | 0 | 186 |
+| F1 | 0 | 30 | 0 | 156 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 118 | 0 | 118 |
@@ -28,6 +28,7 @@ Actualizado: 2026-07-30 11:42:45Z
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
 | `F1-01` Parser de cabecera Haltech dirigido por desc | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido |
+| `F1-02` Parseo del cuerpo con Polars: ≥ 100 MB/s agr | revision_humana | Opus 5 | G1 | REVISAR: memoria_residente sigue INCUMPLE (4.30x el CSV, presupuesto < |
 | `F1-04` Reconciliación de reloj: 12 h de cabecera, e | revision_humana | Opus 5 | G1 | dlv_core/reloj.py + dlv-core/tests/test_reloj.py (50 pruebas). Tres av |
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
@@ -51,12 +52,12 @@ Actualizado: 2026-07-30 11:42:45Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 22/186 pts
+## F1 — 30/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ⏳ | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `0cac953` |
-| ·  | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | — |
+| ⏳ | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `a7cd93a` |
 | ·  | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | — |
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
 | ·  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | — |

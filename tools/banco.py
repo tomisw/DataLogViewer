@@ -18,6 +18,7 @@ Uso:
     python tools/banco.py presupuestos              # lista y estado actual
     python tools/banco.py baseline-stdlib           # línea base sin dependencias
     python tools/banco.py spike-polars              # F0-01: exige polars
+    python tools/banco.py parseo-cuerpo             # F1-02: mide dlv_core.formatos.cuerpo
     python tools/banco.py comprobar                 # puerta de CI (código != 0 si INCUMPLE)
     python tools/banco.py informe                   # markdown a state/banco/INFORME.md
 
@@ -512,6 +513,109 @@ def cmd_spike_polars(args: argparse.Namespace) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# parseo-cuerpo  (el entregable medible de F1-02: mide el módulo real, no el
+# `read_csv` crudo del spike de F0-01)
+# --------------------------------------------------------------------------- #
+DESCRIPTOR_HALTECH = RAIZ / "data" / "formats" / "haltech_nsp.toml"
+
+
+def cmd_parseo_cuerpo(args: argparse.Namespace) -> int:
+    """F1-02: mide `dlv_core.formatos.cuerpo.parsear_cuerpo` sobre el sintético de 1 h.
+
+    A diferencia de `spike-polars` (que mide un `pl.read_csv` crudo como techo
+    de referencia de F0-01), esto mide la función real que usará el resto del
+    pipeline: cabecera vía `dlv_core.formatos.haltech` + proyección a `Int32`
+    (la mitigación de memoria que pide la nota de F0-01).
+    """
+    try:
+        import polars as pl  # noqa: F401  (falla aquí si polars no está instalado)
+
+        from dlv_core.formatos.cuerpo import parsear_cuerpo
+        from dlv_core.formatos.haltech import cargar_descriptor, parsear_cabecera
+    except ImportError as e:
+        print(f"NO_MEDIBLE: no se puede importar dlv_core/polars ({e}).")
+        return 0
+
+    ruta = fichero_grande()
+    if ruta is None:
+        print("NO_MEDIBLE: falta el fichero de trabajo (genera el sintético de 1 h).")
+        return 0
+
+    with DESCRIPTOR_HALTECH.open("rb") as fh:
+        descriptor = cargar_descriptor(fh)
+
+    tam_mb = ruta.stat().st_size / 1e6
+    datos = ruta.read_bytes()
+    cabecera = parsear_cabecera(datos, descriptor)
+    print(f"Fichero: {ruta.relative_to(RAIZ)}  ({tam_mb:.2f} MB, {cabecera.n_canales} canales)")
+
+    tiempos: list[float] = []
+    df = None
+    pico = 0.0
+    for i in range(args.repeticiones):
+        t0 = time.perf_counter()
+        df = parsear_cuerpo(datos, cabecera)
+        tiempos.append(time.perf_counter() - t0)
+        print(f"  repetición {i + 1}: {tiempos[-1]:.2f} s")
+        if i == 0:
+            # Mismo motivo que en spike-polars: el pico de memoria del proceso
+            # nunca baja, así que se captura tras la primera lectura limpia.
+            pico = _pico_memoria_mb()
+
+    mejor = min(tiempos)
+    mbs = tam_mb / mejor
+    filas = 0 if df is None else df.height
+    columnas = 0 if df is None else df.width
+
+    print(f"\n  mejor: {mejor:.2f} s -> {mbs:.1f} MB/s  ({filas} filas, {columnas} columnas)")
+    print(f"  pico de memoria del proceso: {pico:.0f} MB ({pico / tam_mb:.2f}x el tamaño del CSV)")
+
+    p = POR_ID["parseo_nativo"]
+    registrar(
+        Medicion(
+            presupuesto="parseo_nativo",
+            valor=mbs,
+            unidad="MB/s",
+            estado=p.evalua(mbs),
+            fecha=_ahora(),
+            commit=_commit(),
+            maquina=_maquina(),
+            detalle={
+                "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+                "es_linea_base": False,
+                "fichero": str(ruta.relative_to(RAIZ)),
+                "tamano_mb": round(tam_mb, 2),
+                "segundos_mejor": round(mejor, 3),
+                "segundos_todos": [round(t, 3) for t in tiempos],
+                "filas": filas,
+                "columnas": columnas,
+                "pico_memoria_mb": round(pico, 1),
+            },
+        )
+    )
+
+    memoria = pico / tam_mb
+    pm = POR_ID["memoria_residente"]
+    registrar(
+        Medicion(
+            presupuesto="memoria_residente",
+            valor=memoria,
+            unidad="x CSV",
+            estado=pm.evalua(memoria),
+            fecha=_ahora(),
+            commit=_commit(),
+            maquina=_maquina(),
+            detalle={
+                "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+                "pico_memoria_mb": round(pico, 1),
+                "tamano_csv_mb": round(tam_mb, 2),
+            },
+        )
+    )
+    return 0
+
+
+# --------------------------------------------------------------------------- #
 # ADR-009: bucles por muestra, por inspección estática
 # --------------------------------------------------------------------------- #
 # Métodos que recorren los datos elemento a elemento en el intérprete.
@@ -687,6 +791,10 @@ def main() -> int:
     s = sub.add_parser("spike-polars", help="F0-01: mide Polars (exige polars instalado)")
     s.add_argument("--repeticiones", type=int, default=3)
     s.set_defaults(func=cmd_spike_polars)
+
+    s = sub.add_parser("parseo-cuerpo", help="F1-02: mide dlv_core.formatos.cuerpo.parsear_cuerpo")
+    s.add_argument("--repeticiones", type=int, default=3)
+    s.set_defaults(func=cmd_parseo_cuerpo)
 
     s = sub.add_parser("adr009", help="comprueba el invariante de bucles por muestra")
     s.set_defaults(func=cmd_adr009)

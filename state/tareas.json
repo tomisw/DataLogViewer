@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 11:42:45Z"
+    "actualizado": "2026-07-30 12:23:45Z"
   },
   "tareas": [
     {
@@ -464,10 +464,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "a7cd93a"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 12:23:45Z",
+          "texto": "REVISAR: memoria_residente sigue INCUMPLE (4.30x el CSV, presupuesto <=3.5x), aunque bajo de 4.42x aplicando la mitigacion que pedia la nota de F0-01: proyectar cada canal a Int32 en vez del Int64 por omision de Polars, y evitar duplicar el cuerpo en memoria Python con datos[offset:] (bytes es inmutable y eso copia ~70MB extra) usando skip_rows en su lugar. El resto -- overhead fijo de interprete+polars+numpy (~55MB) mas el propio dataframe de cabecera -- no se investigo mas a fondo; sigue siendo el hallazgo de R9 que el propietario decidio documentar y no bloquear en F0-01, mismo estado, numero mejorado. -- parseo_nativo CUMPLE con margen muy amplio: 400+ MB/s (mejor de 3 repeticiones), 4x el presupuesto de >=100 MB/s; de hecho el read_csv con schema explicito (infer_schema_length=0) es MAS rapido que el spike original de F0-01, no solo mas ligero en memoria. -- Modulo nuevo dlv_core/formatos/cuerpo.py (parsear_cuerpo, esquema, columna_polars): parsea el paso 3 de la ruta de ingesta (docs/03 SS3.4) a partir de Cabecera.offset_datos (F1-01); NO hace consolidacion (grupos de muestreo, t compartido) ni construye ChannelSeries -- eso es F1-03/F1-05, dependencia ya declarada en el backlog. 9 tests nuevos (dlv-core/tests/test_cuerpo.py) cubriendo los 3 logs reales y los casos 02/03 del corpus de corruptos (fila corta/larga -- truncate_ragged_lines=True las carga con aviso implicito, sin excepcion, igual que exige samples/corrupt/README.md). Banco: 'python tools/banco.py parseo-cuerpo' mide el modulo real (no el read_csv crudo del spike de F0-01). tools/verificar.py: 341 tests, todo verde salvo 'presupuestos' por el memoria_residente ya conocido. -- AVISO para mas adelante (no bloquea F1-02): dlv_core/formatos/__init__.py tiene un Descriptor/sondear_formato/cargar_descriptor de juguete (todo NotImplementedError) que es una API distinta y contradictoria con la real en dlv_core/formatos/haltech.py; quedo obsoleto tras F1-01 y no se ha limpiado. No lo he tocado (fuera de alcance de F1-02) pero puede confundir a quien lo lea despues."
+        }
+      ]
     },
     {
       "id": "F1-03",

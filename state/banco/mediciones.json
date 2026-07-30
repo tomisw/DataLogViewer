@@ -1323,5 +1323,137 @@
       "hallazgos": [],
       "ficheros_inspeccionados": 14
     }
+  },
+  {
+    "presupuesto": "parseo_nativo",
+    "valor": 348.42095109421734,
+    "unidad": "MB/s",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 12:16:00Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "es_linea_base": false,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "tamano_mb": 70.13,
+      "segundos_mejor": 0.201,
+      "segundos_todos": [
+        0.212,
+        0.224,
+        0.201
+      ],
+      "filas": 38698,
+      "columnas": 476,
+      "pico_memoria_mb": 368.2
+    }
+  },
+  {
+    "presupuesto": "memoria_residente",
+    "valor": 5.250526029128902,
+    "unidad": "x CSV",
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 12:16:00Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "pico_memoria_mb": 368.2,
+      "tamano_csv_mb": 70.13
+    }
+  },
+  {
+    "presupuesto": "parseo_nativo",
+    "valor": 402.86062416393,
+    "unidad": "MB/s",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 12:20:13Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "es_linea_base": false,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "tamano_mb": 70.13,
+      "segundos_mejor": 0.174,
+      "segundos_todos": [
+        0.181,
+        0.178,
+        0.174
+      ],
+      "filas": 38698,
+      "columnas": 476,
+      "pico_memoria_mb": 301.6
+    }
+  },
+  {
+    "presupuesto": "memoria_residente",
+    "valor": 4.299844670563452,
+    "unidad": "x CSV",
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 12:20:14Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "pico_memoria_mb": 301.6,
+      "tamano_csv_mb": 70.13
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 12:20:39Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 15
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 12:22:42Z",
+    "commit": "a7cd93a",
+    "maquina": {
+      "sistema": "Windows",
+      "maquina": "AMD64",
+      "python": "3.14.6",
+      "nucleos": 8
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 15
+    }
   }
 ]

@@ -10,7 +10,7 @@ no falla la compilación. Solo `INCUMPLE` la falla.
 | Presupuesto | Límite | Fase | Última medición | Estado |
 |---|---|---|---|---|
 | Apertura de log de 66 MB / 475 canales hasta el primer gráfico (p95) | `<= 4` s | F1 | 0.28 s | · NO_MEDIBLE |
-| Parseo del camino nativo (enteros, sin comillas), agregado | `>= 100` MB/s | F1 | 247.28 MB/s | ✔ CUMPLE |
+| Parseo del camino nativo (enteros, sin comillas), agregado | `>= 100` MB/s | F1 | 402.86 MB/s | ✔ CUMPLE |
 | Parseo genérico numérico, agregado | `>= 60` MB/s | FG | — | sin medir |
 | Parseo genérico con comillas o texto, agregado | `>= 25` MB/s | FG | — | sin medir |
 | Segunda apertura desde la caché Parquet | `<= 700` ms | F1 | — | sin medir |
@@ -18,7 +18,7 @@ no falla la compilación. Solo `INCUMPLE` la falla.
 | Cursor hasta tabla de valores actualizada | `<= 16` ms | F1 | — | sin medir |
 | Pan/zoom que requiere cubos nuevos del backend (p95) | `<= 120` ms | F1 | — | sin medir |
 | Cambio de unidad con 8 logs abiertos | `<= 100` ms | F1 | — | sin medir |
-| Memoria residente con el log de 66 MB abierto | `<= 3.5` x CSV | F1 | 4.42 x CSV | ✖ INCUMPLE |
+| Memoria residente con el log de 66 MB abierto | `<= 3.5` x CSV | F1 | 4.30 x CSV | ✖ INCUMPLE |
 | Arranque en frío hasta ventana interactiva | `<= 2.5` s | F5 | — | sin medir |
 | Tamaño del paquete portable comprimido | `<= 60` MB | F5 | — | sin medir |
 | Tamaño del paquete portable sin comprimir | `<= 150` MB | F5 | — | sin medir |
