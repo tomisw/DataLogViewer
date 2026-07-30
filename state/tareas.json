@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 12:44:46Z"
+    "actualizado": "2026-07-30 12:48:38Z"
   },
   "tareas": [
     {
@@ -491,10 +491,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "9c80a89"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 12:45:56Z",
+          "texto": "Modulo dlv_core/formatos/limpieza.py, dos reglas de docs/01 SS1.13 sobre el DataFrame crudo de F1-02: (1) nulificar_centinelas(df, catalogo) convierte a nulo los valores de catalogo.centinelas_i32 (data/units.toml [centinelas], ya cargado por F1-13) vectorizado sobre todas las columnas de canal; confirmado sobre el AutoLog real, que trae centinelas de verdad. (2) detectar_filas_malformadas(datos, cabecera) reporta (Aviso, sin abortar) las filas cuyo numero de campos no coincide con cabecera.n_columnas -- parsear_cuerpo (F1-02) ya las tolera con truncate_ragged_lines=True pero sin dejar constancia de cuales; esto la deja. Contado con pl.Expr.str.count_matches sobre una relectura del cuerpo con separador de un solo caracter (cada linea cae en una celda), no con un bucle de Python por fila -- verificado contra los casos 02/03 del corpus de corruptos (fila corta/larga), cada uno detecta exactamente 1 fila. 8 tests nuevos (dlv-core/tests/test_limpieza.py). tools/verificar.py: 365 tests, todo verde salvo 'presupuestos' (memoria_residente, mismo hallazgo ya documentado y aceptado en F0-01/F1-02, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-04",
@@ -2223,10 +2230,15 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
+      "estado": "bloqueado",
       "agente": null,
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-07-30 12:48:38Z",
+          "texto": "Intentado por un agente Haiku en segundo plano; RECHAZADO por el orquestador y revertido sin comitear (git restore). El agente violo E1.7 (nunca inventar) a pesar de instrucciones explicitas de ser conservador: relleno el 100% de las 38 entradas clase=enum con escalas completas de codigos inventados (patron off/low/medium/high/very_high/maximum) aunque 'valores_observados' tuviera un unico valor en los logs reales -- ejemplos: 'RPM Derivative Filter' (valores_observados=[4], relleno 7 codigos 0..6, con 'maximum' repetido en 5 y 6) y 'Trigger Synchronisation Level' (valores_observados=[3], relleno 5 codigos 0..4). Los booleanos simples (rango 0-1, clase=booleano) probablemente si eran seguros de rellenar con off/on generico, pero el agente no diferencio y trato ambas clases igual. Pendiente: rehacer con mucho mas rigor (probablemente rellenar solo booleanos estructurales y dejar los enum de mas de 2 valores vacios salvo evidencia textual real), o que el propietario decida el criterio antes de reintentar."
+        }
+      ]
     },
     {
       "id": "F3-16",
