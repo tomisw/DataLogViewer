@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 09:40:00Z
+Actualizado: 2026-07-30 09:45:43Z
 
-**30 / 669 pts cerrados (4.5 %)** · 36 pts esperando revisión humana → 9.9 % entregado
+**30 / 669 pts cerrados (4.5 %)** · 40 pts esperando revisión humana → 10.5 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 18 | 0 | 0 | 6 | 54 |
-| F1 | 0 | 18 | 0 | 168 | 0 | 186 |
+| F1 | 0 | 22 | 0 | 164 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 118 | 0 | 118 |
@@ -30,6 +30,7 @@ Actualizado: 2026-07-30 09:40:00Z
 | `F1-01` Parser de cabecera Haltech dirigido por desc | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido |
 | `F1-04` Reconciliación de reloj: 12 h de cabecera, e | revision_humana | Opus 5 | G1 | dlv_core/reloj.py + dlv-core/tests/test_reloj.py (50 pruebas). Tres av |
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
+| `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
 
 ## F0 — 48/54 pts
 
@@ -50,7 +51,7 @@ Actualizado: 2026-07-30 09:40:00Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 18/186 pts
+## F1 — 22/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -73,7 +74,7 @@ Actualizado: 2026-07-30 09:40:00Z
 | ·  | `F1-17` | Precedencia canal > dimensión del perfil > preset global > can | Sonnet 5 | 4 | F1-13 | G3 | — |
 | ·  | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | — |
 | ·  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | — |
-| ·  | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | — |
+| ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
 | ·  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | — |
 | ·  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | — |
 | ·  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | — |

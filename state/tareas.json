@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 09:40:00Z"
+    "actualizado": "2026-07-30 09:45:43Z"
   },
   "tareas": [
     {
@@ -832,10 +832,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
+      "estado": "revision_humana",
       "agente": null,
-      "commits": [],
-      "notas": []
+      "commits": [
+        "e94094b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 09:45:43Z",
+          "texto": "data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianzas, 4 de referencia de presion, 5 de rechazo) + dlv-core/tests/test_trampa_del_delta.py. La tabla vive en data/ y no dentro de la prueba para que se pueda auditar sin leer Python: cada fila lleva el valor esperado, la tolerancia y la FUENTE del numero. La seccion de deltas repite combinaciones de la de puntos a proposito, y se afirman los dos valores: afirmar solo el delta dejaria pasar una implementacion que devolviera 10,0 siempre. Propiedades sobre TODO el catalogo, no solo sobre la tabla: punto(x)-intervalo(x)=b en las 44 unidades afines, aditividad, raiz de varianza = intervalo, ida y vuelta exacta en las cuatro clases, delta cero igual a cero en toda unidad, y que solo temperature desplaza el origen. Tambien se comprueba sobre la firma real que 'clase' sigue sin valor por omision. DEFECTO PROPIO CAZADO: la fila del boost en psi decia 18,2555; el valor correcto es 18,256625, recalculado desde la definicion del psi y no desde el catalogo. REVISAR: los 38 valores esperados de la tabla, que son dato G1; en particular las cinco filas que salen de los logs reales."
+        }
+      ]
     },
     {
       "id": "F1-21",
