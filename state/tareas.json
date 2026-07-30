@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 12:23:45Z"
+    "actualizado": "2026-07-30 12:44:46Z"
   },
   "tareas": [
     {
@@ -785,10 +785,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "e968ba5"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 12:44:46Z",
+          "texto": "Modulo dlv_core/resolucion_unidad.py: resolver_unidad(dimension_id, *, catalogo, preset=None, preferencias_perfil=None, anulacion_canal=None) -> UnidadResuelta, precedencia canal > perfil > preset > canonica (docs/06 SS6.9). Perfil modelado como Mapping[dimension_id, unidad_id] minimo (F3-01 no existe todavia); anulacion de canal como str simple (roles.py sigue stub). 16 tests nuevos, verificados por el orquestador de forma independiente (no solo el informe del agente): ruff/mypy/pytest en verde sobre los ficheros nuevos. Cierre en G3, no requiere revision humana."
+        }
+      ]
     },
     {
       "id": "F1-18",
