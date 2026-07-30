@@ -653,6 +653,43 @@ def cmd_piramide(args: argparse.Namespace) -> int:
 
 
 # --------------------------------------------------------------------------- #
+# transporte  (el entregable medible de F1-22; diagnóstico, no ata a ningún
+# presupuesto de docs/02 §2.6: el transporte real lo mide fps_pan_zoom /
+# panzoom_cubos_nuevos una vez exista el renderizador, F1-23)
+# --------------------------------------------------------------------------- #
+def cmd_transporte(args: argparse.Namespace) -> int:
+    """F1-22: mide `dlv_core.transporte.serie_a_arrow_ipc`/`arrow_ipc_a_serie`
+    sobre un canal sintético de `--puntos` muestras."""
+    try:
+        import numpy as np
+
+        from dlv_core.transporte import arrow_ipc_a_serie, serie_a_arrow_ipc
+    except ImportError as e:
+        print(f"NO_MEDIBLE: no se puede importar dlv_core/numpy ({e}).")
+        return 0
+
+    rng = np.random.default_rng(0)
+    t = np.cumsum(rng.integers(1, 200, size=args.puntos)).astype(np.uint32)
+    v = rng.integers(-32768, 32767, size=args.puntos).astype(np.int32)
+
+    t0 = time.perf_counter()
+    datos = serie_a_arrow_ipc(t, v)
+    t_codificar = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
+    t2, v2 = arrow_ipc_a_serie(datos)
+    t_decodificar = time.perf_counter() - t0
+
+    assert np.array_equal(t, t2) and np.array_equal(v, v2), "round-trip no exacto"
+
+    tam_mb = len(datos) / 1e6
+    print(f"{args.puntos:,} muestras -> {tam_mb:.2f} MB Arrow IPC")
+    print(f"  codificar:   {t_codificar * 1000:.2f} ms  ->  {tam_mb / t_codificar:.1f} MB/s")
+    print(f"  decodificar: {t_decodificar * 1000:.2f} ms  ->  {tam_mb / t_decodificar:.1f} MB/s")
+    return 0
+
+
+# --------------------------------------------------------------------------- #
 # ADR-009: bucles por muestra, por inspección estática
 # --------------------------------------------------------------------------- #
 # Métodos que recorren los datos elemento a elemento en el intérprete.
@@ -837,6 +874,10 @@ def main() -> int:
     s.add_argument("--puntos", type=int, default=5_000_000)
     s.add_argument("--tipo", choices=["continuo", "contador", "enum", "bits"], default="continuo")
     s.set_defaults(func=cmd_piramide)
+
+    s = sub.add_parser("transporte", help="F1-22: mide dlv_core.transporte (Arrow IPC)")
+    s.add_argument("--puntos", type=int, default=5_000_000)
+    s.set_defaults(func=cmd_transporte)
 
     s = sub.add_parser("adr009", help="comprueba el invariante de bucles por muestra")
     s.set_defaults(func=cmd_adr009)

@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 13:44:19Z
+Actualizado: 2026-07-30 13:51:04Z
 
-**76 / 669 pts cerrados (11.4 %)** · 62 pts esperando revisión humana → 20.6 % entregado
+**81 / 669 pts cerrados (12.1 %)** · 62 pts esperando revisión humana → 21.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 46 | 38 | 0 | 102 | 0 | 186 |
+| F1 | 51 | 38 | 0 | 97 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -55,7 +55,7 @@ Actualizado: 2026-07-30 13:44:19Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 84/186 pts
+## F1 — 89/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -80,7 +80,7 @@ Actualizado: 2026-07-30 13:44:19Z
 | ·  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | — |
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
 | ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `d05c389` |
-| ·  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | — |
+| ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `8f51688` |
 | ·  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | — |
 | ·  | `F1-24` | Caché de cubos en el frontend — es lo que hace alcanzable el c | Opus 5 | 5 | F1-23 | G2 | — |
 | ·  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | — |

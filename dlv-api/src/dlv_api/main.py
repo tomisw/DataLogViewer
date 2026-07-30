@@ -40,20 +40,27 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from dlv_api import __version__ as version_dlv_api
 from dlv_core import __version__ as version_dlv_core
+from dlv_core.almacen import Storage, construir_desde_polars
+from dlv_core.formatos.cuerpo import COLUMNA_MARCA, columna_polars, parsear_cuerpo
 from dlv_core.formatos.haltech import (
     Descriptor,
     ErrorDeFormato,
     cargar_descriptor,
     parsear_cabecera,
 )
+from dlv_core.formatos.limpieza import nulificar_centinelas
 from dlv_core.informe_importacion import InformeImportacion
+from dlv_core.transporte import MEDIA_TYPE_ARROW_IPC, serie_a_arrow_ipc
+from dlv_core.unidades import Catalogo, cargar_catalogo
 
 _RAIZ_REPO = Path(__file__).resolve().parents[3]
 _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
+_UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
 
 
 def generar_token_sesion() -> str:
@@ -88,6 +95,14 @@ def _descriptor_haltech() -> Descriptor:
     TOML pequeño pero no hay motivo para reparsearlo en cada petición."""
     with _DESCRIPTOR_HALTECH.open("rb") as fh:
         return cargar_descriptor(fh)
+
+
+@lru_cache(maxsize=1)
+def _catalogo_unidades() -> Catalogo:
+    """El catálogo de unidades (F1-13), cacheado por el mismo motivo que el
+    descriptor de formato: no cambia entre peticiones."""
+    with _UNITS_TOML.open("rb") as fh:
+        return cargar_catalogo(fh)
 
 
 class InfoCanal(BaseModel):
@@ -147,6 +162,74 @@ def abrir_cabecera(comando: ComandoAbrirCabecera) -> RespuestaAbrirCabecera:
     )
 
 
+class ComandoSerie(BaseModel):
+    """Cuerpo tipado de `/comandos/serie`: qué fichero y qué canal."""
+
+    ruta: str
+    canal_id: int
+
+
+def serie(comando: ComandoSerie) -> Response:
+    """Devuelve `(t, v)` de un canal como Arrow IPC binario (tarea F1-22).
+
+    ADR-007: las series nunca viajan en JSON. El cuerpo de la respuesta es
+    100% binario (`dlv_core.transporte.serie_a_arrow_ipc`); los metadatos que
+    el frontend necesita para interpretarlo (dimensión, factor de conversión,
+    tipo de almacenamiento, número de muestras) van en cabeceras HTTP, no en
+    el cuerpo, para no mezclar JSON y binario en una sola respuesta.
+
+    Repite el *pipeline* completo (cabecera -> cuerpo -> limpieza -> almacén)
+    en cada petición, sin caché de log abierto entre peticiones: eso es F1-11
+    (caché Parquet) del lado de `dlv-core`, y una futura tarea de sesión de
+    servidor si hace falta mantener logs abiertos en memoria entre
+    peticiones -- fuera de alcance de F1-22, que es el transporte, no el
+    ciclo de vida de qué hay abierto.
+    """
+    ruta = Path(comando.ruta)
+    if not ruta.is_file():
+        raise HTTPException(status_code=404, detail=f"no existe el fichero: {comando.ruta}")
+
+    datos = ruta.read_bytes()
+    try:
+        cabecera = parsear_cabecera(datos, _descriptor_haltech())
+    except ErrorDeFormato as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+    canal = cabecera.por_id(comando.canal_id)
+    if canal is None:
+        raise HTTPException(status_code=404, detail=f"no existe el canal {comando.canal_id}")
+
+    crudo = parsear_cuerpo(datos, cabecera)
+    limpio = nulificar_centinelas(crudo, _catalogo_unidades())
+    storage_por_columna = {
+        columna_polars(c.columna): Storage.INT32_SCALED for c in cabecera.canales
+    }
+    series = construir_desde_polars(
+        limpio, cabecera, columna_tiempo=COLUMNA_MARCA, storage_por_columna=storage_por_columna
+    )
+    serie_canal = next((s for s in series if s.key.id_nativo == str(canal.id)), None)
+    if serie_canal is None:
+        # No debería pasar (el canal existe en la cabecera), pero una fila de
+        # datos con menos columnas de las declaradas podría dejarlo sin
+        # columna en el cuerpo; mejor un 500 explícito que un StopIteration.
+        raise HTTPException(
+            status_code=500, detail=f"el canal {comando.canal_id} no tiene datos en el cuerpo"
+        )
+
+    cuerpo = serie_a_arrow_ipc(serie_canal.t, serie_canal.v)
+    return Response(
+        content=cuerpo,
+        media_type=MEDIA_TYPE_ARROW_IPC,
+        headers={
+            "X-Dimension": serie_canal.dimension or "",
+            "X-Factor-A": repr(serie_canal.to_canon.a),
+            "X-Factor-B": repr(serie_canal.to_canon.b),
+            "X-Storage": serie_canal.storage.name,
+            "X-Muestras": str(len(serie_canal.t)),
+        },
+    )
+
+
 def crear_app(*, token_sesion: str) -> FastAPI:
     """Construye la app de FastAPI.
 
@@ -165,6 +248,12 @@ def crear_app(*, token_sesion: str) -> FastAPI:
         abrir_cabecera,
         methods=["POST"],
         response_model=RespuestaAbrirCabecera,
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/serie",
+        serie,
+        methods=["POST"],
         dependencies=[Depends(verificar_token)],
     )
     return app
