@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 14:04:45Z"
+    "actualizado": "2026-07-30 14:05:37Z"
   },
   "tareas": [
     {
@@ -788,10 +788,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "066a396"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 14:05:37Z",
+          "texto": "resolver_parametro_de_canal(valores_canonicos, rol, tolerancia_relativa=0.01) -> ParametroResuelto(valor, aviso) en dlv_core/parametros_conversion.py (modulo nuevo, deliberadamente separado de unidades.py que sigue sin importar numpy a proposito). El engranaje de datos ya estaba completo desde F0-08/F0-09/F1-13 (units.toml [dimensiones.mixture_ratio.unidades.afr] con parametro_rol=stoichiometry, roles.toml [roles.stoichiometry], haltech_nsp.toml [tipos.Stoichiometry] con rol_sugerido -- ya anotaba 'este canal es el parametro de la conversion lambda->AFR'); faltaba el codigo que va de las muestras crudas del canal al escalar que exige Parametrizada. -- No espera a resolver_rol (roles.py sigue stub): recibe los valores ya identificados como del canal de rol correspondiente, los localiza quien llama (hoy por Canal.id exacto, mañana por resolver_rol cuando exista) -- mismo patron que F1-17 con roles.py. Usa la MEDIANA (robusta a un valor suelto de arranque) y avisa (Aviso, no rechaza) si la variacion observada supera la tolerancia -- puede ser un cambio real de combustible a mitad de log. -- Test de integracion completo con datos reales: canal ID 57 (Fuel Tuning Current Stoichiometry) del AutoLog real da 14700 crudo x 0.001 = 14.7 (gasolina), constante en todo el log, y desde_canonica(1.0, dimension=mixture_ratio, unidad=afr, clase=PUNTO, param=14.7) da AFR=14.7, coincidiendo con el caso conocido de docs/06 SS6.12 (lambda 1,0 = AFR 14,7 con estequiometria de gasolina). 6 tests nuevos. 536 tests en total, todo verde salvo memoria_residente (ya conocido, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-15",
