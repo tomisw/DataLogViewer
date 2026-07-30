@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 13:10:42Z
+Actualizado: 2026-07-30 13:17:41Z
 
-**50 / 669 pts cerrados (7.5 %)** · 59 pts esperando revisión humana → 16.3 % entregado
+**55 / 669 pts cerrados (8.2 %)** · 62 pts esperando revisión humana → 17.5 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 20 | 35 | 0 | 131 | 0 | 186 |
+| F1 | 25 | 38 | 0 | 123 | 0 | 186 |
 | FG | 0 | 0 | 0 | 92 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -32,6 +32,7 @@ Actualizado: 2026-07-30 13:10:42Z
 | `F1-03` Celda vacía ≠ 0, centinelas de desbordamient | revision_humana | Opus 5 | G1 | Modulo dlv_core/formatos/limpieza.py, dos reglas de docs/01 SS1.13 sob |
 | `F1-04` Reconciliación de reloj: 12 h de cabecera, e | revision_humana | Opus 5 | G1 | dlv_core/reloj.py + dlv-core/tests/test_reloj.py (50 pruebas). Tres av |
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
+| `F1-18` Presets SI / Métrico / Imperial / Motorsport | revision_humana | Sonnet 5 | G1 | REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_ |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 
@@ -54,7 +55,7 @@ Actualizado: 2026-07-30 13:10:42Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 55/186 pts
+## F1 — 63/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -63,7 +64,7 @@ Actualizado: 2026-07-30 13:10:42Z
 | ⏳ | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | `9c80a89` |
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
 | ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
-| ·  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | — |
+| ✔  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | `815a8e4` |
 | ·  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | — |
 | ·  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | — |
 | ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `c1296dd` |
@@ -75,7 +76,7 @@ Actualizado: 2026-07-30 13:10:42Z
 | ·  | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | — |
 | ·  | `F1-16` | Dimensiones compuestas derivadas (`%/kPa` → `%/psi`) | Opus 5 | 4 | F1-13 | G1 | — |
 | ✔  | `F1-17` | Precedencia canal > dimensión del perfil > preset global > can | Sonnet 5 | 4 | F1-13 | G3 | `e968ba5` |
-| ·  | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | — |
+| ⏳ | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `815a8e4` |
 | ·  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | — |
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
 | ·  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | — |

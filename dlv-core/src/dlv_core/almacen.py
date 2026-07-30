@@ -14,13 +14,11 @@ Este módulo no accede al sistema de ficheros por su cuenta: todo lo que
 necesita como entrada (arrays ya materializados, un `polars.DataFrame`, un
 lector) llega como parámetro desde quien lo llama.
 
-`construir_desde_polars` (tarea F1-05) agrupa columnas por patrón de nulos
---el "grupo de muestreo" de docs/03 §3.4 paso 4-- con un método directo (un
-`dict` por máscara exacta, sobre el número de CANALES, unas pocas centenas,
-no sobre las 38 M de muestras). F1-06 es la tarea que llega después a hacer
-esa misma detección más eficiente si el banco demuestra que hace falta; esta
-función ya expone el resultado correcto (`t` compartido por grupo) para no
-bloquear a quien consuma el almacén mientras tanto.
+`construir_desde_polars` agrupa columnas por patrón de nulos --el "grupo de
+muestreo" de docs/03 §3.4 paso 4-- delegando en
+`dlv_core.grupos_muestreo.detectar_grupos_de_muestreo` (F1-06), que compara
+las máscaras de todas las columnas de una vez con `numpy.unique(axis=0)` en
+vez de un bucle de Python acumulando en un `dict`.
 """
 
 from __future__ import annotations
@@ -34,6 +32,7 @@ import polars as pl
 
 from dlv_core.formatos.cuerpo import columna_polars
 from dlv_core.formatos.haltech import Cabecera
+from dlv_core.grupos_muestreo import detectar_grupos_de_muestreo
 from dlv_core.reloj import desenrollar_medianoche
 from dlv_core.roles import ChannelKey
 from dlv_core.unidades import Afin
@@ -96,6 +95,12 @@ def construir_desde_polars(
     ni siquiera un `Series` sin nulos admite una vista sin copia -- exigir
     `allow_copy=False` aquí rompería sobre datos reales sin motivo: la copia
     la hace Polars de una vez, vectorizada, no esta función fila a fila.
+
+    La lista devuelta respeta el orden de `cabecera.canales`, aunque
+    `detectar_grupos_de_muestreo` (F1-06) no lo garantice internamente: agrupa
+    por patrón, no por columna, así que el orden de salida de esa función
+    depende de cómo `numpy.unique` ordene los patrones, no de en qué orden se
+    le pasaron las columnas.
     """
     marca = df[columna_tiempo]
     segundos_del_dia = marca.str.strptime(pl.Time, "%H:%M:%S%.f").cast(pl.Int64).to_numpy() / 1e9
@@ -105,21 +110,11 @@ def construir_desde_polars(
     t_relativo = (t_ms_absoluto - t0).astype(np.uint32)
 
     columnas_por_canal = {columna_polars(c.columna): c for c in cabecera.canales}
+    columnas_presentes = [c for c in columnas_por_canal if c in df.columns]
+    grupos = detectar_grupos_de_muestreo(df, columnas_presentes)
 
-    # Un grupo por máscara de filas activas exacta. El número de canales (unas
-    # pocas centenas) fija el tamaño de este bucle, no el número de muestras.
-    grupos: dict[bytes, tuple[np.ndarray, list[str]]] = {}
-    for columna in columnas_por_canal:
-        if columna not in df.columns:
-            continue
-        mascara = df[columna].is_not_null().to_numpy()
-        clave = mascara.tobytes()
-        if clave not in grupos:
-            grupos[clave] = (mascara, [])
-        grupos[clave][1].append(columna)
-
-    series: list[ChannelSeries] = []
-    for mascara, columnas in grupos.values():
+    por_columna: dict[str, ChannelSeries] = {}
+    for mascara, columnas in grupos:
         t_grupo = t_relativo[mascara]
         mascara_pl = pl.Series(mascara)
         for columna in columnas:
@@ -131,18 +126,20 @@ def construir_desde_polars(
                 id_nativo=str(canal.id),
                 nombre_normalizado=None,
             )
-            series.append(
-                ChannelSeries(
-                    key=key,
-                    role=None,
-                    t=t_grupo,
-                    v=valores,
-                    storage=storage_por_columna[columna],
-                    to_canon=Afin(canal.a_canonica),
-                    dimension=canal.dimension,
-                )
+            por_columna[columna] = ChannelSeries(
+                key=key,
+                role=None,
+                t=t_grupo,
+                v=valores,
+                storage=storage_por_columna[columna],
+                to_canon=Afin(canal.a_canonica),
+                dimension=canal.dimension,
             )
-    return series
+
+    # `detectar_grupos_de_muestreo` no promete el orden de entrada (agrupa por
+    # patrón, no por columna): se reordena aquí para que la salida sea
+    # predecible, en el mismo orden que `cabecera.canales`.
+    return [por_columna[c] for c in columnas_presentes]
 
 
 def indexar(serie: ChannelSeries) -> np.ndarray:

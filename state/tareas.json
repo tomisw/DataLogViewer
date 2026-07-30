@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-30 13:10:42Z"
+    "actualizado": "2026-07-30 13:17:41Z"
   },
   "tareas": [
     {
@@ -572,10 +572,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "815a8e4"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:17:11Z",
+          "texto": "detectar_grupos_de_muestreo(df, columnas) en dlv_core/grupos_muestreo.py: apila la mascara is_not_null() de cada columna en una matriz y usa numpy.unique(axis=0, return_inverse=True) para encontrar los patrones distintos en un unico paso vectorizado, en vez del dict de Python por columna que usaba F1-05 directamente. almacen.construir_desde_polars ahora delega en esta funcion. -- CONSECUENCIA DEL REFACTOR: numpy.unique ordena los patrones, asi que el orden de grupos que devuelve detectar_grupos_de_muestreo ya NO seria el orden de columnas de entrada -- lo note porque rompio un test de F1-05 que asumia orden por posicion. Lo corregi anadiendo una reordenacion final en construir_desde_polars (un dict por nombre de columna + reconstruccion en el orden de cabecera.canales), asi que el comportamiento observable de F1-05 no cambia: la lista de ChannelSeries sigue saliendo en el orden de la cabecera. 4 tests nuevos (dlv-core/tests/test_grupos_muestreo.py), incluido un caso de 20 columnas con 3 patrones para comprobar que numpy.unique no pierde ni mezcla ninguna. 409 tests en total, todo verde salvo memoria_residente (ya conocido, sin cambios)."
+        }
+      ]
     },
     {
       "id": "F1-07",
@@ -833,10 +840,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "sonnet",
+      "commits": [
+        "815a8e4"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-30 13:17:41Z",
+          "texto": "REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_usuario.py NO valida en su constructor -- solo crear_preset_usuario() y .validar() explicito lo hacen, a proposito para poder reconstruir un preset guardado (desde_dict/desde_json) sin exigir un catalogo cargado en ese instante (pensando en un futuro .dlvprofile). Riesgo: un llamador futuro podria olvidar invocar validar() y colar un dimension_id/unidad_id invalido sin que nada falle hasta que resolver_unidad lo use. Confirmar que este trade-off es el querido. (2) No se toco data/units.toml ni ningun otro data/*.toml -- confirmado con git diff, los 5 presets de fabrica siguen intactos; este modulo es solo la pieza de 'el usuario puede crear el suyo' (docs/06 SS6.9 linea 194), no mas presets de catalogo. (3) unidades: Mapping[str,str] tiene la MISMA forma que preferencias_perfil de resolver_unidad (F1-17) sin conversion -- a_mapeo() se pasa directo; verificado con tests que un preset de usuario gana al preset global pero pierde ante una anulacion de canal, y que una dimension no cubierta cae al preset global. (4) Serializacion solo a dict/JSON en memoria (a_dict/a_json/desde_dict/desde_json), dlv-core no toca ficheros (ADR-002); la capa de persistencia real es .dlvprofile, todavia no implementado. 19 tests nuevos, incluidos casos de datos corruptos al deserializar. Trabajo de un agente en segundo plano (Sonnet), verificado de forma independiente: ruff/mypy/pytest en verde, sin tocar data/ ni los ficheros de otro trabajo en paralelo (almacen.py, piramide.py, formatos/, tools/banco.py)."
+        }
+      ]
     },
     {
       "id": "F1-19",
