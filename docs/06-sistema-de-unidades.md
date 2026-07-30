@@ -239,3 +239,20 @@ con coma decimal (`07-formatos-y-csv-generico.md` §7.3).
   los umbrales del perfil siguen disparando en los mismos instantes.
 - Canal con `confidence = unknown`: el selector de unidad está desactivado y el
   valor se muestra en crudo.
+
+Los casos conocidos **no viven dentro de las pruebas**: están en
+`data/casos_de_unidades.toml` (F1-20, puerta G1), con el valor esperado y la
+fuente de cada número. Dos razones:
+
+1. Se pueden auditar sin leer Python. Nadie va a revisar aserciones enterradas en
+   un fichero de pruebas, y estos números afirman cosas sobre física.
+2. Añadir un caso conocido —una unidad nueva, una discrepancia con otra
+   herramienta— deja de ser escribir código y pasa a ser añadir una fila.
+
+`dlv-core/tests/test_trampa_del_delta.py` recorre la tabla caso a caso, y añade
+las propiedades que tienen que valer para **todas** las unidades del catálogo y no
+solo para las tabuladas: `punto(x) − intervalo(x) = b`, ida y vuelta exacta,
+`punto(x₂) − punto(x₁) = intervalo(x₂ − x₁)`, `√varianza(σ²) = intervalo(σ)`, y un
+Δ de 0 igual a 0 en toda unidad. También comprueba, sobre la firma real de las
+funciones, que `clase` sigue sin valor por omisión: es lo que convierte el olvido
+en un error en vez de en un número plausible.

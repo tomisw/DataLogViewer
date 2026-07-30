@@ -408,9 +408,10 @@ del lenguaje del backend.
 | `roles.toml` | catálogo de roles semánticos y sinónimos | TOML en el repositorio |
 | `enums.toml` | diccionarios de códigos de estado y máscaras de bits | TOML en el repositorio |
 | `umbrales.toml` | umbrales por omisión de los detectores, en unidad canónica | TOML en el repositorio |
-| `formats/*.toml` | descriptores de formato nativo | TOML en el repositorio |
+| `casos_de_unidades.toml` | tabla de casos conocidos de conversión, con la fuente de cada valor | TOML en el repositorio |
+| `formats/*.toml` | descriptores de formato nativo, incluida la política de reloj | TOML en el repositorio |
 
-Los seis últimos son **datos, no código**: ampliarlos no requiere recompilar ni
+Los siete últimos son **datos, no código**: ampliarlos no requiere recompilar ni
 saber programar. Es la mitigación principal de los riesgos R1, R2 y R10.
 
 ## 3.10 Empaquetado y portabilidad
