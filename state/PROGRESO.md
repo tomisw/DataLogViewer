@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-30 15:11:08Z
+Actualizado: 2026-07-31 07:07:53Z
 
 **93 / 669 pts cerrados (13.9 %)** · 88 pts esperando revisión humana → 27.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 63 | 56 | 0 | 67 | 0 | 186 |
+| F1 | 63 | 56 | 13 | 54 | 0 | 186 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -38,6 +38,7 @@ Actualizado: 2026-07-30 15:11:08Z
 | `F1-18` Presets SI / Métrico / Imperial / Motorsport | revision_humana | Sonnet 5 | G1 | REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_ |
 | `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
+| `F1-23` Renderizador WebGL2 de series desde la pirám | en_curso | Opus 5 | G2 | — |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 
@@ -86,7 +87,7 @@ Actualizado: 2026-07-30 15:11:08Z
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
 | ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `d05c389` |
 | ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `8f51688` |
-| ·  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | — |
+| ▶  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | — |
 | ·  | `F1-24` | Caché de cubos en el frontend — es lo que hace alcanzable el c | Opus 5 | 5 | F1-23 | G2 | — |
 | ·  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | — |
 | ·  | `F1-26` | Paneles apilados con eje X compartido y arrastrar canales entr | Sonnet 5 | 5 | F1-25 | G3 | — |
