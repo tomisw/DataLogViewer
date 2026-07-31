@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-31 07:09:56Z"
+    "actualizado": "2026-07-31 07:10:08Z"
   },
   "tareas": [
     {
@@ -1065,10 +1065,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "fb0548d"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-31 07:10:08Z",
+          "texto": "Cache canal x nivel con margen y desalojo LRU por bytes. Cursor sobre 16 canales: media 0,0059 ms, peor 0,72 ms (presupuesto 16 ms; falta el pintado del DOM, que es F1-29). HALLAZGO: el margen solo compra la mitad de lo que parece porque el lado de atras no se usa; si el presupuesto de 120 ms p95 se pone en rojo, la palanca es sesgar la ventana hacia la direccion del pan (F1-28), no subir el margen."
+        }
+      ]
     },
     {
       "id": "F1-25",
