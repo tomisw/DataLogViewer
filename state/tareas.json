@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-07-31 07:07:53Z"
+    "actualizado": "2026-07-31 07:09:56Z"
   },
   "tareas": [
     {
@@ -1038,10 +1038,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "ff82133"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-07-31 07:09:22Z",
+          "texto": "Renderizador WebGL2 con los datos residentes en GPU: el pan/zoom es un cambio de uniforme, no una subida (probado y medido). Banco de CPU en verde con 200x de margen (0,010 ms/fotograma frente a 2 ms). La mitad de GPU del presupuesto NO esta medida por CI a proposito: se mide abriendo banco-fps.html con npm run dev, porque un navegador sin cabeza mediria su renderizador por software. Fuera de alcance declarado: huecos y segmentos (F2-01)."
+        }
+      ]
     },
     {
       "id": "F1-24",
@@ -1058,8 +1065,8 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "opus",
       "commits": [],
       "notas": []
     },
