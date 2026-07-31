@@ -26,6 +26,12 @@ dev = [
     # dlv-api/tests/test_salud.py) exige httpx2 desde starlette 1.x; solo de
     # test, no entra en el ZIP portable de dlv-app.
     "httpx2",
+    # Fuzzing de propiedad sobre cabecera y filas (F1-36). Solo de test.
+    "hypothesis>=6.0",
+    # Empaquetado `onedir` para el ZIP portable (F1-35, F5-01). Es una
+    # herramienta de construcción: no se importa desde el código y por tanto
+    # no entra en el paquete que produce, solo lo produce.
+    "pyinstaller>=6.0",
 ]
 
 # ---------------------------------------------------------------------------

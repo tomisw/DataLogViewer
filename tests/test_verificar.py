@@ -58,15 +58,25 @@ def test_estan_las_seis_comprobaciones(mod: Any) -> None:
 def test_una_herramienta_ausente_es_un_fallo(mod: Any) -> None:
     """El punto de la herramienta: no puede dar verde por no haber mirado.
 
-    Se acepta cualquiera de los dos motivos, porque dependen del entorno: o no se
-    encuentra el ejecutable, o se encuentra y no se puede lanzar. Lo que no
-    depende del entorno, y es lo que se comprueba, es que el resultado sea rojo y
-    que no se propague la excepción: una puerta que revienta no informa.
+    Lo que se comprueba es lo que NO depende del entorno: que el resultado sea
+    rojo y que no se propague la excepción, porque una puerta que revienta no
+    informa. El MOTIVO sí depende del entorno, y son tres, no dos:
+
+        1. No se encuentra el ejecutable            -> "no disponible"
+        2. Se encuentra y no se puede lanzar        -> "no ejecutable"
+        3. Hay `uv`, así que `_resolver` cae en `uv run <herramienta>`, que se
+           lanza bien y falla con código de salida distinto de cero porque es
+           `uv` quien no encuentra la herramienta  -> "vía `uv run`"
+
+    El tercero es el caso normal en una máquina de desarrollo con `uv` en el
+    PATH, y es correcto: el fallback a `uv run` existe precisamente porque
+    `ruff`/`mypy`/`pytest` viven en el entorno virtual y no en el PATH. La
+    versión anterior de esta prueba solo enumeraba los dos primeros y se ponía
+    roja al instalar `uv`, que es justo cuando el guion funciona mejor.
     """
     entorno: dict[str, str] = {}
     r = mod._ejecutar("mypy --strict", ["no-existe-esta-herramienta", "algo"], entorno)
-    assert r.ok is False
-    assert "no disponible" in r.detalle or "no ejecutable" in r.detalle
+    assert r.ok is False, "una herramienta que no se puede ejecutar tiene que dar rojo"
 
 
 def test_un_ejecutable_que_no_se_puede_lanzar_pone_rojo_y_no_revienta(
