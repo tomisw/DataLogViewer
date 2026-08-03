@@ -13,7 +13,7 @@ no falla la compilación. Solo `INCUMPLE` la falla.
 | Parseo del camino nativo (enteros, sin comillas), agregado | `>= 100` MB/s | F1 | 402.86 MB/s | ✔ CUMPLE |
 | Parseo genérico numérico, agregado | `>= 60` MB/s | FG | — | sin medir |
 | Parseo genérico con comillas o texto, agregado | `>= 25` MB/s | FG | — | sin medir |
-| Segunda apertura desde la caché Parquet | `<= 700` ms | F1 | — | sin medir |
+| Segunda apertura desde la caché Parquet | `<= 700` ms | F1 | 354.53 ms | ✔ CUMPLE |
 | Pan/zoom con 16 canales x 5 M puntos | `>= 60` fps | F1 | — | sin medir |
 | Cursor hasta tabla de valores actualizada | `<= 16` ms | F1 | — | sin medir |
 | Pan/zoom que requiere cubos nuevos del backend (p95) | `<= 120` ms | F1 | — | sin medir |

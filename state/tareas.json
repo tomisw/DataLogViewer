@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:40:57Z"
+    "actualizado": "2026-08-03 11:48:05Z"
   },
   "tareas": [
     {
@@ -1363,10 +1363,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "haiku",
+      "commits": [
+        "1bd6e64"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:48:05Z",
+          "texto": "Presupuestos medibles hoy: parseo_nativo, segunda_apertura, memoria_residente (rojo, R9) y ADR-009, mas los bancos de CPU de dlv-ui, que ANTES DE ESTO no los ejecutaba CI. fps_pan_zoom y latencia_cursor quedan MEDIDOS A MEDIAS: la mitad de CPU es puerta, la de GPU/DOM se mide a mano en dlv-ui/banco-fps.html. cambio_unidad sigue sin medir: le falta F1-31."
+        }
+      ]
     },
     {
       "id": "F1-38",
