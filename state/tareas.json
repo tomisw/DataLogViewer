@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 12:18:05Z"
+    "actualizado": "2026-08-03 12:18:24Z"
   },
   "tareas": [
     {
@@ -1231,10 +1231,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "opus",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "33a7c27"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 12:18:24Z",
+          "texto": "PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMERO ESTA MAL:\n\n1) LA TRAMPA DEL DELTA (consecuencia: una decision de mapa tomada con un numero 273 grados desplazado, y no se ve en pantalla). Mira dlv-ui/src/cursor/doble.ts: el delta se calcula restando los dos valores YA en la unidad mostrada y FormaConversion NO expone el desplazamiento b, asi que el codigo no puede aplicarlo. La unica funcion que recibe factores es convertirDelta, y aplica solo el cociente. Prueba clave: 'convertir un delta de K a C no lo cambia' - el resultado parece que no hace nada y es justo el correcto.\n\n2) EL DELTA DE UNA UNIDAD RECIPROCA NO EXISTE (consecuencia: un delta en lambda presentado como delta en phi es un numero inventado). Decidi devolver indefinido con motivo en vez de lanzar, porque la interfaz tiene que seguir pintando. Revisa si te parece bien el texto que vera el usuario.\n\n3) EL DELTA DE UNA UNIDAD PARAMETRIZADA CON EL PARAMETRO CAMBIADO ENTRE CURSORES (consecuencia: en un log con cambio de mezcla de combustible, un delta de AFR que no es el delta de nada). Uso tolerancia relativa 1e-9 para decidir 'mismo parametro'. Ese umbral es MIO y no sale de data/: dime si quieres otro.\n\n4) A NIVEL DECIMADO EL DELTA ES UN RANGO, NO UN NUMERO (consecuencia: leer una diferencia que el dato no garantiza). Uso aritmetica de intervalos y aviso explicito cuando el rango incluye el cero. Revisa si prefieres otra presentacion.\n\nNO IMPLEMENTADO: el cableado del componente al DOM reutiliza F1-29 y no esta hecho; este commit es la logica y sus 22 pruebas."
+        }
+      ]
     },
     {
       "id": "F1-31",
