@@ -41,26 +41,39 @@ Donde se lo pasamos al frontend importa:
   la exposicion anterior no aplica. Esta via solo cubre el placeholder de
   hoy, no un frontend real.
 
-Que frontend se abre, a falta de `dlv-ui/dist/` (F1-35)
-=========================================================
-`dlv-ui` es un proyecto Vite/TypeScript y esta maquina no tiene Node/npm
-instalados: no hay manera de generar `dist/` ni de levantar `npm run dev`
-aqui, y `dlv-ui/index.html` por si solo no sirve como pagina navegable (el
-navegador no entiende `<script type="module" src="/src/main.ts">` sin que
-Vite lo transpile primero). Con eso, `main()` no tiene ningun frontend real
-al que apuntar por omision, asi que:
+Que frontend se abre (F1-35, verificado de arranque en local)
+================================================================
+La nota original de F1-35 decia que esta maquina no tenia Node/npm y que
+por tanto `main()` no tenia ningun frontend real al que apuntar. Eso ya no
+es cierto: hay Node en `%LOCALAPPDATA%\\nodejs` y `dlv-ui/dist/` se genera
+con `npm run build`. `main()` decide asi, en orden:
 
-- Con `url_frontend` explicito (p. ej. `"http://localhost:5173"` una vez haya
-  Node y `npm run dev` este corriendo en `dlv-ui/`, o la URL de un futuro
-  `dlv-ui/dist/index.html` servido por HTTP), la ventana navega ahi con
-  `puerto_api`/`token` en la query string (ver la seccion anterior y
-  `_url_con_credenciales`).
-- Con `url_frontend=None` (el valor por omision), la ventana carga una
-  pagina placeholder embebida en este modulo (`_pagina_placeholder`),
-  marcada explicitamente como provisional, que solo demuestra que el
-  arranque del servidor y el paso de credenciales al frontend funcionan de
-  extremo a extremo. No es el frontend de `dlv-ui` y no debe confundirse con
-  el: hay que sustituirlo por la URL real en cuanto haya un entorno con Node.
+1. Con `url_frontend` explicito (p. ej. `"http://localhost:5173"` con
+   `npm run dev` corriendo en `dlv-ui/`), la ventana navega ahi con
+   `puerto_api`/`token` en la query string (ver la seccion anterior y
+   `_url_con_credenciales`). Es el caso de desarrollo con recarga en
+   caliente.
+2. Si no se da `url_frontend` pero existe `dlv-ui/dist/index.html`
+   (`_detectar_dist_ui`), se sirve esa carpeta por HTTP en 127.0.0.1 con
+   otro servidor efimero de fondo (`iniciar_ui_estatica_en_hilo`) y la
+   ventana navega ahi. Hace falta un servidor -- no basta con `file://`
+   porque el `index.html` que genera Vite referencia sus assets con rutas
+   absolutas (`/assets/...`), que `file://` no resuelve. Es el caso por
+   omision hoy: `python -m dlv_app` sin argumentos sirve el build de
+   produccion de `dlv-ui`.
+3. Si no hay ni `url_frontend` ni `dlv-ui/dist/index.html` (p. ej. nunca se
+   ha ejecutado `npm run build`), la ventana cae a la pagina placeholder
+   embebida en este modulo (`_pagina_placeholder`), marcada explicitamente
+   como provisional: solo demuestra que el arranque del servidor y el paso
+   de credenciales al frontend funcionan de extremo a extremo, no es el
+   frontend de `dlv-ui`.
+
+Empaquetado con PyInstaller (F5-01): este modulo localiza `dlv-ui/dist/`
+relativo al propio fichero fuente (`_RAIZ_REPO`, igual que `dlv_api.main`
+localiza `data/`), lo que no sera valido bajo un `dlv_app.spec` congelado
+-- ver el aviso ya anotado en ese fichero. No se toca aqui porque el
+paquete congelado esta fuera del alcance de "que la app arranque en esta
+maquina" y ya esta marcado como pendiente de F5-01.
 
 Cierre limpio (F1-35)
 ======================
@@ -79,12 +92,15 @@ ventana se cierra por una excepcion, no solo por el cierre normal.
 
 from __future__ import annotations
 
+import http.server
 import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 import uvicorn
 import webview
@@ -92,6 +108,13 @@ import webview
 from dlv_api.main import ServidorArrancado, preparar_servidor
 
 HOST_LOCAL = "127.0.0.1"
+
+# `parents[3]` desde `dlv-app/src/dlv_app/main.py`: [0]=dlv_app, [1]=src,
+# [2]=dlv-app, [3]=raiz del repositorio. Misma cuenta que usa
+# `dlv_api.main._RAIZ_REPO` para `data/`; ver el aviso de F5-01 en el
+# docstring del modulo sobre por que esto no es valido bajo PyInstaller.
+_RAIZ_REPO = Path(__file__).resolve().parents[3]
+_DIST_UI = _RAIZ_REPO / "dlv-ui" / "dist"
 
 # Plantilla de la pagina placeholder (ver `_pagina_placeholder`). Se sustituye
 # con `str.replace` en vez de un f-string para no tener que escapar las llaves
@@ -232,30 +255,121 @@ def _pagina_placeholder(info: ServidorArrancado) -> str:
     )
 
 
+def _detectar_dist_ui() -> Path | None:
+    """`dlv-ui/dist` si `npm run build` ya se ha ejecutado, si no `None`.
+
+    Solo comprueba `index.html`: es el fichero que Vite escribe al final de
+    un build correcto, asi que su ausencia cubre tanto "nunca se ha
+    compilado" como "el build a medias se interrumpio".
+    """
+    return _DIST_UI if (_DIST_UI / "index.html").is_file() else None
+
+
+@dataclass(slots=True, frozen=True)
+class ServidorUiDeFondo:
+    """Lo que hace falta para hablar con el servidor estatico de `dlv-ui/dist`
+    y para pararlo con limpieza -- el equivalente de `ServidorDeFondo` para
+    ficheros estaticos en vez de para `dlv-api`.
+    """
+
+    host: str
+    puerto: int
+    servidor: http.server.ThreadingHTTPServer
+    hilo: threading.Thread
+
+    @property
+    def url_base(self) -> str:
+        return f"http://{self.host}:{self.puerto}/"
+
+
+def _manejador_estatico(directorio: Path) -> type[http.server.SimpleHTTPRequestHandler]:
+    """Manejador HTTP fijado a `directorio` sin usar `os.chdir` (que mutaria
+    el directorio de trabajo de todo el proceso, no solo del hilo del
+    servidor): `SimpleHTTPRequestHandler` acepta `directory=` desde Python
+    3.7 justamente para este caso.
+
+    Silencia tambien el log por peticion a stderr: es ruido en una app de
+    escritorio sin consola (`console=False` en `dlv_app.spec`).
+    """
+
+    class _Manejador(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, directory=str(directorio), **kwargs)
+
+        def log_message(self, format: str, *args: Any) -> None:
+            pass
+
+    return _Manejador
+
+
+def iniciar_ui_estatica_en_hilo(directorio: Path, *, host: str = HOST_LOCAL) -> ServidorUiDeFondo:
+    """Sirve `directorio` (se espera `dlv-ui/dist`) por HTTP en un puerto
+    efimero, en un hilo de fondo daemon -- mismo patron que
+    `iniciar_api_en_hilo`.
+
+    Hace falta un servidor HTTP y no basta `file://` porque el `index.html`
+    que genera `vite build` referencia sus assets con rutas absolutas
+    (`/assets/index-XXXX.js`), que un motor web solo resuelve contra un
+    origen HTTP, no contra el sistema de ficheros.
+    """
+    servidor = http.server.ThreadingHTTPServer((host, 0), _manejador_estatico(directorio))
+    puerto = servidor.server_address[1]
+    hilo = threading.Thread(target=servidor.serve_forever, daemon=True)
+    hilo.start()
+    return ServidorUiDeFondo(host=host, puerto=puerto, servidor=servidor, hilo=hilo)
+
+
+def detener_servidor_ui_de_fondo(estado: ServidorUiDeFondo, *, timeout_s: float = 5.0) -> None:
+    """Para el servidor estatico con limpieza: `shutdown()` (a diferencia de
+    `should_exit` de uvicorn) es el mecanismo propio de
+    `http.server.ThreadingHTTPServer` para romper `serve_forever()` desde
+    otro hilo, y `server_close()` libera el socket para no dejarlo en
+    `TIME_WAIT` ocupando el puerto.
+    """
+    estado.servidor.shutdown()
+    estado.hilo.join(timeout=timeout_s)
+    estado.servidor.server_close()
+
+
 def main(*, url_frontend: str | None = None) -> None:
     """Arranca `dlv-api` y abre la ventana de `pywebview`.
 
-    Con `url_frontend=None` (por omision) se usa la pagina placeholder de
-    `_pagina_placeholder`. Con una URL explicita (p. ej.
-    `"http://localhost:5173"` para el servidor de desarrollo de Vite de
-    `dlv-ui`, una vez haya Node en la maquina), la ventana navega ahi con
-    `puerto_api`/`token` en la query string (`_url_con_credenciales`).
+    Que frontend se abre, en orden (ver "Que frontend se abre" en el
+    docstring del modulo para el porque de cada paso):
 
-    El arranque del servidor y `webview.start()` (que bloquea hasta que se
-    cierra la ultima ventana) estan en un `try`/`finally` para que
-    `detener_servidor_de_fondo` corra tambien si `webview.start()` termina
-    por una excepcion, no solo por el cierre normal de la ventana.
+    1. `url_frontend` explicito -- p. ej. el servidor de desarrollo de Vite,
+       `"http://localhost:5173"` con `npm run dev` corriendo.
+    2. Si no, `dlv-ui/dist/` si `npm run build` ya se ejecuto: se sirve por
+       HTTP en un puerto efimero propio (`iniciar_ui_estatica_en_hilo`).
+    3. Si no hay ninguno de los dos, la pagina placeholder provisional
+       (`_pagina_placeholder`).
+
+    El arranque de los servidores y `webview.start()` (que bloquea hasta que
+    se cierra la ultima ventana) estan en un `try`/`finally` para que los dos
+    se paren tambien si `webview.start()` termina por una excepcion, no solo
+    por el cierre normal de la ventana.
     """
     estado = iniciar_api_en_hilo(host=HOST_LOCAL)
+    estado_ui: ServidorUiDeFondo | None = None
     try:
-        if url_frontend is None:
-            webview.create_window("DataLogViewer", html=_pagina_placeholder(estado.info))
-        else:
+        if url_frontend is not None:
             webview.create_window(
                 "DataLogViewer", url=_url_con_credenciales(url_frontend, estado.info)
             )
+        else:
+            directorio_dist = _detectar_dist_ui()
+            if directorio_dist is not None:
+                estado_ui = iniciar_ui_estatica_en_hilo(directorio_dist, host=HOST_LOCAL)
+                webview.create_window(
+                    "DataLogViewer",
+                    url=_url_con_credenciales(estado_ui.url_base, estado.info),
+                )
+            else:
+                webview.create_window("DataLogViewer", html=_pagina_placeholder(estado.info))
         webview.start()
     finally:
+        if estado_ui is not None:
+            detener_servidor_ui_de_fondo(estado_ui)
         detener_servidor_de_fondo(estado)
 
 

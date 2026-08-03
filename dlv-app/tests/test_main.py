@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import urllib.request
+from pathlib import Path
 
 import pytest
 
@@ -24,11 +25,14 @@ pytest.importorskip("fastapi")
 
 from dlv_api.main import ServidorArrancado
 from dlv_app.main import (
+    _detectar_dist_ui,
     _esperar_servidor,
     _pagina_placeholder,
     _url_con_credenciales,
     detener_servidor_de_fondo,
+    detener_servidor_ui_de_fondo,
     iniciar_api_en_hilo,
+    iniciar_ui_estatica_en_hilo,
 )
 
 
@@ -89,3 +93,42 @@ def test_pagina_placeholder_incluye_token_puerto_y_marca_provisional() -> None:
     # El token no debe colarse en ninguna URL/atributo href del placeholder:
     # solo debe aparecer como valor de una variable JS.
     assert 'window.__DLV_TOKEN__ = "secreto-xyz"' in html
+
+
+def test_servidor_ui_estatica_sirve_el_directorio_y_se_detiene_con_limpieza(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "index.html").write_text("<html>hola</html>", encoding="utf-8")
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "assets" / "app.js").write_text("console.log('hola')", encoding="utf-8")
+
+    estado = iniciar_ui_estatica_en_hilo(tmp_path)
+    try:
+        assert estado.hilo.is_alive()
+        with urllib.request.urlopen(estado.url_base, timeout=1.0) as respuesta:
+            assert b"hola" in respuesta.read()
+        with urllib.request.urlopen(estado.url_base + "assets/app.js", timeout=1.0) as respuesta:
+            assert b"console.log" in respuesta.read()
+    finally:
+        detener_servidor_ui_de_fondo(estado)
+
+    # Igual que el servidor de dlv-api: cerrar la ventana no puede dejar un
+    # servidor de ficheros estaticos huerfano escuchando en el puerto.
+    assert not estado.hilo.is_alive()
+
+
+def test_detectar_dist_ui_encuentra_index_html(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "index.html").write_text("<html></html>", encoding="utf-8")
+    monkeypatch.setattr("dlv_app.main._DIST_UI", tmp_path)
+
+    assert _detectar_dist_ui() == tmp_path
+
+
+def test_detectar_dist_ui_devuelve_none_si_no_hay_build(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("dlv_app.main._DIST_UI", tmp_path / "no-existe")
+
+    assert _detectar_dist_ui() is None
