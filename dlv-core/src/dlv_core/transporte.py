@@ -28,12 +28,17 @@ __all__ = [
     "COLUMNAS_CUBOS",
     "arrow_ipc_a_cubos",
     "arrow_ipc_a_serie",
+    "binario_a_cubos",
     "cubos_a_arrow_ipc",
+    "cubos_a_binario",
     "serie_a_arrow_ipc",
 ]
 
 MEDIA_TYPE_ARROW_IPC = "application/vnd.apache.arrow.stream"
 """Tipo MIME de la respuesta binaria; lo usa `dlv-api` en la cabecera HTTP."""
+
+MEDIA_TYPE_CUBOS_CRUDO = "application/octet-stream"
+"""Tipo MIME del búfer de tipado fijo. Ver `cubos_a_binario`."""
 
 COLUMNAS_CUBOS: tuple[str, ...] = ("t", "minimo", "maximo", "primero", "ultimo")
 """Columnas de un lote de cubos `CONTINUO`, en orden.
@@ -102,6 +107,69 @@ def cubos_a_arrow_ipc(
     buffer = io.BytesIO()
     tabla.write_ipc(buffer)
     return buffer.getvalue()
+
+
+def cubos_a_binario(
+    t: np.ndarray,
+    minimo: np.ndarray,
+    maximo: np.ndarray,
+    primero: np.ndarray,
+    ultimo: np.ndarray,
+) -> bytes:
+    """Las cinco columnas como un búfer de tipado fijo: `float32` seguidos.
+
+    POR QUÉ EXISTE, HABIENDO YA ARROW IPC
+    =====================================
+    ADR-007 ofrece las dos formas a propósito: «Los cubos visibles se envían
+    como **Arrow IPC** o como **búfer de tipado fijo**, que en el frontend se
+    lee como `TypedArray` sin parseo». Al cablear `FuenteApi` (el MVP) resultó
+    que la segunda no era una alternativa estilística sino la única viable:
+    `dlv-ui` no tiene ninguna dependencia y leer Arrow IPC en el navegador
+    exige o la librería `apache-arrow` —una dependencia nueva, que no se añade
+    sin preguntar (docs/09 §9.11)— o escribir a mano un lector del formato,
+    que es mucho código delicado para transportar cinco arrays de números.
+
+    El formato es deliberadamente tonto: `n` valores `float32` de `t`, luego
+    `n` de `minimo`, y así con las cinco columnas de `COLUMNAS_CUBOS`, en ese
+    orden. Sin cabecera, sin longitudes embebidas: `n` va en la cabecera HTTP
+    `X-Cubos`, igual que el resto de metadatos. En el frontend, cada columna es
+    un `new Float32Array(buffer, i * n * 4, n)` — cero parseo, que es
+    literalmente lo que pide el ADR.
+
+    **Little-endian**, forzado con `<f4` y no dejado al azar del intérprete:
+    los `TypedArray` de JavaScript usan el orden del procesador, que hoy es
+    little-endian en todo lo que ejecuta este programa, pero un servidor
+    big-endian serviría bytes que el navegador leería del revés y produciría
+    números absurdos en vez de un error. Fijarlo aquí cuesta nada.
+
+    Arrow IPC no se retira: sigue siendo lo que consumen las pruebas de Python
+    y cualquier cliente que ya tenga la librería.
+    """
+    columnas = (t, minimo, maximo, primero, ultimo)
+    n = len(t)
+    if any(len(c) != n for c in columnas):
+        raise ValueError(
+            "las cinco columnas de cubos deben tener la misma longitud: "
+            f"t={len(t)}, minimo={len(minimo)}, maximo={len(maximo)}, "
+            f"primero={len(primero)}, ultimo={len(ultimo)}"
+        )
+    return b"".join(np.ascontiguousarray(c, dtype="<f4").tobytes() for c in columnas)
+
+
+def binario_a_cubos(datos: bytes, n: int) -> dict[str, np.ndarray]:
+    """Inversa de `cubos_a_binario`. Existe para poder probar la ida y vuelta.
+
+    `n` no se deduce de `len(datos)`: se pasa, igual que hace el frontend
+    leyéndolo de `X-Cubos`. Deducirlo escondería un búfer truncado —que daría
+    un `n` menor y plausible— en vez de delatarlo.
+    """
+    esperado = n * len(COLUMNAS_CUBOS) * 4
+    if len(datos) != esperado:
+        raise ValueError(
+            f"el búfer mide {len(datos)} bytes y para {n} cubos deberían ser {esperado}"
+        )
+    plano = np.frombuffer(datos, dtype="<f4")
+    return {columna: plano[i * n : (i + 1) * n] for i, columna in enumerate(COLUMNAS_CUBOS)}
 
 
 def arrow_ipc_a_cubos(datos: bytes) -> dict[str, np.ndarray]:

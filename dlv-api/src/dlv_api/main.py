@@ -58,6 +58,7 @@ import socket
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -85,7 +86,13 @@ from dlv_core.formatos.haltech import (
 from dlv_core.formatos.limpieza import nulificar_centinelas
 from dlv_core.informe_importacion import InformeImportacion
 from dlv_core.piramide import NivelPiramide
-from dlv_core.transporte import MEDIA_TYPE_ARROW_IPC, cubos_a_arrow_ipc, serie_a_arrow_ipc
+from dlv_core.transporte import (
+    MEDIA_TYPE_ARROW_IPC,
+    MEDIA_TYPE_CUBOS_CRUDO,
+    cubos_a_arrow_ipc,
+    cubos_a_binario,
+    serie_a_arrow_ipc,
+)
 from dlv_core.unidades import Catalogo, cargar_catalogo
 
 _RAIZ_REPO = Path(__file__).resolve().parents[3]
@@ -367,6 +374,19 @@ class ComandoCubos(BaseModel):
     el frontend pide con margen (F1-24) y eso es normal, no un error."""
     nivel: int | None = None
     factor: int | None = None
+    formato_binario: Literal["arrow", "crudo"] = "arrow"
+    """Cómo se serializa el cuerpo. ADR-007 admite las dos formas.
+
+    `crudo` es un búfer de tipado fijo (`float32` little-endian, las cinco
+    columnas seguidas) y es lo que consume el frontend: `dlv-ui` no tiene
+    ninguna dependencia, y leer Arrow IPC en el navegador exigiría o la
+    librería `apache-arrow` —una dependencia nueva, que no se añade sin
+    preguntar— o un lector escrito a mano. Con `crudo`, cada columna es un
+    `new Float32Array(buffer, i * n * 4, n)`: cero parseo.
+
+    `arrow` sigue siendo el valor por omisión para no romper a nadie que ya lo
+    consuma. Ver `dlv_core.transporte.cubos_a_binario`.
+    """
 
 
 class InfoSesion(BaseModel):
@@ -502,12 +522,16 @@ def cubos(comando: ComandoCubos, request: Request) -> Response:
     indice = _indice_de_nivel(canal.piramide, nivel=comando.nivel, factor=comando.factor)
     recorte = recortar_nivel(canal.t_segundos, canal.piramide[indice], t0=comando.t0, t1=comando.t1)
 
-    cuerpo = cubos_a_arrow_ipc(
-        recorte.t, recorte.minimo, recorte.maximo, recorte.primero, recorte.ultimo
-    )
+    columnas = (recorte.t, recorte.minimo, recorte.maximo, recorte.primero, recorte.ultimo)
+    if comando.formato_binario == "crudo":
+        cuerpo = cubos_a_binario(*columnas)
+        media_type = MEDIA_TYPE_CUBOS_CRUDO
+    else:
+        cuerpo = cubos_a_arrow_ipc(*columnas)
+        media_type = MEDIA_TYPE_ARROW_IPC
     return Response(
         content=cuerpo,
-        media_type=MEDIA_TYPE_ARROW_IPC,
+        media_type=media_type,
         headers={
             "X-Factor": str(recorte.factor),
             "X-Nivel": str(indice),
@@ -520,6 +544,64 @@ def cubos(comando: ComandoCubos, request: Request) -> Response:
             "X-Factor-B": repr(canal.serie.to_canon.b),
         },
     )
+
+
+def catalogo_unidades() -> dict[str, object]:
+    """El catálogo de `data/units.toml` en la forma que pide el frontend.
+
+    JSON y no binario, y eso es coherente con ADR-007, no una excepción: la
+    regla dura es que **las series** nunca viajan en JSON. Esto son metadatos
+    —unas decenas de dimensiones con sus unidades y presets, kilobytes— y es
+    exactamente el caso para el que el ADR reserva JSON.
+
+    Se sirve en vez de duplicar el catálogo en TypeScript porque `data/*.toml`
+    son datos del propietario y la regla 2 de `CLAUDE.md` prohíbe trasladar sus
+    valores al código. Antes de esta ruta, el frontend solo tenía catálogos
+    ilustrativos de prueba; con ella, la aplicación conmuta °C↔°F↔K con los
+    factores reales, que es la mitad del hito M1.
+
+    Los nombres de campo se pasan a `camelCase` aquí y no en el frontend: la
+    frontera entre `snake_case` de Python y `camelCase` de TypeScript tiene que
+    estar en un sitio concreto, y el que serializa es el que la conoce.
+    """
+    catalogo = _catalogo_unidades()
+    dimensiones = [
+        {
+            "id": d.id,
+            "etiqueta": d.etiqueta,
+            "unidadCanonica": d.unidad_canonica,
+            "convertible": d.convertible,
+            "mostrarEnCrudo": d.mostrar_en_crudo,
+            "unidades": [
+                {
+                    "id": u.id,
+                    "etiqueta": u.etiqueta,
+                    "decimales": u.decimales,
+                    "alias": list(u.alias),
+                }
+                for u in d.unidades.values()
+            ],
+        }
+        for d in catalogo.dimensiones.values()
+    ]
+    presets = [
+        {
+            "id": pid,
+            "etiqueta": str(p.get("etiqueta", pid)),
+            "unidades": dict(p.get("unidades", {})),
+        }
+        for pid, p in catalogo.presets.items()
+    ]
+    return {
+        "dimensiones": dimensiones,
+        "presets": presets,
+        # El preset por omisión no lo decide esta ruta: sale del catálogo si lo
+        # declara y, si no, del métrico, que es el que corresponde al locale de
+        # la aplicación. Inventarlo aquí sería una opinión disfrazada de dato.
+        "presetPorOmision": "metrico"
+        if "metrico" in catalogo.presets
+        else next(iter(catalogo.presets), ""),
+    }
 
 
 def _indice_de_nivel(
@@ -657,6 +739,12 @@ def crear_app(
         cerrar_log,
         methods=["POST"],
         response_model=RespuestaCerrarLog,
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/unidades",
+        catalogo_unidades,
+        methods=["GET"],
         dependencies=[Depends(verificar_token)],
     )
     return app

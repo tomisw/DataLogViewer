@@ -223,16 +223,27 @@ def detener_servidor_de_fondo(estado: ServidorDeFondo, *, timeout_s: float = 5.0
     estado.hilo.join(timeout=timeout_s)
 
 
-def _url_con_credenciales(url_frontend: str, info: ServidorArrancado) -> str:
-    """Anade `puerto_api` y `token` a `url_frontend` como parametros de
-    consulta, preservando los que ya tuviera la URL.
+def _url_con_credenciales(
+    url_frontend: str, info: ServidorArrancado, log: str | None = None
+) -> str:
+    """Anade `puerto_api`, `token` y (si lo hay) `log` a `url_frontend` como
+    parametros de consulta, preservando los que ya tuviera la URL.
 
     Ver la seccion "Donde va el token" en el docstring del modulo para la
     justificacion de esta via y sus implicaciones de seguridad.
+
+    `log` es el tercer parametro que `dlv-ui/src/main.ts` necesita para hablar
+    con el backend de verdad: con `puerto_api` y `token` pero sin `log`, el
+    frontend no sabe QUE abrir y cae a su fuente sintetica. Esa caida es
+    deliberada y util (permite trabajar en la interfaz sin log), pero sin este
+    parametro seria la unica opcion posible y la ventana nunca ensenaria un log
+    real.
     """
     partes = urllib.parse.urlsplit(url_frontend)
     consulta = urllib.parse.parse_qsl(partes.query)
     consulta += [("puerto_api", str(info.puerto)), ("token", info.token_sesion)]
+    if log is not None:
+        consulta.append(("log", log))
     return urllib.parse.urlunsplit(partes._replace(query=urllib.parse.urlencode(consulta)))
 
 
@@ -331,8 +342,13 @@ def detener_servidor_ui_de_fondo(estado: ServidorUiDeFondo, *, timeout_s: float 
     estado.servidor.server_close()
 
 
-def main(*, url_frontend: str | None = None) -> None:
+def main(*, url_frontend: str | None = None, log: str | None = None) -> None:
     """Arranca `dlv-api` y abre la ventana de `pywebview`.
+
+    `log` es la ruta del fichero a abrir. Sin ella, la ventana arranca con la
+    fuente sintetica del frontend: util para trabajar en la interfaz, pero no
+    es un log de verdad. Con ella, `dlv-ui` habla con `dlv-api` y abre ese
+    fichero -- que es el hito M1.
 
     Que frontend se abre, en orden (ver "Que frontend se abre" en el
     docstring del modulo para el porque de cada paso):
@@ -354,7 +370,7 @@ def main(*, url_frontend: str | None = None) -> None:
     try:
         if url_frontend is not None:
             webview.create_window(
-                "DataLogViewer", url=_url_con_credenciales(url_frontend, estado.info)
+                "DataLogViewer", url=_url_con_credenciales(url_frontend, estado.info, log)
             )
         else:
             directorio_dist = _detectar_dist_ui()
@@ -362,7 +378,7 @@ def main(*, url_frontend: str | None = None) -> None:
                 estado_ui = iniciar_ui_estatica_en_hilo(directorio_dist, host=HOST_LOCAL)
                 webview.create_window(
                     "DataLogViewer",
-                    url=_url_con_credenciales(estado_ui.url_base, estado.info),
+                    url=_url_con_credenciales(estado_ui.url_base, estado.info, log),
                 )
             else:
                 webview.create_window("DataLogViewer", html=_pagina_placeholder(estado.info))
