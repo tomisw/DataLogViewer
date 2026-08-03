@@ -148,8 +148,9 @@ v1.0 se va a ~67 semanas.
 | F1-39 | **Montaje de la aplicación**: unir renderizador, ejes, paneles, escalas, cursor, navegación y selectores en algo que se abre y funciona | componente | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 |
 | F1-40 | **Sesión de log abierto** en `dlv-api` y endpoint de **cubos de pirámide** por rango y nivel | módulo + pruebas | **Opus 5** | 8 | F1-21, F1-09, F1-11 | G2 |
 | F1-41 | Selector de **tipo de combustible** y factores de conversión editables | componente | Sonnet 5 | 3 | F1-14 | G3 |
+| F1-42 | **Apertura en < 4 s**: `construir_desde_polars` hace un `filter` por canal ×475 y se lleva 5,7 s de los 6,0 s | módulo + banco | **Opus 5** | 5 | F1-05, F1-40 | G2 |
 
-**Subtotal F1: 205 pts** · Hito **M1**
+**Subtotal F1: 210 pts** · Hito **M1**
 
 > **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
 > aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:
@@ -165,6 +166,12 @@ v1.0 se va a ~67 semanas.
 >   nivel para un rango, y un reparseo del fichero entero por petición.
 > - **F1-41** la pidió el propietario al revisar F1-14 (2026-08-03): poder
 >   cambiar el tipo de combustible o editar el factor a mano.
+> - **F1-42** la destapó el banco de F1-40 en cuanto hubo por fin un camino
+>   completo que medir: la primera apertura del log de 70 MB son 6,0 s frente a
+>   un presupuesto de 4,0 s, y **5,7 s de esos están en `construir_desde_polars`**
+>   (F1-05), que hace un `filter` por canal ×475. F1-05 no incumplía nada cuando
+>   se cerró porque nadie había medido todavía la apertura entera; es el
+>   presupuesto de §2.6 haciendo exactamente su trabajo.
 
 ## 5.5 Fase FG — Formatos y CSV genérico (semanas 10–12)
 
