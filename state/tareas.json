@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:48:05Z"
+    "actualizado": "2026-08-03 11:51:05Z"
   },
   "tareas": [
     {
@@ -1256,10 +1256,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "88c015d"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:51:05Z",
+          "texto": "Busqueda difusa por subsecuencia con programacion dinamica (no voraz: un escaneo voraz de cltmp en coolant temperature ata la primera t dentro de coolant). Busca por nombre, rol semantico e ID nativo (identidad en capas de ADR-008). Oculta inactivos de F1-07 pero SIEMPRE cuenta y explica el motivo: oculto porque esta constante es informacion, no aparecer es un error aparente. 36 pruebas."
+        }
+      ]
     },
     {
       "id": "F1-34",
