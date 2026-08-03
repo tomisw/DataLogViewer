@@ -81,6 +81,9 @@ jobs:
       - name: Spike de Polars
         run: uv run python tools/banco.py spike-polars
 
+      - name: Caché Parquet (segunda apertura)
+        run: uv run python tools/banco.py cache
+
       - name: Informe
         run: uv run python tools/banco.py informe
 

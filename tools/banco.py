@@ -113,9 +113,23 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
     Presupuesto(
         "segunda_apertura", "Segunda apertura desde la caché Parquet", "ms", 700.0, "<=", "F1"
     ),
-    Presupuesto("fps_pan_zoom", "Pan/zoom con 16 canales x 5 M puntos", "fps", 60.0, ">=", "F1"),
     Presupuesto(
-        "latencia_cursor", "Cursor hasta tabla de valores actualizada", "ms", 16.0, "<=", "F1"
+        "fps_pan_zoom",
+        "Pan/zoom con 16 canales x 5 M puntos",
+        "fps",
+        60.0,
+        ">=",
+        "F1",
+        "no medible en CI; requiere renderizador WebGL2 y GPU; se mide abriendo dlv-ui/banco-fps.html",
+    ),
+    Presupuesto(
+        "latencia_cursor",
+        "Cursor hasta tabla de valores actualizada",
+        "ms",
+        16.0,
+        "<=",
+        "F1",
+        "no medible en CI; requiere interfaz interactiva",
     ),
     Presupuesto(
         "panzoom_cubos_nuevos",
@@ -124,8 +138,17 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
         120.0,
         "<=",
         "F1",
+        "no medible en CI; requiere backend renderizado",
     ),
-    Presupuesto("cambio_unidad", "Cambio de unidad con 8 logs abiertos", "ms", 100.0, "<=", "F1"),
+    Presupuesto(
+        "cambio_unidad",
+        "Cambio de unidad con 8 logs abiertos",
+        "ms",
+        100.0,
+        "<=",
+        "F1",
+        "no medible en CI; requiere interfaz completa (F1-31)",
+    ),
     Presupuesto(
         "memoria_residente",
         "Memoria residente con el log de 66 MB abierto",
