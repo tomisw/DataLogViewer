@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-03 11:56:23Z
+Actualizado: 2026-08-03 11:57:25Z
 
-**135 / 669 pts cerrados (20.2 %)** · 88 pts esperando revisión humana → 33.3 % entregado
+**140 / 669 pts cerrados (20.9 %)** · 88 pts esperando revisión humana → 34.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 105 | 56 | 0 | 25 | 0 | 186 |
+| F1 | 110 | 56 | 0 | 20 | 0 | 186 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -60,7 +60,7 @@ Actualizado: 2026-08-03 11:56:23Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 161/186 pts
+## F1 — 166/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -91,7 +91,7 @@ Actualizado: 2026-08-03 11:56:23Z
 | ✔  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | `2f707a6` |
 | ·  | `F1-26` | Paneles apilados con eje X compartido y arrastrar canales entr | Sonnet 5 | 5 | F1-25 | G3 | — |
 | ·  | `F1-27` | Múltiples ejes Y, autoescala y bloqueo de escala | Sonnet 5 | 4 | F1-25 | G3 | — |
-| ·  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | — |
+| ✔  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | `b066759` |
 | ✔  | `F1-29` | Cursor con tabla de valores, presupuesto < 16 ms | Sonnet 5 | 4 | F1-24 | G3 | `b3057b4` |
 | ·  | `F1-30` | Doble cursor con delta usando la clase intervalo | Opus 5 | 4 | F1-29, F1-13 | G1 | — |
 | ✔  | `F1-31` | Selector de unidad a tres niveles (global, dimensión, canal) c | Sonnet 5 | 5 | F1-17 | G3 | `2f707a6` |

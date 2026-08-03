@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:56:23Z"
+    "actualizado": "2026-08-03 11:57:25Z"
   },
   "tareas": [
     {
@@ -1161,10 +1161,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "b066759"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:57:25Z",
+          "texto": "Zoom por rueda centrado EN EL PUNTERO (probado: el punto bajo el cursor no se mueve en ninguno de los dos ejes), arrastre con pointer events y setPointerCapture, teclado con pan/zoom/ver todo, e historial que agrupa por gesto y no por evento (40 vueltas de rueda son un paso, no 40). Emite como mucho una Vista por fotograma via rAF. Expone la direccion del pan, que es el enganche que pedia el hallazgo de F1-24. 31 pruebas. DECISION SUYA QUE CONVIENE MIRAR: la rueda y +/- amplian solo el eje de tiempo, no el de valor, para no adelantarse a la autoescala y el bloqueo de F1-27; el arrastre y las flechas si mueven el eje de valor. Esta documentado en la cabecera de controlador.ts y es reversible."
+        }
+      ]
     },
     {
       "id": "F1-29",
