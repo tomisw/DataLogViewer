@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 14:45:11Z"
+    "actualizado": "2026-08-03 14:58:49Z"
   },
   "tareas": [
     {
@@ -1505,10 +1505,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "128ca89"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 14:58:49Z",
+          "texto": "Sesion de log abierto (POST /comandos/abrir-log, /cubos, /cerrar-log, GET /sesiones) y cubos de piramide en Arrow IPC con las cinco columnas que espera CubosContinuos. Tope de 8 sesiones, que es lo que pide §2.6. La cache va a ~/.dlv/cache y NUNCA junto al log: habria escrito en samples/real/. MEDIDO: 2a apertura 327 ms (presupuesto 700, CUMPLE); 8 canales de cubos en un fotograma 37 ms (presupuesto 120 p95, CUMPLE); sesion ya abierta 26 ms. DOS HALLAZGOS QUE NO SON DE ESTE COMMIT Y NO SE HAN TOCADO: (1) la PRIMERA apertura son 6,0 s frente a un presupuesto de 4,0 s, y 5,7 s de esos estan en construir_desde_polars de F1-05, que hace un filter+to_numpy por canal x475; es el siguiente cuello de botella de M1. (2) un log abierto ocupa 165 MB = 2,36x el CSV en valores + piramides, asi que ocho logs son ~1,3 GB; la medicion de memoria_residente que la puerta usa mide SOLO el parseo y por tanto subestima el uso real. 38 pruebas nuevas, incluida una que compara el recorte por rango contra la definicion de solape escrita a mano cubo a cubo."
+        }
+      ]
     },
     {
       "id": "F1-41",
