@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 12:08:12Z"
+    "actualizado": "2026-08-03 12:13:07Z"
   },
   "tareas": [
     {
@@ -1121,10 +1121,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "5597b6c"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 12:13:07Z",
+          "texto": "N paneles apilados con eje X compartido y arrastre de canales entre paneles con pointer events y setPointerCapture. EL INVARIANTE ESTA PROTEGIDO ESTRUCTURALMENTE: el ancho de contenido se mide UNA vez del contenedor y se aplica a los N paneles, en vez de que cada uno mida el suyo; hay pruebas de que sigue siendo identico tras construir, tras arrastrar un divisor y tras redimensionar el contenedor, que son las tres operaciones que podrian desincronizarlo. El agente encontro y arreglo un fallo propio a mitad: el reparto de alturas volcaba el resto del redondeo en el ultimo panel libre y podia devolverlo por debajo del minimo; lo cambio por llenado por niveles y dejo prueba de regresion. 51 pruebas. NO HECHO, declarado: reordenar canales DENTRO de un panel por posicion de pixel; al soltar sobre el propio panel se reañade al final."
+        }
+      ]
     },
     {
       "id": "F1-27",
