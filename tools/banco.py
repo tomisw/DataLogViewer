@@ -38,6 +38,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import tomllib
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -59,7 +60,51 @@ INFORME = BANCO / "INFORME.md"
 SINTETICO_1H = RAIZ / "samples" / "synth" / "autolog-1h.csv"
 REAL_AUTOLOG = RAIZ / "samples" / "real" / "AutoLog_20260729_1830.csv"
 
-Estado = Literal["CUMPLE", "INCUMPLE", "NO_MEDIBLE"]
+Estado = Literal["CUMPLE", "INCUMPLE", "NO_MEDIBLE", "ACEPTADO"]
+
+DESVIACIONES = RAIZ / "data" / "desviaciones_aceptadas.toml"
+"""Incumplimientos que el propietario ha mirado y aceptado, con un techo.
+
+Ver la cabecera del propio fichero. Lo importante para leer este módulo: una
+desviación aceptada NO cambia el presupuesto —el límite de §2.6 se sigue
+comparando contra la medida real y el informe la sigue enseñando en rojo— sino
+que evita que tumbe la puerta de CI mientras no EMPEORE. En cuanto supera
+`peor_aceptado`, vuelve a INCUMPLE.
+"""
+
+
+def _desviaciones_aceptadas() -> dict[str, dict[str, Any]]:
+    """El fichero de desviaciones, o vacío si no existe.
+
+    Que falte es un caso normal (un repositorio sin ninguna desviación
+    aceptada), no un error: se devuelve vacío y todo incumplimiento tumba la
+    puerta, que es el comportamiento por omisión y el más estricto.
+    """
+    if not DESVIACIONES.is_file():
+        return {}
+    with DESVIACIONES.open("rb") as fh:
+        return {k: v for k, v in tomllib.load(fh).items() if isinstance(v, dict)}
+
+
+def aplicar_aceptacion(id_presupuesto: str, estado: Estado, valor: float) -> Estado:
+    """INCUMPLE -> ACEPTADO si el propietario lo aceptó y no ha empeorado.
+
+    El sentido de la comparación es el del presupuesto: para un `<=` (memoria,
+    tiempos) empeorar es subir, y para un `>=` (rendimiento) empeorar es bajar.
+    Cablear "empeorar es subir" habría convertido la aceptación de un
+    presupuesto de rendimiento en un permiso permanente.
+    """
+    if estado != "INCUMPLE":
+        return estado
+    entrada = _desviaciones_aceptadas().get(id_presupuesto)
+    if entrada is None:
+        return estado
+    techo = float(entrada["peor_aceptado"])
+    presupuesto = POR_ID.get(id_presupuesto)
+    if presupuesto is None:
+        return estado
+    dentro = valor <= techo if presupuesto.comparador == "<=" else valor >= techo
+    return "ACEPTADO" if dentro else "INCUMPLE"
 
 
 # --------------------------------------------------------------------------- #
@@ -876,8 +921,22 @@ def cmd_adr009(_args: argparse.Namespace) -> int:
 # presupuestos / comprobar / informe
 # --------------------------------------------------------------------------- #
 def _tabla_estado() -> list[tuple[Presupuesto, dict[str, Any] | None]]:
+    """Los presupuestos con su última medida y el estado EFECTIVO.
+
+    La aceptación se aplica aquí, al leer, y no al medir: el registro de
+    `state/banco/mediciones.json` guarda lo que se midió de verdad
+    (`estado`), y `estado_efectivo` es lo que decide la puerta. Así, si algún
+    día se retira la aceptación, el histórico no está contaminado con un
+    "ACEPTADO" que ya no lo es.
+    """
     ultima = ultima_por_presupuesto()
-    return [(p, ultima.get(p.id)) for p in PRESUPUESTOS]
+    salida: list[tuple[Presupuesto, dict[str, Any] | None]] = []
+    for p in PRESUPUESTOS:
+        m = ultima.get(p.id)
+        if m is not None:
+            m = {**m, "estado_efectivo": aplicar_aceptacion(p.id, m["estado"], m["valor"])}
+        salida.append((p, m))
+    return salida
 
 
 def cmd_presupuestos(_args: argparse.Namespace) -> int:
@@ -890,23 +949,43 @@ def cmd_presupuestos(_args: argparse.Namespace) -> int:
         else:
             val = f"{m['valor']:.2f} {m['unidad']}"
             extra = " (línea base)" if m["detalle"].get("es_linea_base") else ""
-            print(f"{p.id:30s} {lim:>14s}  {val:>12s}  {m['estado']}{extra}")
+            if m["estado_efectivo"] == "ACEPTADO":
+                extra += f" (incumple, aceptado; techo {_desviaciones_aceptadas()[p.id]['peor_aceptado']})"
+            print(f"{p.id:30s} {lim:>14s}  {val:>12s}  {m['estado_efectivo']}{extra}")
     return 0
 
 
 def cmd_comprobar(_args: argparse.Namespace) -> int:
-    """Puerta de CI. Falla SOLO con INCUMPLE: lo no medible no rompe nada."""
-    incumplen = [(p, m) for p, m in _tabla_estado() if m is not None and m["estado"] == "INCUMPLE"]
+    """Puerta de CI. Falla SOLO con INCUMPLE: lo no medible no rompe nada.
+
+    Una desviación ACEPTADA tampoco la tumba, pero se imprime igualmente y con
+    su techo delante: aceptada no es lo mismo que resuelta, y una aceptación
+    que deja de verse se convierte en una que nadie recuerda.
+    """
+    tabla = _tabla_estado()
+    incumplen = [(p, m) for p, m in tabla if m is not None and m["estado_efectivo"] == "INCUMPLE"]
+    aceptadas = [(p, m) for p, m in tabla if m is not None and m["estado_efectivo"] == "ACEPTADO"]
+
     for p, m in incumplen:
         print(
             f"✖ {p.id}: {m['valor']:.2f} {m['unidad']}, "
             f"presupuesto {p.comparador} {p.limite:g} — {p.descripcion}"
         )
+    for p, m in aceptadas:
+        techo = _desviaciones_aceptadas()[p.id]["peor_aceptado"]
+        print(
+            f"~ {p.id}: {m['valor']:.2f} {m['unidad']}, incumple el presupuesto "
+            f"{p.comparador} {p.limite:g} pero está ACEPTADO por el propietario "
+            f"(techo {techo}; si empeora de ahí, vuelve a fallar) — {p.descripcion}"
+        )
     if incumplen:
         print(f"\n{len(incumplen)} presupuesto(s) incumplido(s).")
         return 1
-    medidos = sum(1 for _, m in _tabla_estado() if m and m["estado"] == "CUMPLE")
-    print(f"Sin presupuestos incumplidos. {medidos}/{len(PRESUPUESTOS)} medidos y en verde.")
+    medidos = sum(1 for _, m in tabla if m and m["estado_efectivo"] == "CUMPLE")
+    sufijo = f", {len(aceptadas)} desviación(es) aceptada(s)" if aceptadas else ""
+    print(
+        f"Sin presupuestos incumplidos. {medidos}/{len(PRESUPUESTOS)} medidos y en verde{sufijo}."
+    )
     return 0
 
 
@@ -929,10 +1008,19 @@ def cmd_informe(_args: argparse.Namespace) -> int:
             L.append(f"| {p.descripcion} | {lim} | {p.fase} | — | sin medir |")
         else:
             extra = " *(línea base)*" if m["detalle"].get("es_linea_base") else ""
-            simbolo = {"CUMPLE": "✔", "INCUMPLE": "✖", "NO_MEDIBLE": "·"}[m["estado"]]
+            # El informe enseña el estado EFECTIVO, pero una desviación
+            # aceptada sale con «✖ … ACEPTADO» y no con un ✔: sigue
+            # incumpliendo el presupuesto de §2.6 y el informe es justo el sitio
+            # donde eso no puede desaparecer de la vista.
+            simbolo = {"CUMPLE": "✔", "INCUMPLE": "✖", "NO_MEDIBLE": "·", "ACEPTADO": "✖"}[
+                m["estado_efectivo"]
+            ]
+            if m["estado_efectivo"] == "ACEPTADO":
+                techo = _desviaciones_aceptadas()[p.id]["peor_aceptado"]
+                extra += f" *(aceptado por el propietario; techo {techo})*"
             L.append(
                 f"| {p.descripcion} | {lim} | {p.fase} "
-                f"| {m['valor']:.2f} {m['unidad']}{extra} | {simbolo} {m['estado']} |"
+                f"| {m['valor']:.2f} {m['unidad']}{extra} | {simbolo} {m['estado_efectivo']} |"
             )
     L.append("")
 

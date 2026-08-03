@@ -160,12 +160,96 @@ def test_dlv_core_cumple_adr009_ahora_mismo() -> None:
 # --------------------------------------------------------------------------- #
 def test_no_medible_no_puede_fallar_la_compilacion() -> None:
     """Es la propiedad que permite tener el banco activo desde F0 con la mayoría
-    de los presupuestos sin implementar todavía."""
-    estados = {"CUMPLE", "INCUMPLE", "NO_MEDIBLE"}
-    assert estados == {"CUMPLE", "INCUMPLE", "NO_MEDIBLE"}
-    # `comprobar` filtra por INCUMPLE exclusivamente; se comprueba leyendo el
-    # criterio desde el propio módulo para que un cambio en él rompa la prueba.
+    de los presupuestos sin implementar todavía.
+
+    La comprobación es sobre el texto del módulo porque lo que se protege es el
+    CRITERIO de la puerta, no un resultado concreto: cualquier medición real
+    depende de la máquina. La cadena buscada cambió al añadir las desviaciones
+    aceptadas (`estado` -> `estado_efectivo`); lo que no puede cambiar es que se
+    filtre por un único estado y que ese estado sea INCUMPLE.
+    """
     fuente = (RAIZ / "tools" / "banco.py").read_text(encoding="utf-8")
-    assert 'm["estado"] == "INCUMPLE"' in fuente, (
+    assert 'm["estado_efectivo"] == "INCUMPLE"' in fuente, (
         "la puerta de CI ya no filtra exclusivamente por INCUMPLE"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Desviaciones aceptadas por el propietario
+# --------------------------------------------------------------------------- #
+# Lo que se protege aquí es que una aceptación NO se convierta en una barra
+# libre. Aceptar un incumplimiento es una decisión legítima del propietario;
+# dejar de vigilarlo a partir de ese momento no lo es, porque así es como se
+# pierde un presupuesto: no de golpe, sino empeorando un poco cada semana.
+def test_una_desviacion_aceptada_no_tumba_la_puerta() -> None:
+    assert banco.aplicar_aceptacion("memoria_residente", "INCUMPLE", 4.30) == "ACEPTADO"
+
+
+def test_pero_si_empeora_vuelve_a_fallar() -> None:
+    """El trinquete. Sin esto, aceptar 4,30x autorizaría 8x."""
+    assert banco.aplicar_aceptacion("memoria_residente", "INCUMPLE", 4.31) == "INCUMPLE"
+
+
+def test_la_aceptacion_es_por_presupuesto_y_no_general() -> None:
+    """Aceptar la memoria no puede silenciar el parseo."""
+    assert banco.aplicar_aceptacion("parseo_nativo", "INCUMPLE", 10.0) == "INCUMPLE"
+
+
+def test_no_convierte_en_aceptado_lo_que_ya_cumplia() -> None:
+    assert banco.aplicar_aceptacion("memoria_residente", "CUMPLE", 3.0) == "CUMPLE"
+    assert banco.aplicar_aceptacion("memoria_residente", "NO_MEDIBLE", 0.0) == "NO_MEDIBLE"
+
+
+def test_el_sentido_de_empeorar_depende_del_comparador() -> None:
+    """Para un presupuesto de rendimiento (`>=`) empeorar es BAJAR.
+
+    Cablear «empeorar es subir» habría convertido la aceptación de un
+    presupuesto de rendimiento en un permiso permanente: cualquier valor por
+    debajo del techo habría contado como aceptado.
+    """
+    presupuestos_por_id = {p.id: p for p in banco.PRESUPUESTOS}
+    assert presupuestos_por_id["memoria_residente"].comparador == "<="
+    assert presupuestos_por_id["parseo_nativo"].comparador == ">="
+
+    # Se comprueba con el fichero real: la memoria (`<=`) acepta hasta 4,30 y
+    # rechaza 4,31. La rama `>=` se comprueba por construcción del código,
+    # porque hoy no hay ninguna desviación aceptada de un presupuesto `>=` — y
+    # que no la haya es justo lo que se quiere.
+    aceptadas = banco._desviaciones_aceptadas()
+    for id_, entrada in aceptadas.items():
+        p = presupuestos_por_id[id_]
+        techo = float(entrada["peor_aceptado"])
+        justo = banco.aplicar_aceptacion(id_, "INCUMPLE", techo)
+        peor = techo * (1.01 if p.comparador == "<=" else 0.99)
+        assert justo == "ACEPTADO", f"{id_}: el propio techo debería estar aceptado"
+        assert banco.aplicar_aceptacion(id_, "INCUMPLE", peor) == "INCUMPLE", (
+            f"{id_}: empeorar respecto al techo tiene que volver a fallar"
+        )
+
+
+def test_toda_desviacion_aceptada_esta_documentada() -> None:
+    """Una aceptación sin motivo escrito es indistinguible de un descuido.
+
+    Es la misma exigencia que `data/umbrales.toml` para un umbral: el valor sin
+    la razón no se puede revisar, y estas entradas las firma el propietario.
+    """
+    for id_, entrada in banco._desviaciones_aceptadas().items():
+        assert id_ in {p.id for p in banco.PRESUPUESTOS}, f"{id_} no es un presupuesto"
+        for campo in ("peor_aceptado", "motivo", "fecha", "decidido_por"):
+            assert entrada.get(campo), f"{id_}: falta '{campo}'"
+        assert len(str(entrada["motivo"]).strip()) > 80, (
+            f"{id_}: el motivo es demasiado corto para poder revisarlo"
+        )
+
+
+def test_el_informe_no_enseña_una_desviacion_aceptada_como_verde() -> None:
+    """Aceptada no es cumplida.
+
+    El informe es el sitio donde alguien mira para saber cómo va el proyecto;
+    si una desviación aceptada saliera con un ✔, en tres meses nadie recordaría
+    que sigue incumpliendo el presupuesto de §2.6.
+    """
+    fuente = (RAIZ / "tools" / "banco.py").read_text(encoding="utf-8")
+    assert '"ACEPTADO": "✖"' in fuente, (
+        "el informe está a punto de enseñar una desviación aceptada como cumplida"
     )

@@ -1,0 +1,52 @@
+# Desviaciones de presupuesto aceptadas por el propietario.
+#
+# QUÉ ES ESTE FICHERO Y QUÉ NO ES
+# ================================
+# NO es una forma de ajustar un presupuesto para que pase. Eso está prohibido
+# (docs/09 §9.11) y sigue estándolo: el límite de `docs/02` §2.6 no se toca y
+# `tools/banco.py` lo sigue comparando contra la medida real.
+#
+# Lo que hace es distinto: registra que el propietario ha MIRADO un
+# incumplimiento concreto, lo ha aceptado por ahora, y ha fijado un techo. La
+# medida sigue en rojo en el informe; lo que deja de hacer es tumbar la puerta
+# de CI. La alternativa era peor de las dos maneras posibles:
+#
+#   - Subir el límite: se pierde la señal. Si mañana la memoria sube de 4,30x a
+#     4,49x, nadie se entera.
+#   - Dejarlo rojo para siempre: `verificar.py` dice «NO commitear» en cada
+#     ejecución y en dos semanas todo el mundo ha aprendido a ignorarlo. Una
+#     puerta que siempre está en rojo no es una puerta.
+#
+# EL TRINQUETE
+# ============
+# `peor_aceptado` es un techo, no un permiso. Mientras la medida no lo supere,
+# el estado es ACEPTADO y la puerta pasa. En cuanto lo supere —aunque siga por
+# debajo de lo que alguien considere "razonable"— vuelve a INCUMPLE y la
+# compilación falla. Así una aceptación no se convierte en una barra libre para
+# empeorar poco a poco, que es como se pierden todos los presupuestos.
+#
+# Cada entrada la firma el propietario. Un modelo no añade entradas aquí por su
+# cuenta: es exactamente la misma clase de decisión que cambiar un umbral por
+# omisión, y está en la misma lista de cosas que no se hacen sin preguntar.
+
+[memoria_residente]
+peor_aceptado = 4.30
+unidad = "x CSV"
+fecha = "2026-08-03"
+decidido_por = "propietario"
+motivo = """
+Riesgo R9 (docs/02 §2.8), medido en F0-01 y mitigado en F1-02.
+
+Partió de 4,42x y bajó a 4,30x aplicando las dos mitigaciones que pedía la nota
+de F0-01: proyectar cada canal a Int32 en vez del Int64 por omisión de Polars, y
+saltarse la cabecera con `skip_rows` en lugar de `datos[offset:]`, que copiaba
+unos 70 MB del cuerpo antes de que Polars viera un byte.
+
+Lo que queda son ~55 MB fijos de intérprete + Polars + NumPy sobre un CSV de
+70 MB, así que el cociente lo domina el coste fijo y no el del log: con un log
+más grande el múltiplo baja solo. Bajar de 3,5x pide lectura en streaming o
+descartar columnas antes de materializarlas, y eso es trabajo de fase posterior.
+
+Decisión del propietario (2026-08-03): «Acepto ese consumo de memoria, ya
+veremos más adelante cómo mejorarlo». El presupuesto de §2.6 NO se ha cambiado.
+"""
