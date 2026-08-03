@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:57:25Z"
+    "actualizado": "2026-08-03 12:08:12Z"
   },
   "tareas": [
     {
@@ -1141,10 +1141,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "e145838"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 12:08:12Z",
+          "texto": "Ejes Y independientes por unidad/rango; produce el vistaPorSerie que Renderizador.dibujar ya esperaba (la puerta que F1-23 dejo abierta a proposito). Autoescala con margen y bloqueo de escala, que es lo que permite comparar dos tramos sin que el ojo se engañe. El modo (autoescala/bloqueado) va SIEMPRE en el titulo del eje: un bloqueo invisible es peor que no tenerlo. Casos degenerados resueltos: canal constante usa margen absoluto por orden de magnitud (nunca v0==v1) y canal todo nulo conserva el ultimo rango bueno. 36 pruebas. PENDIENTE DE INTEGRACION: quien monte el panel real tiene que instanciar GestorEscalas y pasar tituloConModo a ConfiguracionEjes de F1-25."
+        }
+      ]
     },
     {
       "id": "F1-28",
@@ -1264,10 +1271,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "haiku",
+      "commits": [
+        "e145838"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 12:08:12Z",
+          "texto": "Locale ES/EN con Intl. El agente entrego un modulo correcto y SIN USUARIOS, y al integrarlo aparecio el problema de fondo: habia CUATRO formateadores de numero, uno por carril de trabajo, y no coincidian (la tabla del cursor ponia punto decimal y los ejes coma, en la misma ventana). Unificado por mi en src/locale/numerico.ts; los otros tres delegan. DECISION QUE PUEDES QUERER REVISAR: no se agrupan los miles por omision, porque en español el separador de miles es el punto y un lector ingles puede leer 4.000 rpm como cuatro; el riesgo es asimetrico. El banco cazo una regresion mia (Intl construido por llamada: 138 ms -> 5,3 s) y se arreglo memorizando los formateadores."
+        }
+      ]
     },
     {
       "id": "F1-33",
