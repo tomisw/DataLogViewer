@@ -24,10 +24,25 @@ import io
 import numpy as np
 import polars as pl
 
-__all__ = ["arrow_ipc_a_serie", "serie_a_arrow_ipc"]
+__all__ = [
+    "COLUMNAS_CUBOS",
+    "arrow_ipc_a_cubos",
+    "arrow_ipc_a_serie",
+    "cubos_a_arrow_ipc",
+    "serie_a_arrow_ipc",
+]
 
 MEDIA_TYPE_ARROW_IPC = "application/vnd.apache.arrow.stream"
 """Tipo MIME de la respuesta binaria; lo usa `dlv-api` en la cabecera HTTP."""
+
+COLUMNAS_CUBOS: tuple[str, ...] = ("t", "minimo", "maximo", "primero", "ultimo")
+"""Columnas de un lote de cubos `CONTINUO`, en orden.
+
+Son exactamente los campos de `CubosContinuos` en `dlv-ui/src/render/tipos.ts`
+(menos `tOrigen` y `factor`, que son escalares y viajan en cabeceras HTTP, no
+en el cuerpo binario). El orden importa: el frontend puede leer las columnas
+por posición sin buscarlas por nombre.
+"""
 
 
 def serie_a_arrow_ipc(t: np.ndarray, v: np.ndarray) -> bytes:
@@ -52,3 +67,50 @@ def arrow_ipc_a_serie(datos: bytes) -> tuple[np.ndarray, np.ndarray]:
     """
     tabla = pl.read_ipc(io.BytesIO(datos))
     return tabla["t"].to_numpy(), tabla["v"].to_numpy()
+
+
+def cubos_a_arrow_ipc(
+    t: np.ndarray,
+    minimo: np.ndarray,
+    maximo: np.ndarray,
+    primero: np.ndarray,
+    ultimo: np.ndarray,
+) -> bytes:
+    """Serializa un lote de cubos `CONTINUO` a bytes Arrow IPC (stream).
+
+    Cinco columnas en el orden de `COLUMNAS_CUBOS`, que es el contrato de
+    `CubosContinuos` del frontend. Los dos escalares que ese contrato pide
+    además (`tOrigen` y `factor`) NO van aquí: viajan en cabeceras HTTP,
+    igual que ya hace `/comandos/serie` con la dimensión y el factor de
+    conversión, para no mezclar JSON y binario en un mismo cuerpo (ADR-007).
+
+    Esta función no impone dtypes: los pone quien llama. Lo natural es
+    `float32` en las cinco columnas -- es lo que acaba en la GPU y lo que
+    `CubosContinuos` declara-- y `t` ya restado su origen, porque un
+    `float32` con el instante absoluto de un log de 8 h pierde los dígitos
+    que importan (ver el comentario de `CubosContinuos.t`).
+    """
+    if not (len(t) == len(minimo) == len(maximo) == len(primero) == len(ultimo)):
+        raise ValueError(
+            "las cinco columnas de cubos deben tener la misma longitud: "
+            f"t={len(t)}, minimo={len(minimo)}, maximo={len(maximo)}, "
+            f"primero={len(primero)}, ultimo={len(ultimo)}"
+        )
+    tabla = pl.DataFrame(
+        {"t": t, "minimo": minimo, "maximo": maximo, "primero": primero, "ultimo": ultimo}
+    )
+    buffer = io.BytesIO()
+    tabla.write_ipc(buffer)
+    return buffer.getvalue()
+
+
+def arrow_ipc_a_cubos(datos: bytes) -> dict[str, np.ndarray]:
+    """Inversa de `cubos_a_arrow_ipc`: bytes Arrow IPC -> columna por nombre.
+
+    Devuelve un diccionario y no una tupla de cinco arrays a propósito: cinco
+    posiciones sin nombre son cinco oportunidades de intercambiar `minimo` con
+    `maximo` en la línea que las desempaqueta, y ese error no se nota hasta que
+    alguien mira un gráfico y lo cree.
+    """
+    tabla = pl.read_ipc(io.BytesIO(datos))
+    return {columna: tabla[columna].to_numpy() for columna in COLUMNAS_CUBOS}
