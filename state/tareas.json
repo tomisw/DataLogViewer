@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 14:59:20Z"
+    "actualizado": "2026-08-03 18:44:37Z"
   },
   "tareas": [
     {
@@ -1481,10 +1481,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "e918085"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 18:44:37Z",
+          "texto": "La aplicacion existe: paquete de 1,36 kB a 63,9 kB, de 3 a 36 modulos. Une renderizador, cache, ejes, paneles, escalas, cursor, navegacion, unidades, canales y locale. El acceso a datos va detras de la interfaz FuenteDeDatos con dos implementaciones (sintetica y API esbozada), que es lo que evito que quedara bloqueada esperando a F1-40. Un solo ControladorDeNavegacion para todos los paneles: es lo que garantiza el eje X compartido. app/conversion-demo.ts es un sustituto TEMPORAL de la conversion de unidad, etiquetado, con factores de mentira y sin copiar data/units.toml. AVISO: el agente cayo por limite de sesion antes de abrir la pagina. Verificado por mi que compila y que las 384 pruebas pasan; NO verificado visualmente por nadie todavia. PENDIENTE: cablear FuenteApi contra los endpoints reales de F1-40."
+        }
+      ]
     },
     {
       "id": "F1-40",

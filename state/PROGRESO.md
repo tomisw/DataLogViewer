@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-03 14:59:20Z
+Actualizado: 2026-08-03 18:44:37Z
 
-**162 / 693 pts cerrados (23.4 %)** · 92 pts esperando revisión humana → 36.7 % entregado
+**170 / 693 pts cerrados (24.5 %)** · 92 pts esperando revisión humana → 37.8 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 132 | 60 | 0 | 18 | 0 | 210 |
+| F1 | 140 | 60 | 0 | 10 | 0 | 210 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -61,7 +61,7 @@ Actualizado: 2026-08-03 14:59:20Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 192/210 pts
+## F1 — 200/210 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -103,7 +103,7 @@ Actualizado: 2026-08-03 14:59:20Z
 | ✔  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | `b01e52e` |
 | ✔  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | `1bd6e64` |
 | ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
-| ·  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | — |
+| ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `e918085` |
 | ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | `128ca89` |
 | ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | `5c8068d` |
 | ·  | `F1-42` | Apertura en < 4 s: `construir_desde_polars` hace un `filter` p | Opus 5 | 5 | F1-05, F1-40 | G2 | — |
