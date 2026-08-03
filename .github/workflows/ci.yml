@@ -33,12 +33,14 @@ jobs:
         run: uv run pytest -q
 
       # F1-35: el `.spec` de PyInstaller (empaquetado `onedir` de dlv-app,
-      # ADR-002) no se ejecuta en CI -- PyInstaller no es una dependencia
-      # instalada del proyecto todavía, y generar el paquete real (medir
-      # arranque en frío y tamaño contra docs/02-alcance-y-plan.md §2.6) es
-      # trabajo de F5-01, no de esta tarea. Esta comprobación es deliberada-
-      # mente barata: solo confirma que el fichero sigue siendo Python
-      # sintácticamente válido, para detectar una errata antes de F5-01.
+      # ADR-002) no se ejecuta en CI. PyInstaller ya es dependencia de
+      # desarrollo, así que el motivo ya no es ese: es que generar el paquete
+      # real y medirlo (arranque en frío y tamaño contra
+      # docs/02-alcance-y-plan.md §2.6) es trabajo de F5-01, y hacerlo en cada
+      # push costaría varios minutos por plataforma para comprobar algo que
+      # todavía no tiene presupuesto exigible. Esta comprobación es
+      # deliberadamente barata: solo confirma que el fichero sigue siendo
+      # Python sintácticamente válido, para detectar una errata antes de F5-01.
       - name: Sintaxis del .spec de PyInstaller (dlv-app)
         run: uv run python -m py_compile dlv-app/dlv_app.spec
 
@@ -114,6 +116,26 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: dlv-ui
+
+      # F1-37. Sin estas dos líneas, `dlv-ui` solo compilaba en CI: las pruebas
+      # y los bancos existían y no los ejecutaba nadie, que es la misma
+      # situación que no tenerlos.
+      - name: Test
+        run: npm test
+        working-directory: dlv-ui
+
+      # Bancos de CPU de F1-23 y F1-24. Miden la MITAD de los presupuestos de
+      # §2.6 que no necesita GPU —el trabajo de JavaScript por fotograma y el
+      # coste de buscar el valor del cursor— y fallan si se pasan. La otra
+      # mitad (fps reales, coste del DOM) necesita navegador con GPU y NO se
+      # mide aquí: un navegador sin cabeza mediría su renderizador por
+      # software y daría un número tranquilizador y falso. Se mide abriendo
+      # `dlv-ui/banco-fps.html`, y hasta que alguien lo abra ese presupuesto
+      # está NO MEDIDO, que no es lo mismo que verde (docs/08 §8.10).
+      - name: Bancos de CPU del frontend
+        run: npm run banco
+        working-directory: dlv-ui
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:

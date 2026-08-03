@@ -120,7 +120,7 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
         60.0,
         ">=",
         "F1",
-        "no medible en CI; requiere renderizador WebGL2 y GPU; se mide abriendo dlv-ui/banco-fps.html",
+        "medido a medias. La mitad de CPU (trabajo de JavaScript por fotograma) SÍ es puerta de CI: `npm run banco` en dlv-ui, con 0,010 ms/fotograma frente a 2 ms de presupuesto. La mitad de GPU (fps reales) necesita navegador con GPU y se mide abriendo dlv-ui/banco-fps.html; no se automatiza porque un navegador sin cabeza mide su renderizador por software y daría un número tranquilizador y falso",
     ),
     Presupuesto(
         "latencia_cursor",
@@ -129,7 +129,7 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
         16.0,
         "<=",
         "F1",
-        "no medible en CI; requiere interfaz interactiva",
+        "medido a medias. La búsqueda del valor SÍ es puerta de CI desde F1-24 (`npm run banco` en dlv-ui: 0,0059 ms de media con 16 canales). Falta el coste de pintar la tabla en el DOM, que es lo caro de verdad y necesita navegador",
     ),
     Presupuesto(
         "panzoom_cubos_nuevos",
