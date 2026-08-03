@@ -145,8 +145,26 @@ v1.0 se va a ~67 semanas.
 | F1-36 | *Fuzzing* de propiedad sobre cabecera y filas (Hypothesis) | suite de pruebas | **Opus 5** | 4 | F1-03, F0-06 | G2 |
 | F1-37 | Presupuestos de F1 como puertas de CI, incluido el de cambio de unidad | configuración del banco | Haiku 4.5 | 2 | F0-04, F1-23 | G4 |
 | F1-38 | Confirmar los **21 tipos `unknown`** con análisis de datos y evidencia documentada | datos + informe | **Opus 5** | 5 | F0-09 | **G1** |
+| F1-39 | **Montaje de la aplicación**: unir renderizador, ejes, paneles, escalas, cursor, navegación y selectores en algo que se abre y funciona | componente | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 |
+| F1-40 | **Sesión de log abierto** en `dlv-api` y endpoint de **cubos de pirámide** por rango y nivel | módulo + pruebas | **Opus 5** | 8 | F1-21, F1-09, F1-11 | G2 |
+| F1-41 | Selector de **tipo de combustible** y factores de conversión editables | componente | Sonnet 5 | 3 | F1-14 | G3 |
 
-**Subtotal F1: 186 pts** · Hito **M1**
+**Subtotal F1: 205 pts** · Hito **M1**
+
+> **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
+> aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:
+>
+> - **F1-39** es el hueco entre «las 38 tareas de F1 hechas» y «M1 alcanzado».
+>   Cada tarea de interfaz construyó su pieza y ninguna tenía asignada la
+>   costura, así que `dlv-ui/src/main.ts` seguía siendo el «hola, dlv-api» de
+>   F0-02 con 343 pruebas verdes detrás. Es la lección que deja F1 para las
+>   fases siguientes: **un backlog de piezas necesita una tarea de montaje**, o
+>   el hito no se alcanza aunque el contador de puntos diga que sí.
+> - **F1-40** salió de comparar lo que `/comandos/serie` (F1-22) devuelve con lo
+>   que el renderizador (F1-23) consume: series completas frente a cubos de un
+>   nivel para un rango, y un reparseo del fichero entero por petición.
+> - **F1-41** la pidió el propietario al revisar F1-14 (2026-08-03): poder
+>   cambiar el tipo de combustible o editar el factor a mano.
 
 ## 5.5 Fase FG — Formatos y CSV genérico (semanas 10–12)
 

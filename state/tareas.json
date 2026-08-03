@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 12:18:24Z"
+    "actualizado": "2026-08-03 14:45:11Z"
   },
   "tareas": [
     {
@@ -1457,6 +1457,85 @@
       "agente": null,
       "commits": [],
       "notas": []
+    },
+    {
+      "id": "F1-39",
+      "fase": "F1",
+      "titulo": "Montaje de la aplicación: unir renderizador, ejes, paneles, escalas, cursor, navegación y selectores en algo que se abre y funciona",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 8,
+      "deps": [
+        "F1-26",
+        "F1-28",
+        "F1-29",
+        "F1-31",
+        "F1-33"
+      ],
+      "deps_backlog": [
+        "F1-26",
+        "F1-28",
+        "F1-29",
+        "F1-31",
+        "F1-33"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-40",
+      "fase": "F1",
+      "titulo": "Sesión de log abierto en `dlv-api` y endpoint de cubos de pirámide por rango y nivel",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-21",
+        "F1-09",
+        "F1-11"
+      ],
+      "deps_backlog": [
+        "F1-21",
+        "F1-09",
+        "F1-11"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "F1-41",
+      "fase": "F1",
+      "titulo": "Selector de tipo de combustible y factores de conversión editables",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "F1-14"
+      ],
+      "deps_backlog": [
+        "F1-14"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "5c8068d"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 14:45:11Z",
+          "texto": "Selector de combustible con la regla del propietario: usuario (persistido en perfil) > log (canal stoichiometry) > gasolina supuesta. El caso supuesto se marca 'SUPUESTO', no como un dato normal: es lo unico que separa un AFR correcto de uno incorrecto con aspecto de correcto. Permite teclear un factor a mano. No convierte valores (comprobado por mi): solo decide el factor. 41 pruebas. PIDE DECISION TUYA: los cinco combustibles del fixture son ilustrativos. Gasolina/E85/metanol (14,7 / 9,77 / 6,4) coinciden con data/roles.toml, pero etanol puro y diesel son cifras de uso general, NO medidas en tus logs. El agente propone -y yo estoy de acuerdo- que el catalogo real viva en data/ y pase por G1 como el resto de constantes fisicas. No lo hizo porque data/ es tuyo."
+        }
+      ]
     },
     {
       "id": "FG-01",
