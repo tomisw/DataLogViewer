@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-07-31 07:10:08Z
+Actualizado: 2026-08-03 11:40:27Z
 
 **111 / 669 pts cerrados (16.6 %)** · 88 pts esperando revisión humana → 29.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 81 | 56 | 0 | 49 | 0 | 186 |
+| F1 | 81 | 56 | 4 | 45 | 0 | 186 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -38,6 +38,7 @@ Actualizado: 2026-07-31 07:10:08Z
 | `F1-18` Presets SI / Métrico / Imperial / Motorsport | revision_humana | Sonnet 5 | G1 | REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_ |
 | `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
+| `F1-36` Fuzzing de propiedad sobre cabecera y filas  | en_curso | Opus 5 | G2 | — |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 
@@ -99,7 +100,7 @@ Actualizado: 2026-07-31 07:10:08Z
 | ·  | `F1-33` | Selector de canales con búsqueda difusa y ocultación de inacti | Sonnet 5 | 4 | F1-07 | G3 | — |
 | ✔  | `F1-34` | Arrastrar y soltar ficheros y carpetas; apertura múltiple | Sonnet 5 | 3 | F1-12 | G3 | `dcb9944` |
 | ✔  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | `a26fb1b` |
-| ·  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | — |
+| ▶  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | — |
 | ·  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | — |
 | ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
 
