@@ -148,7 +148,7 @@ v1.0 se va a ~67 semanas.
 | F1-39 | **Montaje de la aplicación**: unir renderizador, ejes, paneles, escalas, cursor, navegación y selectores en algo que se abre y funciona | componente | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 |
 | F1-40 | **Sesión de log abierto** en `dlv-api` y endpoint de **cubos de pirámide** por rango y nivel | módulo + pruebas | **Opus 5** | 8 | F1-21, F1-09, F1-11 | G2 |
 | F1-41 | Selector de **tipo de combustible** y factores de conversión editables | componente | Sonnet 5 | 3 | F1-14 | G3 |
-| F1-42 | **Apertura en < 4 s**: `construir_desde_polars` hace un `filter` por canal ×475 y se lleva 5,7 s de los 6,0 s | módulo + banco | **Opus 5** | 5 | F1-05, F1-40 | G2 |
+| F1-42 | **Apertura en < 4 s**: `detectar_grupos_de_muestreo` usa `np.unique(axis=0)` y se lleva el 98 % del tiempo de apertura | módulo + banco | **Opus 5** | 5 | F1-05, F1-06, F1-40 | G2 |
 
 **Subtotal F1: 210 pts** · Hito **M1**
 
@@ -167,11 +167,19 @@ v1.0 se va a ~67 semanas.
 > - **F1-41** la pidió el propietario al revisar F1-14 (2026-08-03): poder
 >   cambiar el tipo de combustible o editar el factor a mano.
 > - **F1-42** la destapó el banco de F1-40 en cuanto hubo por fin un camino
->   completo que medir: la primera apertura del log de 70 MB son 6,0 s frente a
->   un presupuesto de 4,0 s, y **5,7 s de esos están en `construir_desde_polars`**
->   (F1-05), que hace un `filter` por canal ×475. F1-05 no incumplía nada cuando
->   se cerró porque nadie había medido todavía la apertura entera; es el
->   presupuesto de §2.6 haciendo exactamente su trabajo.
+>   completo que medir: la primera apertura del log de 70 MB pasaba del
+>   presupuesto de 4,0 s. F1-05 y F1-06 no incumplían nada cuando se cerraron
+>   porque nadie había medido todavía la apertura entera; es el presupuesto de
+>   §2.6 haciendo exactamente su trabajo.
+>
+>   **El primer diagnóstico era falso y conviene que quede escrito.** Se
+>   atribuyó a `construir_desde_polars` (F1-05) por hacer un `filter` por canal
+>   ×475. Al perfilarlo, ese `filter` costaba **0,02 s**; el 98 % del tiempo
+>   estaba en `detectar_grupos_de_muestreo` (F1-06) y su `np.unique(axis=0)`
+>   sobre una matriz de 475×38 698. La primera corrección, hecha sobre el
+>   diagnóstico equivocado, dejó la apertura **más lenta**. Es el motivo por el
+>   que un banco mide antes y después: sin el «después», el cambio se habría
+>   dado por bueno.
 
 ## 5.5 Fase FG — Formatos y CSV genérico (semanas 10–12)
 

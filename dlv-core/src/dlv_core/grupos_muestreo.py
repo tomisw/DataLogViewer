@@ -42,13 +42,39 @@ def detectar_grupos_de_muestreo(
         return []
 
     matriz = np.stack([df[c].is_not_null().to_numpy() for c in columnas])
-    patrones, inverso = np.unique(matriz, axis=0, return_inverse=True)
-    # NumPy >= 2.0 ya da un array plano (n_columnas,) para este caso, pero se
-    # homogeneiza por si una versión futura vuelve a la forma (n_columnas, 1).
-    inverso = inverso.reshape(-1)
 
+    # POR QUÉ NO `np.unique(matriz, axis=0)` (F1-42)
+    # ==============================================
+    # Era lo que hacía esta función y es lo que parece natural, pero costaba
+    # **4,70 s de los 4,79 s** que tardaba abrir el AutoLog sintético de 70 MB
+    # y 475 canales: el 98 % del presupuesto de apertura de §2.6 (< 4,0 s) se
+    # iba aquí. `np.unique(axis=0)` no compara filas: las reinterpreta como
+    # escalares `void` y las ordena lexicográficamente, y con 475 filas de
+    # 38 698 bytes eso es una montaña de comparaciones sobre 18 MB.
+    #
+    # Lo que hace falta no es ordenar los patrones, es saber cuáles son
+    # IGUALES. `packbits` comprime cada patrón de 38 698 booleanos a 4 838
+    # bytes (×8) y la igualdad byte a byte es exactamente la igualdad de
+    # patrón, así que un diccionario resuelve el agrupamiento en una pasada.
+    #
+    # El bucle recorre CANALES (475), no muestras (17,7 millones): ADR-009
+    # prohíbe lo segundo, no lo primero. Todo el trabajo por muestra —el
+    # `is_not_null` y el `packbits`— sigue siendo vectorizado.
+    #
+    # Efecto lateral bueno: el orden de salida pasa a ser el de primera
+    # aparición en `columnas`, en vez de depender de cómo `numpy` ordene
+    # patrones de bits. `construir_desde_polars` reordena de todas formas, pero
+    # un orden que se puede explicar es más fácil de depurar que uno que no.
+    empaquetada = np.packbits(matriz, axis=1)
+
+    indice_por_patron: dict[bytes, int] = {}
     grupos: list[tuple[np.ndarray, list[str]]] = []
-    for indice_patron in range(len(patrones)):
-        posiciones = np.flatnonzero(inverso == indice_patron)
-        grupos.append((patrones[indice_patron], [columnas[int(i)] for i in posiciones]))
+    for i, columna in enumerate(columnas):
+        clave = empaquetada[i].tobytes()
+        indice = indice_por_patron.get(clave)
+        if indice is None:
+            indice_por_patron[clave] = len(grupos)
+            grupos.append((matriz[i], [columna]))
+        else:
+            grupos[indice][1].append(columna)
     return grupos
