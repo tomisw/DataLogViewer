@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:51:05Z"
+    "actualizado": "2026-08-03 11:54:14Z"
   },
   "tareas": [
     {
@@ -1094,10 +1094,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "2f707a6"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:54:13Z",
+          "texto": "Ticks 1/2/5x10^n para el eje de valores y tabla de pasos de tiempo para el eje X, con formato s / m:ss / h:mm:ss elegido por la magnitud del EJE y no por tick (para no mezclar formatos al cruzar un minuto). La inversion Y del DOM frente al recorte de OpenGL esta aislada en coordenadas.ts con el porque escrito: es el punto exacto donde se cuela un dibujo que parece casi correcto. 56 pruebas, con foco en rangos raros (cruce de cero, degenerado, negativo). PENDIENTE ESTETICO: la leyenda va arriba-derecha con fondo semitransparente y no tiene prueba automatica detras; conviene mirarla con muchos canales al integrar F1-26/F1-27."
+        }
+      ]
     },
     {
       "id": "F1-26",
@@ -1216,10 +1223,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "2f707a6"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:54:14Z",
+          "texto": "Precedencia canal > perfil > preset > canonica, espejo en TypeScript de dlv_core.resolucion_unidad. Distingue 'heredado de <capa>' de 'fijado aqui', que es lo que permite deshacer una eleccion. Dos invariantes comprobados por mi: NO convierte valores (recibe el valor ya convertido) y NO llama a cache-cubos.invalidar(), que es de lo que depende el presupuesto de cambio de unidad < 100 ms de §2.6. 35 pruebas. SUPUESTO DEL AGENTE: el catalogo llega como prop; el cableado de data/units.toml a esa forma via dlv-api no existe todavia y queda como integracion posterior."
+        }
+      ]
     },
     {
       "id": "F1-32",

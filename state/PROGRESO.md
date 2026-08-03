@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-03 11:51:05Z
+Actualizado: 2026-08-03 11:54:14Z
 
-**121 / 669 pts cerrados (18.1 %)** · 88 pts esperando revisión humana → 31.2 % entregado
+**131 / 669 pts cerrados (19.6 %)** · 88 pts esperando revisión humana → 32.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 91 | 56 | 0 | 39 | 0 | 186 |
+| F1 | 101 | 56 | 0 | 29 | 0 | 186 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
 | F2 | 0 | 0 | 0 | 80 | 0 | 80 |
 | F3 | 0 | 0 | 0 | 115 | 3 | 118 |
@@ -60,7 +60,7 @@ Actualizado: 2026-08-03 11:51:05Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 147/186 pts
+## F1 — 157/186 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -88,13 +88,13 @@ Actualizado: 2026-08-03 11:51:05Z
 | ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `8f51688` |
 | ✔  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | `ff82133` |
 | ✔  | `F1-24` | Caché de cubos en el frontend — es lo que hace alcanzable el c | Opus 5 | 5 | F1-23 | G2 | `fb0548d` |
-| ·  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | — |
+| ✔  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | `2f707a6` |
 | ·  | `F1-26` | Paneles apilados con eje X compartido y arrastrar canales entr | Sonnet 5 | 5 | F1-25 | G3 | — |
 | ·  | `F1-27` | Múltiples ejes Y, autoescala y bloqueo de escala | Sonnet 5 | 4 | F1-25 | G3 | — |
 | ·  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | — |
 | ·  | `F1-29` | Cursor con tabla de valores, presupuesto < 16 ms | Sonnet 5 | 4 | F1-24 | G3 | — |
 | ·  | `F1-30` | Doble cursor con delta usando la clase intervalo | Opus 5 | 4 | F1-29, F1-13 | G1 | — |
-| ·  | `F1-31` | Selector de unidad a tres niveles (global, dimensión, canal) c | Sonnet 5 | 5 | F1-17 | G3 | — |
+| ✔  | `F1-31` | Selector de unidad a tres niveles (global, dimensión, canal) c | Sonnet 5 | 5 | F1-17 | G3 | `2f707a6` |
 | ·  | `F1-32` | Locale numérico ES/EN (separador decimal, agrupación) | Haiku 4.5 | 2 | F1-31 | G4 | — |
 | ✔  | `F1-33` | Selector de canales con búsqueda difusa y ocultación de inacti | Sonnet 5 | 4 | F1-07 | G3 | `88c015d` |
 | ✔  | `F1-34` | Arrastrar y soltar ficheros y carpetas; apertura múltiple | Sonnet 5 | 3 | F1-12 | G3 | `dcb9944` |
