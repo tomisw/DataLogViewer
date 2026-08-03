@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 18:49:45Z"
+    "actualizado": "2026-08-03 18:49:46Z"
   },
   "tareas": [
     {
@@ -1570,10 +1570,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "501b77b"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 18:49:46Z",
+          "texto": "Apertura de 4,79 s a 0,51 s (presupuesto < 4,0 s: CUMPLE con 8x de margen). El almacen pasa de 4,45 s a 0,15 s. EL DIAGNOSTICO DE PARTIDA ERA FALSO: no era el filter por canal de F1-05 (0,02 s medidos) sino np.unique(axis=0) en detectar_grupos_de_muestreo de F1-06, que ordena 475 filas de 38.698 bytes para averiguar cuales son iguales; sustituido por packbits + diccionario. La correccion hecha sobre el diagnostico equivocado dejo la apertura MAS lenta (5,24 s) y solo lo dijo el banco. Correccion comprobada: 17.701.060 muestras y suma de v identicas antes y despues; ninguna prueba tocada."
+        }
+      ]
     },
     {
       "id": "FG-01",
