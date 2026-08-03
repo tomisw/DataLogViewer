@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 11:40:27Z"
+    "actualizado": "2026-08-03 11:40:57Z"
   },
   "tareas": [
     {
@@ -1334,10 +1334,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "b01e52e"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 11:40:57Z",
+          "texto": "Fuzzing de propiedad sobre cabecera y filas. La propiedad principal es E1.7 hecha asercion: para CUALQUIER entrada, o sale una Cabecera o sale un ErrorDeFormato; cualquier otra excepcion es un fallo de contrato porque llega a la interfaz como traza. Cuatro pruebas en rojo a la primera, las cuatro por defecto del generador (permitia logs sin filas), no del parser."
+        }
+      ]
     },
     {
       "id": "F1-37",
