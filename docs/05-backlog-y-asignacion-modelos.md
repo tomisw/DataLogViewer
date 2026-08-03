@@ -149,8 +149,9 @@ v1.0 se va a ~67 semanas.
 | F1-40 | **Sesión de log abierto** en `dlv-api` y endpoint de **cubos de pirámide** por rango y nivel | módulo + pruebas | **Opus 5** | 8 | F1-21, F1-09, F1-11 | G2 |
 | F1-41 | Selector de **tipo de combustible** y factores de conversión editables | componente | Sonnet 5 | 3 | F1-14 | G3 |
 | F1-42 | **Apertura en < 4 s**: `detectar_grupos_de_muestreo` usa `np.unique(axis=0)` y se lleva el 98 % del tiempo de apertura | módulo + banco | **Opus 5** | 5 | F1-05, F1-06, F1-40 | G2 |
+| F1-43 | **La aplicación abre un log de verdad**: cablear `FuenteApi`, búfer de tipado fijo para el navegador, catálogo de unidades por HTTP y arranque con ruta de log | módulo + pruebas | **Opus 5** | 5 | F1-39, F1-40, F1-35 | G2 |
 
-**Subtotal F1: 210 pts** · Hito **M1**
+**Subtotal F1: 215 pts** · Hito **M1**
 
 > **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
 > aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:

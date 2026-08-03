@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-03 18:49:46Z"
+    "actualizado": "2026-08-03 20:12:11Z"
   },
   "tareas": [
     {
@@ -1579,6 +1579,37 @@
         {
           "fecha": "2026-08-03 18:49:46Z",
           "texto": "Apertura de 4,79 s a 0,51 s (presupuesto < 4,0 s: CUMPLE con 8x de margen). El almacen pasa de 4,45 s a 0,15 s. EL DIAGNOSTICO DE PARTIDA ERA FALSO: no era el filter por canal de F1-05 (0,02 s medidos) sino np.unique(axis=0) en detectar_grupos_de_muestreo de F1-06, que ordena 475 filas de 38.698 bytes para averiguar cuales son iguales; sustituido por packbits + diccionario. La correccion hecha sobre el diagnostico equivocado dejo la apertura MAS lenta (5,24 s) y solo lo dijo el banco. Correccion comprobada: 17.701.060 muestras y suma de v identicas antes y despues; ninguna prueba tocada."
+        }
+      ]
+    },
+    {
+      "id": "F1-43",
+      "fase": "F1",
+      "titulo": "La aplicación abre un log de verdad: cablear `FuenteApi`, búfer de tipado fijo para el navegador, catálogo de unidades por HTTP y arranque con ruta de log",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-39",
+        "F1-40",
+        "F1-35"
+      ],
+      "deps_backlog": [
+        "F1-39",
+        "F1-40",
+        "F1-35"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "a0a5d55"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-03 20:12:11Z",
+          "texto": "MVP cerrado: la aplicacion abre un log real. Medido contra el servidor de verdad y el log de 70 MB: abrirLog 1783 ms / 475 canales, pedirCubos 10 ms, RPM min 412 max 7996 (valores plausibles), 27 dimensiones de unidades reales. DOS COSAS QUE APARECIERON AL CABLEAR: (1) el frontend NO puede leer Arrow IPC sin una dependencia nueva, asi que se anadio el bufer de tipado fijo que ADR-007 ya contemplaba (cinco columnas float32 little-endian seguidas); Arrow sigue siendo el formato por omision y hay prueba de que los dos llevan los mismos numeros. (2) no habia forma de servir data/units.toml al frontend sin duplicarlo en TypeScript, que esta prohibido por la regla 2; se anadio GET /comandos/unidades. HUECOS ANOTADOS, NO RELLENADOS: FuenteApi devuelve rol null y clasificacion 'ni vacio ni constante' porque dlv-api no expone ni FG-09 ni F1-07; la direccion del error es enseñar de mas, nunca esconder un canal con datos."
         }
       ]
     },
