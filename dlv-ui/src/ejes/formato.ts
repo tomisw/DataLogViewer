@@ -6,12 +6,14 @@
  * solo decide cuántos decimales y qué forma (segundos sueltos, `mm:ss` o
  * `h:mm:ss`) sin saber qué es un canal ni una unidad física.
  *
- * Separador decimal: coma, siguiendo el locale de la app (`docs/06` §6.10:
- * «coma decimal en español»). No se usa `Intl.NumberFormat` a propósito: el
- * número de decimales no lo da la unidad (eso es F1-31/F1-32, decimales por
- * unidad y locale ES/EN) sino el paso entre ticks — mostrar más decimales de
- * los que el paso justifica es tan ilegible como mostrar de menos.
+ * Separador decimal: lo pone `src/locale/numerico.ts` (F1-32), que es el único
+ * sitio del frontend que convierte un número en texto. Lo que decide este
+ * módulo es CUÁNTOS decimales, que en un eje los da el paso entre ticks y no
+ * la unidad — mostrar más decimales de los que el paso justifica es tan
+ * ilegible como mostrar de menos.
  */
+
+import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts";
 
 /**
  * Cuántos decimales hacen falta para distinguir ticks separados por `paso`.
@@ -27,21 +29,20 @@ export function decimalesParaPaso(paso: number): number {
 }
 
 /**
- * Un número con `decimales` decimales y coma en vez de punto.
+ * Un número con `decimales` decimales, en el locale de la aplicación.
  *
- * Corrige el `-0` que produce `toFixed` cuando un valor negativo muy pequeño
- * redondea a cero (por ejemplo, un tick en `-0,0001` con un decimal): un
- * usuario que lee `-0,0` en un eje piensa que hay un signo con significado y
- * no lo hay. Es exactamente la clase de detalle que un rango que cruza el
- * cero saca a la luz y que no se ve en un rango que no lo cruza.
+ * Delega en `src/locale/numerico.ts` (F1-32), que es el único sitio del
+ * frontend que convierte un número en texto. Antes de esa unificación había
+ * cuatro implementaciones y no coincidían entre sí: la tabla del cursor ponía
+ * punto decimal y este módulo coma, así que el mismo valor salía como `101.2`
+ * en la tabla y `101,2` en el eje de al lado.
+ *
+ * Lo que sigue decidiendo ESTE módulo es **cuántos** decimales, y por eso
+ * `decimalesParaPaso` no se ha movido: en un eje los decimales los da el paso
+ * entre ticks, no la unidad. Es la parte que no se puede compartir.
  */
 export function formatearNumero(valor: number, decimales: number): string {
-  const dec = Number.isFinite(decimales) && decimales >= 0 ? Math.trunc(decimales) : 0;
-  let texto = valor.toFixed(dec);
-  if (texto.startsWith("-") && Number(texto) === 0) {
-    texto = texto.slice(1);
-  }
-  return texto.replace(".", ",");
+  return formatearNumeroLocale(valor, decimales);
 }
 
 /**

@@ -16,6 +16,7 @@ import { describe, expect, it } from "vitest";
 
 import { CacheDeCubos } from "../datos/cache-cubos.ts";
 import type { CubosContinuos } from "../render/tipos.ts";
+import { formatearNumero as formatearEnEje } from "../ejes/formato.ts";
 import { contenidoDeCelda, CursorDeTabla, formatearNumero, type CanalCursor } from "./cursor.ts";
 import { crearDobleDOM } from "./doble-dom.ts";
 
@@ -40,9 +41,17 @@ function cubosDePrueba(n: number, tOrigen: number, paso: number, factor: number)
 describe("formatearNumero", () => {
   it("recorta decimales según la magnitud", () => {
     expect(formatearNumero(4000.4)).toBe("4000");
-    expect(formatearNumero(101.23)).toBe("101.2");
-    expect(formatearNumero(4.5678)).toBe("4.57");
-    expect(formatearNumero(0.85123)).toBe("0.851");
+    expect(formatearNumero(101.23)).toBe("101,2");
+    expect(formatearNumero(4.5678)).toBe("4,57");
+    expect(formatearNumero(0.85123)).toBe("0,851");
+  });
+
+  it("usa coma decimal, igual que los ejes", () => {
+    // Esta función usaba `toFixed`, que da siempre punto: la tabla del cursor
+    // enseñaba `101.2` y el eje de al lado, en la misma ventana, `101,2`. El
+    // separador lo pone ahora `src/locale/numerico.ts` (F1-32) para los dos.
+    expect(formatearNumero(101.23)).toBe(formatearEnEje(101.23, 1));
+    expect(formatearNumero(0.85123)).toBe(formatearEnEje(0.85123, 3));
   });
 
   it("un número no finito no rompe el formato", () => {

@@ -38,6 +38,10 @@ import type {
   UnidadResuelta,
 } from "./tipos.ts";
 import { Capa } from "./tipos.ts";
+// El separador decimal lo pone `src/locale/numerico.ts` (F1-32), único sitio
+// del frontend que convierte un número en texto. Aquí se decide CUÁNTOS
+// decimales —los de la unidad, `data/units.toml`— y allí con qué separador.
+import { formatearNumero, type Locale } from "../locale/numerico.ts";
 
 /** Uso incorrecto del sistema de unidades — espejo de `unidades.ErrorDeUnidad`. */
 export class ErrorDeUnidad extends Error {
@@ -150,9 +154,8 @@ export function resolverUnidad(parametros: ParametrosResolucion): UnidadResuelta
 export function formatearValor(
   unidad: UnidadInfo,
   valor: number,
-  separadorDecimal: string = ",",
+  locale: Locale = "es",
 ): string {
-  let texto = valor.toFixed(unidad.decimales);
-  if (separadorDecimal !== ".") texto = texto.replace(".", separadorDecimal);
+  const texto = formatearNumero(valor, unidad.decimales, { locale });
   return unidad.etiqueta ? `${texto} ${unidad.etiqueta}` : texto;
 }

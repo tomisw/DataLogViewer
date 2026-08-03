@@ -60,6 +60,7 @@
  */
 
 import { CacheDeCubos, valorEn, type ClaveCubos } from "../datos/cache-cubos.ts";
+import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts";
 import type { ContextoDOM } from "./contexto-dom.ts";
 
 /** Un canal a mostrar en la tabla del cursor. */
@@ -92,7 +93,13 @@ export function formatearNumero(valor: number): string {
   if (!Number.isFinite(valor)) return "—";
   const absoluto = Math.abs(valor);
   const decimales = absoluto >= 1000 ? 0 : absoluto >= 100 ? 1 : absoluto >= 1 ? 2 : 3;
-  return valor.toFixed(decimales);
+  // El separador lo pone `src/locale/numerico.ts` (F1-32). Esta función usaba
+  // `toFixed`, que da SIEMPRE punto decimal: la tabla del cursor enseñaba
+  // `101.2` mientras el eje de al lado, en la misma ventana, enseñaba `101,2`.
+  // Lo que sigue decidiéndose aquí es cuántos decimales, y por la magnitud del
+  // valor: sin eso un RPM de 4000 saldría "4000,000" y una lambda de 0,85
+  // saldría "1", y ninguno de los dos es lo que hay que leer de un vistazo.
+  return formatearNumeroLocale(valor, decimales);
 }
 
 /** Lo que va en la celda de valor y en la de nivel, ya decidido para un canal e instante. */

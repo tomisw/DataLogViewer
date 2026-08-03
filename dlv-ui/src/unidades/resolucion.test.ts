@@ -139,8 +139,11 @@ describe("formatearValor: decimales por unidad (docs/06 §6.10)", () => {
     expect(formatearValor(degC, 93.2)).toBe("93,2 °C");
   });
 
-  it("admite punto decimal si se pide explícitamente", () => {
-    expect(formatearValor(degC, 93.2, ".")).toBe("93.2 °C");
+  it("admite punto decimal pidiendo el locale inglés", () => {
+    // El tercer parámetro era un separador suelto (`"."`); ahora es el locale,
+    // porque el separador decimal no es la única diferencia entre ES y EN y un
+    // carácter suelto no puede expresar las demás (F1-32).
+    expect(formatearValor(degC, 93.2, "en")).toBe("93.2 °C");
   });
 
   it("una unidad sin etiqueta (fracción adimensional) no deja un espacio colgando", () => {
