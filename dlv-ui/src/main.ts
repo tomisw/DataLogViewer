@@ -1,36 +1,26 @@
 /**
- * Punto de entrada mínimo de dlv-ui (F0-02): llama a `/salud` de dlv-api y
- * muestra el resultado en pantalla.
+ * Punto de entrada de dlv-ui: monta `Aplicacion` (`app/aplicacion.ts`) sobre
+ * `#app` con `FuenteSintetica` (`datos/fuente-sintetica.ts`) como fuente de
+ * datos.
  *
- * Sin librerías de gráficos (ADR-006): el lienzo WebGL2 propio y las capas
- * SVG de ejes/leyenda se añaden en fases posteriores, no aquí.
+ * POR QUÉ `FuenteSintetica` Y NO `FuenteApi` AQUÍ
+ * =================================================
+ * `FuenteApi` está deliberadamente esbozada y sin terminar: `dlv-api` todavía
+ * no tiene sesión de log abierto ni endpoint de cubos (ver la cabecera de
+ * `datos/fuente-api.ts`). `FuenteSintetica` es la que permite tener una
+ * aplicación que se abre y se navega HOY. El día que el endpoint de cubos
+ * exista, cablear la real es sustituir esta única línea —
+ * `new FuenteSintetica()` por `new FuenteApi({urlBase, tokenSesion})`, leídos
+ * de `?puerto_api=` y de lo que `dlv-app` pase por la URL (ADR-007) — sin
+ * tocar `app/aplicacion.ts`, que solo conoce la interfaz `FuenteDeDatos`.
+ *
+ * Sin librerías de gráficos (ADR-006): el lienzo WebGL2 y las capas SVG que
+ * antes se limitaban al «hola, dlv-api» de F0-02 ahora los monta
+ * `Aplicacion` sobre DOM directo, igual que el resto de `dlv-ui`.
  */
 
-interface RespuestaSalud {
-  estado: string;
-  version_api: string;
-  version_core: string;
-}
-
-/**
- * Resuelve la URL base de dlv-api. `dlv-app` (ADR-002) abre la ventana con
- * `?puerto_api=<puerto>` en la URL una vez el servidor está escuchando en un
- * puerto efímero (ADR-007); en desarrollo suelto (`npm run dev`, sin
- * dlv-app) se usa el puerto por defecto documentado en `dlv-api/README`.
- */
-function urlBaseApi(): string {
-  const parametros = new URLSearchParams(window.location.search);
-  const puerto = parametros.get("puerto_api") ?? "8000";
-  return `http://127.0.0.1:${puerto}`;
-}
-
-async function consultarSalud(): Promise<RespuestaSalud> {
-  const respuesta = await fetch(`${urlBaseApi()}/salud`);
-  if (!respuesta.ok) {
-    throw new Error(`dlv-api respondió ${respuesta.status}`);
-  }
-  return (await respuesta.json()) as RespuestaSalud;
-}
+import { Aplicacion } from "./app/aplicacion.ts";
+import { FuenteSintetica } from "./datos/fuente-sintetica.ts";
 
 function contenedorApp(): HTMLDivElement {
   const contenedor = document.querySelector<HTMLDivElement>("#app");
@@ -40,19 +30,9 @@ function contenedorApp(): HTMLDivElement {
   return contenedor;
 }
 
-function render(texto: string): void {
-  contenedorApp().textContent = texto;
-}
-
 async function iniciar(): Promise<void> {
-  render("Consultando dlv-api…");
-  try {
-    const salud = await consultarSalud();
-    render(`dlv-api: ${salud.estado} · api ${salud.version_api} · core ${salud.version_core}`);
-  } catch (error) {
-    const mensaje = error instanceof Error ? error.message : String(error);
-    render(`No se pudo contactar con dlv-api: ${mensaje}`);
-  }
+  const aplicacion = new Aplicacion(contenedorApp(), new FuenteSintetica());
+  await aplicacion.abrirLog("autolog-sintetico");
 }
 
 void iniciar();
