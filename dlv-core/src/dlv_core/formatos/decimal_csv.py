@@ -63,6 +63,7 @@ __all__ = [
     "MotivoDecimal",
     "SeparadorDecimal",
     "detectar_separador_decimal",
+    "es_numerica",
 ]
 
 #: Filas de datos que se inspeccionan. Con unas decenas ya hay decimales de
@@ -255,8 +256,13 @@ def _clasificar(celda: str) -> tuple[str, str | None, bool]:
     return "texto", None, False
 
 
-def _es_numerica(celda: str, decimal: str) -> bool:
+def es_numerica(celda: str, decimal: str) -> bool:
     """¿Sabe esta interpretación leer esta celda como número?
+
+    Pública porque FG-03 decide dónde empiezan los datos con la regla «la primera
+    línea mayoritariamente numérica», y «numérico» tiene que significar lo mismo
+    en las dos tareas. Dos definiciones de numérico es exactamente el tipo de
+    divergencia que este módulo ya pagó una vez.
 
     La primera versión quitaba el carácter contrario y probaba `float`, y eso
     destruía justamente lo que esta tarea tiene que medir: `0,000` con punto
@@ -321,10 +327,10 @@ def detectar_separador_decimal(sondeo: Sondeo, texto: str) -> Decimales:
     interpretaciones = tuple(
         Interpretacion(
             decimal=d,
-            celdas_numericas=sum(1 for c in celdas if _es_numerica(c, d)),
+            celdas_numericas=sum(1 for c in celdas if es_numerica(c, d)),
             celdas_totales=len(celdas),
             ejemplos_no_numericos=tuple(
-                dict.fromkeys(c.strip() for c in celdas if not _es_numerica(c, d))
+                dict.fromkeys(c.strip() for c in celdas if not es_numerica(c, d))
             )[:5],
         )
         for d in posibles
@@ -344,7 +350,7 @@ def detectar_separador_decimal(sondeo: Sondeo, texto: str) -> Decimales:
         otro = {posibles[0]: posibles[1], posibles[1]: posibles[0]}
         for c in celdas:
             for d in posibles:
-                if _es_numerica(c, d) and not _es_numerica(c, otro[d]):
+                if es_numerica(c, d) and not es_numerica(c, otro[d]):
                     evidencias[d] += 1
 
     ambiguo = False

@@ -4,16 +4,16 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 12:08:53Z
+Actualizado: 2026-08-04 13:08:10Z
 
-**180 / 698 pts cerrados (25.8 %)** · 113 pts esperando revisión humana → 42.0 % entregado
+**184 / 698 pts cerrados (26.4 %)** · 118 pts esperando revisión humana → 43.3 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
-| FG | 0 | 21 | 0 | 71 | 0 | 92 |
-| F2 | 0 | 8 | 5 | 67 | 0 | 80 |
+| FG | 0 | 26 | 0 | 66 | 0 | 92 |
+| F2 | 4 | 8 | 5 | 63 | 0 | 80 |
 | F3 | 0 | 0 | 5 | 110 | 3 | 118 |
 | F4 | 0 | 0 | 0 | 63 | 0 | 63 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
@@ -41,6 +41,7 @@ Actualizado: 2026-08-04 12:08:53Z
 | `F1-30` Doble cursor con delta usando la clase inter | revision_humana | Opus 5 | G1 | PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMER |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
+| `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
@@ -114,13 +115,13 @@ Actualizado: 2026-08-04 12:08:53Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 
-## FG — 21/92 pts
+## FG — 26/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ⏳ | `FG-01` | Sondeo: codificación, fin de línea, delimitador por consistenc | Opus 5 | 8 | F1-02 | G1 | `79524dd` |
 | ⏳ | `FG-02` | Separador decimal con verificación cruzada de interpretaciones | Opus 5 | 5 | FG-01 | G1 | `63f6cfa` |
-| ·  | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | — |
+| ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `b1ed1e3` |
 | ·  | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | — |
 | ·  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | — |
 | ·  | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | — |
@@ -136,13 +137,13 @@ Actualizado: 2026-08-04 12:08:53Z
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ·  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
 
-## F2 — 8/80 pts
+## F2 — 12/80 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ▶  | `F2-01` | Modelo de segmento y eje X virtual | Opus 5 | 5 | F1-05 | G2 | `9408b4f` |
 | ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `3d15d8a` |
-| ·  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | — |
+| ✔  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | `b1ed1e3` |
 | ·  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
 | ·  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
 | ·  | `F2-06` | Desfase manual arrastrando el segmento | Sonnet 5 | 3 | F2-04 | G3 | — |

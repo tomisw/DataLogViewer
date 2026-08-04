@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 12:08:53Z"
+    "actualizado": "2026-08-04 13:08:10Z"
   },
   "tareas": [
     {
@@ -1690,10 +1690,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "b1ed1e3"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 13:00:32Z",
+          "texto": "Continua FG-01 y FG-02, que ya dejan calculado el delimitador, la comilla, el separador decimal y donde empieza el bloque consistente. En paralelo corre un agente Sonnet con F2-03 (dlv_core/proyecto.py): no hay colision, esta tarea toca solo dlv-core/src/dlv_core/formatos/."
+        },
+        {
+          "fecha": "2026-08-04 13:08:10Z",
+          "texto": "dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila de unidades e inicio de datos (SS7.4 pasos 6 y 7); las unidades salen EN CRUDO porque resolverlas contra el catalogo de alias es FG-06. TRES DEFECTOS PROPIOS EN LA MISMA HEURISTICA: la regla de SS7.4 ('linea no numerica y corta') falla porque una fila de NOMBRES tambien es no numerica y corta. (1) La fila de unidades tiene que estar dentro del bloque consistente y tener otra linea del bloque encima; sin eso, en 14-preambulo-largo.csv los nombres salian de 'notes: Practice session with setup changes'. (2) La linea que haria de nombres no puede tener forma 'clave: valor'. (3) Una linea 'clave: valor' cuyo numero de campos no cuadra con los datos es preambulo aunque este pegada a ellos: lo destapo el AutoLog, cuya ultima linea antes de los datos es 'Log : 20260729 06:30:35' y dejaba UN nombre para 476 columnas. Consecuencia correcta y ya comprobada: un log nativo NO tiene fila de nombres por el camino generico. decimal_csv.es_numerica pasa a publica para que 'numerico' signifique lo mismo en FG-02 y FG-03. REVISAR EN LA G1: (a) FRACCION_NUMERICA_MINIMA = 0,7 (no 1,0 por los centinelas '#N/A' de 11-valores-ausentes.csv); (b) MAX_LARGO_UNIDAD = 12; (c) que la fila de unidades es la decision menos fundada del modulo y se avisa cuando entra por los pelos; (d) que los nombres no se inventan ni se renombran. PENDIENTE: verificar.sh completo en local."
+        }
+      ]
     },
     {
       "id": "FG-04",
@@ -2071,10 +2082,21 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "sonnet",
+      "commits": [
+        "b1ed1e3"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 12:59:40Z",
+          "texto": "Delegada a un agente Sonnet en segundo plano, como dice docs/08 SS8.5 para las tareas asignadas a Sonnet. --forzar porque F2-02 esta en revision_humana (SS8.7: no bloquea). Ficheros que puede tocar: dlv-core/src/dlv_core/proyecto.py (nuevo) y dlv-core/tests/test_proyecto.py (nuevo). PROHIBIDO tocar identidad.py, tiempo.py, state/ y hacer commit: el orquestador integra, verifica y commitea."
+        },
+        {
+          "fecha": "2026-08-04 13:08:10Z",
+          "texto": "Delegada a un agente Sonnet en segundo plano y REVISADA E INTEGRADA por el orquestador: dlv_core/proyecto.py + 25 pruebas. Coleccion de emparejamientos manuales del .dlvproj con esquema versionado (VERSION_ESQUEMA_EMPAREJAMIENTOS = 1) y ErrorDeVersionDesconocida antes de mirar ninguna otra clave. NO ME FIE DEL INFORME (SS8.10): comprobe por mi cuenta la ida y vuelta del JSON, que un canal en dos emparejamientos se rechaza ANTES de guardar, que una version de esquema 99 se niega a leer a medias, y que a_secuencia() produce un grupo de Capa.MANUAL de verdad al pasarlo a identidad.emparejar. Dos decisiones del agente que merecen quedar escritas: validacion eager en __post_init__ y no diferida como en PresetUsuario (aqui no hace falta catalogo externo, asi que no hay razon para un paso que alguien pueda olvidar), y la version de esquema es del bloque de emparejamientos y no del .dlvproj completo. El agente informa de que no encontro defectos en identidad.py al usarlo. Puerta G3: verificacion completa pendiente en local, aqui solo pude ejecutar ruff, mypy --strict y las 569 pruebas de solo-stdlib."
+        }
+      ]
     },
     {
       "id": "F2-04",
