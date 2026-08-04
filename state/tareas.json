@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 16:24:33Z"
+    "actualizado": "2026-08-04 17:36:14Z"
   },
   "tareas": [
     {
@@ -1774,7 +1774,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "bloqueado",
+      "estado": "en_curso",
       "agente": "sonnet",
       "commits": [],
       "notas": [
@@ -1785,6 +1785,10 @@
         {
           "fecha": "2026-08-04 16:24:33Z",
           "texto": "SIN EMPEZAR. El agente Sonnet murio por el LIMITE DE SESION DE LA CUENTA (no por un error de la tarea) durante su fase de lectura, antes de escribir nada: no hay ningun fichero a medias que reconstruir, comprobado con git status. El limite se reinicia a las 15:30 UTC. Para retomarla basta relanzar el agente con el mismo encargo. Ficheros previstos: data/alias_unidades.toml (dato G1) + dlv-core/src/dlv_core/formatos/unidades_declaradas.py + su prueba."
+        },
+        {
+          "fecha": "2026-08-04 17:36:14Z",
+          "texto": "RELANZADA tras el reinicio del limite de sesion (eran 17:35 UTC, el limite se reiniciaba a las 15:30). Mismo encargo que el intento anterior, que murio en su fase de lectura sin escribir nada."
         }
       ]
     },
@@ -2849,7 +2853,7 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "bloqueado",
+      "estado": "en_curso",
       "agente": "sonnet",
       "commits": [],
       "notas": [
@@ -2860,6 +2864,10 @@
         {
           "fecha": "2026-08-04 16:24:33Z",
           "texto": "SIN EMPEZAR. Mismo motivo que FG-06: el agente Sonnet murio por el limite de sesion de la cuenta antes de escribir nada. malla.py sigue con su esqueleto intacto (git diff vacio). El limite se reinicia a las 15:30 UTC. El encargo apuntaba al patron del protocolo Vectorial de reloj.py para poder implementar y PROBAR la agregacion vectorizada sin NumPy instalado."
+        },
+        {
+          "fecha": "2026-08-04 17:36:14Z",
+          "texto": "RELANZADA tras el reinicio del limite de sesion. Mismo encargo que el intento anterior, que murio en su fase de lectura sin escribir nada; malla.py sigue con su esqueleto intacto."
         }
       ]
     },

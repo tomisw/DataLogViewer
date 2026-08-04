@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 16:24:33Z
+Actualizado: 2026-08-04 17:36:14Z
 
 **184 / 698 pts cerrados (26.4 %)** · 126 pts esperando revisión humana → 44.4 % entregado
 
@@ -12,10 +12,10 @@ Actualizado: 2026-08-04 16:24:33Z
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
-| FG | 0 | 34 | 0 | 53 | 5 | 92 |
+| FG | 0 | 34 | 5 | 53 | 0 | 92 |
 | F2 | 4 | 8 | 5 | 63 | 0 | 80 |
 | F3 | 0 | 0 | 5 | 110 | 3 | 118 |
-| F4 | 0 | 0 | 0 | 59 | 4 | 63 |
+| F4 | 0 | 0 | 4 | 59 | 0 | 63 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
 ## Requieren atención
@@ -43,13 +43,13 @@ Actualizado: 2026-08-04 16:24:33Z
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
 | `FG-04` Columna de tiempo en las 8 variantes de §7.5 | revision_humana | Opus 5 | G1 | dlv_core/formatos/tiempo_csv.py + 39 pruebas. Las ocho variantes de SS |
-| `FG-06` Unidad declarada en el nombre o en la fila d | bloqueado | Sonnet 5 | G1 | SIN EMPEZAR. El agente Sonnet murio por el LIMITE DE SESION DE LA CUEN |
+| `FG-06` Unidad declarada en el nombre o en la fila d | en_curso | Sonnet 5 | G1 | RELANZADA tras el reinicio del limite de sesion (eran 17:35 UTC, el li |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
-| `F4-01` Malla RPM×MAP configurable, con los ejes mos | bloqueado | Sonnet 5 | G3 | SIN EMPEZAR. Mismo motivo que FG-06: el agente Sonnet murio por el lim |
+| `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | RELANZADA tras el reinicio del limite de sesion. Mismo encargo que el  |
 
 ## F0 — 54/54 pts
 
@@ -127,7 +127,7 @@ Actualizado: 2026-08-04 16:24:33Z
 | ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `b1ed1e3` |
 | ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `4c99e53` |
 | ·  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | — |
-| ✖  | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | — |
+| ▶  | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | — |
 | ·  | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | — |
 | ·  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | — |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `a26fb1b` |
@@ -191,7 +191,7 @@ Actualizado: 2026-08-04 16:24:33Z
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ✖  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | — |
+| ▶  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | — |
 | ·  | `F4-02` | Agregación por celda: media, desviación, mín, máx, número de m | Opus 5 | 5 | F4-01 | G2 | — |
 | ·  | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
 | ·  | `F4-04` | Mapa de calor de λ error con detalle por celda | Sonnet 5 | 5 | F4-02 | G3 | — |
