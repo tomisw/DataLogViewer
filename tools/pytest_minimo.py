@@ -219,8 +219,14 @@ def ejecutar(ruta: Path) -> tuple[int, int, int, list[str]]:
                 if isinstance(pnombres, (tuple, list))
                 else [c.strip() for c in pnombres.split(",")]
             )
+            # Con UN solo nombre, el valor se pasa entero aunque sea una lista o
+            # una tupla: `parametrize("celdas", [["a", "b"], ["c"]])` da dos
+            # casos con una lista cada uno, no un caso de dos argumentos. Sin
+            # esta distinción, este sustituto reventaba con `zip(strict=True)`
+            # justo en las pruebas que parametrizan una lista, que es la forma
+            # natural de probar una función que recibe una secuencia.
             casos = [
-                dict(zip(claves, v if isinstance(v, (tuple, list)) else (v,), strict=True))
+                {claves[0]: v} if len(claves) == 1 else dict(zip(claves, v, strict=True))
                 for v in pvalores
             ]
         else:
