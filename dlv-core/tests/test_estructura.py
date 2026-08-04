@@ -38,6 +38,7 @@ from dlv_core.formatos.estructura import (
     FRACCION_NUMERICA_MINIMA,
     ErrorDeEstructura,
     analizar_estructura,
+    parece_marca_de_tiempo,
 )
 from dlv_core.formatos.sondeo import sondear_csv
 
@@ -435,3 +436,50 @@ def test_las_lineas_vacias_no_desplazan_los_indices() -> None:
     assert e.linea_nombres == 1
     assert e.linea_inicio_datos == 2
     assert e.metadatos == {"vehiculo": "GT"}
+
+
+# --------------------------------------------------------------------------- #
+# Una marca de tiempo es una celda de datos (defecto destapado por FG-04)
+# --------------------------------------------------------------------------- #
+def test_un_fichero_estrecho_con_columna_de_marca_de_tiempo() -> None:
+    """El defecto que destapó FG-04 al usar este módulo.
+
+    La regla del paso 6 es «la primera línea mayoritariamente numérica», y en
+    `Time,RPM` con `18:30:35.506,1456` hay una celda numérica de dos: un 50 %, por
+    debajo del umbral de 0,7. En un log real con 20 columnas la marca de tiempo es
+    una fracción despreciable y no se nota; con dos columnas, el fichero entero se
+    declaraba ilegible. Una marca de tiempo NO es un número y sí es un dato.
+    """
+    datos = b"Time,RPM\n18:30:35.506,1456\n18:30:35.556,4107\n18:30:35.606,5873\n"
+    e = analizar(datos)
+    assert e.linea_nombres == 0
+    assert e.linea_inicio_datos == 1
+    assert e.nombres == ("Time", "RPM")
+
+
+def test_fecha_y_hora_en_dos_columnas_con_una_sola_numerica() -> None:
+    """Dos columnas de marca y una numérica: un 33 % de celdas numéricas."""
+    datos = b"Fecha,Hora,RPM\n2026-07-29,18:30:35.506,1456\n2026-07-29,18:30:35.556,4107\n"
+    e = analizar(datos)
+    assert e.linea_inicio_datos == 1
+
+
+@pytest.mark.parametrize(
+    "celda",
+    ["18:30:35.506", "18:30", "2026-07-29T18:30:35Z", "2026-07-29", "20260729", "29/07/2026"],
+)
+def test_formas_que_cuentan_como_marca_de_tiempo(celda: str) -> None:
+    assert parece_marca_de_tiempo(celda)
+
+
+@pytest.mark.parametrize("celda", ["RPM", "s", "kPa", "#N/A", "true", ""])
+def test_formas_que_no_son_marca_de_tiempo(celda: str) -> None:
+    assert not parece_marca_de_tiempo(celda)
+
+
+def test_una_fila_de_unidades_no_puede_llevar_marcas_de_tiempo() -> None:
+    """`s,18:30:35` es una fila de datos con la marca en otra columna, no unidades."""
+    datos = b"Time,RPM\ns,rpm\n18:30:35.506,1456\n18:30:35.556,4107\n"
+    e = analizar(datos)
+    assert e.linea_unidades == 1, "esta sí es de unidades"
+    assert e.unidades_declaradas == ("s", "rpm")

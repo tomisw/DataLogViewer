@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 13:08:10Z"
+    "actualizado": "2026-08-04 16:24:33Z"
   },
   "tareas": [
     {
@@ -1721,10 +1721,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "4c99e53"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 13:18:51Z",
+          "texto": "En linea (Opus). Continua la cadena FG-01/02/03. En paralelo corren dos agentes Sonnet con FG-06 y F4-01; ninguno toca formatos/tiempo_csv.py."
+        },
+        {
+          "fecha": "2026-08-04 16:24:33Z",
+          "texto": "dlv_core/formatos/tiempo_csv.py + 39 pruebas. Las ocho variantes de SS7.5. Reutiliza FiabilidadReloj de tiempo.py y NO un tipo nuevo: un CSV con eje sintetico tiene el mismo problema que un log interno sin reloj de tiempo real. DEFECTO PROPIO: el factor se aplicaba DOS VECES (parsear_instante dividia por mil y el llamador volvia a multiplicar), asi que el t0 de 08-epoch-milisegundos.csv salia en 1970-01-21 en vez de 2026-07-25; ahora el factor es parametro y se aplica en un solo sitio. Otros dos: '25:99:99' pasaba sin validar rangos, y '2026-13-45' salia como ValueError de la biblioteca en vez de error del modulo. DEFECTO EN FG-03 DESTAPADO AL USARLO: la regla 'primera linea mayoritariamente numerica' declaraba ILEGIBLE un fichero estrecho cuya columna de tiempo es una marca ('Time,RPM' con '18:30:35.506,1456' da 50 % de celdas numericas, bajo el umbral de 0,7). Arreglado: una marca de tiempo no es un numero y si es un dato. parece_marca_de_tiempo es publica y deliberadamente MENOS estricta que las expresiones de tiempo_csv, porque la pregunta es distinta. REVISAR EN LA G1: (a) la ventana de epoch plausible (2000-2100); (b) PASO_MAXIMO_SEGUNDOS_S = 2,0, que decide si un eje relativo esta en segundos o en milisegundos; (c) que un contador de muestras NO se convierte a tiempo sin frecuencia declarada. PENDIENTE: verificar.sh completo en local."
+        }
+      ]
     },
     {
       "id": "FG-05",
@@ -1763,10 +1774,19 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "bloqueado",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-04 13:18:51Z",
+          "texto": "Agente Sonnet en segundo plano (SS8.5). Ficheros: data/alias_unidades.toml (nuevo, dato G1) + dlv-core/src/dlv_core/formatos/unidades_declaradas.py + dlv-core/tests/test_unidades_declaradas.py. Prohibido tocar data/units.toml, estructura.py, sondeo.py, decimal_csv.py, state/ y hacer commit."
+        },
+        {
+          "fecha": "2026-08-04 16:24:33Z",
+          "texto": "SIN EMPEZAR. El agente Sonnet murio por el LIMITE DE SESION DE LA CUENTA (no por un error de la tarea) durante su fase de lectura, antes de escribir nada: no hay ningun fichero a medias que reconstruir, comprobado con git status. El limite se reinicia a las 15:30 UTC. Para retomarla basta relanzar el agente con el mismo encargo. Ficheros previstos: data/alias_unidades.toml (dato G1) + dlv-core/src/dlv_core/formatos/unidades_declaradas.py + su prueba."
+        }
+      ]
     },
     {
       "id": "FG-07",
@@ -2829,10 +2849,19 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "bloqueado",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-04 13:18:51Z",
+          "texto": "Agente Sonnet en segundo plano (SS8.5), en paralelo con FG-06. Ficheros: dlv-core/src/dlv_core/malla.py (esqueleto existente) + dlv-core/tests/test_malla.py. Prohibido tocar unidades.py, resolucion_unidad.py, formatos/, state/ y hacer commit."
+        },
+        {
+          "fecha": "2026-08-04 16:24:33Z",
+          "texto": "SIN EMPEZAR. Mismo motivo que FG-06: el agente Sonnet murio por el limite de sesion de la cuenta antes de escribir nada. malla.py sigue con su esqueleto intacto (git diff vacio). El limite se reinicia a las 15:30 UTC. El encargo apuntaba al patron del protocolo Vectorial de reloj.py para poder implementar y PROBAR la agregacion vectorizada sin NumPy instalado."
+        }
+      ]
     },
     {
       "id": "F4-02",

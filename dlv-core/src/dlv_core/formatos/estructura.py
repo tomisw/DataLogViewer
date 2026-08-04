@@ -60,6 +60,7 @@ __all__ = [
     "ErrorDeEstructura",
     "Estructura",
     "analizar_estructura",
+    "parece_marca_de_tiempo",
 ]
 
 #: Fracción de celdas que tienen que ser numéricas para que una línea sea de
@@ -79,6 +80,31 @@ MAX_LARGO_UNIDAD = 12
 #: la línea CRUDA y no sobre los campos ya partidos: `notes: cambios, y más` tiene
 #: una coma dentro y partirla por el delimitador rompería el valor.
 _METADATO = re.compile(r"^\s*([^:=]{1,60}?)\s*[:=]\s*(.*?)\s*$")
+
+#: Una celda que NO es un número pero sí es un dato: una marca de tiempo.
+#: `18:30:35.506`, `2026-07-29T18:30:35Z`, `2026-07-29`, `20260729`.
+#:
+#: Hace falta aquí, y lo destapó FG-04. La regla del paso 6 —«la primera línea
+#: mayoritariamente numérica»— falla en un fichero estrecho cuya columna de tiempo
+#: es una marca: `Time,RPM` con `18:30:35.506,1456` tiene una celda numérica de
+#: dos, un 50 %, por debajo del umbral. En un log real con 20 columnas la marca es
+#: una fracción despreciable y no se nota; con dos o tres columnas, el fichero
+#: entero se declaraba ilegible.
+#:
+#: Deliberadamente MENOS estricta que las expresiones de `tiempo_csv.py`, y no es
+#: una duplicación de la misma verdad: aquí la pregunta es «¿esto puede ser una
+#: celda de datos?» y allí es «¿qué es exactamente esta columna?». La primera
+#: admite formas que la segunda rechaza, y tiene que hacerlo: si esta fuera igual
+#: de estricta, una variante de marca que FG-04 no clasifique dejaría el fichero
+#: sin inicio de datos en vez de sin columna de tiempo, que es un fallo mucho peor.
+_RE_MARCA_TIEMPO = re.compile(
+    r"^("
+    r"\d{1,2}:\d{1,2}(:\d{1,2}([.,]\d+)?)?"  # 18:30 o 18:30:35.506
+    r"|\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{1,2}(:\d{1,2}([.,]\d+)?)?)?[A-Z+\-:0-9]*"
+    r"|\d{8}"  # 20260729
+    r"|\d{1,2}/\d{1,2}/\d{2,4}"  # 29/07/2026
+    r")$"
+)
 
 
 class ErrorDeEstructura(ValueError):
@@ -143,8 +169,18 @@ class _Acumulador:
         self.avisos.append(Aviso(codigo, mensaje))
 
 
+def parece_marca_de_tiempo(celda: str) -> bool:
+    """¿Puede esta celda ser una marca de tiempo, y por tanto una celda de datos?
+
+    Pública porque el asistente de importación necesita la misma pregunta, y
+    porque tenerla en un solo sitio es lo que evita que la respuesta cambie según
+    quién pregunte.
+    """
+    return _RE_MARCA_TIEMPO.match(celda.strip()) is not None
+
+
 def _fraccion_numerica(campos: Sequence[str], decimal: str) -> float:
-    """Fracción de celdas NO VACÍAS que son números.
+    """Fracción de celdas NO VACÍAS que son números **o marcas de tiempo**.
 
     Las vacías se excluyen del denominador en vez de contarlas como numéricas:
     una fila con tres celdas vacías y una `0.5` es de datos, pero una fila
@@ -154,7 +190,8 @@ def _fraccion_numerica(campos: Sequence[str], decimal: str) -> float:
     llenas = [c for c in campos if c.strip()]
     if not llenas:
         return 0.0
-    return sum(1 for c in llenas if es_numerica(c, decimal)) / len(llenas)
+    cuentan = sum(1 for c in llenas if es_numerica(c, decimal) or parece_marca_de_tiempo(c))
+    return cuentan / len(llenas)
 
 
 def _parece_fila_de_unidades(campos: Sequence[str], decimal: str) -> bool:
@@ -162,8 +199,9 @@ def _parece_fila_de_unidades(campos: Sequence[str], decimal: str) -> bool:
     llenas = [c.strip() for c in campos if c.strip()]
     if not llenas:
         return False
-    if any(es_numerica(c, decimal) for c in llenas):
-        # Una unidad no es un número. `s,rpm,2,kPa` es otra cosa.
+    if any(es_numerica(c, decimal) or parece_marca_de_tiempo(c) for c in llenas):
+        # Una unidad no es un número ni una marca de tiempo. `s,rpm,2,kPa` es otra
+        # cosa, y `s,18:30:35` es una fila de datos con la marca en otra columna.
         return False
     return all(len(c) <= MAX_LARGO_UNIDAD for c in llenas)
 
