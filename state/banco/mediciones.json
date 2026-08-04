@@ -2717,5 +2717,59 @@
       "hallazgos": [],
       "ficheros_inspeccionados": 32
     }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-08-04 22:43:34Z",
+    "commit": "0a590f9",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.12.3",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 33
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-08-04 22:43:44Z",
+    "commit": "0a590f9",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.12.3",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 33
+    }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-08-04 22:45:52Z",
+    "commit": "0a590f9",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.12.3",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 33
+    }
   }
 ]

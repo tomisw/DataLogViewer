@@ -385,6 +385,58 @@ def test_se_rechaza_un_catalogo_con_desplazamiento_mal_marcado(tmp_path: Path) -
         cargar_catalogo(fh)
 
 
+def test_la_canonica_de_toda_dimension_es_una_unidad_suya(cat: Catalogo) -> None:
+    """El suelo de la precedencia de §6.9 dice «la unidad canónica de la
+    dimensión — SIEMPRE existe». Si no existe, `resolucion_unidad` lanza en vez
+    de resolver, y lo hace solo para los canales sin unidad declarada de esa
+    dimensión: un fallo estrecho y tardío, el peor de encontrar.
+
+    Pasó de verdad: `acceleration` y `density` escriben su canónica con barra
+    (`m/s2`, `kg/m3`) mientras la clave de la unidad la lleva con `_` (`m_s2`,
+    `kg_m3`), porque una clave TOML con barra habría que entrecomillarla."""
+    for id_dim, dim in cat.dimensiones.items():
+        assert dim.unidad_canonica in dim.unidades, (
+            f"{id_dim}: la canónica '{dim.unidad_canonica}' no está entre sus "
+            f"unidades {sorted(dim.unidades)}"
+        )
+        assert dim.unidad(dim.unidad_canonica).id == dim.unidad_canonica
+
+
+def test_se_rechaza_una_canonica_que_no_es_una_unidad_de_la_dimension(tmp_path: Path) -> None:
+    """Una canónica que no se puede traducir a ninguna unidad real es un fallo
+    del catálogo y hay que decirlo al cargarlo."""
+    malo = tmp_path / "malo.toml"
+    malo.write_text(
+        "[dimensiones.x]\n"
+        'canonica = "no_existe"\n'
+        "[dimensiones.x.unidades.u]\n"
+        'etiqueta = "u"\n'
+        'desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }\n'
+        "decimales = 1\n",
+        encoding="utf-8",
+    )
+    with malo.open("rb") as fh, pytest.raises(ErrorDeUnidad, match="canónica"):
+        cargar_catalogo(fh)
+
+
+def test_una_canonica_con_barra_se_traduce_a_la_clave_con_guion_bajo(tmp_path: Path) -> None:
+    """La convención del catálogo (`m/s2` -> `m_s2`) se aplica al cargar, en un
+    solo sitio, en vez de en cada consumidor de `unidad_canonica`."""
+    bueno = tmp_path / "bueno.toml"
+    bueno.write_text(
+        "[dimensiones.x]\n"
+        'canonica = "m/s2"\n'
+        "[dimensiones.x.unidades.m_s2]\n"
+        'etiqueta = "m/s²"\n'
+        'desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }\n'
+        "decimales = 2\n",
+        encoding="utf-8",
+    )
+    with bueno.open("rb") as fh:
+        catalogo = cargar_catalogo(fh)
+    assert catalogo.dimension("x").unidad_canonica == "m_s2"
+
+
 def test_se_rechaza_un_tipo_de_conversion_desconocido(tmp_path: Path) -> None:
     malo = tmp_path / "malo.toml"
     malo.write_text(
