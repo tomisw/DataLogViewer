@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 10:46:30Z"
+    "actualizado": "2026-08-04 11:25:25Z"
   },
   "tareas": [
     {
@@ -2018,10 +2018,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "3d15d8a"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 11:20:39Z",
+          "texto": "Se arranca con --forzar porque depende de FG-09, que esta en revision_humana y no en hecho: docs/08 SS8.7 dice que revision_humana NO bloquea a los dependientes, solo avisa. Es logica pura (diccionarios), asi que se puede hacer sin polars/numpy y no toca dlv-ui ni dlv-api, donde esta el agente local con los hallazgos de la auditoria. Desbloquea F2-09 (vista concatenada, G1) y F2-13."
+        },
+        {
+          "fecha": "2026-08-04 11:25:25Z",
+          "texto": "dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (formato,ID) > nombre) recorridas EN ORDEN apartando lo ya emparejado, para garantizar que un canal esta en exactamente un grupo. GrupoDeCanales con ausentes() para los huecos de SS3.6, conflictos avisados sin fusionar, emparejamiento manual con prioridad maxima y aviso cuando contradice un rol. 35 pruebas. CARENCIA DE FG-09 DETECTADA (relevante para su G1): ChannelKey NO guarda el indice de los roles indexados, y 13 roles de roles.toml lo son; agrupar por ChannelKey.rol a secas colapsaria los dos sensores de knock de un log en un grupo, haciendo desaparecer uno y comparando el otro contra el sensor equivocado. Lo rodeo pasando el indice aparte en CanalDeLog y usando 'rol:knock_count#2' como id de grupo; no he tocado roles.py porque esta en revision_humana. REVISAR EN LA G1 DE F2-02: (a) que el orden de capas es el de SS7.11 y no otro; (b) que un conflicto de dos canales del mismo log se queda con el de id menor y avisa, en vez de fusionar; (c) que lo manual gana incluso contradiciendo un rol, que es lo que dice SS7.11 punto 4; (d) si ChannelKey deberia llevar el indice. PENDIENTE: 'bash tools/verificar.sh' completo en local (aqui no hay polars/numpy/fastapi)."
+        }
+      ]
     },
     {
       "id": "F2-03",

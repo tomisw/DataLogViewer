@@ -4,16 +4,16 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 10:46:30Z
+Actualizado: 2026-08-04 11:25:25Z
 
-**180 / 698 pts cerrados (25.8 %)** · 92 pts esperando revisión humana → 39.0 % entregado
+**180 / 698 pts cerrados (25.8 %)** · 100 pts esperando revisión humana → 40.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
 | FG | 0 | 8 | 0 | 84 | 0 | 92 |
-| F2 | 0 | 0 | 5 | 75 | 0 | 80 |
+| F2 | 0 | 8 | 5 | 67 | 0 | 80 |
 | F3 | 0 | 0 | 5 | 110 | 3 | 118 |
 | F4 | 0 | 0 | 0 | 63 | 0 | 63 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
@@ -41,6 +41,7 @@ Actualizado: 2026-08-04 10:46:30Z
 | `F1-30` Doble cursor con delta usando la clase inter | revision_humana | Opus 5 | G1 | PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMER |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
+| `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 
@@ -133,12 +134,12 @@ Actualizado: 2026-08-04 10:46:30Z
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ·  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
 
-## F2 — 0/80 pts
+## F2 — 8/80 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ▶  | `F2-01` | Modelo de segmento y eje X virtual | Opus 5 | 5 | F1-05 | G2 | `9408b4f` |
-| ·  | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | — |
+| ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `3d15d8a` |
 | ·  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | — |
 | ·  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
 | ·  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
