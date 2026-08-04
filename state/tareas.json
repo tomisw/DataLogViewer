@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 17:36:14Z"
+    "actualizado": "2026-08-04 22:47:28Z"
   },
   "tareas": [
     {
@@ -1774,9 +1774,11 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "45a0600"
+      ],
       "notas": [
         {
           "fecha": "2026-08-04 13:18:51Z",
@@ -1789,6 +1791,10 @@
         {
           "fecha": "2026-08-04 17:36:14Z",
           "texto": "RELANZADA tras el reinicio del limite de sesion (eran 17:35 UTC, el limite se reiniciaba a las 15:30). Mismo encargo que el intento anterior, que murio en su fase de lectura sin escribir nada."
+        },
+        {
+          "fecha": "2026-08-04 22:47:28Z",
+          "texto": "Entregado por agente Sonnet, revisado e integrado por Opus. Commits 45a0600 (FG-06) y 3704d0d (defecto de units.py que salio en la revision).\n\nQUE HAY QUE REVISAR EN LA PUERTA G1, POR CONSECUENCIA SI EL DATO ESTA MAL:\n\n1. data/alias_unidades.toml, 75 formas en 25 grupos. Un alias mal apuntado hace que una columna se muestre en la unidad equivocada, que es R1: el numero parece plausible y nadie puede saber que esta mal. Verificado por mi cuenta que las 75 formas resuelven a un (dimension, unidad) que existe en data/units.toml, que ninguna forma apunta a dos destinos, y que ninguna pisa un id ni un alias que units.toml ya cubra. Lo que NO puedo verificar y hay que leer: si cada forma es de verdad la que escribe un exportador. Las mas dudosas, por si conviene borrarlas: 'ratio' -> lambda (viene de la propia especificacion §7.6, pero 'ratio' a secas podria ser cualquier adimensional), 'A/F' -> afr, 'ms2' sin barra -> m_s2, y los nombres largos en castellano (porciento, milisegundos, litros, newton metro, kilometros) que no he visto en ningun log real: si no aparecen, sobran.\n\n2. Cero factores en el fichero: 'C' es otra forma de escribir el id degC, no una conversion. El factor de °C sigue viviendo solo en units.toml. Comprobado que no hay ningun numero en alias_unidades.toml.\n\n3. Las cuatro muestras que declaran unidad resuelven enteras y sin avisos: 04-fila-de-unidades.csv, 05-unidad-en-el-nombre.csv y dos-formatos/generico.csv (11 columnas, incluidas λ y ° sueltos). Los ficheros que NO declaran unidad no resuelven nada, que es lo correcto: no se adivina.\n\n4. TRES CAMBIOS MIOS sobre lo que entrego el agente, que son los que mas conviene mirar:\n   a) Un parentesis puede ser un calificador, no una unidad. 'Lambda (Sensor 1)' con λ en la fila de unidades acababa SIN resolver (el nombre ganaba con 'Sensor 1' y tiraba una declaracion buena) y con nombre_limpio recortado a 'Lambda', asi que dos sensores quedaban rotulados igual. Ahora el nombre solo se recorta si lo de dentro resuelve, y si el nombre no resuelve pero la fila si, gana la fila con aviso unidad_del_nombre_no_resuelta. La precedencia de §7.6 sigue intacta donde importa: si las dos resuelven y discrepan, gana el nombre.\n   b) Alias nuevos para m/s2, m/s², kg/m3, kg/m³. Sin ellos aceleracion y densidad eran inalcanzables desde un CSV generico, porque su clave en units.toml lleva guion bajo (m_s2, kg_m3) y nadie exporta 'm_s2'.\n   c) [resumen] grupos decia 21 con 23 escritos. Corregido a 25 y atado al contenido con una prueba, porque ese numero es justo lo que se lee en un diff para saber si algo entra o sale.\n\n5. El empate de 'g' se deja SIN resolver a proposito (masa, masa por cilindro y aceleracion, canonica de ninguna). Comprobado que sigue siendo un empate real despues del arreglo de la canonica. Decision de datos: si el propietario prefiere que 'g' signifique una de las tres, es una entrada en el fichero, no un cambio de codigo.\n\nVERIFICACION: ruff check y ruff format en verde. mypy --strict en verde sobre unidades_declaradas.py y unidades.py con --python-version 3.12. ADR-009 y presupuestos en verde. Pruebas: 752 pasan y 0 fallan bajo Python 3.12 (tools/pytest_minimo.py); con el pytest real del contenedor son 750 y 2 fallos, y los dos son test_invariante_imports y test_banco parseando con ast bajo 3.11 el 'def elegir_nivel[T: ...]' de piramide.py:318, sintaxis PEP 695 que 3.11 no sabe leer. LO QUE NO HE PODIDO EJECUTAR: verificar.sh entero en verde, porque en este contenedor no hay numpy ni polars (17 modulos de prueba no se coleccionan) y mypy esta instalado sobre un interprete 3.11 que no puede parsear piramide.py. Las dos limitaciones son del entorno y preexistentes, no de esta tarea."
         }
       ]
     },

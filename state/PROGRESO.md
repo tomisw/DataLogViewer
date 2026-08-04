@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 17:36:14Z
+Actualizado: 2026-08-04 22:47:28Z
 
-**184 / 698 pts cerrados (26.4 %)** · 126 pts esperando revisión humana → 44.4 % entregado
+**184 / 698 pts cerrados (26.4 %)** · 131 pts esperando revisión humana → 45.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
-| FG | 0 | 34 | 5 | 53 | 0 | 92 |
+| FG | 0 | 39 | 0 | 53 | 0 | 92 |
 | F2 | 4 | 8 | 5 | 63 | 0 | 80 |
 | F3 | 0 | 0 | 5 | 110 | 3 | 118 |
 | F4 | 0 | 0 | 4 | 59 | 0 | 63 |
@@ -43,7 +43,7 @@ Actualizado: 2026-08-04 17:36:14Z
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
 | `FG-04` Columna de tiempo en las 8 variantes de §7.5 | revision_humana | Opus 5 | G1 | dlv_core/formatos/tiempo_csv.py + 39 pruebas. Las ocho variantes de SS |
-| `FG-06` Unidad declarada en el nombre o en la fila d | en_curso | Sonnet 5 | G1 | RELANZADA tras el reinicio del limite de sesion (eran 17:35 UTC, el li |
+| `FG-06` Unidad declarada en el nombre o en la fila d | revision_humana | Sonnet 5 | G1 | Entregado por agente Sonnet, revisado e integrado por Opus. Commits 45 |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
@@ -118,7 +118,7 @@ Actualizado: 2026-08-04 17:36:14Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 
-## FG — 34/92 pts
+## FG — 39/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -127,7 +127,7 @@ Actualizado: 2026-08-04 17:36:14Z
 | ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `b1ed1e3` |
 | ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `4c99e53` |
 | ·  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | — |
-| ▶  | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | — |
+| ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `45a0600` |
 | ·  | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | — |
 | ·  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | — |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `a26fb1b` |
