@@ -82,6 +82,7 @@ __all__ = [
     "FinDeLinea",
     "PuntuacionCandidato",
     "Sondeo",
+    "dividir_campos",
     "sondear_csv",
 ]
 
@@ -370,36 +371,59 @@ def _fin_de_linea(texto: str, avisos: list[Aviso]) -> tuple[FinDeLinea, bool]:
 # --------------------------------------------------------------------------- #
 # Delimitador y comillas
 # --------------------------------------------------------------------------- #
-def _contar_campos(linea: str, delimitador: str, comilla: str | None) -> int:
-    """Campos de una línea, respetando las comillas.
+def dividir_campos(linea: str, delimitador: str, comilla: str | None) -> list[str]:
+    """Parte una línea en campos, respetando las comillas y quitándolas.
 
-    No usa `csv.reader` porque hace falta contar con combinaciones que pueden ser
-    absurdas —parte del trabajo es descubrir que lo son— y `csv` lanza o
-    normaliza en casos que aquí solo tienen que puntuar mal.
+    Pública porque FG-02 y las fases siguientes necesitan los campos, no solo
+    cuántos hay, y duplicar este recorrido sería la forma segura de que un día
+    contaran una cosa y leyeran otra.
+
+    No usa `csv.reader` porque el sondeo necesita partir con combinaciones que
+    pueden ser absurdas —parte del trabajo es descubrir que lo son— y `csv` lanza
+    o normaliza en casos que aquí solo tienen que puntuar mal.
     """
     if comilla is None:
-        return linea.count(delimitador) + 1
+        return linea.split(delimitador)
 
-    campos = 1
+    campos: list[str] = []
+    actual: list[str] = []
     dentro = False
     i = 0
     n = len(linea)
     while i < n:
         c = linea[i]
         if c == "\\" and dentro and i + 1 < n:
-            i += 2  # escape por barra: el siguiente carácter no cuenta
+            actual.append(linea[i + 1])  # escape por barra
+            i += 2
             continue
         if c == comilla:
             if dentro and i + 1 < n and linea[i + 1] == comilla:
-                i += 2  # comilla doblada dentro del campo
+                actual.append(comilla)  # comilla doblada dentro del campo
+                i += 2
                 continue
             dentro = not dentro
-        elif not dentro and linea.startswith(delimitador, i):
-            campos += 1
+            i += 1
+            continue
+        if not dentro and linea.startswith(delimitador, i):
+            campos.append("".join(actual))
+            actual = []
             i += len(delimitador)
             continue
+        actual.append(c)
         i += 1
+    campos.append("".join(actual))
     return campos
+
+
+def _contar_campos(linea: str, delimitador: str, comilla: str | None) -> int:
+    """Cuántos campos tiene una línea.
+
+    El camino sin comillas es `str.count`, en C, y es el que se recorre para casi
+    todos los ficheros: el recuento se hace una vez por línea y por candidato, así
+    que es lo único de este módulo que está en un camino caliente."""
+    if comilla is None:
+        return linea.count(delimitador) + 1
+    return len(dividir_campos(linea, delimitador, comilla))
 
 
 def _puntuar(lineas: list[str], delimitador: str, comilla: str | None) -> PuntuacionCandidato:

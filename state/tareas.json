@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 11:36:55Z"
+    "actualizado": "2026-08-04 12:08:53Z"
   },
   "tareas": [
     {
@@ -1659,10 +1659,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "63f6cfa"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 12:02:17Z",
+          "texto": "Continua FG-01 (en revision_humana; SS8.7 dice que no bloquea). Es el paso 4 de SS7.4, el que la propia especificacion llama 'el que mas a menudo se hace mal y el mas importante en Europa'. Biblioteca estandar, dlv-core puro, sin colision con el agente local."
+        },
+        {
+          "fecha": "2026-08-04 12:08:53Z",
+          "texto": "dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de las dos lecturas del fichero, no la regla del delimitador: hay exportadores que escriben ';' con punto decimal y esa regla los leeria multiplicados por mil en silencio (hay prueba). TRES MOTIVOS y no un booleano: DELIMITADOR (con ',' la coma decimal es imposible: certeza), VERIFICACION_CRUZADA, SIN_EVIDENCIA (todo enteros: utilizable y sin respaldo, para que la fila 50000 no se lea con el separador equivocado). DOS DEFECTOS PROPIOS DE FONDO: (1) _es_numerica quitaba el caracter contrario y probaba float, asi que '0,000' con punto salia numerico y las dos interpretaciones explicaban el fichero entero -- la verificacion cruzada no distinguia NADA; (2) la evidencia se contaba desde un clasificador paralelo y se dejaba fuera la notacion cientifica, ahora sale de la propia prueba numerica, que es lo que dice SS7.4 y deja una sola definicion de 'numerico'. El [1-9] del patron de tres digitos tampoco es un detalle: la agrupacion de millares nunca produce grupos con ceros a la izquierda, asi que '0,050' es decimal sin ambigüedad; sin eso, un CSV europeo normal se declaraba ambiguo entero. REVISAR EN LA G1: (a) que la ambigüedad de '1.234' se declare ambigüedad y no se resuelva a ojo -- es un factor 1000; (b) que un fichero contradictorio se declare contradictorio en vez de resolverse por mayoria; (c) MAX_FILAS_INSPECCIONADAS = 200. PENDIENTE: verificar.sh completo en local."
+        }
+      ]
     },
     {
       "id": "FG-03",

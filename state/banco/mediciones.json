@@ -2663,5 +2663,23 @@
       "hallazgos": [],
       "ficheros_inspeccionados": 28
     }
+  },
+  {
+    "presupuesto": "bucles_por_muestra",
+    "valor": 0.0,
+    "unidad": "ocurrencias",
+    "estado": "CUMPLE",
+    "fecha": "2026-08-04 12:07:54Z",
+    "commit": "61af05c",
+    "maquina": {
+      "sistema": "Linux",
+      "maquina": "x86_64",
+      "python": "3.12.3",
+      "nucleos": 4
+    },
+    "detalle": {
+      "hallazgos": [],
+      "ficheros_inspeccionados": 29
+    }
   }
 ]
