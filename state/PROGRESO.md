@@ -4,17 +4,17 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 22:52:01Z
+Actualizado: 2026-08-04 23:14:56Z
 
-**184 / 698 pts cerrados (26.4 %)** · 131 pts esperando revisión humana → 45.1 % entregado
+**189 / 698 pts cerrados (27.1 %)** · 131 pts esperando revisión humana → 45.8 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
-| FG | 0 | 39 | 0 | 53 | 0 | 92 |
+| FG | 5 | 39 | 0 | 48 | 0 | 92 |
 | F2 | 4 | 8 | 5 | 63 | 0 | 80 |
-| F3 | 0 | 0 | 5 | 110 | 3 | 118 |
+| F3 | 0 | 0 | 8 | 107 | 3 | 118 |
 | F4 | 0 | 0 | 4 | 59 | 0 | 63 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
@@ -49,6 +49,7 @@ Actualizado: 2026-08-04 22:52:01Z
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
+| `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 
 ## F0 — 54/54 pts
@@ -118,7 +119,7 @@ Actualizado: 2026-08-04 22:52:01Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 
-## FG — 39/92 pts
+## FG — 44/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -126,7 +127,7 @@ Actualizado: 2026-08-04 22:52:01Z
 | ⏳ | `FG-02` | Separador decimal con verificación cruzada de interpretaciones | Opus 5 | 5 | FG-01 | G1 | `63f6cfa` |
 | ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `b1ed1e3` |
 | ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `4c99e53` |
-| ·  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | — |
+| ✔  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | `88d1c71` |
 | ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `45a0600` |
 | ·  | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | — |
 | ·  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | — |
@@ -185,7 +186,7 @@ Actualizado: 2026-08-04 22:52:01Z
 | ·  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | — |
 | ·  | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | — |
 | ·  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | — |
-| ·  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
+| ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
 
 ## F4 — 0/63 pts
 

@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 22:52:01Z"
+    "actualizado": "2026-08-04 23:14:56Z"
   },
   "tareas": [
     {
@@ -1752,10 +1752,21 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "88d1c71"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 22:54:16Z",
+          "texto": "Opus en linea (SS8.5). Ficheros: dlv-core/src/dlv_core/formatos/tipos.py + dlv-core/tests/test_tipos.py. Desbloquea FG-07, FG-08 y FG-14 (las tres de Sonnet)."
+        },
+        {
+          "fecha": "2026-08-04 23:05:19Z",
+          "texto": "Puerta G2: implementado por Opus en linea y con pasada de revision propia registrada. Ficheros: dlv-core/src/dlv_core/formatos/tipos.py (nuevo) + dlv-core/tests/test_tipos.py (43 pruebas) + arreglo en tools/pytest_minimo.py.\n\nHALLAZGOS DE LA PASADA DE REVISION G2, los tres arreglados en el mismo commit:\n1. 'True'/'FALSE'/'true' en la misma columna salia como enum de tres estados en vez de booleano: la cuenta de valores distintos era sobre las cadenas crudas y solo la comparacion normalizaba. Un exportador que mezcla mayusculas en una columna no es raro. La normalizacion se aplica SOLO a la comprobacion booleana; valores_distintos sigue guardando las cadenas tal cual, porque en un enum de texto 'Alta' y 'alta' pueden ser dos estados que el fichero distingue.\n2. La columna de marcha con 'N' de punto muerto (34 celdas numericas, 16 de texto, cobertura 0,68) era la unica columna del fichero de muestra de la que el informe no decia NADA: no es vacia, ni constante, ni se propone numerica, ni es texto libre, asi que se colaba por todas las ramas de aviso. Y es la primera que hay que mirar. Aviso nuevo enum_con_numeros. Nota: clasificarla como enum es lo correcto, no un apano; proponerla numerica perderia todas las muestras en punto muerto.\n3. Con cero filas se emitia un aviso POR COLUMNA: 476 lineas identicas en el AutoLog, un informe que nadie lee. Ahora es un aviso del fichero.\n\nDECISIONES QUE CONVIENE CONOCER AL CONSTRUIR FG-07, FG-08 y FG-14 ENCIMA:\n- La lista de 'sin dato' NO esta en el codigo: sale de [centinelas] de data/units.toml via Catalogo. Sin catalogo, 'NULL' es texto; con catalogo, es ausencia. Una prueba usa esa diferencia para demostrar que no hay lista escondida en Python.\n- Los centinelas de texto y los de desbordamiento se cuentan aparte aunque los dos sean ausencia, porque 900 celdas vacias son un canal a otra frecuencia y 900 a 2147483647 son un sensor desconectado.\n- Entero o decimal se decide por la ESCRITURA, no por el valor.\n- La constancia se juzga por la CADENA y no por el valor: '1.0' y '1.00' no se consideran el mismo valor, porque decidir eso exige parsear y parsear es FG-07. Se pierde un aviso, no un dato: la columna se queda en DECIMAL y sigue siendo graficable.\n- COBERTURA_NUMERICA_MINIMA = 0,95 es una heuristica de formato (como sondeo.CONFIANZA_MINIMA), no un umbral de fisica: no va a data/umbrales.toml y se puede pasar por parametro.\n\nVERIFICACION: ruff check y ruff format en verde. mypy --strict en verde sobre tipos.py con --python-version 3.12. ADR-009 en verde (el bucle es sobre una muestra acotada del principio del fichero para PROPONER un esquema, igual que FG-01/02/03, no sobre las 73 M muestras). 43 pruebas propias en verde con el pytest REAL del contenedor, y la suite entera: 798 pasan con pytest real y 800 con el sustituto sobre 3.12; los 2 de diferencia son test_invariante_imports y test_banco parseando con ast bajo 3.11 la sintaxis PEP 695 de piramide.py:318, preexistente y del entorno.\n\nDesbloquea FG-07 (G1), FG-08 (G3) y FG-14 (G3), las tres de Sonnet."
+        }
+      ]
     },
     {
       "id": "FG-06",
@@ -2839,10 +2850,19 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "orquestador",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-04 22:53:33Z",
+          "texto": "Agente Haiku 4.5 en segundo plano (SS8.5), en paralelo con FG-05 que hace Opus en dlv-core. Ficheros: dlv-ui/index.html (tema, donde ya viven las variables CSS) + un modulo nuevo dlv-ui/src/tema/ con su prueba + los tres modulos que hoy cablean color (dlv-ui/src/ejes/ejes.ts, dlv-ui/src/carriles/color.ts, dlv-ui/src/paneles/paneles.ts:314). Prohibido tocar dlv-core, dlv-api, state/, data/ y hacer commit."
+        },
+        {
+          "fecha": "2026-08-04 23:14:56Z",
+          "texto": "CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pase). Commit 13f6d99.\n\nSigue en_curso porque la puerta es G4 y en este contenedor no se puede ejecutar vitest: npm install falla con 403 contra registry.npmjs.org, no hay node_modules. Las pruebas nuevas (tema.test.ts reescrita, selector-tema.test.ts nueva) no se han ejecutado NUNCA con vitest. Marcarla hecha seria dar por buena una suite sin correr.\n\nLO QUE SI ESTA VERIFICADO, ejecutado de verdad y no leido: tsc --noEmit limpio sobre todo src/ en modo estricto (los unicos errores del proyecto son los 3 ficheros de configuracion que importan vite/vitest, ausentes por no haber node_modules). Y la logica de tema.ts y de colorPorCodigo ejecutada con node --experimental-strip-types: 24 comprobaciones del tema en verde (precedencia sin navegador, aviso de cambio y baja, colores de los tres temas, rangos HSL validos, codigo negativo) y confirmado que el matiz de una serie NO depende del tema, que es el requisito de estabilidad de color de F3-13.\n\nCINCO DEFECTOS QUE ENCONTRE EN LO ENTREGADO POR EL AGENTE HAIKU, todos arreglados en el mismo commit y todos utiles como aviso para el resto de tareas de dlv-ui:\n1. NO SE PODIA ELEGIR EL TEMA: establecerTema exportada y nadie la llamaba, sin control en la interfaz. Como prefers-color-scheme solo distingue claro de oscuro, el alto contraste era INALCANZABLE. Es la mitad del titulo de la tarea. Añadido selector-tema.ts.\n2. Cambiar de tema no repintaba las curvas: el color de serie va a la GPU con los datos, no por variables CSS. Y el arreglo obvio no bastaba, porque la clave de ultimaSubida no incluia el color y la subida se saltaba por cache. Una clave de cache tiene que nombrar TODO lo que se sube, no solo los datos.\n3. Las tres paletas declaradas dos veces (tema.ts e index.html), con el bloque CSS perdiendo la especificidad para los colores pero ganandola para color-scheme: unas propiedades se aplicaban y otras no, y tocar un color en el CSS no tenia ningun efecto.\n4. Logica de color de serie copiada en carriles/color.ts y en app/aplicacion.ts, con los numeros a pelo en el segundo.\n5. La suite afirmaba que el tema inicial es oscuro, pero el matchMedia de jsdom responde matches:false a todo, asi que en jsdom el inicial es CLARO: media suite decia lo contrario de lo que hace el codigo, incluidas dos pruebas que creian comparar la paleta oscura con la clara y comparaban la clara consigo misma. Ahora la preferencia del sistema se simula en cada prueba.\n\nQUE HAY QUE HACER PARA CERRAR G4: npm ci y npm run test en dlv-ui (o dejar que CI lo haga) y, como es una tarea de estilos, MIRAR LOS TRES TEMAS con el log sintetico abierto: que el oscuro se vea exactamente igual que antes, que el claro no deje curvas ilegibles sobre fondo blanco, y que en alto contraste se distingan dos series consecutivas. Eso ultimo no lo puede comprobar ninguna prueba automatica de las que hay hoy; F5-12 (regresion visual) es la tarea que lo hara."
+        }
+      ]
     },
     {
       "id": "F4-01",
