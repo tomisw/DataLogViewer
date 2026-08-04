@@ -6,6 +6,7 @@
     <title>DataLogViewer</title>
     <style>
       :root {
+        /* Tema oscuro por omisión (F3-21). */
         color-scheme: dark;
         --fondo: #14161a;
         --panel: #1c1f26;
@@ -16,6 +17,19 @@
         --rejilla: rgba(255, 255, 255, 0.08);
         --eje: rgba(255, 255, 255, 0.55);
       }
+
+      /* Los tres temas de F3-21 (oscuro, claro, alto contraste) están definidos
+         en `src/tema/tema.ts`, y NO se repiten aquí. El bloque `:root` de arriba
+         es solo el color del primer pintado, antes de que cargue el módulo;
+         desde que carga, `aplicarTema` escribe las variables en línea sobre
+         `documentElement` y eso gana a cualquier regla de esta hoja.
+
+         Declararlos también aquí no era redundancia inocua: las reglas
+         `:root[data-theme="claro"]` perdían la especificidad para los colores
+         pero la ganaban para `color-scheme`, así que el mismo bloque tenía unas
+         propiedades que se aplicaban y otras que no, y cambiar un color en el
+         sitio obvio (este) no tenía ningún efecto. Para añadir o retocar un
+         tema: `src/tema/tema.ts`. */
 
       * {
         box-sizing: border-box;
@@ -66,6 +80,27 @@
 
       .dlv-barra button:hover {
         filter: brightness(1.1);
+      }
+
+      /* Selector de tema (F3-21). `<select>` nativo a propósito: el control
+         existe por accesibilidad, así que se maneja con teclado y lo lee un
+         lector de pantalla sin tener que implementar nada de eso. */
+      .dlv-barra__tema {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--texto-tenue);
+        font-size: 13px;
+      }
+
+      .dlv-barra__tema select {
+        background: var(--fondo);
+        color: var(--texto);
+        border: 1px solid var(--panel-borde);
+        border-radius: 4px;
+        padding: 5px 8px;
+        font: inherit;
+        cursor: pointer;
       }
 
       .dlv-barra__estado {
@@ -130,8 +165,15 @@
         background: #0b0d10;
       }
 
+      .dlv-panel-divisor {
+        background: var(--eje);
+        opacity: 0.4;
+        transition: opacity 0.15s ease-out, background 0.15s ease-out;
+      }
+
       .dlv-panel-divisor:hover {
         background: var(--acento) !important;
+        opacity: 1 !important;
       }
 
       .dlv-panel-chip {

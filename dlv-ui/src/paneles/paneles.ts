@@ -311,7 +311,6 @@ export class PanelesApilados {
     divisor.style.setProperty("flex", `0 0 ${ALTO_DIVISOR_PX}px`);
     divisor.style.setProperty("cursor", "row-resize");
     divisor.style.setProperty("touch-action", "none");
-    divisor.style.setProperty("background-color", "rgba(128, 128, 128, 0.4)");
     this.#contenedor.appendChild(divisor);
     this.#cablearArrastreDivisor(divisor, panelSuperior, panelInferior);
   }

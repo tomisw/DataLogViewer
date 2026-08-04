@@ -1,5 +1,5 @@
 /**
- * Color estable por código de estado (F3-13).
+ * Color estable por código de estado (F3-13) con ajustes por tema (F3-21).
  *
  * "Estable" es el requisito literal de la tarea: el mismo código tiene que
  * pintarse siempre del mismo color, sin depender del orden en que aparecieron
@@ -15,22 +15,33 @@
  * estabilidad. Duplicado a propósito en vez de importado: `aplicacion.ts` es
  * la capa de ensamblado (F1) y este componente no depende hacia arriba de
  * ella (mismo motivo por el que `render/tipos.ts` no sabe de logs).
+ *
+ * **Ajustes por tema (F3-21):** lo único que cambia con el tema es la saturación
+ * y la luz, y las decide `tema.parametrosDeSerie` para que este fichero y
+ * `aplicacion.ts` no puedan discrepar. El matiz no depende del tema, que es lo
+ * que preserva la estabilidad de color que exige F3-13.
  */
 
 import type { Color } from "../render/tipos.ts";
+import { parametrosDeSerie } from "../tema/tema.ts";
 
-/** Saturación y luz fijas, altas para leerse bien sobre fondo oscuro (igual que `colorPorIndice`). */
-const SATURACION = 0.65;
-const LUZ = 0.6;
 const ANGULO_AUREO = 137.508;
 
-/** Color estable para `codigo`. Códigos negativos incluidos (p. ej. `Launch Control State`). */
+/**
+ * Color estable para `codigo`. Códigos negativos incluidos (p. ej. `Launch Control State`).
+ *
+ * El matiz solo depende del código, así que la estabilidad que exige F3-13 se
+ * mantiene entre temas: cambiar de tema cambia lo saturada y lo clara que se ve
+ * la serie, nunca de qué color es. La saturación y la luz salen de
+ * `tema.parametrosDeSerie`, que es el único sitio donde están esos números.
+ */
 export function colorPorCodigo(codigo: number): Color {
   // `% 360` de un `codigo` negativo puede dar un resultado negativo en JS
   // (a diferencia de Python): `(-101 * 137.508) % 360` es negativo, así que
   // se normaliza a `[0, 360)` con un segundo `% 360` tras sumar 360.
   const matiz = (((codigo * ANGULO_AUREO) % 360) + 360) % 360;
-  const { r, g, b } = hslARgb(matiz, SATURACION, LUZ);
+  const { saturacion, luz } = parametrosDeSerie(codigo);
+  const { r, g, b } = hslARgb(matiz, saturacion, luz);
   return { r, g, b, a: 1 };
 }
 
