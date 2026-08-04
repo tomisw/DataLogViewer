@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 22:47:28Z"
+    "actualizado": "2026-08-04 22:52:01Z"
   },
   "tareas": [
     {
@@ -2860,7 +2860,7 @@
       "dep_todo": false,
       "gate": "G3",
       "estado": "en_curso",
-      "agente": "sonnet",
+      "agente": "orquestador",
       "commits": [],
       "notas": [
         {
@@ -2874,6 +2874,10 @@
         {
           "fecha": "2026-08-04 17:36:14Z",
           "texto": "RELANZADA tras el reinicio del limite de sesion. Mismo encargo que el intento anterior, que murio en su fase de lectura sin escribir nada; malla.py sigue con su esqueleto intacto."
+        },
+        {
+          "fecha": "2026-08-04 22:52:01Z",
+          "texto": "CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQUINA CON NUMPY. Commit eea3de7 (dlv-core/src/dlv_core/malla.py, 456 lineas nuevas + dlv-core/tests/test_malla.py, 26 pruebas).\n\nSigue en_curso a proposito y no en hecho: la puerta de esta tarea es G3, verificacion completa, y en este contenedor no hay numpy ni polars. El modulo de produccion corre sobre numpy y NO lo he podido ejecutar con numpy ni una vez. Marcarla hecha seria la misma contradiccion que ya hubo que corregir en F3-13 y F2-01.\n\nLO QUE SI ESTA VERIFICADO: ruff check y ruff format en verde; mypy --strict en verde sobre malla.py con --python-version 3.12; ADR-009 por patron (tools/banco.py adr009, 0 ocurrencias) Y por conducta (una prueba cuenta las llamadas a min/max con 30 y con 3000 muestras sobre la misma malla y exige 3 en los dos casos); 757 pruebas de biblioteca estandar pasan y 0 fallan bajo Python 3.12, 26 de ellas de esta tarea.\n\nLO QUE FALTA PARA CERRAR G3: ejecutar bash tools/verificar.sh entero en una maquina con el entorno de uv sync, y en particular las pruebas de malla con numpy de verdad en vez de la implementacion de biblioteca estandar de las pruebas. La divergencia importa: revisando esta tarea encontre que bordes_por_omision daba un resultado DISTINTO con numpy que con la implementacion minima cuando el canal tiene huecos, porque numpy.min de un array con NaN es NaN y el min de la biblioteca estandar devuelve el primer elemento o el NaN segun el orden. Ya esta arreglado y probado, pero es la prueba de que la implementacion minima puede esconder este tipo de diferencia, asi que la pasada con numpy no es una formalidad.\n\nREVISADO POR MI CUENTA, ademas de lo anterior: que cumsum(cuenta) delimita de verdad los tramos del argsort (lo hace: bincount indexa por celda en el mismo orden ascendente); el convenio de bordes semiabiertos salvo el ultimo, con n_bins = 1 incluido (searchsorted sobre bordes[1:-1] vacio da 0 para todo, correcto); que el divisor seguro no cambia ningun resultado porque las celdas vacias se machacan con NaN despues; y que un valor infinito en el canal deja media = inf y desviacion = NaN, que es degradacion aceptable pero no esta probado.\n\nQUEDA COMO POSIBLE MEJORA, NO DEFECTO: la malla se devuelve como arrays planos y no como matriz, para no meter reshape en el protocolo Vectorial. Quien la consuma hace .reshape(malla.forma). Esta documentado en el docstring de Malla."
         }
       ]
     },

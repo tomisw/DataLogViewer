@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 22:47:28Z
+Actualizado: 2026-08-04 22:52:01Z
 
 **184 / 698 pts cerrados (26.4 %)** · 131 pts esperando revisión humana → 45.1 % entregado
 
@@ -49,7 +49,7 @@ Actualizado: 2026-08-04 22:47:28Z
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
-| `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | RELANZADA tras el reinicio del limite de sesion. Mismo encargo que el  |
+| `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 
 ## F0 — 54/54 pts
 
