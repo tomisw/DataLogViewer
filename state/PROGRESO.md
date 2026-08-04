@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-04 11:25:25Z
+Actualizado: 2026-08-04 11:36:55Z
 
-**180 / 698 pts cerrados (25.8 %)** · 100 pts esperando revisión humana → 40.1 % entregado
+**180 / 698 pts cerrados (25.8 %)** · 108 pts esperando revisión humana → 41.3 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 150 | 60 | 0 | 5 | 0 | 215 |
-| FG | 0 | 8 | 0 | 84 | 0 | 92 |
+| FG | 0 | 16 | 0 | 76 | 0 | 92 |
 | F2 | 0 | 8 | 5 | 67 | 0 | 80 |
 | F3 | 0 | 0 | 5 | 110 | 3 | 118 |
 | F4 | 0 | 0 | 0 | 63 | 0 | 63 |
@@ -39,6 +39,7 @@ Actualizado: 2026-08-04 11:25:25Z
 | `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
 | `F1-30` Doble cursor con delta usando la clase inter | revision_humana | Opus 5 | G1 | PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMER |
+| `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
@@ -112,11 +113,11 @@ Actualizado: 2026-08-04 11:25:25Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 
-## FG — 8/92 pts
+## FG — 16/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ·  | `FG-01` | Sondeo: codificación, fin de línea, delimitador por consistenc | Opus 5 | 8 | F1-02 | G1 | — |
+| ⏳ | `FG-01` | Sondeo: codificación, fin de línea, delimitador por consistenc | Opus 5 | 8 | F1-02 | G1 | `79524dd` |
 | ·  | `FG-02` | Separador decimal con verificación cruzada de interpretaciones | Opus 5 | 5 | FG-01 | G1 | — |
 | ·  | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | — |
 | ·  | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | — |

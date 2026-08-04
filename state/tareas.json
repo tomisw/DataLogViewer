@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 11:25:25Z"
+    "actualizado": "2026-08-04 11:36:55Z"
   },
   "tareas": [
     {
@@ -1628,10 +1628,21 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [
+        "79524dd"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-04 11:26:34Z",
+          "texto": "Se arranca con --forzar: depende de F1-02, que esta en revision_humana y no en hecho (docs/08 SS8.7: revision_humana no bloquea a los dependientes). El sondeo es analisis de bytes con biblioteca estandar, asi que no necesita polars, y abre los 92 pts de la fase FG (CSV genérico), que es un requisito explicito del propietario. No toca dlv-ui ni dlv-api."
+        },
+        {
+          "fecha": "2026-08-04 11:36:55Z",
+          "texto": "dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion con BOM/UTF-8/latin-1, fin de linea, delimitador, comillas y escape). 47 pruebas, incluidos los 14 ficheros de samples/generico uno por uno, los tres logs reales y el par de F0-13. DECISION DE FONDO: se puntua por la RACHA mas larga de lineas con el mismo numero de campos, no por la moda global. Mi primera version puntuaba por la moda y NO sabia leer el AutoLog del propietario por el camino generico: 475 canales dan 1895 lineas de cabecera, asi que la moda de campos con ',' en los primeros 64 kB es 1. El limite de 200 lineas que habia puesto era lo que de verdad lo escondia (los datos empiezan en el byte 42345, dentro de los 64 kB); quitado. RENDIMIENTO: solo se prueban las comillas que aparecen en la muestra -- no es poda heuristica, es que las demas dan el mismo recuento -- y eso baja el sondeo del AutoLog de 94 ms a 2,2 ms. DEFECTOS PROPIOS CAZADOS: (1) Sondeo.confianza leia candidatos[0], que no es el elegido; (2) la prueba literal de csv.Sniffer fallaba contra el propio modulo porque su docstring lo cita, el MISMO defecto del detector de ADR-009, reescrita con ast; (3) la racha minima de 3 dejaba sin delimitador a un fichero de dos lineas. REVISAR EN LA G1: (a) el umbral CONFIANZA_MINIMA de 0,6, que decide cuando el sondeo dice 'no se' en vez de proponer; (b) RACHA_MINIMA = 3; (c) que puntuar por racha y no por moda es la eleccion correcta -- el caso decisivo esta en test_el_csv_espanol_da_puntoycoma_y_no_coma, donde las DOS interpretaciones dan 6 campos con consistencia 1,0 y lo unico que las distingue es que la de la coma deja la cabecera fuera. PENDIENTE: 'bash tools/verificar.sh' completo en local."
+        }
+      ]
     },
     {
       "id": "FG-02",
