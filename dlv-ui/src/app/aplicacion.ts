@@ -43,6 +43,7 @@ import type { Color, CubosContinuos, Vista, Viewport } from "../render/tipos.ts"
 import { GestorEscalas, tituloConModo } from "../escalas/gestor.ts";
 import type { RangoValor } from "../escalas/rango.ts";
 import { SelectorCanales } from "../canales/selector-canales.ts";
+import { elegirProtagonistas } from "../canales/protagonistas.ts";
 import type { CanalInfo as CanalParaSelector } from "../canales/tipos.ts";
 import { fabricaDesdeDocumento } from "../unidades/dom.ts";
 import { SelectorUnidad } from "../unidades/selector-unidad.ts";
@@ -56,6 +57,45 @@ import { alCambiarTema, obtenerTemaActual, parametrosDeSerie } from "../tema/tem
 import { montarSelectorDeTema } from "../tema/selector-tema.ts";
 
 const EJE_PRINCIPAL = "principal";
+
+const MAXIMO_PROTAGONISTAS = 8;
+
+/**
+ * Con qué canales se abre un log, por rol semántico y en orden de preferencia
+ * (`#preseleccionarProtagonistas`).
+ *
+ * ES UN VALOR POR OMISIÓN, NO UNA AFIRMACIÓN SOBRE EL MOTOR
+ * ========================================================
+ * Ocho canales de entre varios cientos es una elección, y ninguna elección
+ * sirve para todos los coches. Esta es la de «qué mira alguien en los primeros
+ * cinco segundos de abrir una tirada»: a qué régimen iba, cuánta presión daba,
+ * cuánto gas, cómo iba de mezcla, y las tres temperaturas/presiones que hacen
+ * abortar una sesión. Se cambia marcando y desmarcando casillas, sin tocar
+ * código.
+ *
+ * NO vive en `data/roles.toml` aunque nombre roles suyos: ese fichero es una
+ * puerta G1 y describe QUÉ ES cada rol (dimensión, rango plausible, si algún
+ * detector crítico depende de él), no cuáles se enseñan primero. Añadirle un
+ * campo de presentación mezclaría las dos cosas y metería una decisión de
+ * interfaz en un fichero que se revisa por sus consecuencias físicas.
+ *
+ * Un rol que este log no tenga simplemente no aparece; ver el repliegue a
+ * «primeros canales activos» en `#preseleccionarProtagonistas`.
+ */
+const ORDEN_PROTAGONISTAS: readonly string[] = [
+  "engine_speed",
+  "manifold_pressure",
+  "throttle_position",
+  "lambda_measured",
+  "coolant_temp",
+  "oil_pressure",
+  "intake_air_temp",
+  "battery_voltage",
+  "boost_pressure_actual",
+  "ignition_advance",
+  "injector_duty",
+  "vehicle_speed",
+];
 
 interface EstadoPanel {
   readonly panelId: string;
@@ -156,15 +196,12 @@ export class Aplicacion {
   /**
    * Se incrementa en cada `#reconstruir()`. `#redibujarUnaVez` la comprueba
    * tras cada `await`: si cambió mientras esperaba datos, el `EstadoPanel`
-   * que tiene en la mano puede haber sido destruido entre medias (p. ej. la
-   * preselección inicial dispara varias reconstrucciones seguidas, una por
-   * canal marcado) y seguir usándolo lanzaría contra un `Renderizador` ya
-   * destruido. Abortar en silencio es correcto: la reconstrucción que ganó
-   * ya ha pedido su propio redibujado.
+   * que tiene en la mano puede haber sido destruido entre medias (marcar un
+   * canal mientras se está pidiendo el nivel de otro basta) y seguir usándolo
+   * lanzaría contra un `Renderizador` ya destruido. Abortar en silencio es
+   * correcto: la reconstrucción que ganó ya ha pedido su propio redibujado.
    */
   #generacion = 0;
-  /** Ver la cabecera de `#preseleccionarProtagonistas`: silencia `#onSeleccionCambia` mientras dura. */
-  #reconstruccionSuprimida = false;
 
   constructor(raiz: HTMLElement, fuente: FuenteDeDatos) {
     this.#raiz = raiz;
@@ -256,7 +293,11 @@ export class Aplicacion {
     this.#contenedorSelectorCanales.textContent = "";
     const canales: CanalParaSelector[] = log.canales.map((c) => ({
       idNativo: c.idNativo,
-      formato: "sintético",
+      // El nombre de la FUENTE, no la palabra "sintético" cableada: con un log
+      // real el selector decía "sintético" en cada una de las 475 filas, que es
+      // exactamente la clase de repliegue silencioso a datos falsos que
+      // `main.ts` se molesta en no hacer.
+      formato: this.#fuente.nombre,
       nombre: c.nombre,
       rol: c.rol,
       clasificacion: c.clasificacion,
@@ -269,39 +310,43 @@ export class Aplicacion {
   }
 
   /**
-   * `SelectorCanales` no ofrece una forma de preseleccionar canales por
-   * programa (ni `estadoInicial`, ni un atributo `data-*` por fila que
-   * permita encontrar una casilla concreta desde fuera — ver el informe de
-   * la tarea). Como paliativo NO invasivo (no se toca `selector-canales.ts`),
-   * esto simula clics reales sobre las primeras filas: son las primeras N
-   * entradas de `log.canales`, que `fuente-sintetica.ts` rellena con los
-   * canales "protagonistas" en primer lugar, así que la posición es estable
-   * mientras no haya filtro de búsqueda activo ni "mostrar inactivos".
+   * Deja marcados los canales con los que merece la pena abrir el log.
    *
-   * `#reconstruccionSuprimida` evita que los 8 clics disparen 8
-   * reconstrucciones completas de `PanelesApilados` (una por clic, con 1, 2,
-   * 3… canales): además de lento, cada reconstrucción crea un
-   * `WebGL2RenderingContext` por panel y un navegador solo garantiza un
-   * puñado de contextos vivos a la vez (Chrome/Edge: 16) — encadenar 8
-   * reconstrucciones de tamaño creciente llegó a pedir 36 contextos y el
-   * navegador empezó a descartar los más antiguos («Too many active WebGL
-   * contexts», visto al verificar esta tarea con `npm run dev`). Con la
-   * supresión, los 8 clics solo actualizan el estado interno de
-   * `SelectorCanales`; la reconstrucción real se dispara UNA vez al final,
-   * ya con los 8 canales.
+   * POR QUÉ NO VALE «LOS OCHO PRIMEROS»
+   * ===================================
+   * Eso es lo que hacía antes, y funcionaba con `FuenteSintetica` porque esa
+   * fuente pone los canales interesantes al principio de la lista. Sobre un
+   * log real de Haltech es un desastre silencioso: las primeras columnas del
+   * fichero son diagnósticos de arranque de la ECU —`Bootmode Reason`,
+   * `Reset Required`, `Memory Writes Pending`, tres errores de referencia de
+   * tensión—, y tres de los ocho son una línea recta. El log se abría
+   * perfectamente y la ventana parecía vacía.
+   *
+   * El criterio ahora es el ROL SEMÁNTICO (`dlv_core.roles`, FG-09), que es
+   * justamente la indirección que existe para no tener que nombrar «la
+   * columna 197 de Haltech». `ORDEN_PROTAGONISTAS` dice en qué orden se
+   * prefieren.
+   *
+   * LO QUE NO SE ACEPTA COMO PROTAGONISTA
+   * ====================================
+   * - Un rol de confianza `DIFUSA`: es un parecido de cadenas por encima de un
+   *   umbral (docs/07 §7.15). Como protagonista, un falso positivo pone en
+   *   pantalla un canal que no es el que dice ser, y eso es peor que enseñar
+   *   uno menos.
+   * - Un canal `vacio` o `constante`: dibuja una recta o nada. Que exista un
+   *   rol `oil_pressure` no significa que ese sensor estuviera conectado en
+   *   esta tirada.
+   *
+   * Si tras filtrar no quedan ocho, se rellena con los primeros canales
+   * ACTIVOS de la lista. Es el mismo criterio de antes pero sin las rectas: un
+   * repliegue que enseña algo real, en vez de una ventana en blanco cuando el
+   * catálogo de roles no reconoce el formato (un CSV genérico, docs/07).
    */
   #preseleccionarProtagonistas(): void {
-    if (this.#selectorCanales === null) return;
-    const filas = this.#contenedorSelectorCanales.querySelectorAll<HTMLLIElement>(
-      ".selector-canales__fila",
+    if (this.#selectorCanales === null || this.#log === null) return;
+    this.#selectorCanales.preseleccionar(
+      elegirProtagonistas(this.#log.canales, ORDEN_PROTAGONISTAS, MAXIMO_PROTAGONISTAS),
     );
-    const objetivo = Math.min(8, filas.length);
-    this.#reconstruccionSuprimida = true;
-    for (let i = 0; i < objetivo; i += 1) {
-      filas[i]?.querySelector<HTMLInputElement>("input[type=checkbox]")?.click();
-    }
-    this.#reconstruccionSuprimida = false;
-    this.#onSeleccionCambia(this.#selectorCanales.seleccionados);
   }
 
   // ------------------------------------------------------------------ //
@@ -342,7 +387,7 @@ export class Aplicacion {
   // ------------------------------------------------------------------ //
 
   #onSeleccionCambia(seleccionados: ReadonlySet<string>): void {
-    if (this.#reconstruccionSuprimida || this.#log === null) return;
+    if (this.#log === null) return;
     const canalesVisibles = this.#log.canales.filter((c) => seleccionados.has(c.idNativo));
     this.#reconstruirSelectorUnidad(canalesVisibles);
     const definiciones: DefinicionPanel[] = canalesVisibles.map((c) => ({

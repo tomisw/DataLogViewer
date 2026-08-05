@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 23:14:56Z"
+    "actualizado": "2026-08-05 11:25:55Z"
   },
   "tareas": [
     {
@@ -1612,6 +1612,26 @@
           "texto": "MVP cerrado: la aplicacion abre un log real. Medido contra el servidor de verdad y el log de 70 MB: abrirLog 1783 ms / 475 canales, pedirCubos 10 ms, RPM min 412 max 7996 (valores plausibles), 27 dimensiones de unidades reales. DOS COSAS QUE APARECIERON AL CABLEAR: (1) el frontend NO puede leer Arrow IPC sin una dependencia nueva, asi que se anadio el bufer de tipado fijo que ADR-007 ya contemplaba (cinco columnas float32 little-endian seguidas); Arrow sigue siendo el formato por omision y hay prueba de que los dos llevan los mismos numeros. (2) no habia forma de servir data/units.toml al frontend sin duplicarlo en TypeScript, que esta prohibido por la regla 2; se anadio GET /comandos/unidades. HUECOS ANOTADOS, NO RELLENADOS: FuenteApi devuelve rol null y clasificacion 'ni vacio ni constante' porque dlv-api no expone ni FG-09 ni F1-07; la direccion del error es enseñar de mas, nunca esconder un canal con datos."
         }
       ]
+    },
+    {
+      "id": "F1-44",
+      "fase": "F1",
+      "titulo": "Un log real abierto enseña sus datos: CORS con `expose_headers`, rol semántico y clasificación en `/comandos/abrir-log`, y elección de canales por rol",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 3,
+      "deps": [
+        "F1-43"
+      ],
+      "deps_backlog": [
+        "F1-43"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "en_curso",
+      "agente": "Opus 5 (orquestador)",
+      "commits": [],
+      "notas": []
     },
     {
       "id": "FG-01",

@@ -101,6 +101,7 @@ from dlv_core.formatos.cuerpo import COLUMNA_MARCA, columna_polars, parsear_cuer
 from dlv_core.formatos.haltech import Cabecera, Descriptor, ErrorDeFormato, parsear_cabecera
 from dlv_core.formatos.limpieza import nulificar_centinelas
 from dlv_core.piramide import NivelPiramide, construir_piramide_continuo
+from dlv_core.roles import Rol, asignar_rol
 from dlv_core.unidades import Catalogo
 
 __all__ = [
@@ -193,6 +194,12 @@ class CanalSesion:
     serie: ChannelSeries
     piramide: list[NivelPiramide]
     t_segundos: np.ndarray
+    rol: str | None = None
+    """Rol semántico conjeturado a partir del nombre (`dlv_core.roles`). Ver
+    `dlv_api.main.InfoCanalSesion.rol` para qué se puede y qué no se puede
+    hacer con él."""
+    confianza_rol: str | None = None
+    """Cómo se decidió `rol`: `EXACTA`, `INDEXADA` o `DIFUSA`."""
 
     @property
     def niveles(self) -> tuple[ResumenNivel, ...]:
@@ -201,6 +208,34 @@ class CanalSesion:
     @property
     def n_muestras(self) -> int:
         return len(self.serie.t)
+
+    @property
+    def vacio(self) -> bool:
+        """`IndiceCanal.vacio` (F1-07): el canal no tiene ni una muestra."""
+        return self.serie.v.size == 0
+
+    @property
+    def constante(self) -> bool:
+        """`IndiceCanal.constante` (F1-07): todas las muestras valen lo mismo.
+
+        Se calcula con `min`/`max` de NumPy sobre `serie.v` entera --una
+        pasada vectorizada, sin bucle por muestra (ADR-009)-- y no llamando a
+        `dlv_core.almacen.indexar`, que además calcula percentiles: eso es una
+        ORDENACIÓN por canal, y aquí solo hace falta saber si la serie varía.
+
+        Tampoco se saca del nivel más alto de la pirámide, que ya trae mín/máx
+        y sería gratis: los niveles altos truncan la cola que no completa un
+        cubo (ver `recortar_nivel`), así que un canal que solo cambia en los
+        últimos segundos del log saldría declarado constante. Un canal
+        escondido por un redondeo de la pirámide es justo el fallo que nadie
+        encuentra.
+        """
+        if self.serie.v.size == 0:
+            # No es "constante": no hay ningún valor que se esté repitiendo
+            # (mismo criterio que `IndiceCanal.constante`, y `min()` sobre un
+            # array vacío es un `ValueError`).
+            return False
+        return bool(self.serie.v.min() == self.serie.v.max())
 
 
 @dataclass(slots=True)
@@ -455,11 +490,17 @@ class RegistroSesiones:
         version_descriptor: str,
         dir_cache: Path,
         maximo: int = MAXIMO_SESIONES,
+        catalogo_roles: dict[str, Rol] | None = None,
     ) -> None:
         if maximo < 1:
             raise ValueError(f"el tope de sesiones tiene que ser >= 1, se dio {maximo}")
         self._descriptor = descriptor
         self._catalogo = catalogo
+        # Sin catálogo de roles el registro sigue funcionando y todos los
+        # canales salen con `rol=None`: es un dato de presentación, y una
+        # sesión que no se puede abrir porque falta `data/roles.toml` sería
+        # peor que una sesión sin rol asignado.
+        self._catalogo_roles: dict[str, Rol] = catalogo_roles or {}
         self._version_descriptor = version_descriptor
         self._dir_cache = dir_cache
         self._maximo = maximo
@@ -614,6 +655,12 @@ class RegistroSesiones:
                 )
                 continue
             serie, piramide = par
+            # El recorrido es por canal (unos cientos) contra el catálogo de
+            # roles (unas decenas), no por muestra: ADR-009 no aplica aquí, y
+            # así lo dice también el docstring de `asignar_rol`.
+            asignacion = (
+                asignar_rol(canal.nombre, self._catalogo_roles) if self._catalogo_roles else None
+            )
             canales.append(
                 CanalSesion(
                     id=canal.id,
@@ -621,6 +668,8 @@ class RegistroSesiones:
                     dimension=serie.dimension,
                     confianza=canal.confianza,
                     serie=serie,
+                    rol=None if asignacion is None else asignacion.rol,
+                    confianza_rol=None if asignacion is None else asignacion.confianza.name,
                     # `Piramide` es la unión de las cuatro variantes; aquí
                     # siempre es `CONTINUO` porque `_construir_series_y_piramides`
                     # llama a `construir_piramide_continuo` para todos los

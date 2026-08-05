@@ -24,22 +24,23 @@
  * `new Float32Array(buffer, i * n * 4, n)`. Cero parseo, que es literalmente
  * lo que pedía el ADR. `n` viene en la cabecera `X-Cubos`.
  *
- * DOS COSAS QUE ESTA FUENTE TODAVÍA NO SABE, Y QUE NO SE INVENTAN
- * ==============================================================
- * 1. **El rol semántico de cada canal.** La asignación automática existe
- *    (`dlv_core.roles`, FG-09) pero `dlv-api` no la expone todavía, así que
- *    aquí `rol` es `null`. Un rol inventado activaría o desactivaría
- *    detectores críticos por accidente (docs/07 §7.15), así que «no lo sé» es
- *    la única respuesta honesta.
- * 2. **La clasificación `vacío`/`constante`** de `IndiceCanal` (F1-07).
- *    Tampoco se expone. Se devuelve «ni vacío ni constante», y esa elección
- *    tiene una dirección deliberada: el selector de canales (F1-33) oculta los
- *    inactivos, así que el error por este lado es **enseñar de más**, nunca
- *    esconder un canal que sí tenía datos. Al revés, un canal desaparecería
- *    sin motivo visible.
+ * EL ROL Y LA CLASIFICACIÓN YA LLEGAN DEL BACKEND
+ * ===============================================
+ * Este fichero decía antes que `dlv-api` no exponía ni el rol semántico
+ * (`dlv_core.roles`, FG-09) ni la clasificación `vacío`/`constante`
+ * (`IndiceCanal`, F1-07), y devolvía `rol: null` y «ni vacío ni constante».
+ * Ese hueco tenía una consecuencia concreta y visible: al abrir un log real de
+ * 475 canales, la aplicación no tenía NINGÚN criterio para elegir cuáles
+ * enseñar, así que enseñaba los ocho primeros del fichero — que en un Haltech
+ * son diagnósticos de arranque (`Bootmode Reason`, `Reset Required`,
+ * `Memory Writes Pending`), tres de ellos una línea recta. El log se abría
+ * bien y parecía vacío.
  *
- * Las dos quedan anotadas para que quien las cablee no tenga que deducir que
- * faltaban: no son olvidos, son huecos conocidos del backend.
+ * `/comandos/abrir-log` manda ahora los cuatro campos. `confianzaRol` viaja
+ * separado de `rol` a propósito: una coincidencia `DIFUSA` es un parecido de
+ * cadenas por encima de un umbral, y docs/07 §7.15 no la deja activar un
+ * detector crítico sin que el usuario la confirme. Quien mire `rol` sin mirar
+ * `confianzaRol` estará tratando una corazonada como un hecho.
  */
 
 import type { CubosContinuos } from "../render/tipos.ts";
@@ -65,6 +66,10 @@ interface CanalDeApi {
   readonly nombre: string;
   readonly dimension: string | null;
   readonly niveles: readonly { readonly factor: number; readonly n_cubos: number }[];
+  readonly rol: string | null;
+  readonly confianza_rol: string | null;
+  readonly vacio: boolean;
+  readonly constante: boolean;
 }
 
 interface RespuestaAbrirLog {
@@ -112,13 +117,14 @@ export class FuenteApi implements FuenteDeDatos {
       return {
         idNativo,
         nombre: c.nombre,
-        rol: null,
+        rol: c.rol,
+        confianzaRol: c.confianza_rol,
         // `dimension` llega `null` cuando el tipo no está en el descriptor o su
         // escala no está confirmada. `CanalDeFuente` pide un id siempre, y
         // `unknown` ES una dimensión del catálogo —la de «se muestra en crudo,
         // sin unidad»—, no la ausencia de una.
         dimensionId: c.dimension ?? "unknown",
-        clasificacion: { vacio: false, constante: false },
+        clasificacion: { vacio: c.vacio, constante: c.constante },
       };
     });
     this.#nivelesPorLog.set(datos.id_sesion, niveles);

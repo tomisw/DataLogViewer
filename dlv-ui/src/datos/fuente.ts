@@ -59,6 +59,16 @@ export interface CanalDeFuente {
   readonly nombre: string;
   readonly rol: string | null;
   /**
+   * Cómo se decidió `rol`: `"EXACTA"`, `"INDEXADA"` o `"DIFUSA"`
+   * (`dlv_core.roles.Confianza`), y `null` cuando no hay rol.
+   *
+   * Va separado de `rol` porque docs/07 §7.15 lo exige: una coincidencia
+   * `DIFUSA` es un parecido de cadenas por encima de un umbral, no un hecho, y
+   * no puede activar por sí sola nada que dependa del significado del canal.
+   * Opcional para que las fuentes que no lo sepan no tengan que mentir.
+   */
+  readonly confianzaRol?: string | null;
+  /**
    * Id de dimensión del catálogo de unidades (`"unknown"` si no se pudo
    * asignar ninguna, igual que `dlv_core.unidades` — nunca `null`: "sin
    * confirmar" es una dimensión más, con su propia entrada en el catálogo,

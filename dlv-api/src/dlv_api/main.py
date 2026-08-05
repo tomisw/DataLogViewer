@@ -62,6 +62,7 @@ from typing import Literal
 
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -86,6 +87,7 @@ from dlv_core.formatos.haltech import (
 from dlv_core.formatos.limpieza import nulificar_centinelas
 from dlv_core.informe_importacion import InformeImportacion
 from dlv_core.piramide import NivelPiramide
+from dlv_core.roles import Rol, cargar_catalogo_roles
 from dlv_core.transporte import (
     MEDIA_TYPE_ARROW_IPC,
     MEDIA_TYPE_CUBOS_CRUDO,
@@ -98,6 +100,31 @@ from dlv_core.unidades import Catalogo, cargar_catalogo
 _RAIZ_REPO = Path(__file__).resolve().parents[3]
 _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
 _UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
+_ROLES_TOML = _RAIZ_REPO / "data" / "roles.toml"
+
+CABECERAS_EXPUESTAS = (
+    "X-Factor",
+    "X-Nivel",
+    "X-T-Origen",
+    "X-Cubos",
+    "X-Indice-Inicio",
+    "X-Dimension",
+    "X-Storage",
+    "X-Factor-A",
+    "X-Factor-B",
+    "X-Muestras",
+)
+"""Cabeceras `X-*` que el navegador tiene permiso para leer (ver `crear_app`).
+
+Es la lista que va en `Access-Control-Expose-Headers`. Toda cabecera `X-*` que
+cualquier endpoint devuelva tiene que estar aquí: una que falte no da error en
+ningún sitio, simplemente llega como ausente al JavaScript. En
+`/comandos/cubos` eso significa cero cubos y un panel vacío; en
+`/comandos/serie`, un factor de conversión perdido y un trazo con la escala
+equivocada. `dlv-api/tests/test_cors.py` compara esta lista contra las
+cabeceras que las respuestas traen de verdad, para que añadir una nueva sin
+apuntarla aquí falle en las pruebas y no en la ventana del usuario.
+"""
 
 VARIABLE_DIR_CACHE = "DLV_DIR_CACHE"
 """Variable de entorno que decide dónde se escriben los `.dlvcache`.
@@ -162,6 +189,17 @@ def _catalogo_unidades() -> Catalogo:
     descriptor de formato: no cambia entre peticiones."""
     with _UNITS_TOML.open("rb") as fh:
         return cargar_catalogo(fh)
+
+
+@lru_cache(maxsize=1)
+def _catalogo_roles() -> dict[str, Rol]:
+    """El catálogo de roles semánticos de `data/roles.toml` (FG-09).
+
+    Se sirve desde aquí, y no se duplica en el frontend, por la regla 2 de
+    `CLAUDE.md`: `data/*.toml` son datos del propietario.
+    """
+    with _ROLES_TOML.open("rb") as fh:
+        return cargar_catalogo_roles(fh)
 
 
 class InfoCanal(BaseModel):
@@ -328,6 +366,35 @@ class InfoCanalSesion(BaseModel):
     """Vacío si el canal está declarado en la cabecera pero no tiene columna en
     el cuerpo: entonces no hay cubos que pedir, y el frontend puede decirlo en
     vez de dibujar un panel vacío sin explicación."""
+    rol: str | None
+    """Rol semántico asignado por `dlv_core.roles` (FG-09), o `None` si nada
+    del catálogo se le parece lo bastante.
+
+    Sirve para que el frontend sepa CUÁLES de los 475 canales de un log real
+    son los que alguien quiere ver al abrirlo. Sin esto, el único criterio
+    disponible es el orden del fichero, y en un log de Haltech las primeras
+    columnas son diagnósticos de arranque (`Bootmode Reason`,
+    `Memory Writes Pending`): abrir el log enseñaba ocho líneas rectas.
+
+    **No es una verdad, es una conjetura sobre un nombre de columna**, por eso
+    viaja con `confianza_rol` al lado. El propietario decidió que un rol mal
+    asignado se corrige a mano y se guarda en un perfil."""
+    confianza_rol: str | None
+    """`EXACTA`, `INDEXADA` o `DIFUSA` (`dlv_core.roles.Confianza`), o `None`
+    si no hay rol.
+
+    Va separado del rol y no plegado dentro de él porque docs/07 §7.15 lo
+    exige: una coincidencia DIFUSA es un parecido de cadenas por encima de un
+    umbral, y no puede activar un detector crítico sin que el usuario la
+    confirme. Quien reciba esto y solo mire `rol` estará tratando una
+    corazonada como un hecho."""
+    vacio: bool
+    """El canal no tiene ni una muestra: estaba declarado en la cabecera pero
+    su módulo no estaba presente en esa tirada (`IndiceCanal.vacio`, F1-07)."""
+    constante: bool
+    """Todas las muestras valen lo mismo. No es un error --un canal atascado en
+    un valor es información real-- pero dibuja una línea recta, así que es lo
+    que el selector necesita para no ofrecerlo antes que un canal con señal."""
 
 
 class RespuestaAbrirLog(BaseModel):
@@ -437,6 +504,10 @@ def _info_canal(canal: CanalSesion) -> InfoCanalSesion:
         factor_b=canal.serie.to_canon.b,
         n_muestras=canal.n_muestras,
         niveles=[NivelCanal(factor=n.factor, n_cubos=n.n_cubos) for n in canal.niveles],
+        rol=canal.rol,
+        confianza_rol=canal.confianza_rol,
+        vacio=canal.vacio,
+        constante=canal.constante,
     )
 
 
@@ -692,6 +763,32 @@ def crear_app(
     decorador, que solo se resuelve del todo cuando `fastapi` está instalado.
     """
     app = FastAPI(title="dlv-api")
+    # El frontend vive en un origen HTTP distinto al de esta API (puerto
+    # efimero propio en ambos casos: el servidor de desarrollo de Vite en
+    # `:5173`, o el servidor estatico efimero de `dlv-ui/dist` que arranca
+    # `dlv_app.main.iniciar_ui_estatica_en_hilo`). Los POST autenticados
+    # mandan cabeceras `Content-Type`/`Authorization` (`dlv-ui/src/datos/
+    # fuente-api.ts`), que no son "simples" para CORS: el navegador antepone
+    # un preflight `OPTIONS` que, sin este middleware, FastAPI responde con
+    # 405 (no hay ruta `OPTIONS` registrada) y la petición real nunca sale.
+    # Restringido a loopback (ADR-007: la API solo escucha en 127.0.0.1) en
+    # cualquier puerto, porque el puerto es efimero y distinto cada arranque.
+    #
+    # `expose_headers` no es un detalle: de una respuesta con CORS, el
+    # JavaScript solo puede leer siete cabeceras de una lista fija del
+    # estándar. Las `X-*` de `/comandos/cubos` -- que son TODO lo que hace
+    # interpretable un cuerpo binario mudo: cuántos cubos, dónde empieza el
+    # tiempo, qué factor -- son invisibles sin nombrarlas aquí, y su ausencia
+    # no da ningún error: `respuesta.headers.get("X-Cubos")` devuelve `null`,
+    # el frontend lee cero cubos y los paneles salen vacíos con un 200 en el
+    # registro del servidor. Ver `CABECERAS_EXPUESTAS` y `tests/test_cors.py`.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"^http://(127\.0\.0\.1|localhost):\d+$",
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=list(CABECERAS_EXPUESTAS),
+    )
     app.state.token_sesion = token_sesion
     app.state.registro_sesiones = RegistroSesiones(
         descriptor=_descriptor_haltech(),
@@ -699,6 +796,7 @@ def crear_app(
         version_descriptor=huella_descriptor(_DESCRIPTOR_HALTECH),
         dir_cache=dir_cache if dir_cache is not None else directorio_cache_por_omision(),
         maximo=maximo_sesiones,
+        catalogo_roles=_catalogo_roles(),
     )
     app.add_api_route("/salud", salud, methods=["GET"])
     app.add_api_route(

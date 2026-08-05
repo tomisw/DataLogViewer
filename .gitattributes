@@ -38,3 +38,9 @@ samples/corrupt/** -text
 *.json text eol=lf
 *.yml text eol=lf
 *.sh text eol=lf
+
+# Los `.bat` son la excepción: `cmd.exe` es el único intérprete de este
+# repositorio que sí depende del fin de línea (un `goto` o un `if` partido por
+# un LF suelto se comporta de forma distinta), así que se guardan y se sacan
+# con CRLF en todas las máquinas.
+*.bat text eol=crlf

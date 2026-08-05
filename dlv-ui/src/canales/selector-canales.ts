@@ -145,6 +145,45 @@ export class SelectorCanales {
     if (cambio) this.#onSeleccionCambia(new Set(this.#seleccionados));
   }
 
+  /**
+   * Fija la selección por programa, en una sola operación.
+   *
+   * POR QUÉ ESTO EXISTE
+   * ===================
+   * Al abrir un log hay que dejar marcados unos pocos canales: una ventana con
+   * 475 casillas y ninguna marcada no enseña nada. Sin este método, la única
+   * vía era simular clics sobre las casillas del DOM, y eso trae dos problemas
+   * que no son de estilo:
+   *
+   * - Encontrar la casilla de un canal concreto exigía asumir su POSICIÓN en
+   *   la lista, porque las filas no llevan el `idNativo` en ningún atributo.
+   *   Esa posición depende del filtro de búsqueda y de «mostrar inactivos», y
+   *   basta con que uno de los dos esté activo para marcar otros canales.
+   * - Cada clic emitía `onSeleccionCambia`, y quien escucha reconstruye los
+   *   paneles: ocho clics eran ocho reconstrucciones de tamaño creciente, cada
+   *   una creando un `WebGL2RenderingContext` por panel. Un navegador solo
+   *   garantiza un puñado de contextos vivos (Chrome/Edge: 16) y empezaba a
+   *   descartar los antiguos («Too many active WebGL contexts»).
+   *
+   * Aquí la selección se fija de una vez y el callback se emite UNA vez, y
+   * solo si algo cambió de verdad.
+   *
+   * Los ids que no existan en la lista actual se ignoran en silencio: quien
+   * llama propone canales por rol semántico (`rol`), y que un log no tenga
+   * sensor de presión de aceite es lo normal, no un error que deba propagarse.
+   */
+  preseleccionar(ids: Iterable<string>): void {
+    const vigentes = new Set(this.#canales.map((c) => c.idNativo));
+    const nueva = new Set([...ids].filter((id) => vigentes.has(id)));
+    const igual =
+      nueva.size === this.#seleccionados.size && [...nueva].every((id) => this.#seleccionados.has(id));
+    if (igual) return;
+    this.#seleccionados.clear();
+    for (const id of nueva) this.#seleccionados.add(id);
+    this.#renderizarLista();
+    this.#onSeleccionCambia(new Set(this.#seleccionados));
+  }
+
   /** Quita el fragmento del DOM. No se puede seguir usando la instancia tras esto. */
   destruir(): void {
     this.#contenedor.replaceChildren();

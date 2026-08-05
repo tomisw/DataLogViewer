@@ -150,8 +150,9 @@ v1.0 se va a ~67 semanas.
 | F1-41 | Selector de **tipo de combustible** y factores de conversión editables | componente | Sonnet 5 | 3 | F1-14 | G3 |
 | F1-42 | **Apertura en < 4 s**: `detectar_grupos_de_muestreo` usa `np.unique(axis=0)` y se lleva el 98 % del tiempo de apertura | módulo + banco | **Opus 5** | 5 | F1-05, F1-06, F1-40 | G2 |
 | F1-43 | **La aplicación abre un log de verdad**: cablear `FuenteApi`, búfer de tipado fijo para el navegador, catálogo de unidades por HTTP y arranque con ruta de log | módulo + pruebas | **Opus 5** | 5 | F1-39, F1-40, F1-35 | G2 |
+| F1-44 | **Un log real abierto enseña sus datos**: CORS con `expose_headers`, rol semántico y clasificación en `/comandos/abrir-log`, y elección de canales por rol | módulo + pruebas | **Opus 5** | 3 | F1-43 | G2 |
 
-**Subtotal F1: 215 pts** · Hito **M1**
+**Subtotal F1: 218 pts** · Hito **M1**
 
 > **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
 > aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:
@@ -181,6 +182,29 @@ v1.0 se va a ~67 semanas.
 >   diagnóstico equivocado, dejó la apertura **más lenta**. Es el motivo por el
 >   que un banco mide antes y después: sin el «después», el cambio se habría
 >   dado por bueno.
+> - **F1-44 la encontró el propietario abriendo la aplicación**, no una prueba:
+>   «no puedo cargar logs reales, me salen datos vacíos». F1-43 dejó el camino
+>   completo y las 1075 pruebas en verde, y aun así la ventana salía vacía, por
+>   dos motivos que ninguna prueba de Python podía ver:
+>
+>   1. **Ningún cliente que no sea un navegador aplica CORS.** Las cabeceras
+>      `X-*` de `/comandos/cubos` —que son todo lo que hace interpretable un
+>      cuerpo binario mudo— no estaban en `Access-Control-Expose-Headers`, así
+>      que llegaban al JavaScript como ausentes. `pytest`, `httpx` y `curl` las
+>      reciben siempre; el navegador no. El servidor registraba un 200 impecable
+>      y los paneles salían vacíos. Ahora `dlv-api/tests/test_cors.py` compara
+>      la lista de expuestas contra las que las respuestas traen de verdad.
+>   2. **La aplicación elegía «los ocho primeros canales del fichero»**, que en
+>      un Haltech son diagnósticos de arranque (`Bootmode Reason`,
+>      `Memory Writes Pending`), tres de ellos constantes. Era correcto con la
+>      fuente sintética, que pone los interesantes primero. El criterio ahora es
+>      el rol semántico de FG-09, que es la indirección que existe justamente
+>      para no depender del orden de las columnas de un formato.
+>
+>   La lección se parece a la de F1-39 y merece quedar escrita: **las pruebas
+>   de F1 verifican el backend contra clientes de Python, y el cliente real es
+>   un navegador.** Todo lo que solo el navegador impone —CORS, contextos WebGL,
+>   el orden en que el DOM entrega los eventos— es invisible para esa suite.
 
 ## 5.5 Fase FG — Formatos y CSV genérico (semanas 10–12)
 
