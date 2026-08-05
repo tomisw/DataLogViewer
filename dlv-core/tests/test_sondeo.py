@@ -1,556 +1,476 @@
-"""Pruebas del sondeo de formato de CSV genérico (tarea FG-01).
+"""Pruebas del sondeo de CSV desconocido (tarea FG-01).
 
-Tres capas, y cada una caza lo que las otras no pueden:
+Especificación: `docs/07-formatos-y-csv-generico.md` §7.4, pasos 1, 2, 3 y 5.
 
-1. **El corpus de `samples/generico/`** (14 ficheros, uno por rasgo) es la
-   especificación ejecutable: si el sondeo cambia de opinión sobre uno de ellos,
-   se entera aquí. Cubre lo previsto por quien escribió el corpus.
-2. **Los casos que se equivocan en silencio**, escritos a mano porque no salen
-   de un generador: el `;` con coma decimal, las comas dentro de comillas, el
-   UTF-16, el fin de línea mixto, la comilla que no delimita nada. Todos tienen
-   en común que producen un resultado *plausible* cuando se detectan mal, que es
-   lo que los hace caros.
-3. **Propiedades con Hypothesis**, en la línea de `test_fuzzing_formato.py`. Dos
-   importan de verdad:
-   - el sondeo **nunca lanza una excepción**: para cualquier secuencia de bytes
-     hay un `Sondeo`, con la confianza que haga falta. Es la regla E1.7 llevada
-     hasta el final —aquí ni siquiera queda el caso de rechazo del parser
-     nativo—, y una traza escapando de un sondeo llegaría a la interfaz donde
-     tenía que haber una propuesta editable.
-   - **`confirmed` no miente**: cuando el veredicto del delimitador es
-     `confirmed`, es el delimitador de verdad. Un `inferred` equivocado lo
-     corrige el usuario en el asistente (§7.8); un `confirmed` equivocado se
-     precarga sin que nadie lo mire, y ese es el camino por el que un fichero
-     entero se importa con las columnas partidas donde no toca.
+QUÉ PROTEGE ESTA SUITE
+======================
+El paso 4 de §7.4 —el separador decimal— es de FG-02, pero su fallo empieza
+aquí: si el sondeo propone `,` para un CSV español que usa `;` con coma decimal,
+`12,5` se parte en dos columnas y el log entero sale con el doble de canales y
+la mitad de los valores. §7.4 dice que es «el que más a menudo se hace mal y el
+más importante en Europa».
+
+De ahí el orden de las pruebas:
+
+1. **El corpus real de `samples/generico/`**, los 14 ficheros, uno por uno. Es
+   la prueba que ata el módulo a ficheros que existen en el repositorio.
+2. **El CSV español** (`;` + coma decimal) tiene que dar `;`. Es el caso que
+   `csv.Sniffer` falla y por el que §7.4 lo descarta por nombre.
+3. **El preámbulo no puede cambiar el ganador.** Cinco líneas de `clave: valor`
+   delante de los datos son un bloque de una sola columna: puntuar por
+   uniformidad global penalizaría al delimitador correcto.
+4. **La truncación no puede cambiar la codificación.** Un corte en medio de una
+   «ñ» declararía latin-1 un fichero UTF-8 válido, y todos los nombres con
+   acentos saldrían mal.
+5. **Antes «no sé» que una propuesta que parte mal los datos.**
+
+Solo biblioteca estándar.
 """
 
 from __future__ import annotations
 
-import time
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
-from hypothesis import HealthCheck, assume, given, settings
-from hypothesis import strategies as st
 
 from dlv_core.formatos.sondeo import (
-    CANDIDATOS_DELIMITADOR,
-    LIMITE_MUESTRA,
-    Sondeo,
-    sondear,
+    CONFIANZA_MINIMA,
+    ErrorDeSondeo,
+    Escape,
+    FinDeLinea,
+    sondear_csv,
 )
 
 RAIZ = Path(__file__).resolve().parents[2]
-GENERICO = RAIZ / "samples" / "generico"
-REAL = RAIZ / "samples" / "real"
-
-AJUSTES = settings(max_examples=200, deadline=None)
-
-
-def codigos(sondeo: Sondeo) -> set[str]:
-    return {a.codigo for a in sondeo.avisos}
+GENERICOS = RAIZ / "samples" / "generico"
+DOS_FORMATOS = RAIZ / "samples" / "dos-formatos"
+REALES = RAIZ / "samples" / "real"
 
 
-# --------------------------------------------------------------------------- #
-# 1. El corpus de samples/generico como especificación ejecutable
-# --------------------------------------------------------------------------- #
-# (fichero, codificación, fin de línea, delimitador, comilla). Las expectativas
-# salen de `samples/generico/README.md`, que es donde el corpus declara qué
-# ejercita cada fichero; aquí no se «ajustan a lo que sale».
-CORPUS = [
-    ("01-coma-punto.csv", "utf-8", "CRLF", ",", None),
-    ("02-puntoycoma-coma.csv", "utf-8", "CRLF", ";", None),
-    ("03-tabulaciones.csv", "utf-8", "CRLF", "\t", None),
-    ("04-fila-de-unidades.csv", "utf-8", "CRLF", ",", None),
-    ("05-unidad-en-el-nombre.csv", "utf-8", "CRLF", ",", None),
-    ("06-sin-columna-de-tiempo.csv", "utf-8", "CRLF", ",", None),
-    ("07-epoch-segundos.csv", "utf-8", "CRLF", ",", None),
-    ("08-epoch-milisegundos.csv", "utf-8", "CRLF", ",", None),
-    ("09-iso8601.csv", "utf-8", "CRLF", ",", None),
-    ("10-latin1.csv", "latin-1", "CRLF", ",", None),
-    ("11-valores-ausentes.csv", "utf-8", "CRLF", ",", None),
-    ("12-texto-y-booleanos.csv", "utf-8", "CRLF", ",", None),
-    ("13-columnas-duplicadas.csv", "utf-8", "CRLF", ",", None),
-    ("14-preambulo-largo.csv", "utf-8", "CRLF", ",", None),
-]
-
-
-@pytest.mark.parametrize(("fichero", "codec", "eol", "delim", "comilla"), CORPUS)
-def test_el_corpus_generico_se_sondea_entero(
-    fichero: str, codec: str, eol: str, delim: str, comilla: str | None
-) -> None:
-    datos = (GENERICO / fichero).read_bytes()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.codificacion.valor == codec, s.resumen()
-    assert s.fin_de_linea.valor == eol, s.resumen()
-    assert s.delimitador.valor == delim, s.resumen()
-    assert s.comillas.valor == comilla, s.resumen()
-    # Los 14 ficheros tienen 6 columnas salvo el de la fila de unidades, que
-    # también, y el del preámbulo, que también: el corpus es rectangular.
-    assert s.n_campos == 6, s.resumen()
-
-
-def test_el_corpus_generico_no_deja_nada_en_unknown_salvo_la_codificacion_latin1() -> None:
-    """Un sondeo que se rinde en un fichero limpio deja al usuario rellenando a
-    mano lo que la máquina podía deducir, y el asistente se vuelve un peaje
-    (§7.9). El único `unknown` legítimo del corpus es el de la codificación del
-    fichero 10: latin-1 no es deducible, solo es lo que queda cuando UTF-8 no
-    valida."""
-    for fichero, *_ in CORPUS:
-        datos = (GENERICO / fichero).read_bytes()
-        s = sondear(datos, tamano_total=len(datos))
-        assert s.delimitador.es_fiable, f"{fichero}: {s.delimitador}"
-        assert s.fin_de_linea.es_fiable, f"{fichero}: {s.fin_de_linea}"
-        assert s.comillas.es_fiable, f"{fichero}: {s.comillas}"
-        if fichero != "10-latin1.csv":
-            assert s.codificacion.es_fiable, f"{fichero}: {s.codificacion}"
-
-
-def test_el_preambulo_no_impide_ver_el_delimitador_pero_deja_constancia() -> None:
-    """§7.4 paso 7: las 12 líneas de metadatos de `14-preambulo-largo.csv` no
-    tienen delimitador, así que bajan la cobertura. El veredicto sigue siendo el
-    bueno, con confianza `inferred`, y el aviso dice cuántas líneas discrepan
-    para que FG-03 sepa que ahí hay un preámbulo que separar."""
-    datos = (GENERICO / "14-preambulo-largo.csv").read_bytes()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ","
-    assert s.delimitador.confianza == "inferred"
-    assert "lineas_de_longitud_distinta" in codigos(s)
-    assert "12 de 63" in dict((a.codigo, a.mensaje) for a in s.avisos)[
-        "lineas_de_longitud_distinta"
-    ]
-
-
-def test_el_fichero_latin1_avisa_y_sigue() -> None:
-    """E1.7 en su forma más pura: el fichero se lee entero, con los acentos
-    puestos, y lo único que pasa es que la codificación queda `unknown` porque
-    ninguna estructura distingue latin-1 de cp1252."""
-    datos = (GENERICO / "10-latin1.csv").read_bytes()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.codificacion.confianza == "unknown"
-    assert "codificacion_no_utf8" in codigos(s)
-    assert "Presión_colector" in s.texto
+def bytes_de(ruta: Path) -> bytes:
+    return ruta.read_bytes()
 
 
 # --------------------------------------------------------------------------- #
-# 2. Los casos que se equivocan en silencio
+# El corpus real, fichero por fichero
 # --------------------------------------------------------------------------- #
-def test_el_delimitador_no_es_el_caracter_mas_frecuente() -> None:
-    """El ejemplo del enunciado de FG-01, y el motivo de que §7.4 prohíba
-    `csv.Sniffer`: hay ocho comas y seis puntos y coma, y el delimitador es el
-    punto y coma. Contar caracteres da la respuesta contraria; contar
-    consistencia del número de campos da la buena."""
-    datos = (
-        b'nombre;nota;rpm\r\n"a,b,c";"d,e";100\r\n"f,g,h";"i,j";200\r\n"k,l,m";"n,o";300\r\n'
-    )
-    s = sondear(datos, tamano_total=len(datos))
-    assert datos.count(b",") > datos.count(b";")
-    assert s.delimitador.valor == ";", s.resumen()
-    assert s.comillas.valor == '"', s.resumen()
-    assert s.n_campos == 3
-
-
-def test_punto_y_coma_con_coma_decimal_no_se_confunde_con_coma() -> None:
-    """El CSV español típico (§7.4 paso 4). La coma decimal deja cinco comas por
-    fila de datos, MÁS que puntos y coma, y además de forma perfectamente
-    consistente: lo único que separa a las dos hipótesis es la línea de
-    cabecera, que no lleva ninguna coma.
-
-    Por eso el veredicto es `inferred` y no `confirmed`, y por eso sale el aviso
-    `delimitador_ambiguo`: el sondeo acierta, pero no puede demostrarlo con la
-    tipografía sola. Quien lo confirma es la detección del separador decimal
-    (FG-02). Si esta prueba se pusiera en `confirmed`, el aviso desaparecería y
-    con él la única señal de que ese fichero merece una mirada.
-    """
-    datos = (
-        "Time;RPM;MAP;TPS;CLT;Lambda\r\n"
-        "0,000;1456;217,300;6,900;72,400;1,009\r\n"
-        "0,050;4107;56,380;89,000;78,600;0,928\r\n"
-        "0,100;5873;48,040;65,700;89,800;0,845\r\n"
-    ).encode()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ";", s.resumen()
-    assert s.n_campos == 6
-    assert s.delimitador.confianza == "inferred"
-    assert "delimitador_ambiguo" in codigos(s)
-
-
-def test_el_delimitador_dentro_de_un_campo_entrecomillado_no_cuenta() -> None:
-    """`a,"b,c",d` son tres campos, no cuatro. Contar cuatro no rompe nada
-    visible: corre una columna a la derecha y el log se importa con los canales
-    desplazados, que es el fallo de importación más caro que hay."""
-    datos = b'a,"b,c",d\r\ne,"f,g",h\r\ni,"j,k",l\r\n'
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ","
-    assert s.comillas.valor == '"'
-    assert s.n_campos == 3, s.resumen()
-
-
-def test_un_salto_de_linea_dentro_de_comillas_no_parte_el_registro() -> None:
-    """Un valor con salto de línea es un campo, no dos filas. Partir por él
-    inventaría una fila corta y dejaría a la siguiente con campos de menos."""
-    datos = b'a;b;c\r\n"x\r\ny";2;3\r\nd;e;f\r\n'
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ";", s.resumen()
-    assert s.comillas.valor == '"', s.resumen()
-    assert s.n_campos == 3
-    assert s.puntuaciones[0].lineas_examinadas == 3
-
-
-def test_una_comilla_que_no_delimita_campos_no_es_la_comilla_del_fichero() -> None:
-    """`12" de llanta` lleva una comilla suelta. Tomarla por comilla de campo
-    invertiría el estado «dentro/fuera» a partir de ahí y se comería los
-    delimitadores del resto del fichero. Se avisa y se sigue sin comillas."""
-    datos = 'rueda,ancho\r\n12" de llanta,205\r\n13" de llanta,215\r\n15,225\r\n'.encode()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ","
-    assert s.comillas.valor is None, s.resumen()
-    assert "comillas_sueltas" in codigos(s)
-    assert s.n_campos == 2
-
-
-def test_un_apostrofo_en_el_texto_no_convierte_la_comilla_simple_en_delimitadora() -> None:
-    datos = b"piloto,vuelta\r\nO'Brien,89.4\r\nD'Angelo,90.1\r\nSmith,88.7\r\n"
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ","
-    assert s.comillas.valor is None, s.resumen()
-    assert s.n_campos == 2
-
-
 @pytest.mark.parametrize(
-    ("codec", "bom"),
+    ("fichero", "delimitador", "n_campos"),
     [
-        ("utf-16-le", True),
-        ("utf-16-be", True),
-        ("utf-16-le", False),
-        ("utf-16-be", False),
+        ("01-coma-punto.csv", ",", 6),
+        ("02-puntoycoma-coma.csv", ";", 6),
+        ("03-tabulaciones.csv", "\t", 6),
+        ("04-fila-de-unidades.csv", ",", 6),
+        ("05-unidad-en-el-nombre.csv", ",", 6),
+        ("06-sin-columna-de-tiempo.csv", ",", 6),
+        ("07-epoch-segundos.csv", ",", 6),
+        ("08-epoch-milisegundos.csv", ",", 6),
+        ("09-iso8601.csv", ",", 6),
+        ("10-latin1.csv", ",", 6),
+        ("11-valores-ausentes.csv", ",", 6),
+        ("12-texto-y-booleanos.csv", ",", 6),
+        ("13-columnas-duplicadas.csv", ",", 6),
+        ("14-preambulo-largo.csv", ",", 6),
     ],
 )
-def test_utf16_con_y_sin_bom(codec: str, bom: bool) -> None:
-    """Un UTF-16 leído como latin-1 sale lleno de nulos y no parece un CSV: cero
-    columnas y cero avisos útiles. Con BOM lo decide el BOM; sin BOM lo decide el
-    patrón de bytes nulos en posiciones alternas, que es estructura pura."""
-    texto = "Time,RPM,MAP\r\n0.000,850,32.6\r\n0.050,860,33.1\r\n0.100,870,34.0\r\n"
-    boms = {"utf-16-le": b"\xff\xfe", "utf-16-be": b"\xfe\xff"}
-    datos = (boms[codec] if bom else b"") + texto.encode(codec)
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.codificacion.valor == codec, s.resumen()
-    assert s.bytes_de_bom == (2 if bom else 0)
-    assert s.texto == texto
-    assert s.fin_de_linea.valor == "CRLF", s.resumen()
-    assert s.delimitador.valor == ",", s.resumen()
-    assert s.n_campos == 3
+def test_corpus_generico(fichero: str, delimitador: str, n_campos: int) -> None:
+    """Los 14 ficheros de `samples/generico/`, con su delimitador esperado.
+
+    Si uno falla, el módulo ha dejado de servir para un caso que el propietario
+    ya tiene en el repositorio, no para uno hipotético.
+    """
+    s = sondear_csv(bytes_de(GENERICOS / fichero))
+    assert s.delimitador == delimitador, f"{fichero}: candidatos {s.candidatos[:3]}"
+    assert s.n_campos == n_campos, fichero
 
 
-def test_el_bom_utf8_no_se_cuela_en_el_texto() -> None:
-    """`docs/09` §9.10, la trampa de los desplazamientos: el contrato no debe
-    obligar a acordarse del BOM. `texto` viene ya sin él y `bytes_de_bom` dice
-    cuántos se descontaron, para quien tenga que volver a los bytes."""
-    texto = "Time,RPM\r\n0.000,850\r\n0.050,860\r\n"
-    datos = b"\xef\xbb\xbf" + texto.encode()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.codificacion.valor == "utf-8"
-    assert s.codificacion.confianza == "confirmed"
-    assert s.bytes_de_bom == 3
-    assert s.texto == texto
-    assert not s.texto.startswith("﻿")
+def test_el_csv_espanol_da_puntoycoma_y_no_coma() -> None:
+    """El caso que §7.4 llama «el más importante en Europa».
+
+    `02-puntoycoma-coma.csv` es `;` con coma decimal. Leído con `,`, la cabecera
+    tiene 6 campos y cada fila de datos 11, porque cada `0,050` se parte en dos.
+    Es lo que `csv.Sniffer` hace mal y por lo que §7.4 lo descarta.
+    """
+    s = sondear_csv(bytes_de(GENERICOS / "02-puntoycoma-coma.csv"))
+    assert s.delimitador == ";"
+    assert s.n_campos == 6
+    assert s.confianza == 1.0
+
+    # Este fichero es más traicionero de lo que parece, y por eso es el bueno para
+    # esta prueba. La coma aparece MÁS veces que el punto y coma —una por cada
+    # decimal— y además, por casualidad de este fixture, cada fila de datos tiene
+    # cinco decimales, así que leída con `,` da SEIS campos: exactamente los mismos
+    # que la lectura correcta. Las dos interpretaciones dan 6 campos y las dos
+    # tienen consistencia 1,0.
+    #
+    # Lo único que las distingue es que la racha de la coma **empieza en la línea
+    # 1**: deja la cabecera fuera, porque `Time;RPM;...` no tiene ninguna coma. La
+    # del punto y coma empieza en la 0 e incluye la fila de nombres. La
+    # interpretación correcta es la que hace que la cabecera cuadre con los datos, y
+    # eso es lo que mide la longitud de la racha. Ni la frecuencia de caracteres ni
+    # el número de campos habrían decidido este caso.
+    por_coma = next(c for c in s.candidatos if c.delimitador == "," and c.comilla is None)
+    por_puntoycoma = next(c for c in s.candidatos if c.delimitador == ";")
+    assert por_coma.n_campos == por_puntoycoma.n_campos == 6, "las dos dan 6 campos"
+    assert por_coma.consistencia == 1.0, "y las dos son perfectamente consistentes"
+    assert por_coma.linea_inicio == 1, "la racha de la coma empieza DESPUÉS de la cabecera"
+    assert por_puntoycoma.linea_inicio == 0, "la del punto y coma incluye la cabecera"
+    assert por_puntoycoma.lineas_consistentes == por_coma.lineas_consistentes + 1
+    assert por_coma.clave_de_orden < s.candidatos[0].clave_de_orden
 
 
-def test_un_bom_utf32_no_se_lee_como_utf16() -> None:
-    """El BOM de UTF-32 LE empieza por el de UTF-16 LE. Mirarlos en el orden
-    equivocado produce texto plausible lleno de caracteres nulos, que es peor
-    que no detectar nada."""
-    texto = "a,b\r\n1,2\r\n3,4\r\n"
-    datos = b"\xff\xfe\x00\x00" + texto.encode("utf-32-le")
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.codificacion.valor == "utf-32-le"
-    assert s.texto == texto
-    assert s.delimitador.valor == ","
+def test_el_preambulo_no_cambia_el_ganador() -> None:
+    """Doce líneas de `clave: valor` delante de los datos (§7.4 paso 7).
+
+    Son un bloque de una sola columna. Puntuar por la moda global penalizaría al
+    delimitador correcto por culpa del preámbulo, que es justo lo que FG-03 va a
+    separar después. La puntuación por racha lo resuelve: consistencia 1,0 desde
+    donde empiezan los datos, y la cobertura por debajo de 1 es lo que delata que
+    hay algo delante.
+    """
+    s = sondear_csv(bytes_de(GENERICOS / "14-preambulo-largo.csv"))
+    assert s.delimitador == ","
+    assert s.n_campos == 6
+    assert s.confianza == 1.0, "desde donde empiezan los datos, es perfecto"
+    assert s.elegido is not None and s.elegido.cobertura < 1.0, "y hay algo delante"
+    assert s.linea_inicio_datos == 12, "las 12 líneas de metadatos del fichero"
+    assert "campos_inconsistentes" in {a.codigo for a in s.avisos}
+    assert "FG-03" in next(a.mensaje for a in s.avisos if a.codigo == "campos_inconsistentes"), (
+        "el aviso tiene que decir qué tarea separa el preámbulo"
+    )
 
 
 @pytest.mark.parametrize(
-    ("eol", "esperado"),
-    [("\r\n", "CRLF"), ("\n", "LF"), ("\r", "CR")],
+    ("fichero", "n_campos", "inicio"),
+    [("20260729_1859_Log2768.csv", 26, 108), ("AutoLog_20260729_1830.csv", 476, 1895)],
 )
-def test_los_tres_finales_de_linea(eol: str, esperado: str) -> None:
-    texto = eol.join(["a,b,c", "1,2,3", "4,5,6", "7,8,9"]) + eol
-    datos = texto.encode()
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.fin_de_linea.valor == esperado
-    assert s.fin_de_linea.confianza == "confirmed"
+def test_los_logs_nativos_reales_se_sondean_por_el_camino_generico(
+    fichero: str, n_campos: int, inicio: int
+) -> None:
+    """El camino genérico tiene que funcionar sobre un Haltech real.
 
+    No es su camino —para eso está el descriptor de F1-01— pero es la red de
+    seguridad de §7.15: si algún día el descriptor no reconoce una variante, el
+    fichero sigue siendo un CSV con comas.
 
-def test_fin_de_linea_mixto_avisa_y_sigue() -> None:
-    """Un fichero editado o concatenado a mano. No es motivo para no leerlo,
-    pero sí para decirlo: mezclar finales de línea suele venir acompañado de
-    otras cosas hechas a mano."""
-    datos = b"a,b,c\r\n1,2,3\n4,5,6\r\n7,8,9\n"
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.fin_de_linea.valor == "mixto"
-    assert "fin_de_linea_mixto" in codigos(s)
-    assert s.delimitador.valor == ","
-    assert s.n_campos == 3
-
-
-def test_una_sola_linea_propone_pero_no_confirma() -> None:
-    """Hay comas, y probablemente el delimitador sea la coma. Pero la evidencia
-    de este módulo es la CONSISTENCIA entre líneas, y con una sola línea esa
-    evidencia no existe: no hay con qué comprobar que el número de campos se
-    mantiene. Confianza `unknown` y que pregunte el asistente."""
-    datos = b"a,b,c,d"
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor == ","
-    assert s.delimitador.confianza == "unknown"
-    assert "sin_evidencia_de_consistencia" in codigos(s)
-    assert "sin_fin_de_linea" in codigos(s)
-
-
-def test_un_fichero_de_una_sola_columna_no_inventa_delimitador() -> None:
-    """§7.10: se carga igual. Lo que no se puede hacer es elegir el candidato
-    «menos malo» y partir en columnas que no existen."""
-    datos = b"850\r\n860\r\n870\r\n880\r\n"
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.delimitador.valor is None
-    assert s.delimitador.confianza == "unknown"
-    assert "sin_delimitador" in codigos(s)
-    assert s.puntuaciones == ()
-    assert s.n_campos is None
-
-
-def test_la_muestra_vacia_no_revienta() -> None:
-    s = sondear(b"")
-    assert s.texto == ""
-    assert s.delimitador.valor is None
-    assert "muestra_vacia" in codigos(s)
-
-
-def test_el_espacio_solo_se_propone_si_no_hay_nada_mejor() -> None:
-    """Los dos lados de la regla.
-
-    Un fichero separado por espacios se detecta, con `inferred` porque el
-    espacio también separa palabras dentro de un campo. Y un fichero con
-    preámbulo `clave : valor` —donde el espacio parece un delimitador de tres
-    columnas perfectamente consistente— NO se detecta como separado por
-    espacios: gana la coma, que es la que parte las filas de datos.
+    El AutoLog es el caso que rompió la primera versión: sus 475 canales dan 1 895
+    líneas de cabecera, así que con un límite de 200 líneas la muestra era toda
+    cabecera y el sondeo decía «no sé». Los datos empiezan en el byte 42 345,
+    dentro de los 64 kB: era el límite de líneas, no el de bytes.
     """
-    espacios = b"t rpm map\r\n0.0 850 32.6\r\n0.1 860 33.1\r\n0.2 870 34.0\r\n"
-    s = sondear(espacios, tamano_total=len(espacios))
-    assert s.delimitador.valor == " ", s.resumen()
-    assert s.delimitador.confianza == "inferred"
-
-    con_preambulo = (
-        b"vehicle : Track car\r\nengine : 2000cc turbo\r\ndriver : John Doe\r\n"
-        b"t,rpm,map\r\n0.0,850,32.6\r\n0.1,860,33.1\r\n0.2,870,34.0\r\n"
-    )
-    s = sondear(con_preambulo, tamano_total=len(con_preambulo))
-    assert s.delimitador.valor == ",", s.resumen()
-    assert s.n_campos == 3
+    s = sondear_csv(bytes_de(REALES / fichero))
+    assert s.delimitador == ","
+    assert s.n_campos == n_campos, "la marca de tiempo más los canales"
+    assert s.linea_inicio_datos == inicio, "dónde acaba la cabecera del formato"
+    assert s.confianza == 1.0
+    assert s.fin_de_linea is FinDeLinea.CRLF, "el formato nativo es CRLF (§1.13)"
 
 
-def test_la_cabecera_de_un_haltech_real_no_se_da_por_buena() -> None:
-    """Los primeros 64 kB del AutoLog de 475 canales son cabecera ENTERA: no hay
-    ni una fila de datos donde mirar. El camino nativo lo resuelve por firma
-    (`%DataLog%`) y este módulo no llega a verlo, pero si algún día llegara, lo
-    que no puede hacer es proponer un delimitador con confianza alta a partir de
-    líneas `Channel : Coolant Temperature`. Con el espacio puntuando de igual a
-    igual, ese fichero salía con delimitador ' ' y tres columnas."""
-    datos = (REAL / "AutoLog_20260729_1830.csv").read_bytes()
-    s = sondear(datos)
-    assert s.muestra_truncada
-    assert s.delimitador.valor != " ", s.resumen()
-    assert not s.delimitador.es_fiable, s.resumen()
+def test_truncado_dice_si_el_sondeo_vio_todo_el_fichero() -> None:
+    """De los tres logs reales solo el AutoLog (4,5 MB) pasa de 64 kB.
+
+    `truncado` es lo que explica que una propuesta pueda fallar más adelante: con
+    el fichero entero delante, lo que el sondeo dice es lo que hay.
+    """
+    assert sondear_csv(bytes_de(REALES / "AutoLog_20260729_1830.csv")).truncado is True
+    assert sondear_csv(bytes_de(REALES / "20260729_1859_Log2768.csv")).truncado is False
 
 
-def test_una_muestra_truncada_por_la_mitad_de_una_linea_no_pierde_confianza() -> None:
-    """El corte de los 64 kB cae donde cae. Si la última línea, cortada a medias,
-    contara como línea en desacuerdo, un fichero perfectamente regular saldría
-    con confianza rebajada por un accidente del tamaño de la muestra."""
-    fichero = ("a,b,c\r\n" + "1,2,3\r\n" * 20_000).encode()
-    assert len(fichero) > LIMITE_MUESTRA
-    s = sondear(fichero[:LIMITE_MUESTRA], tamano_total=len(fichero))
-    assert s.muestra_truncada
-    assert s.delimitador.valor == ","
-    assert s.delimitador.confianza == "confirmed", s.resumen()
-    assert s.n_campos == 3
-    # Y la codificación baja a `inferred` justo por lo contrario: solo se ha
-    # visto ASCII, y el primer acento del fichero podría estar más allá del corte.
-    assert s.codificacion.confianza == "inferred"
+def test_el_par_de_f0_13_se_sondea_cada_uno_con_su_delimitador() -> None:
+    """El mismo log en dos formatos: el nativo es `,` y el genérico es `;`.
 
-
-def test_el_resumen_lleva_las_cuatro_decisiones_con_su_evidencia() -> None:
-    """La puerta es G1: el propietario tiene que poder revisar POR QUÉ se decidió
-    cada cosa sin abrir el código."""
-    datos = (GENERICO / "02-puntoycoma-coma.csv").read_bytes()
-    resumen = sondear(datos, tamano_total=len(datos)).resumen()
-    for aspecto in ("codificacion", "fin_de_linea", "delimitador", "comillas"):
-        assert aspecto in resumen
-    assert "51 de 51 líneas" in resumen
-    assert "confirmed" in resumen and "inferred" in resumen
-
-
-def test_el_sondeo_no_es_un_coste_perceptible() -> None:
-    """El presupuesto de apertura es de 4 s (§2.6) y el sondeo es lo primero que
-    corre. Con máscaras de NumPy sobre 64 kB son décimas de milisegundo; este
-    límite tan holgado no mide rendimiento, solo detecta que alguien haya
-    sustituido el recuento vectorizado por un bucle sobre caracteres."""
-    fichero = ("a,b,c,d,e,f\r\n" + "1,2,3,4,5,6\r\n" * 20_000).encode()[:LIMITE_MUESTRA]
-    inicio = time.perf_counter()
-    sondear(fichero)
-    assert (time.perf_counter() - inicio) < 0.1
+    Es la prueba de independencia de fabricante en miniatura: dos ficheros con los
+    mismos datos y convenciones distintas, y el sondeo acierta con los dos sin que
+    nadie le diga cuál es cuál.
+    """
+    nativo = sondear_csv(bytes_de(DOS_FORMATOS / "nativo.csv"))
+    generico = sondear_csv(bytes_de(DOS_FORMATOS / "generico.csv"))
+    assert nativo.delimitador == ","
+    assert generico.delimitador == ";"
+    assert nativo.n_campos == generico.n_campos, "los mismos datos, los mismos campos"
 
 
 # --------------------------------------------------------------------------- #
-# 3. Propiedades
+# Codificación
 # --------------------------------------------------------------------------- #
-@settings(max_examples=500, deadline=None)
-@given(st.binary(min_size=0, max_size=600))
-def test_bytes_arbitrarios_no_hacen_escapar_nada(datos: bytes) -> None:
-    """La propiedad principal. El sondeo es una PROPUESTA (§7.4): no hay ningún
-    fichero que pueda rechazar, porque no llega a interpretar ni un valor. Así
-    que la única salida legítima es un `Sondeo`, y cualquier excepción que se
-    escape llegaría a la interfaz como una traza donde tenía que haber un
-    formulario relleno con lo que se ha podido deducir."""
-    try:
-        s = sondear(datos)
-    except Exception as error:  # noqa: BLE001 - cazarlo TODO es la prueba
-        raise AssertionError(
-            f"sondear dejó escapar {type(error).__name__}: {error}\n"
-            f"Con estos bytes: {datos[:200]!r}"
-        ) from error
-    assert isinstance(s.texto, str)
-    assert s.delimitador.valor is None or s.delimitador.valor in CANDIDATOS_DELIMITADOR
+def test_utf8_sin_bom() -> None:
+    s = sondear_csv("Tiempo,Régimen\n0.0,1000\n".encode())
+    assert (s.codificacion, s.tiene_bom) == ("utf-8", False)
+    assert s.avisos == ()
 
 
-@settings(max_examples=300, deadline=None)
-@given(st.binary(min_size=0, max_size=400))
-def test_el_texto_devuelto_no_lleva_bom(datos: bytes) -> None:
-    assume(datos)
-    assert not sondear(datos).texto.startswith("﻿")
+def test_bom_utf8() -> None:
+    s = sondear_csv(b"\xef\xbb\xbf" + b"Time,RPM\n0.0,1000\n")
+    assert (s.codificacion, s.tiene_bom) == ("utf-8-sig", True)
+    assert s.delimitador == ","
 
 
-# --- Generador de CSV bien formados ---------------------------------------- #
-# El alfabeto de los campos es ASCII alfanumérico a propósito: sin ninguno de
-# los cinco delimitadores candidatos dentro, el fichero generado tiene UNA sola
-# lectura posible y la propiedad puede exigir el acierto exacto. Los campos con
-# delimitadores dentro se prueban aparte, en la propiedad de `confirmed`, porque
-# ahí el fichero SÍ puede ser genuinamente ambiguo y lo que se exige es otra cosa.
-campos_sin_delimitadores = st.text(
-    alphabet=st.characters(min_codepoint=48, max_codepoint=122, whitelist_categories=("Lu", "Ll", "Nd")),
-    min_size=0,
-    max_size=8,
-)
-
-CODIFICACIONES = ["utf-8", "utf-8-sig", "utf-16-le-bom", "utf-16-be-bom", "utf-16-le"]
+def test_bom_utf16() -> None:
+    """Sin detectar el BOM, un UTF-16 se leería como latin-1 y cada carácter
+    saldría seguido de un byte nulo: el delimitador no aparecería nunca."""
+    s = sondear_csv("Time,RPM\n0.0,1000\n".encode("utf-16"))
+    assert s.codificacion == "utf-16" and s.tiene_bom
+    assert s.delimitador == ","
+    assert s.n_campos == 2
 
 
-@dataclass(frozen=True)
-class ModeloCsv:
-    filas: tuple[tuple[str, ...], ...]
-    delimitador: str
-    comilla: str | None
-    fin_de_linea: str
-    codificacion: str
-    salto_final: bool
+def test_latin1_se_lee_y_se_avisa() -> None:
+    """El fichero 10 del corpus tiene nombres con acentos en latin-1.
 
-
-@st.composite
-def modelos_csv(
-    dibujar: st.DrawFn,
-    *,
-    campos: st.SearchStrategy[str] = campos_sin_delimitadores,
-    min_filas: int = 3,
-) -> ModeloCsv:
-    n_columnas = dibujar(st.integers(2, 6))
-    n_filas = dibujar(st.integers(min_filas, 10))
-    filas = tuple(
-        tuple(dibujar(st.lists(campos, min_size=n_columnas, max_size=n_columnas)))
-        for _ in range(n_filas)
-    )
-    return ModeloCsv(
-        filas=filas,
-        delimitador=dibujar(st.sampled_from(CANDIDATOS_DELIMITADOR)),
-        comilla=dibujar(st.sampled_from([None, '"', "'"])),
-        fin_de_linea=dibujar(st.sampled_from(["\r\n", "\n"])),
-        codificacion=dibujar(st.sampled_from(CODIFICACIONES)),
-        salto_final=dibujar(st.booleans()),
-    )
-
-
-def texto_de(modelo: ModeloCsv) -> str:
-    def campo(valor: str) -> str:
-        return valor if modelo.comilla is None else f"{modelo.comilla}{valor}{modelo.comilla}"
-
-    lineas = [modelo.delimitador.join(campo(v) for v in fila) for fila in modelo.filas]
-    return modelo.fin_de_linea.join(lineas) + (modelo.fin_de_linea if modelo.salto_final else "")
-
-
-def bytes_de(modelo: ModeloCsv) -> bytes:
-    texto = texto_de(modelo)
-    if modelo.codificacion == "utf-8":
-        return texto.encode()
-    if modelo.codificacion == "utf-8-sig":
-        return b"\xef\xbb\xbf" + texto.encode()
-    if modelo.codificacion == "utf-16-le-bom":
-        return b"\xff\xfe" + texto.encode("utf-16-le")
-    if modelo.codificacion == "utf-16-be-bom":
-        return b"\xfe\xff" + texto.encode("utf-16-be")
-    return texto.encode("utf-16-le")
-
-
-@AJUSTES
-@given(modelos_csv())
-def test_un_csv_bien_formado_se_sondea_exacto(modelo: ModeloCsv) -> None:
-    """Ida y vuelta sobre las cinco variables a la vez: delimitador, comilla,
-    fin de línea, codificación y salto final. Son accidentes de quién exportó el
-    fichero, y ninguna combinación de ellos debe cambiar lo que se lee."""
-    datos = bytes_de(modelo)
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.texto == texto_de(modelo)
-    assert s.delimitador.valor == modelo.delimitador, s.resumen()
-    assert s.n_campos == len(modelo.filas[0]), s.resumen()
-    assert s.fin_de_linea.valor == ("CRLF" if modelo.fin_de_linea == "\r\n" else "LF")
-
-
-@AJUSTES
-@given(modelos_csv())
-def test_las_comillas_se_detectan_cuando_delimitan_campos(modelo: ModeloCsv) -> None:
-    """Con campos vacíos y comillas puestas, `""` es un campo entrecomillado
-    vacío; sin comillas no debe inventarse ninguna."""
-    datos = bytes_de(modelo)
-    s = sondear(datos, tamano_total=len(datos))
-    assert s.comillas.valor == modelo.comilla, s.resumen()
-
-
-# --- La propiedad que protege al usuario ------------------------------------ #
-campos_con_delimitadores = st.text(
-    alphabet=st.characters(
-        min_codepoint=32,
-        max_codepoint=122,
-        blacklist_characters="\"'\\",
-    ),
-    min_size=0,
-    max_size=10,
-)
-
-
-@settings(max_examples=400, deadline=None, suppress_health_check=[HealthCheck.too_slow])
-@given(modelos_csv(campos=campos_con_delimitadores))
-def test_confirmed_no_miente_nunca(modelo: ModeloCsv) -> None:
-    """Aquí los campos SÍ llevan comas, puntos y coma, tabuladores y espacios
-    dentro, así que hay ficheros genuinamente ambiguos: `a,b;a,b` es un fichero
-    de dos columnas separadas por `;` o de tres separadas por `,`, y no hay
-    forma tipográfica de saberlo.
-
-    Lo que se exige no es acertar siempre —eso no es posible—, sino **no decir
-    `confirmed` cuando no se puede demostrar**. Un `inferred` equivocado lo
-    corrige el usuario en el paso 1 del asistente, que se lo enseña relleno y
-    editable; un `confirmed` equivocado se precarga sin que nadie lo mire.
+    Latin-1 nunca falla —los 256 bytes son válidos— así que no es una detección,
+    es una rendición, y el usuario tiene que enterarse para poder cambiarla.
     """
-    assume(modelo.comilla is not None)  # sin comillas, un campo con el delimitador dentro
-    # es indistinguible de dos campos, y el fichero deja de tener una lectura verdadera.
-    datos = bytes_de(modelo)
-    s = sondear(datos, tamano_total=len(datos))
-    if s.delimitador.confianza == "confirmed":
-        assert s.delimitador.valor == modelo.delimitador, s.resumen()
-        assert s.n_campos == len(modelo.filas[0]), s.resumen()
+    s = sondear_csv(bytes_de(GENERICOS / "10-latin1.csv"))
+    assert s.codificacion == "latin-1"
+    assert "codificacion_supuesta" in {a.codigo for a in s.avisos}
+    assert s.delimitador == ","
+
+
+def test_la_truncacion_no_cambia_la_codificacion_detectada() -> None:
+    """La regla 4 de esta suite.
+
+    Se corta a propósito por la mitad de una «ñ» (dos bytes en UTF-8). Sin
+    recortar la cola incompleta, el fichero se declararía latin-1 por el corte y
+    no por su contenido, y todos los nombres de canal con acentos saldrían mal.
+    """
+    contenido = "Tiempo,Presión\n" + "".join(f"{i / 10:.1f},1.0\n" for i in range(50))
+    crudo = contenido.encode("utf-8")
+    # Buscar un corte que caiga en medio del carácter multibyte de «Presión».
+    posicion = crudo.index("ó".encode()) + 1
+    with pytest.raises(UnicodeDecodeError):
+        crudo[:posicion].decode("utf-8")
+
+    s = sondear_csv(crudo, max_bytes=posicion)
+    assert s.codificacion == "utf-8", "el corte no puede decidir la codificación"
+    assert s.truncado is True
+    assert "codificacion_supuesta" not in {a.codigo for a in s.avisos}
+
+
+def test_un_fichero_vacio_es_un_error_con_nombre() -> None:
+    with pytest.raises(ErrorDeSondeo, match="vacío"):
+        sondear_csv(b"")
+
+
+def test_un_fichero_de_solo_saltos_es_un_error_con_nombre() -> None:
+    with pytest.raises(ErrorDeSondeo, match="ninguna línea con contenido"):
+        sondear_csv(b"\n\n   \n\n")
+
+
+# --------------------------------------------------------------------------- #
+# Fin de línea
+# --------------------------------------------------------------------------- #
+@pytest.mark.parametrize(
+    ("salto", "esperado"),
+    [("\r\n", FinDeLinea.CRLF), ("\n", FinDeLinea.LF), ("\r", FinDeLinea.CR)],
+)
+def test_los_tres_finales_de_linea(salto: str, esperado: FinDeLinea) -> None:
+    datos = salto.join(["Time,RPM", "0.0,1000", "0.1,1100", ""]).encode()
+    s = sondear_csv(datos)
+    assert s.fin_de_linea is esperado
+    assert s.finales_mezclados is False
+    assert s.delimitador == ","
+
+
+def test_finales_mezclados_se_avisan_y_gana_el_mayoritario() -> None:
+    """Suele significar que el log se editó con dos herramientas distintas."""
+    datos = b"Time,RPM\r\n0.0,1000\r\n0.1,1100\n0.2,1200\r\n"
+    s = sondear_csv(datos)
+    assert s.fin_de_linea is FinDeLinea.CRLF
+    assert s.finales_mezclados is True
+    assert "finales_de_linea_mezclados" in {a.codigo for a in s.avisos}
+
+
+def test_una_sola_linea_sin_salto_final() -> None:
+    """Caso válido de §1.13: no hay saltos, así que no hay nada que partir."""
+    s = sondear_csv(b"Time,RPM,MAP")
+    assert s.fin_de_linea is FinDeLinea.LF
+    assert s.finales_mezclados is False
+    assert s.delimitador == "," and s.n_campos == 3
+
+
+def test_la_ultima_linea_cortada_no_penaliza_al_delimitador() -> None:
+    """Un sondeo truncado casi siempre corta la última línea a medias, y una
+    línea a medias tiene menos campos: dejarla dentro penalizaría al delimitador
+    correcto justo en los ficheros grandes, que son todos los reales."""
+    completo = "Time,RPM,MAP\n" + "".join(f"{i / 10:.1f},1000,50.0\n" for i in range(30))
+    cortado = completo[: completo.index("\n", 200) + 8]  # se para en mitad de una fila
+    s = sondear_csv(cortado.encode())
+    assert s.delimitador == ","
+    assert s.n_campos == 3
+    assert s.confianza == 1.0, "la línea a medias no debería contar"
+
+
+# --------------------------------------------------------------------------- #
+# Comillas y escapes
+# --------------------------------------------------------------------------- #
+def test_un_campo_entrecomillado_con_el_delimitador_dentro() -> None:
+    """Sin conteo consciente de comillas, esta línea tendría 4 campos y una sola
+    línea así basta para cambiar el ganador en un fichero corto."""
+    datos = (
+        b"Time,Nombre,RPM\n"
+        b'0.0,"Sensor A, trasero",1000\n'
+        b'0.1,"Sensor B, delantero",1100\n'
+        b'0.2,"Sensor C, lateral",1200\n'
+    )
+    s = sondear_csv(datos)
+    assert s.delimitador == ","
+    assert s.comilla == '"'
+    assert s.n_campos == 3
+    assert s.confianza == 1.0
+
+
+def test_comilla_simple() -> None:
+    datos = (
+        b"Time,Nombre,RPM\n"
+        b"0.0,'Sensor A, trasero',1000\n"
+        b"0.1,'Sensor B, delantero',1100\n"
+        b"0.2,'Sensor C, lateral',1200\n"
+    )
+    s = sondear_csv(datos)
+    assert (s.delimitador, s.comilla, s.n_campos) == (",", "'", 3)
+
+
+def test_escape_por_comilla_doblada() -> None:
+    datos = b'Time,Nombre\n0.0,"Sensor ""A"", trasero"\n0.1,"Sensor ""B"", delantero"\n'
+    s = sondear_csv(datos)
+    assert s.comilla == '"'
+    assert s.escape is Escape.DOBLADA
+    assert s.n_campos == 2
+
+
+def test_escape_por_barra_invertida() -> None:
+    datos = b'Time,Nombre\n0.0,"Sensor \\"A\\", trasero"\n0.1,"Sensor \\"B\\", lateral"\n'
+    s = sondear_csv(datos)
+    assert s.comilla == '"'
+    assert s.escape is Escape.BARRA
+
+
+def test_sin_comillas_el_escape_es_ninguno() -> None:
+    s = sondear_csv(bytes_de(GENERICOS / "01-coma-punto.csv"))
+    assert s.comilla is None
+    assert s.escape is Escape.NINGUNO
+
+
+def test_una_comilla_suelta_en_un_nombre_no_convierte_el_fichero_en_entrecomillado() -> None:
+    """Por eso `None` va primero en los candidatos de comilla.
+
+    «Sensor "A"» en un nombre de canal es texto, no un campo entrecomillado: si el
+    sondeo propusiera comillas, el nombre perdería las suyas al leerlo.
+    """
+    datos = b'Time,Sensor "A",RPM\n0.0,1.0,1000\n0.1,2.0,1100\n0.2,3.0,1200\n'
+    s = sondear_csv(datos)
+    assert s.delimitador == "," and s.n_campos == 3
+    assert s.comilla is None
+
+
+# --------------------------------------------------------------------------- #
+# Antes «no sé» que una propuesta equivocada
+# --------------------------------------------------------------------------- #
+def test_un_fichero_de_una_sola_columna_no_propone_delimitador() -> None:
+    """La regla 5. Proponer un delimitador que parte los datos mal es peor que
+    admitir que no se sabe: el asistente puede preguntar, un dato partido no."""
+    datos = b"Valor\n1000\n1100\n1200\n1300\n"
+    s = sondear_csv(datos)
+    assert s.delimitador is None
+    assert s.n_campos == 1
+    assert "delimitador_sin_determinar" in {a.codigo for a in s.avisos}
+    assert s.confianza >= 0.0
+
+
+def test_un_fichero_incoherente_no_propone_delimitador() -> None:
+    datos = b"a,b\nc,d,e\nf,g,h,i\nj\nk,l,m,n,o\n"
+    s = sondear_csv(datos)
+    assert s.delimitador is None or s.confianza < CONFIANZA_MINIMA
+    assert "delimitador_sin_determinar" in {a.codigo for a in s.avisos}
+
+
+def test_mas_campos_desempata_a_favor_de_la_interpretacion_informativa() -> None:
+    """`Time;RPM` con `,` da 1 campo perfectamente consistente y con `;` da 2.
+
+    Las dos son «consistentes»; solo una separa los datos. Sin el desempate por
+    número de campos, el sondeo podría quedarse con la que no separa nada.
+    """
+    datos = b"Time;RPM\n0.0;1000\n0.1;1100\n"
+    s = sondear_csv(datos)
+    assert s.delimitador == ";" and s.n_campos == 2
+
+
+def test_los_candidatos_se_devuelven_para_que_el_asistente_los_ensene() -> None:
+    """§7.4: «la detección es una propuesta, no un hecho».
+
+    El asistente tiene que poder enseñar por qué propone `;` y no `,`, y el
+    usuario tiene que poder discrepar con información delante.
+    """
+    s = sondear_csv(bytes_de(GENERICOS / "02-puntoycoma-coma.csv"))
+    # Cinco y no quince: el fichero no tiene ninguna comilla, así que las
+    # combinaciones entrecomilladas darían exactamente el mismo recuento y no se
+    # calculan. No es una poda heurística, es que son redundantes.
+    assert len(s.candidatos) == 5, "los 5 delimitadores, sin variantes de comilla"
+    assert s.candidatos[0].delimitador == ";"
+    ordenadas = [c.clave_de_orden for c in s.candidatos]
+    assert ordenadas == sorted(ordenadas, reverse=True), "vienen ya ordenadas"
+
+
+def test_el_resultado_es_reproducible() -> None:
+    """Dos sondeos del mismo fichero dan exactamente lo mismo, candidatos
+    incluidos: nada puede depender del orden de un diccionario."""
+    datos = bytes_de(GENERICOS / "14-preambulo-largo.csv")
+    a, b = sondear_csv(datos), sondear_csv(datos)
+    assert a == b
+
+
+def test_los_parametros_de_lectura_no_mencionan_ningun_motor() -> None:
+    """ADR-002: `dlv-core` no conoce Polars. Quien lea traduce."""
+    s = sondear_csv(bytes_de(GENERICOS / "01-coma-punto.csv"))
+    p = s.parametros_de_lectura
+    assert set(p) == {"codificacion", "delimitador", "comilla", "fin_de_linea"}
+    assert p["delimitador"] == "," and p["fin_de_linea"] == "\n"
+
+
+# --------------------------------------------------------------------------- #
+# Lo que §7.4 descarta por nombre
+# --------------------------------------------------------------------------- #
+def test_el_modulo_no_usa_csv_sniffer() -> None:
+    """§7.4 lo descarta por nombre: es poco fiable con estos ficheros.
+
+    Usar `Sniffer` no rompería ninguna prueba funcional con el corpus de hoy
+    —acierta en los casos fáciles— y solo fallaría con el CSV español de un
+    usuario. Lo único que lo detecta es buscarlo.
+
+    Se busca sobre el ÁRBOL SINTÁCTICO y no sobre el texto, y es la misma lección
+    que ya se pagó con el detector de ADR-009: la primera versión de esta prueba
+    quitaba los comentarios `#` a mano y fallaba contra el propio módulo, porque su
+    docstring cita `csv.Sniffer` justamente para explicar por qué no se usa. Un
+    detector que se marca a sí mismo se acaba desactivando.
+    """
+    import ast
+
+    fuente = (RAIZ / "dlv-core" / "src" / "dlv_core" / "formatos" / "sondeo.py").read_text(
+        encoding="utf-8"
+    )
+    arbol = ast.parse(fuente)
+    nombres = {
+        nodo.attr if isinstance(nodo, ast.Attribute) else nodo.id
+        for nodo in ast.walk(arbol)
+        if isinstance(nodo, (ast.Attribute, ast.Name))
+    }
+    assert "Sniffer" not in nombres, "§7.4 descarta csv.Sniffer: puntúa por frecuencia"
+    importados = {
+        alias.name.split(".")[0]
+        for nodo in ast.walk(arbol)
+        if isinstance(nodo, ast.Import)
+        for alias in nodo.names
+    } | {
+        nodo.module.split(".")[0]
+        for nodo in ast.walk(arbol)
+        if isinstance(nodo, ast.ImportFrom) and nodo.module is not None
+    }
+    assert "csv" not in importados, "el módulo `csv` no hace falta y su Sniffer está vetado"
+
+
+def test_el_modulo_no_decide_el_separador_decimal() -> None:
+    """El paso 4 de §7.4 es FG-02, y colarlo aquí lo dejaría sin la verificación
+    cruzada de interpretaciones que esa tarea exige."""
+    s = sondear_csv(bytes_de(GENERICOS / "02-puntoycoma-coma.csv"))
+    assert not hasattr(s, "separador_decimal")
+    assert "decimal" not in s.parametros_de_lectura

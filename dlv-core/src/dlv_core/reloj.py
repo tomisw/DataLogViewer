@@ -346,14 +346,34 @@ class Reconciliacion:
     modo_desfase_recomendado: ModoDesfase
     avisos: tuple[Aviso, ...] = ()
 
-    def a_segmento(self, id_: str, *, orden: int, offset_usuario: float = 0.0) -> Segmento:
-        """Punto de entrega al motor de tiempo multi-log (§3.6)."""
+    def a_segmento(
+        self,
+        id_: str,
+        *,
+        orden: int,
+        t_inicio: float,
+        t_fin: float,
+        offset_usuario: float = 0.0,
+        etiqueta: str | None = None,
+    ) -> Segmento:
+        """Punto de entrega al motor de tiempo multi-log (§3.6).
+
+        `t_inicio` y `t_fin` son la duración del log en segundos locales
+        (`SesionLog.t_inicio`/`t_fin` los da ya calculados) y son OBLIGATORIOS
+        aunque casi siempre valgan 0 y la duración: un valor por omisión de
+        `0.0, 0.0` crearía segmentos de duración nula, que en la vista
+        concatenada se apilarían todos en la misma x sin que nada fallara.
+        Este módulo no puede deducirlos —no ve las series— así que los pide.
+        """
         return Segmento(
             id=id_,
+            t_inicio=t_inicio,
+            t_fin=t_fin,
             t0_absoluto=self.t0_absoluto,
             offset_usuario=offset_usuario,
             fiabilidad_reloj=self.fiabilidad,
             orden=orden,
+            etiqueta=etiqueta,
         )
 
 

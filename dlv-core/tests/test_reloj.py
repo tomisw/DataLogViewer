@@ -549,13 +549,13 @@ def test_a_segmento_traslada_la_fiabilidad(politica_haltech: PoliticaReloj) -> N
         {"Log": "20260729 06:30:35"},
         parsear_marca_de_fila("18:30:35.506"),
         politica=politica_haltech,
-    ).a_segmento("autolog", orden=0)
+    ).a_segmento("autolog", orden=0, t_inicio=0.0, t_fin=245.1)
     assert fiable.fiabilidad_reloj is FiabilidadReloj.FIABLE
     assert fiable.t0_absoluto == datetime(2026, 7, 29, 18, 30, 35, 506000)
 
     ficticio = reconciliar(
         {"Log": "19800101 01:01:01", "Log Number": "2768"}, 3661.005, politica=politica_haltech
-    ).a_segmento("log2768", orden=1, offset_usuario=12.5)
+    ).a_segmento("log2768", orden=1, t_inicio=0.0, t_fin=60.0, offset_usuario=12.5)
     assert ficticio.fiabilidad_reloj is FiabilidadReloj.DESCONOCIDA
     assert ficticio.t0_absoluto is None
     assert ficticio.offset_usuario == 12.5

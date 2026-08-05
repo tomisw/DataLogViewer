@@ -52,6 +52,8 @@ import type {
   UnidadResuelta,
 } from "../unidades/tipos.ts";
 import { convertirCubos, convertirValor, factorDe } from "./conversion-demo.ts";
+import { alCambiarTema, obtenerTemaActual, parametrosDeSerie } from "../tema/tema.ts";
+import { montarSelectorDeTema } from "../tema/selector-tema.ts";
 
 const EJE_PRINCIPAL = "principal";
 
@@ -72,10 +74,19 @@ interface EstadoPanel {
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
-/** Paleta fija por índice: HSL con separación uniforme de matiz, saturación y luz altas para fondo oscuro. */
+/**
+ * Paleta por índice de canal: matiz con separación de ángulo áureo, y saturación
+ * y luz según el tema activo (F3-21).
+ *
+ * Los parámetros del tema salen de `tema.parametrosDeSerie`, el mismo sitio del
+ * que los toma `carriles/color.ts`: son dos funciones distintas por capas —esta
+ * reparte por índice de canal y aquella por código de estado— pero la respuesta
+ * a «cómo se ve una serie en este tema» tiene que ser una sola.
+ */
 function colorPorIndice(indice: number): Color {
   const matiz = (indice * 137.508) % 360; // ángulo áureo: buena dispersión sin tabla fija
-  const { r, g, b } = hslARgb(matiz, 0.65, 0.6);
+  const { saturacion, luz } = parametrosDeSerie(indice);
+  const { r, g, b } = hslARgb(matiz, saturacion, luz);
   return { r, g, b, a: 1 };
 }
 
@@ -170,7 +181,16 @@ export class Aplicacion {
     this.#estadoTexto = document.createElement("span");
     this.#estadoTexto.className = "dlv-barra__estado";
     this.#estadoTexto.textContent = `fuente: ${fuente.nombre}`;
-    this.#barra.append(boton, this.#estadoTexto);
+    this.#barra.append(boton, montarSelectorDeTema(), this.#estadoTexto);
+
+    // El color de una serie se calcula en TypeScript y se sube a la GPU, así que
+    // cambiar el tema no lo toca: hay que olvidar los colores cacheados y volver
+    // a pintar. Sin esto, cambiar a alto contraste reteñía la interfaz y dejaba
+    // las curvas con los colores del tema anterior.
+    alCambiarTema(() => {
+      this.#colorPorCanal.clear();
+      this.#dispararRedibujado();
+    });
 
     const cuerpo = document.createElement("div");
     cuerpo.className = "dlv-cuerpo";
@@ -582,7 +602,12 @@ export class Aplicacion {
           ? { a: 1, b: 0 }
           : factorDe(this.#dimensionDe(canalId), unidadResuelta.unidad.id);
 
-        const claveSubida = `${factor}|${entrada.cubre.t0}|${entrada.cubre.t1}|${unidadResuelta?.unidad.id ?? ""}`;
+        // El tema entra en la clave porque el COLOR va en la misma subida a la
+        // GPU que los datos: sin él, un cambio de tema no volvía a subir nada y
+        // las curvas se quedaban con el color del tema anterior aunque el resto
+        // de la interfaz ya hubiera cambiado. La clave tiene que nombrar todo lo
+        // que `renderizadorSubir` mete en la GPU, no solo los datos.
+        const claveSubida = `${factor}|${entrada.cubre.t0}|${entrada.cubre.t1}|${unidadResuelta?.unidad.id ?? ""}|${obtenerTemaActual()}`;
         if (estado.ultimaSubida.get(canalId) !== claveSubida) {
           renderizadorSubir(estado.renderizador, canalId, entrada.cubos, factorConv, color);
           estado.ultimaSubida.set(canalId, claveSubida);

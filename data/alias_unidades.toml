@@ -1,0 +1,227 @@
+#  DataLogViewer — diccionario de alias de unidades declaradas en el propio CSV
+#
+#  Tarea FG-06.  Especificación: docs/07-formatos-y-csv-generico.md §7.6.
+#  PUERTA G1: cada alias de este fichero decide si una columna se muestra en la
+#  unidad correcta o en crudo. No se cambia una entrada sin que una persona lea
+#  el diff.
+#
+#  PARA QUÉ SIRVE ESTE FICHERO, Y PARA QUÉ NO
+#  ============================================
+#  `data/units.toml` (F0-08) ya tiene un campo `alias` por unidad para las
+#  variantes que el propio catálogo necesita (`kph`/`KPH` de km/h, `mbar` de hPa,
+#  `Torr` de mmHg, `CV` de PS, `mL` de cc). Este fichero NO los repite: aquí solo
+#  van las formas que un EXPORTADOR DE CSV escribe en el nombre de una columna o
+#  en la fila de unidades (§7.6) y que `units.toml` no cubre porque no son parte
+#  de la definición de la unidad, son la letra de quien la escribió.
+#
+#  Cada alias apunta a un `(dimension, unidad)` que tiene que existir de verdad
+#  en `data/units.toml`; `dlv-core/tests/test_unidades_declaradas.py` lo
+#  comprueba fichero por fichero, y `unidades_declaradas.py` lo vuelve a
+#  comprobar al cargar (falla alto y con nombre propio si alguien borra una
+#  unidad de `units.toml` y se olvida de este fichero).
+#
+#  SOLO ALIAS DE NOMBRE — CERO FACTORES
+#  =====================================
+#  Aquí no hay ningún número. `C` es otra forma de escribir el identificador
+#  `degC`, no una conversión: el factor de °C ya vive en `units.toml` y sigue
+#  siendo el único sitio que lo declara. Si una fila de este fichero necesitara
+#  un `a` o una `b`, sería la señal de que el sitio equivocado es este.
+#
+#  LA REGLA DE R1: UN ALIAS QUE NO ESTÁ AQUÍ NO SE ADIVINA
+#  =========================================================
+#  `unidades_declaradas.py` no intenta parecidos, no recorta sufijos al azar ni
+#  prueba mayúsculas y minúsculas por su cuenta. Si la forma exacta que trae el
+#  fichero no es un id de `units.toml` ni un alias de aquí, la columna se queda
+#  sin dimensión resuelta: valor en crudo, selector desactivado (docs/07 §7.6,
+#  último párrafo; mismo mitigador que R1 en docs/07 §7.15).
+#
+#  FORMATO
+#  =======
+#  `[alias.<dimension>.<unidad>]` — la clave repite el par exacto de
+#  `data/units.toml`, así que un alias que apunte a una unidad borrada revienta
+#  al cargar en vez de fallar en silencio meses después.
+#  `formas` — las cadenas EXACTAS (sensibles a mayúsculas) que un exportador
+#  puede escribir. No hay normalización de mayúsculas ni de acentos aquí: cada
+#  variante de verdad se escribe, porque una regla "y también sin mayúsculas"
+#  además resolvería casos que nadie ha visto en un log real.
+
+[meta]
+version = 1
+tarea = "FG-06"
+especificacion = "docs/07-formatos-y-csv-generico.md §7.6"
+no_incluye = "alias ya cubiertos por el campo `alias` de data/units.toml (kph, KPH, mbar, Torr, CV, mL)"
+
+# =========================================================================== #
+#  TEMPERATURA
+#  `C`, `Celsius` y `deg C` son las tres formas más comunes de exportador que no
+#  usa el símbolo °. `°C` se añade porque `units.toml` no la lista: el símbolo
+#  grado va casi siempre pegado a la letra y no es la etiqueta ("°C" con
+#  espacio duro distinto del literal aquí escrito, así que se declara sin dar
+#  por hecho que coincide con la etiqueta de units.toml).
+# =========================================================================== #
+[alias.temperature.degC]
+formas = ["C", "Celsius", "celsius", "deg C", "°C"]
+
+[alias.temperature.degF]
+formas = ["F", "Fahrenheit", "fahrenheit", "deg F", "°F"]
+
+[alias.temperature.K]
+# "K" ya es el id de la unidad y hace match directo; aquí solo la palabra
+# completa, que algunos exportadores usan en la fila de unidades.
+formas = ["Kelvin", "kelvin", "deg K"]
+
+# =========================================================================== #
+#  RELACIÓN DE MEZCLA
+#  El caso que trajo la propia especificación (§7.6): una fila de unidades que
+#  dice literalmente "ratio" para una columna de lambda, y el símbolo griego
+#  suelto `λ` que usa más de un exportador europeo en vez de "lambda".
+# =========================================================================== #
+[alias.mixture_ratio.lambda]
+formas = ["ratio", "λ", "Lambda"]
+
+[alias.mixture_ratio.afr]
+# "afr" ya es el id; "AFR" mayúsculas es la forma que de verdad aparece en la
+# fila de unidades de un exportador que sí distingue AFR de lambda.
+formas = ["AFR", "A/F"]
+
+# =========================================================================== #
+#  RELACIÓN ADIMENSIONAL (fracción / porcentaje)
+#  `%` es el símbolo, no el id: `units.toml` usa `pct` como identificador y
+#  reserva "%" para la ETIQUETA de presentación, así que como alias de entrada
+#  hay que declararlo aparte.
+# =========================================================================== #
+[alias.ratio.pct]
+formas = ["%", "percent", "Percent", "porciento", "porcentaje"]
+
+# =========================================================================== #
+#  ÁNGULO
+#  El símbolo `°` suelto (sin letra detrás) es un ángulo, no una temperatura:
+#  es justo el caso de `samples/dos-formatos/generico.csv`, donde la columna de
+#  avance de encendido trae `°` a secas en la fila de unidades.
+# =========================================================================== #
+[alias.angle.deg]
+formas = ["°", "grados", "degrees"]
+
+# =========================================================================== #
+#  RÉGIMEN Y VELOCIDAD ANGULAR
+#  "RPM" en mayúsculas es la forma más común de exportador americano en la fila
+#  de unidades; "rev/min" es la escritura larga que usan algunos dataloggers.
+# =========================================================================== #
+[alias.angular_speed.rpm]
+formas = ["RPM", "rev/min", "r/min"]
+
+# =========================================================================== #
+#  VELOCIDAD
+#  `units.toml` ya cubre kph/KPH (alias propio de la unidad). Lo que falta son
+#  las formas sin barra, porque muchos exportadores no pueden meter "/" en un
+#  identificador de columna y lo sustituyen por nada o por un guion bajo.
+# =========================================================================== #
+[alias.speed."km/h"]
+formas = ["kmh", "km_h", "Km/h"]
+
+# =========================================================================== #
+#  PRESIÓN
+#  `KPa` con mayúscula en la "P" es un error de tecleo extendido, no una unidad
+#  distinta; "Bar" y "PSI" son las variantes de capitalización que de verdad
+#  circulan en exportaciones anglosajonas.
+# =========================================================================== #
+[alias.pressure.kPa]
+formas = ["KPa", "kpa", "kilopascal"]
+
+[alias.pressure.bar]
+formas = ["Bar"]
+
+[alias.pressure.psi]
+formas = ["PSI", "lb/in2", "lbf/in2"]
+
+# =========================================================================== #
+#  TIEMPO
+#  Los nombres largos en inglés y castellano de segundo y milisegundo, para la
+#  fila de unidades de dataloggers que no abrevian.
+# =========================================================================== #
+[alias.time.s]
+formas = ["sec", "secs", "seconds", "segundos"]
+
+[alias.time.ms]
+formas = ["millisecond", "milliseconds", "milisegundos"]
+
+# =========================================================================== #
+#  CAUDAL MÁSICO
+#  Variante sin barra de "kg/h", por la misma razón que "kmh" en velocidad.
+# =========================================================================== #
+[alias.mass_flow."kg/h"]
+formas = ["kgh", "kg_h"]
+
+# =========================================================================== #
+#  DISTANCIA
+#  Nombres largos de kilómetro y milla que aparecen en exportadores que no
+#  abrevian sus unidades de distancia.
+# =========================================================================== #
+[alias.distance.km]
+formas = ["kilometers", "kilometres", "kilometros"]
+
+[alias.distance.mi]
+formas = ["miles"]
+
+# =========================================================================== #
+#  VOLUMEN
+#  `units.toml` ya cubre "mL" como alias de `cc`. Falta el nombre largo del
+#  litro en los tres idiomas que aparecen en los exportadores vistos.
+# =========================================================================== #
+[alias.volume.L]
+formas = ["liter", "liters", "litre", "litres", "litros"]
+
+# =========================================================================== #
+#  POTENCIA
+#  `units.toml` ya cubre "CV" como alias de PS. Falta la forma larga de
+#  caballos de vapor en inglés y el nombre largo del kilovatio.
+# =========================================================================== #
+[alias.power.hp]
+formas = ["HP", "horsepower"]
+
+[alias.power.kW]
+formas = ["kilowatt", "kilowatts"]
+
+# =========================================================================== #
+#  FRECUENCIA Y RESISTENCIA
+#  Nombres largos, la forma en que un datalogger sin abreviar los escribiría en
+#  la fila de unidades.
+# =========================================================================== #
+[alias.frequency.Hz]
+formas = ["hertz", "Hertz"]
+
+[alias.resistance.ohm]
+formas = ["Ohm", "Ohms", "ohms"]
+
+# =========================================================================== #
+#  PAR MOTOR
+#  Nombre largo en castellano, visto en exportaciones de herramientas
+#  localizadas.
+# =========================================================================== #
+[alias.torque.Nm]
+formas = ["newton metro", "newton-metro"]
+
+# =========================================================================== #
+#  ACELERACIÓN Y DENSIDAD — la unidad escrita CON barra
+#  Estas dos son el caso raro del catálogo: su clave en `units.toml` lleva `_`
+#  donde la unidad de verdad lleva `/` (`m_s2`, `kg_m3`), porque una clave TOML
+#  con barra habría que entrecomillarla. Un exportador escribe "m/s2" o "m/s²",
+#  nunca "m_s2", así que sin estas entradas la forma natural de la unidad no
+#  resolvía. No son un alias de conveniencia: son LA manera de escribirlas.
+# =========================================================================== #
+[alias.acceleration.m_s2]
+formas = ["m/s2", "m/s²", "m/s^2", "ms2"]
+
+[alias.density.kg_m3]
+formas = ["kg/m3", "kg/m³", "kg/m^3"]
+
+# =========================================================================== #
+#  RESUMEN
+# =========================================================================== #
+[resumen]
+grupos = 25
+nota = """
+Ningún alias de este fichero introduce una unidad nueva: cada uno apunta a un
+(dimension, unidad) que ya existe en data/units.toml. Añadir compatibilidad con
+la forma de escribir unidades de un fabricante nuevo es una entrada aquí, no un
+cambio de código (misma filosofía que data/roles.toml, docs/07 §7.7)."""

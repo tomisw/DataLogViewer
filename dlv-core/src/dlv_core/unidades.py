@@ -277,6 +277,47 @@ def _conversion_desde_toml(bruto: Mapping[str, Any], donde: str) -> Conversion:
     raise ErrorDeUnidad(f"{donde}: tipo de conversión desconocido: {tipo!r}")
 
 
+def _resolver_canonica(
+    declarada: str, id_dim: str, unidades: Mapping[str, Unidad], alias: Mapping[str, str]
+) -> str:
+    """La `canonica` de una dimensión, traducida a la clave REAL de sus unidades.
+
+    `data/units.toml` escribe la canónica en su forma legible y la clave de la
+    unidad con `_` en lugar de `/`, porque una clave TOML con barra hay que
+    entrecomillarla: `canonica = "m/s2"` con `[...unidades.m_s2]`, y lo mismo en
+    `density` (`kg/m3` -> `kg_m3`). Es la convención que ya fija la puerta del
+    propio catálogo (`tests/test_units_catalogo.py`), y traducirla aquí —una vez,
+    al cargar— es lo que garantiza que `dimension.unidad(dim.unidad_canonica)`
+    funcione siempre.
+
+    Sin esta traducción, `unidad_canonica` guardaba un id que no existía entre
+    las unidades de su propia dimensión. Las consecuencias, por orden: el último
+    recurso de la cadena de resolución (`resolucion_unidad.py`, canal > perfil >
+    usuario > fichero > CANÓNICA) lanzaba `ErrorDeUnidad` en vez de devolver la
+    unidad para todo canal de aceleración o densidad sin unidad declarada; y el
+    desempate por canónica de `formatos/unidades_declaradas.py` no podía ganar
+    nunca en esas dos dimensiones. Ninguna de las dos fallaba en el catálogo
+    entero, solo en las dos dimensiones cuya canónica lleva barra, que es
+    justo por lo que no se vio antes.
+
+    Si tras la traducción sigue sin existir, es un fallo del catálogo y se dice
+    al cargarlo, no meses después al graficar un canal.
+    """
+    if declarada in unidades:
+        return declarada
+    if declarada in alias:
+        return alias[declarada]
+    normalizada = declarada.replace("/", "_").replace("·", "")
+    if normalizada in unidades:
+        return normalizada
+    raise ErrorDeUnidad(
+        f"{id_dim}: la canónica declarada {declarada!r} no está entre sus unidades "
+        f"{sorted(unidades)} ni entre sus alias, ni con la barra normalizada "
+        f"({normalizada!r}). Una dimensión sin canónica real deja sin último recurso "
+        "a la cadena de resolución de unidad"
+    )
+
+
 def cargar_catalogo(fuente: IO[bytes]) -> Catalogo:
     """Carga el catálogo desde `units.toml` ya abierto en binario.
 
@@ -315,7 +356,7 @@ def cargar_catalogo(fuente: IO[bytes]) -> Catalogo:
         dimensiones[id_dim] = Dimension(
             id=id_dim,
             etiqueta=str(d.get("etiqueta", id_dim)),
-            unidad_canonica=str(d["canonica"]),
+            unidad_canonica=_resolver_canonica(str(d["canonica"]), id_dim, unidades, alias),
             unidades=unidades,
             convertible=bool(d.get("convertible", True)),
             admite_referencia=bool(d.get("admite_referencia", False)),

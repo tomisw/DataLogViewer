@@ -1,0 +1,40 @@
+# Git NO puede tocar los bytes del corpus de muestras.
+#
+# EL PROBLEMA QUE ESTO ARREGLA
+# ============================
+# En Windows, `core.autocrlf` reescribe los finales de línea al sacar los
+# ficheros del repositorio: lo que en git es `\n` aparece en disco como
+# `\r\n`. Para casi cualquier proyecto eso es una comodidad. Aquí destruye
+# exactamente lo que se está probando.
+#
+# `samples/generico/` es el corpus del sondeo de CSV (FG-01), y una de las
+# cuatro cosas que ese sondeo detecta ES EL FIN DE LÍNEA. Con la conversión
+# activada, un fichero grabado a propósito con LF llega al parser con CRLF y
+# la prueba de que "este fichero usa LF" falla en Windows y pasa en Linux, sin
+# que nada apunte a la causa. Es un fallo que parece del código y es del
+# sistema de control de versiones.
+#
+# `samples/real/` son los tres logs del propietario y la evidencia de todo el
+# formato (regla 5 de `CLAUDE.md`). Sus bytes tienen que ser los mismos en
+# todas las máquinas, punto: cualquier medida de tamaño, cualquier `offset` y
+# cualquier comprobación byte a byte deja de valer si el fichero engorda un
+# byte por línea al clonar.
+#
+# `-text` significa «no conviertas nunca, ni al guardar ni al sacar».
+samples/** -text
+
+# El corpus de corruptos incluye ficheros con finales de línea mixtos a
+# propósito (`docs/01` §1.13): normalizarlos los dejaría sin el defecto que
+# están para reproducir.
+samples/corrupt/** -text
+
+# Los ficheros de datos y de código sí se normalizan a LF en el repositorio.
+# `text=auto` deja que git decida qué es texto; `eol=lf` fija cómo se guarda,
+# para que el repositorio sea idéntico venga de donde venga el commit.
+*.py text eol=lf
+*.ts text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf

@@ -23,6 +23,7 @@ import { Aplicacion } from "./app/aplicacion.ts";
 import { FuenteApi } from "./datos/fuente-api.ts";
 import type { FuenteDeDatos } from "./datos/fuente.ts";
 import { FuenteSintetica } from "./datos/fuente-sintetica.ts";
+import { inicializarTema } from "./tema/tema.ts";
 
 function contenedorApp(): HTMLDivElement {
   const contenedor = document.querySelector<HTMLDivElement>("#app");
@@ -62,6 +63,7 @@ function elegirFuente(): { fuente: FuenteDeDatos; referencia: string } {
 }
 
 async function iniciar(): Promise<void> {
+  inicializarTema();
   const { fuente, referencia } = elegirFuente();
   const aplicacion = new Aplicacion(contenedorApp(), fuente);
   try {
