@@ -1,0 +1,305 @@
+#  DataLogViewer — umbrales de los detectores
+#
+#  Especificación: docs/04-perfiles-motorsport.md §4.3
+#  PUERTA G1: estos números deciden cuándo se avisa a un tuner. No se cambia una
+#  entrada sin que una persona lea el diff.
+#
+#  ESTOS SON VALORES POR OMISIÓN, NO CONSTANTES
+#  ============================================
+#  Todo umbral de este fichero es **configurable**. La precedencia, de mayor a
+#  menor:
+#
+#      1. Anulación por canal     «este canal con este límite y no otro»
+#      2. Perfil activo           `.dlvprofile` (docs/02 E4.1) — es donde un
+#                                 equipo fija sus propios criterios y los
+#                                 comparte como un fichero suelto
+#      3. Preferencias de usuario
+#      4. Este fichero            por omisión
+#
+#  Es la misma precedencia que las unidades (docs/06 §6.9), y por el mismo
+#  motivo: el criterio de cuándo un motor está en problemas depende del motor, del
+#  combustible y de para qué se usa. Un valor cableado en el código sería una
+#  opinión disfrazada de física.
+#
+#  UNIDADES
+#  ========
+#  Todos los valores están en **unidad canónica** (data/units.toml): kelvin,
+#  kPa absolutos, fracción en lugar de porcentaje, lambda, segundos. Es lo que
+#  permite editarlos en la unidad que el usuario tenga activa sin reescribir nada
+#  (docs/06 §6.11).
+#
+#  PERMANENCIA MÍNIMA
+#  ==================
+#  Casi todos los detectores llevan `permanencia_s`: el tiempo que la condición
+#  debe mantenerse antes de generar una incidencia. Sin ella, con un log a 20 Hz y
+#  ruido, un umbral desnudo produce cientos de falsas alertas y el usuario apaga
+#  la función (docs/04 §4.3). Por omisión, 3 muestras o 100 ms, el mayor de los dos.
+
+[meta]
+version = 1
+especificacion = "docs/04-perfiles-motorsport.md §4.3"
+tarea = "F0-07 / F3-07"
+unidades = "canónicas (data/units.toml)"
+
+[general]
+# Aplicable a cualquier detector que no declare la suya.
+permanencia_s = 0.1
+muestras_minimas = 3
+# Histéresis: fracción del umbral que hay que recorrer de vuelta para que la
+# condición se considere terminada. Evita que una señal que oscila justo en el
+# umbral genere una ráfaga de incidencias.
+histeresis_relativa = 0.02
+
+# =========================================================================== #
+#  D1 · Evento de knock (contador)
+# =========================================================================== #
+[detectores.D1]
+etiqueta = "Evento de knock"
+roles = ["knock_count"]
+descripcion = "Incremento del contador acumulado de knock"
+# Cualquier incremento cuenta: un solo evento de knock importa.
+delta_minimo = 1
+severidad = "alta"
+permanencia_s = 0.0   # un contador que sube no necesita permanencia
+
+# La severidad asciende a crítica con contexto de carga: detonar a 6 000 rpm con
+# 2,2 bar no es lo mismo que un repique en ralentí.
+[detectores.D1.escalada_critica]
+engine_speed_min = 4000.0     # rpm
+manifold_pressure_min = 150.0  # kPa absolutos
+
+# =========================================================================== #
+#  D2 · Knock sostenido sobre umbral
+# =========================================================================== #
+[detectores.D2]
+etiqueta = "Knock sobre umbral"
+roles = ["knock_level", "knock_threshold"]
+descripcion = "Nivel de knock por encima del umbral de la ECU"
+# El umbral no es un número: es otro canal. Comparar contra un valor fijo daría
+# falsos positivos a alta carga, porque el umbral de la ECU sube con la carga.
+comparar_con_rol = "knock_threshold"
+margen_db = 0.0
+severidad = "media"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D3 · Retardo por knock activo
+# =========================================================================== #
+[detectores.D3]
+etiqueta = "Retardo por knock activo"
+roles = ["knock_retard"]
+descripcion = "La ECU está quitando avance por detonación"
+umbral_max_grados = -1.0   # más negativo que esto
+severidad = "media"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D4 · Mezcla pobre en carga  (el detector crítico por excelencia)
+# =========================================================================== #
+[detectores.D4]
+etiqueta = "Mezcla pobre en carga"
+roles = ["lambda_measured", "lambda_target", "throttle_position", "engine_speed"]
+descripcion = "Lambda por encima del objetivo mientras el motor está en carga"
+# Desviación RELATIVA al objetivo, no absoluta: el objetivo cambia con la carga.
+desviacion_relativa_max = 0.04
+severidad = "critica"
+permanencia_s = 0.2
+
+[detectores.D4.condiciones]
+throttle_position_min = 0.70   # fracción
+engine_speed_min = 3000.0      # rpm
+
+# =========================================================================== #
+#  D5 · Mezcla rica sostenida
+# =========================================================================== #
+[detectores.D5]
+etiqueta = "Mezcla rica sostenida"
+roles = ["lambda_measured", "lambda_target", "throttle_position"]
+descripcion = "Lambda muy por debajo del objetivo durante un tiempo largo"
+desviacion_relativa_min = -0.07
+severidad = "baja"
+permanencia_s = 2.0
+
+[detectores.D5.condiciones]
+throttle_position_min = 0.50
+
+# =========================================================================== #
+#  D6 · Sobrepresión
+# =========================================================================== #
+[detectores.D6]
+etiqueta = "Sobrepresión"
+roles = ["boost_pressure_actual"]
+descripcion = "Presión de sobrealimentación cerca del corte por sobrepresión"
+# Fracción del corte declarado por la ECU, si el canal existe; si no, absoluto.
+fraccion_del_corte = 0.97
+umbral_absoluto_kpa = 250.0
+severidad = "alta"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D7 · Sobreoscilación de boost
+# =========================================================================== #
+[detectores.D7]
+etiqueta = "Sobreoscilación de boost"
+roles = ["boost_pressure_actual", "boost_pressure_target"]
+descripcion = "Pico por encima del objetivo tras una subida de presión"
+sobreoscilacion_relativa_max = 0.05
+severidad = "media"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D8 · Saturación de inyectores
+# =========================================================================== #
+[detectores.D8]
+etiqueta = "Duty de inyección alto"
+roles = ["injector_duty"]
+descripcion = "Ciclo de trabajo de inyección cerca del máximo"
+umbral_aviso = 0.85      # fracción
+umbral_critico = 0.95
+severidad = "alta"
+severidad_critica = "critica"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D9 · Sobretemperatura de refrigerante
+# =========================================================================== #
+[detectores.D9]
+etiqueta = "Sobretemperatura de refrigerante"
+roles = ["coolant_temp"]
+descripcion = "Refrigerante por encima del límite durante un tiempo sostenido"
+umbral_max_k = 378.15    # 105 °C
+severidad = "alta"
+# Tres segundos: un pico corto al parar el motor es normal y no debe avisar.
+permanencia_s = 3.0
+
+# =========================================================================== #
+#  D10 · Presión de aceite baja  (el caso que justifica las curvas)
+# =========================================================================== #
+[detectores.D10]
+etiqueta = "Presión de aceite baja"
+roles = ["oil_pressure", "engine_speed"]
+descripcion = "Presión de aceite por debajo del mínimo para el régimen actual"
+severidad = "critica"
+permanencia_s = 0.3
+
+# El umbral es una CURVA en función del régimen, no un valor fijo. Un umbral
+# plano da falsos positivos en ralentí y falsos negativos a alto régimen, que es
+# justo donde importa (docs/04 §4.2 P8).
+#
+#     minimo_kPa_abs = base + pendiente * (rpm / 1000)
+#
+# Por omisión: 1 bar de margen sobre la atmosférica, más 1 bar por cada 1 000 rpm.
+# El usuario puede sustituir la fórmula por una tabla de puntos.
+[detectores.D10.curva_minima]
+tipo = "lineal_por_regimen"
+base_kpa = 201.3          # 101,3 atmosférica + 100 de margen
+pendiente_kpa_por_1000rpm = 100.0
+# Alternativa: puntos = [[0, 201.3], [3000, 501.3], [7000, 901.3]] con
+# interpolación lineal. Si `puntos` está presente, gana sobre la fórmula.
+
+# =========================================================================== #
+#  D11 · Baja tensión de batería
+# =========================================================================== #
+[detectores.D11]
+etiqueta = "Baja tensión de batería"
+roles = ["battery_voltage", "engine_speed"]
+descripcion = "Tensión baja con el motor en marcha (alternador o batería)"
+umbral_min_v = 11.5
+severidad = "media"
+permanencia_s = 1.0
+
+[detectores.D11.condiciones]
+engine_speed_min = 500.0   # solo con el motor en marcha
+
+# =========================================================================== #
+#  D12 · Error de trigger
+# =========================================================================== #
+[detectores.D12]
+etiqueta = "Error de sincronización"
+roles = ["trigger_errors"]
+descripcion = "Cualquier bit activo en la máscara de errores de trigger"
+# Máscara de bits: cualquier bit distinto de cero cuenta. `bits_de_interes`
+# permite restringirlo cuando el diccionario de enums esté traducido (F3-15).
+bits_de_interes = "todos"
+severidad = "critica"
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  D13 · Protección de motor activa
+# =========================================================================== #
+[detectores.D13]
+etiqueta = "Protección de motor activa"
+roles = ["protection_level"]
+descripcion = "La ECU está limitando para proteger el motor"
+umbral_min = 1.0
+severidad_por_nivel = { 1 = "media", 2 = "alta", 3 = "critica" }
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  D14 · Corte activo
+# =========================================================================== #
+[detectores.D14]
+etiqueta = "Corte activo"
+roles = ["cut_percentage"]
+descripcion = "Corte de encendido o inyección fuera del limitador esperado"
+umbral_min = 0.01
+severidad = "media"
+permanencia_s = 0.1
+
+# =========================================================================== #
+#  D15 · Excursión de lambda en tip-in
+# =========================================================================== #
+[detectores.D15]
+etiqueta = "Excursión de lambda en tip-in"
+roles = ["throttle_position", "lambda_measured", "lambda_target"]
+descripcion = "Desviación de mezcla tras una apertura brusca de mariposa"
+derivada_tps_min_por_s = 2.0    # fracción/s
+ventana_s = 0.5
+desviacion_relativa_max = 0.06
+severidad = "media"
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  D16 · Canal muerto o pegado
+# =========================================================================== #
+[detectores.D16]
+etiqueta = "Canal muerto o pegado"
+descripcion = "Varianza nula en todo el log con el motor en marcha"
+# El caso real: Oil Temperature pegada en −20 °C con el motor a 93 °C
+# (docs/01 §1.11).
+severidad = "informativa"
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  D17 · Valor centinela
+# =========================================================================== #
+[detectores.D17]
+etiqueta = "Valor centinela"
+descripcion = "Muestra igual a un centinela de sin dato o saturación"
+# La lista vive en data/units.toml, no aquí: es propiedad del formato.
+centinelas_desde = "data/units.toml"
+severidad = "informativa"
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  D18 · Hueco de muestreo
+# =========================================================================== #
+[detectores.D18]
+etiqueta = "Hueco de muestreo"
+descripcion = "Intervalo entre muestras muy por encima del habitual"
+# Múltiplo del dt mediano del propio log, no un valor absoluto: el AutoLog va a
+# ~18 Hz y los logs internos a 20/10/5 Hz (docs/01 §1.6 y §1.7).
+factor_sobre_dt_mediano = 3.0
+severidad = "informativa"
+permanencia_s = 0.0
+
+# =========================================================================== #
+#  DESACTIVACIÓN AUTOMÁTICA  (mitigación de R10, docs/07 §7.15)
+# =========================================================================== #
+[desactivacion_automatica]
+# Un detector de severidad crítica se DESACTIVA si alguno de sus roles proviene
+# de asignación difusa no confirmada por el usuario. Preferimos no avisar a
+# avisar en falso: una alerta falsa repetida enseña al usuario a ignorar las
+# alertas, y entonces el detector que sí importa tampoco se lee.
+severidades_afectadas = ["critica"]
+motivo = "rol asignado por parecido de nombre y sin confirmar"

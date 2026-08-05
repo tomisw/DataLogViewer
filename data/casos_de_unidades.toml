@@ -1,0 +1,443 @@
+#  DataLogViewer — tabla de casos conocidos de conversión de unidades
+#
+#  Tarea F1-20.  Especificación: docs/06-sistema-de-unidades.md §6.5 y §6.12.
+#  PUERTA G1: cada número de este fichero es una afirmación sobre física o sobre
+#  una definición de unidad. No se cambia una entrada sin que una persona la
+#  compruebe contra la fuente citada en `origen`.
+#
+#  PARA QUÉ SIRVE ESTE FICHERO
+#  ==========================
+#  Es la red del subsistema de unidades. `dlv-core/tests/test_trampa_del_delta.py`
+#  recorre estas entradas y comprueba que el motor las reproduce. La tabla está en
+#  `data/` y no dentro de la prueba por dos razones:
+#
+#    1. Se puede revisar sin leer Python. Un tuner puede auditar la columna de
+#       valores esperados; nadie va a auditar aserciones enterradas en un fichero
+#       de pruebas.
+#    2. Añadir un caso conocido no es escribir código. Cuando aparezca una unidad
+#       nueva o una discrepancia con otra herramienta, la reacción correcta es
+#       añadir una fila aquí, no una función.
+#
+#  LA TRAMPA DEL DELTA
+#  ===================
+#  El fallo más caro de todo el subsistema es aplicar el desplazamiento de origen
+#  a una diferencia. Un Δ de 10 K son 10 °C y 18 °F, nunca −263,15 °C. La sección
+#  [[delta]] es la que lo fija, y es deliberadamente redundante con [[punto]]:
+#  cada temperatura aparece como punto y como intervalo, porque lo que importa no
+#  es que cada una salga bien por separado, sino que la MISMA unidad dé resultados
+#  distintos según la clase.
+#
+#  UNIDADES
+#  ========
+#  `canonica` está siempre en la unidad canónica de la dimensión (data/units.toml):
+#  kelvin, kPa absolutos, lambda, fracción, rpm, km/h, grados, voltios, segundos.
+#  `esperado` está en la unidad de `unidad`.
+#
+#  `tolerancia` es absoluta, en la unidad de `esperado`. Donde la conversión es
+#  exacta en binario (×1, ×100, ×0,01) se pone 0,0 a propósito: cualquier
+#  desviación sería un defecto, no ruido de coma flotante.
+
+[meta]
+version = 1
+tarea = "F1-20"
+especificacion = "docs/06-sistema-de-unidades.md §6.5 y §6.12"
+unidades = "`canonica` en unidad canónica; `esperado` en la unidad indicada"
+
+# =========================================================================== #
+#  PUNTOS  ·  se aplica la conversión afín completa `a·x + b`
+# =========================================================================== #
+
+# --- Temperatura: la única dimensión del catálogo con b ≠ 0 ---------------- #
+[[punto]]
+caso = "cero Celsius"
+dimension = "temperature"
+unidad = "degC"
+canonica = 273.15
+esperado = 0.0
+tolerancia = 1e-9
+origen = "definición del SI: 0 °C ≡ 273,15 K"
+
+[[punto]]
+caso = "cero Celsius en Fahrenheit"
+dimension = "temperature"
+unidad = "degF"
+canonica = 273.15
+esperado = 32.0
+tolerancia = 1e-9
+origen = "definición: 0 °C = 32 °F"
+
+[[punto]]
+caso = "cien Celsius en Fahrenheit"
+dimension = "temperature"
+unidad = "degF"
+canonica = 373.15
+esperado = 212.0
+tolerancia = 1e-9
+origen = "definición: 100 °C = 212 °F"
+
+[[punto]]
+caso = "refrigerante del AutoLog real"
+dimension = "temperature"
+unidad = "degC"
+canonica = 366.3
+esperado = 93.15
+tolerancia = 1e-9
+origen = "AutoLog_20260729_1830.csv: Coolant Temperature 3663 deciK (docs/01 §1.8)"
+
+[[punto]]
+caso = "temperatura de aceite pegada del AutoLog real"
+dimension = "temperature"
+unidad = "degC"
+canonica = 253.15
+esperado = -20.0
+tolerancia = 1e-9
+origen = "AutoLog: Oil Temperature pegada en 2531 deciK con el motor a 93 °C (docs/01 §1.11). Un canal muerto, no una medida: lo detecta D16"
+
+[[punto]]
+caso = "cero absoluto en Rankine"
+dimension = "temperature"
+unidad = "degR"
+canonica = 0.0
+esperado = 0.0
+tolerancia = 0.0
+origen = "Rankine comparte origen con el kelvin: b = 0, solo cambia la escala"
+
+# --- Presión: kPa absolutos como canónica --------------------------------- #
+[[punto]]
+caso = "un bar en kPa"
+dimension = "pressure"
+unidad = "kPa"
+canonica = 100.0
+esperado = 100.0
+tolerancia = 0.0
+origen = "identidad: la canónica es el kPa"
+
+[[punto]]
+caso = "un bar"
+dimension = "pressure"
+unidad = "bar"
+canonica = 100.0
+esperado = 1.0
+tolerancia = 0.0
+origen = "definición: 1 bar ≡ 100 kPa"
+
+[[punto]]
+caso = "un bar en psi"
+dimension = "pressure"
+unidad = "psi"
+canonica = 100.0
+esperado = 14.5037738
+tolerancia = 1e-6
+origen = "1 psi = 6 894,757 293 Pa exactos (NIST SP 811)"
+
+[[punto]]
+caso = "atmósfera estándar"
+dimension = "pressure"
+unidad = "atm"
+canonica = 101.325
+esperado = 1.0
+tolerancia = 1e-9
+origen = "definición: 1 atm ≡ 101 325 Pa"
+
+[[punto]]
+caso = "atmósfera estándar en inHg"
+dimension = "pressure"
+unidad = "inHg"
+canonica = 101.325
+esperado = 29.9212558
+tolerancia = 1e-5
+origen = "1 inHg (0 °C) = 3 386,389 Pa"
+
+[[punto]]
+caso = "MAP máxima del AutoLog real"
+dimension = "pressure"
+unidad = "kPa"
+canonica = 227.2
+esperado = 227.2
+tolerancia = 1e-9
+origen = "AutoLog: fila de MAP máximo, 2272 deciKPa (data/formats/haltech_nsp.toml, fila de referencia)"
+
+[[punto]]
+caso = "MAP máxima del AutoLog real en bar absolutos"
+dimension = "pressure"
+unidad = "bar"
+canonica = 227.2
+esperado = 2.272
+tolerancia = 1e-9
+origen = "la misma fila. En relativo son 1,259 bar de boost: ver [[referencia]]"
+
+# --- Mezcla --------------------------------------------------------------- #
+[[punto]]
+caso = "lambda uno es lambda uno"
+dimension = "mixture_ratio"
+unidad = "lambda"
+canonica = 1.0
+esperado = 1.0
+tolerancia = 0.0
+origen = "identidad"
+
+[[punto]]
+caso = "lambda uno en AFR de gasolina"
+dimension = "mixture_ratio"
+unidad = "afr_gasolina"
+canonica = 1.0
+esperado = 14.7
+tolerancia = 1e-9
+origen = "estequiometría de la gasolina, 14,7:1. Es la unidad de factor FIJO; la parametrizada por el canal del log es `afr` y se prueba en F1-14"
+
+[[punto]]
+caso = "lambda 0,850 en phi"
+dimension = "mixture_ratio"
+unidad = "phi"
+canonica = 0.85
+esperado = 1.1764706
+tolerancia = 1e-6
+origen = "φ ≡ 1/λ (docs/06 §6.12)"
+
+[[punto]]
+caso = "objetivo de lambda en carga del log real"
+dimension = "mixture_ratio"
+unidad = "afr_gasolina"
+canonica = 0.78
+esperado = 11.466
+tolerancia = 1e-9
+origen = "Target Lambda 780 en la zona de plena carga del AutoLog"
+
+# --- Fracciones: el porcentaje NO es la canónica -------------------------- #
+[[punto]]
+caso = "TPS de la fila de referencia"
+dimension = "ratio"
+unidad = "pct"
+canonica = 0.563
+esperado = 56.3
+tolerancia = 1e-9
+origen = "AutoLog: Throttle Position 563 en la fila de MAP máximo. La canónica es la FRACCIÓN, no el porcentaje: es la razón de que los umbrales de data/umbrales.toml lleven 0,70 y no 70"
+
+[[punto]]
+caso = "fracción uno son mil por mil"
+dimension = "ratio"
+unidad = "permil"
+canonica = 1.0
+esperado = 1000.0
+tolerancia = 0.0
+origen = "definición"
+
+# --- Velocidades y ángulos ------------------------------------------------ #
+[[punto]]
+caso = "régimen máximo del AutoLog real"
+dimension = "angular_speed"
+unidad = "rpm"
+canonica = 6715.0
+esperado = 6715.0
+tolerancia = 0.0
+origen = "AutoLog: fila de MAP máximo (data/formats/haltech_nsp.toml)"
+
+[[punto]]
+caso = "seis mil rpm en Hz"
+dimension = "angular_speed"
+unidad = "Hz"
+canonica = 6000.0
+esperado = 100.0
+tolerancia = 1e-6
+origen = "6 000 rpm ÷ 60 = 100 rev/s"
+
+[[punto]]
+caso = "cien km/h en mph"
+dimension = "speed"
+unidad = "mph"
+canonica = 100.0
+esperado = 62.1371192
+tolerancia = 1e-6
+origen = "1 milla = 1 609,344 m exactos"
+
+[[punto]]
+caso = "ciento ocho km/h en m/s"
+dimension = "speed"
+unidad = "m/s"
+canonica = 108.0
+esperado = 30.0
+tolerancia = 1e-6
+origen = "108 km/h ÷ 3,6"
+
+[[punto]]
+caso = "ciento ochenta grados en radianes"
+dimension = "angle"
+unidad = "rad"
+canonica = 180.0
+esperado = 3.14159265
+tolerancia = 1e-7
+origen = "π radianes"
+
+[[punto]]
+caso = "grados de cigüeñal a grados de árbol"
+dimension = "angle"
+unidad = "deg_cam"
+canonica = 720.0
+esperado = 360.0
+tolerancia = 0.0
+origen = "dos vueltas de cigüeñal son una de árbol de levas"
+
+# --- Tensión -------------------------------------------------------------- #
+[[punto]]
+caso = "tensión de batería en marcha"
+dimension = "voltage"
+unidad = "mV"
+canonica = 13.8
+esperado = 13800.0
+tolerancia = 1e-6
+origen = "definición. El umbral de D11 (11,5 V) vive en voltios canónicos"
+
+# =========================================================================== #
+#  DELTAS  ·  solo la parte lineal `a·x`.  LA PRUEBA CENTRAL DE F1-20
+# =========================================================================== #
+#  Nótese que `unidad` y `canonica` repiten combinaciones de la sección [[punto]]
+#  con resultados distintos. Es el objeto de la prueba: la misma unidad y el mismo
+#  número deben dar cosas distintas según la clase.
+
+[[delta]]
+caso = "el caso canónico: diez kelvin de diferencia en Celsius"
+dimension = "temperature"
+unidad = "degC"
+canonica = 10.0
+esperado = 10.0
+tolerancia = 0.0
+origen = "docs/06 §6.12. Como PUNTO daría −263,15: 27 000 % de error y con aspecto de temperatura razonable en algún otro contexto"
+
+[[delta]]
+caso = "el caso canónico: diez kelvin de diferencia en Fahrenheit"
+dimension = "temperature"
+unidad = "degF"
+canonica = 10.0
+esperado = 18.0
+tolerancia = 1e-9
+origen = "docs/06 §6.12. Solo la pendiente: 10 × 1,8. Como PUNTO daría −441,67"
+
+[[delta]]
+caso = "desviación típica de temperatura"
+dimension = "temperature"
+unidad = "degC"
+canonica = 2.0
+esperado = 2.0
+tolerancia = 0.0
+origen = "docs/06 §6.5: la desviación típica es un intervalo. Como punto saldría −271,15 °C, que es el síntoma clásico de este defecto"
+
+[[delta]]
+caso = "diferencia de MAP entre dos cursores"
+dimension = "pressure"
+unidad = "bar"
+canonica = 50.0
+esperado = 0.5
+tolerancia = 0.0
+origen = "la presión no desplaza origen, así que punto e intervalo coinciden. Está en la tabla justamente por eso: para fijar que la clase no rompe lo que ya estaba bien"
+
+[[delta]]
+caso = "diferencia de TPS en porcentaje"
+dimension = "ratio"
+unidad = "pct"
+canonica = 0.25
+esperado = 25.0
+tolerancia = 1e-9
+origen = "25 puntos porcentuales de apertura"
+
+# =========================================================================== #
+#  VARIANZAS  ·  `a²·x`
+# =========================================================================== #
+[[varianza]]
+caso = "varianza de temperatura en Fahrenheit"
+dimension = "temperature"
+unidad = "degF"
+canonica = 4.0
+esperado = 12.96
+tolerancia = 1e-9
+origen = "4 × 1,8² = 12,96. La raíz, 3,6 °F, es la desviación típica de 2 K: la coherencia entre VARIANZA e INTERVALO es lo que se comprueba"
+
+[[varianza]]
+caso = "varianza de presión en bar"
+dimension = "pressure"
+unidad = "bar"
+canonica = 100.0
+esperado = 0.01
+tolerancia = 1e-12
+origen = "100 × 0,01² = 0,01"
+
+# =========================================================================== #
+#  REFERENCIA DE PRESIÓN  ·  cambio de ORIGEN, no de unidad (docs/06 §6.6)
+# =========================================================================== #
+#  `referencia_kpa` se resta a los PUNTOS y no a los intervalos. Se comprueba
+#  aquí y no en [[punto]] porque es la combinación —origen y unidad a la vez— lo
+#  que hay que fijar: cualquier unidad de presión debe poder ser relativa.
+
+[[referencia]]
+caso = "MAP máxima del AutoLog real como boost en bar"
+unidad = "bar"
+canonica = 227.2
+referencia_kpa = 101.325
+clase = "punto"
+esperado = 1.258750
+tolerancia = 1e-6
+origen = "227,2 − 101,325 = 125,875 kPa de boost. Es el número que un tuner reconoce del log; los 2,272 bar absolutos de la misma fila no le dicen nada"
+
+[[referencia]]
+caso = "la misma fila en psi de boost"
+unidad = "psi"
+canonica = 227.2
+referencia_kpa = 101.325
+clase = "punto"
+esperado = 18.2566252
+tolerancia = 1e-6
+origen = "125 875 Pa ÷ 6 894,757 293 Pa/psi = 18,256 625 psi. «18 psi» es como se describe esta puesta a punto. Este valor se comprobó desde la definición del psi, no desde el catálogo: la primera versión de esta fila decía 18,2555 y la prueba la cazó"
+
+[[referencia]]
+caso = "presión atmosférica es cero boost"
+unidad = "bar"
+canonica = 101.325
+referencia_kpa = 101.325
+clase = "punto"
+esperado = 0.0
+tolerancia = 1e-12
+origen = "por construcción, y es la comprobación de que el origen se resta antes de escalar y no después"
+
+[[referencia]]
+caso = "una diferencia de presión NO cambia al pasar a relativa"
+unidad = "bar"
+canonica = 50.0
+referencia_kpa = 101.325
+clase = "intervalo"
+esperado = 0.5
+tolerancia = 0.0
+origen = "docs/06 §6.6: al pasar a relativo la conversión de un punto resta la referencia; la de un intervalo no. Si se restara, un Δ de 50 kPa se mostraría como −0,51 bar"
+
+# =========================================================================== #
+#  ERRORES DE USO  ·  lo que el motor tiene que RECHAZAR
+# =========================================================================== #
+#  Un valor aproximado y equivocado es peor que un error: el usuario no tiene
+#  forma de saber que lo que ve no significa lo que cree.
+
+[[rechazo]]
+caso = "diferencia en una conversión recíproca"
+dimension = "mixture_ratio"
+unidad = "phi"
+clase = "intervalo"
+motivo = "φ = 1/λ no es lineal: la diferencia de dos φ no es el φ de la diferencia"
+
+[[rechazo]]
+caso = "varianza en una conversión recíproca"
+dimension = "mixture_ratio"
+unidad = "phi"
+clase = "varianza"
+motivo = "por lo mismo, y con el error elevado al cuadrado"
+
+[[rechazo]]
+caso = "referencia de origen en una dimensión que no es presión"
+dimension = "temperature"
+unidad = "degC"
+clase = "punto"
+referencia_kpa = 101.325
+motivo = "solo la presión admite cambio de origen (docs/06 §6.6). Restar kPa a un kelvin no significa nada"
+
+[[rechazo]]
+caso = "unidad que no pertenece a la dimensión"
+dimension = "temperature"
+unidad = "bar"
+clase = "punto"
+motivo = "el selector de unidad nunca debe ofrecer una unidad de otra dimensión, y si un perfil guardado la trae, hay que enterarse"

@@ -1,0 +1,149 @@
+# Raíz del workspace Python de DataLogViewer.
+#
+# Elección de gestor de workspace (F0-02): se usa `uv` con `[tool.uv.workspace]`
+# en vez de `[tool.hatch]` porque `uv` ya es la herramienta elegida para resolver
+# e instalar dependencias del proyecto (está disponible en el entorno de
+# ejecución) y su soporte de workspaces permite un único `uv sync` que instala
+# `dlv-core`, `dlv-api` y `dlv-app` como paquetes editables en un solo entorno
+# virtual, resolviendo las dependencias cruzadas entre ellos mediante
+# `[tool.uv.sources]` con `workspace = true` en cada paquete consumidor. Un
+# workspace de Hatch habría exigido además que esta raíz fuera ella misma un
+# paquete instalable; aquí la raíz es un "proyecto virtual" (sin tabla
+# `[project]`) que solo coordina el workspace y centraliza la configuración de
+# `ruff` y `mypy`, que es justo lo que se necesita.
+#
+# `dlv-ui` no entra en el workspace de `uv`: es un proyecto TypeScript/Vite
+# independiente, gestionado con `npm` desde `dlv-ui/package.json`.
+[tool.uv.workspace]
+members = ["dlv-core", "dlv-api", "dlv-app"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    # `starlette.testclient` (vía `fastapi.testclient`, usado en
+    # dlv-api/tests/test_salud.py) exige httpx2 desde starlette 1.x; solo de
+    # test, no entra en el ZIP portable de dlv-app.
+    "httpx2",
+    # Fuzzing de propiedad sobre cabecera y filas (F1-36). Solo de test.
+    "hypothesis>=6.0",
+    # Empaquetado `onedir` para el ZIP portable (F1-35, F5-01). Es una
+    # herramienta de construcción: no se importa desde el código y por tanto
+    # no entra en el paquete que produce, solo lo produce.
+    "pyinstaller>=6.0",
+]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+# `pythonpath` (soporte nativo de pytest >= 7, sin plugin adicional) añade los
+# directorios `src/` de cada paquete Python a `sys.path` durante la recolección
+# de tests. Esto permite ejecutar `python -m pytest` desde la raíz sin haber
+# instalado (`uv sync` / `pip install -e`) ningún paquete primero: útil en
+# cualquier entorno, y necesario en el que se usó para andamiar F0-02, donde el
+# acceso a PyPI está bloqueado por política de red (ver informe de la tarea).
+[tool.pytest.ini_options]
+pythonpath = [
+    "dlv-core/src",
+    "dlv-api/src",
+    "dlv-app/src",
+]
+testpaths = [
+    "dlv-core/tests",
+    "dlv-api/tests",
+    "dlv-app/tests",
+    # Pruebas de nivel de proyecto, no de paquete: validan los catálogos de
+    # `data/` (F0-08 units.toml, F0-10 roles.toml) y las herramientas de
+    # `tools/`. Sin esta entrada no se ejecutaban, y son la red de los riesgos
+    # R1 y R11 (un factor de escala mal puesto llega a una decisión de tuning).
+    "tests",
+]
+# Los tres paquetes tienen un `tests/test_smoke.py` (mismo nombre a propósito:
+# cada uno es "el test de humo de este paquete"). Sin `__init__.py` en esos
+# directorios, el modo de importación por defecto de pytest (`prepend`) los
+# trata como el mismo módulo y colisiona. `importlib` importa cada fichero
+# por su ruta completa, sin ese choque, y sin tener que forzarlos a un
+# nombre de fichero único ni añadir paquetes de test.
+addopts = "--import-mode=importlib"
+
+# ---------------------------------------------------------------------------
+# ruff (lint + formato)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
+# `docs/`, `state/`, `tools/`, `samples/`, `data/` y el `tests/` de nivel raíz
+# son de otras tareas del plan (p. ej. F0-05, F0-08) o del orquestador (ver
+# restricciones de F0-02): no se tocan ni se lintan aquí. Estos nombres solo
+# existen como directorios de nivel raíz en este repo (comprobado con
+# `ruff check --show-settings`), así que no excluyen de paso `dlv-core/tests`
+# ni similares. `dlv-ui` es TypeScript, fuera del alcance de ruff.
+extend-exclude = ["docs", "state", "samples", "data", "dlv-ui"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # bugbear
+    "C4",  # comprehensions
+    "SIM", # simplificaciones
+    "RUF", # reglas propias de ruff
+]
+
+[tool.ruff.lint.per-file-ignores]
+# `tools/` y `tests/` de raíz se lintan desde la integración de F0-02, pero con
+# tolerancias: son guiones de datos y prosa en español, no código de librería.
+"tools/*.py" = [
+    "E501",    # tablas de datos y cadenas de ayuda: partirlas empeora la lectura
+    "RUF059",  # desempaquetados parciales deliberados al leer tuplas del backlog
+    "RUF002",  # docstrings en español con comillas tipográficas y «»
+    "RUF001",  # signo menos tipográfico (−) en cadenas de prosa
+    "RUF003",  # signo menos tipográfico (−) en comentarios
+]
+"tests/*.py" = ["E501", "RUF059", "RUF002", "RUF001", "RUF003"]
+# La prosa de `dlv-core` y `dlv-api` está en español y usa el signo menos
+# tipográfico (−) y las comillas «», que ruff marca como ambiguos. Es deliberado.
+"dlv-core/**/*.py" = ["RUF001", "RUF002", "RUF003"]
+"dlv-api/**/*.py" = ["RUF001", "RUF002", "RUF003"]
+
+"*/tests/*" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ---------------------------------------------------------------------------
+# mypy (modo estricto)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+# Layout `src/`: cada paquete vive bajo `<paquete>/src/<modulo>/`, y `src/` no
+# tiene `__init__.py` propio, así que se declaran las bases explícitamente para
+# que mypy resuelva `dlv_core`, `dlv_api`, `dlv_app` como paquetes de nivel
+# superior en vez de intentar adivinarlo por la ruta del fichero.
+explicit_package_bases = true
+mypy_path = ["dlv-core/src", "dlv-api/src", "dlv-app/src"]
+# Excluye también los `tests/` de cada paquete (no solo el de la raíz): sin
+# `__init__.py`, dos ficheros con el mismo nombre en paquetes distintos
+# (`dlv-core/tests/test_smoke.py` y `dlv-api/tests/test_smoke.py`) colisionan
+# como "mismo módulo" para mypy (ver informe de F0-02). El código de librería
+# (`dlv-core/src`, `dlv-api/src`) es lo que este comando tiene que cubrir; los
+# tests se comprueban con `pytest`, no con `mypy --strict`.
+exclude = "^(docs|state|tools|samples|data|dlv-ui)/|(^|/)tests/"
+
+# `polars`, `numpy`, `fastapi`, `uvicorn` y `pywebview` publican tipos propios
+# (`py.typed`) y en una instalación normal mypy los usa sin ayuda. Este
+# override solo entra en juego cuando el paquete no está físicamente instalado
+# (p. ej. este sandbox de F0-02, sin acceso a PyPI: ver informe de la tarea) y
+# evita que `mypy` falle con "Cannot find implementation or library stub" en
+# vez de comprobar el resto del código; con las dependencias instaladas no
+# cambia nada, porque entonces sí se encuentran los tipos reales.
+[[tool.mypy.overrides]]
+module = ["polars.*", "numpy.*", "fastapi.*", "uvicorn.*", "webview.*", "pytest.*"]
+ignore_missing_imports = true

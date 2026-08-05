@@ -1,0 +1,569 @@
+# DataLogViewer — Catálogo de canales enumerados (enums)
+#
+# Tarea F0-11. Especificación: docs/01-formato-log.md §1.10
+#
+# Este archivo contiene los 75 canales candidatos a enumeración
+# (Type: Raw con rango ≤ 20) más las 2 máscaras de bits especiales:
+# Engine Protection Cause (0…65535) y Trigger System Errors (0…31).
+#
+# IMPORTANTE: Los códigos están SIN TRADUCIR a propósito. La asignación
+# código → nombre requiere documentación del fabricante (tarea F3-15).
+# Hasta entonces, los códigos desconocidos se muestran como «Estado N».
+#
+# Los canales bitmask (Protection Cause, Trigger Errors) no son líneas
+# continuas: se decodifican bit a bit y se dibujan como carriles apilados.
+#
+
+[meta]
+version = 1
+tarea = "F0-11"
+especificacion = "docs/01-formato-log.md §1.10"
+
+[canales]
+
+[canales."Reset Required"]
+id = 13
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."RPM Derivative Filter"]
+id = 65
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [4]
+codigos = {}
+
+[canales."AVI7 Switch State"]
+id = 506
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."AVI9 Switch State"]
+id = 508
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Check Engine Light Output State"]
+id = 689
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Synced Pulse Input 4 Input State"]
+id = 739
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Trigger Synchronisation Level"]
+id = 759
+rango = { min = 0, max = 4 }
+clase = "enum"
+valores_observados = [3]
+codigos = {}
+
+[canales."Drive By Wire 1 Pin 1 Output State"]
+id = 1045
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Drive By Wire 1 Pin 2 Output State"]
+id = 1051
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Digital Pulse Output 1 Output State"]
+id = 1240
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Digital Pulse Output 2 Output State"]
+id = 1241
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Digital Pulse Output 3 Output State"]
+id = 1242
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 1, 2]
+codigos = {}
+
+[canales."Digital Pulse Output 4 Output State"]
+id = 1243
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Ignition 1 Output State"]
+id = 1244
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Ignition 2 Output State"]
+id = 1245
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Ignition 3 Output State"]
+id = 1246
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Ignition 4 Output State"]
+id = 1247
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Ignition 5 Output State"]
+id = 1248
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Ignition 6 Output State"]
+id = 1249
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Injector 6 Output State"]
+id = 1250
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 5 Output State"]
+id = 1251
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 4 Output State"]
+id = 1252
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 3 Output State"]
+id = 1253
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 2 Output State"]
+id = 1254
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 1 Output State"]
+id = 1255
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [0, 2]
+codigos = {}
+
+[canales."Injector 8 Output State"]
+id = 1256
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Injector 7 Output State"]
+id = 1257
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Digital Pulse Output 5 Output State"]
+id = 1258
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Ignition 7 Output State"]
+id = 1260
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Ignition 8 Output State"]
+id = 1261
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Engine Limiting Method"]
+id = 1321
+rango = { min = 0, max = 3 }
+clase = "enum"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Trigger Synchronisation State"]
+id = 1351
+rango = { min = 0, max = 5 }
+clase = "enum"
+valores_observados = [5]
+codigos = {}
+
+[canales."Trigger System Errors"]
+id = 1353
+rango = { min = 0, max = 31 }
+clase = "bitmask"
+rol = "trigger_errors"
+valores_observados = [0]
+codigos = {}
+
+[canales."Launch Control State"]
+id = 1433
+rango = { min = -101, max = 1 }
+clase = "enum"
+rol = "launch_state"
+valores_observados = [-6, -4, 1]
+codigos = {}
+
+[canales."Decel Cut State"]
+id = 1500
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Aux Fuel Pump 1 Output Channel State"]
+id = 1529
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Fuel Pump Output State"]
+id = 1530
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Thermofan 1 Output State"]
+id = 1531
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Air Con Request Switch State"]
+id = 1538
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Air Con Compressor Output State"]
+id = 1539
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Stepper 1 Pin 1 Output State"]
+id = 2479
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."AVI2 Switch State"]
+id = 2611
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Engine Limiter Active"]
+id = 2754
+rango = { min = 0, max = 4 }
+clase = "enum"
+rol = "limiter_active"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Stepper 1 Pin 2 Output State"]
+id = 2857
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Data Log Status"]
+id = 3003
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [0, 1, 2]
+codigos = {}
+
+[canales."Stepper 1 Pin 3 Output State"]
+id = 3061
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Stepper 1 Pin 4 Output State"]
+id = 3321
+rango = { min = 0, max = 2 }
+clase = "enum"
+valores_observados = [1, 2]
+codigos = {}
+
+[canales."Throttle Position Derivative Filter"]
+id = 4062
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [3]
+codigos = {}
+
+[canales."Manifold Pressure Derivative Filter"]
+id = 4079
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [4]
+codigos = {}
+
+[canales."Accumulated Engine Running Time Status"]
+id = 4159
+rango = { min = 0, max = 10 }
+clase = "enum"
+valores_observados = [0]
+codigos = {}
+
+[canales."Ignition Switch State"]
+id = 4165
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Engine Control Relay Output State"]
+id = 4167
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Manifold Pressure Filter Scale"]
+id = 4447
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [1, 2, 3]
+codigos = {}
+
+[canales."Engine Protection Severity Level"]
+id = 4487
+rango = { min = 0, max = 3 }
+clase = "enum"
+rol = "protection_level"
+valores_observados = [0]
+codigos = {}
+
+[canales."Throttle Position Filter Scale"]
+id = 5298
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [3]
+codigos = {}
+
+[canales."Air Con State"]
+id = 5332
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Mass Air Flow Filter Scale"]
+id = 5417
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [2]
+codigos = {}
+
+[canales."Engine State"]
+id = 5841
+rango = { min = 0, max = 4 }
+clase = "enum"
+valores_observados = [2, 3, 4]
+codigos = {}
+
+[canales."Knock Detection Light Output State"]
+id = 6397
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Aux Fuel Pump 2 Output Channel State"]
+id = 6717
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Power Steering Switch State"]
+id = 7661
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Trigger Sync Level Status"]
+id = 8017
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Vehicle Speed Filter Scale"]
+id = 8035
+rango = { min = 0, max = 5 }
+clase = "enum"
+valores_observados = [4]
+codigos = {}
+
+[canales."Cut Percentage Method"]
+id = 8203
+rango = { min = 0, max = 3 }
+clase = "enum"
+valores_observados = [0]
+codigos = {}
+
+[canales."RPM Limiting Method"]
+id = 8866
+rango = { min = 0, max = 3 }
+clase = "enum"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."RPM Limiter Active"]
+id = 8867
+rango = { min = 0, max = 1 }
+clase = "booleano"
+rol = "limiter_active"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Idle Control State"]
+id = 8952
+rango = { min = -8, max = 3 }
+clase = "enum"
+rol = "idle_state"
+valores_observados = [-8, -7, -3, -2, -1, 1, 2]
+codigos = {}
+
+[canales."Boost Control State"]
+id = 8953
+rango = { min = 0, max = 10 }
+clase = "enum"
+rol = "boost_state"
+valores_observados = [0, 1, 2, 3, 6]
+codigos = {}
+
+[canales."Air Con Idle Up Active"]
+id = 9240
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Thermofan 1 Idle Up Active"]
+id = 9265
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [1]
+codigos = {}
+
+[canales."Decel Detected"]
+id = 9281
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0, 1]
+codigos = {}
+
+[canales."Fuel Active Table"]
+id = 9319
+rango = { min = 0, max = 2 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Ignition Active Table"]
+id = 9320
+rango = { min = 0, max = 6 }
+clase = "enum"
+valores_observados = [0, 2, 3]
+codigos = {}
+
+[canales."Data Log Memory State"]
+id = 9500
+rango = { min = 0, max = 15 }
+clase = "enum"
+valores_observados = [0, 2, 3, 4, 16]
+codigos = {}
+
+[canales."Engine Protection Cause"]
+id = 11920
+rango = { min = 0, max = 65535 }
+clase = "bitmask"
+rol = "protection_cause"
+valores_observados = [0]
+codigos = {}
+
+[canales."Trigger Input State"]
+id = 12410
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}
+
+[canales."Home Input State"]
+id = 12411
+rango = { min = 0, max = 1 }
+clase = "booleano"
+valores_observados = [0]
+codigos = {}

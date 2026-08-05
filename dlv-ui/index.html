@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataLogViewer</title>
+    <style>
+      :root {
+        /* Tema oscuro por omisión (F3-21). */
+        color-scheme: dark;
+        --fondo: #14161a;
+        --panel: #1c1f26;
+        --panel-borde: #2c313c;
+        --texto: #e6e8ec;
+        --texto-tenue: #9aa3b2;
+        --acento: #4da3ff;
+        --rejilla: rgba(255, 255, 255, 0.08);
+        --eje: rgba(255, 255, 255, 0.55);
+      }
+
+      /* Los tres temas de F3-21 (oscuro, claro, alto contraste) están definidos
+         en `src/tema/tema.ts`, y NO se repiten aquí. El bloque `:root` de arriba
+         es solo el color del primer pintado, antes de que cargue el módulo;
+         desde que carga, `aplicarTema` escribe las variables en línea sobre
+         `documentElement` y eso gana a cualquier regla de esta hoja.
+
+         Declararlos también aquí no era redundancia inocua: las reglas
+         `:root[data-theme="claro"]` perdían la especificidad para los colores
+         pero la ganaban para `color-scheme`, así que el mismo bloque tenía unas
+         propiedades que se aplicaban y otras que no, y cambiar un color en el
+         sitio obvio (este) no tenía ningún efecto. Para añadir o retocar un
+         tema: `src/tema/tema.ts`. */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        background: var(--fondo);
+        color: var(--texto);
+        font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+
+      #app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Barra superior                                                  */
+      /* -------------------------------------------------------------- */
+      .dlv-barra {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--panel-borde);
+      }
+
+      .dlv-barra button {
+        background: var(--acento);
+        color: #06141f;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .dlv-barra button:hover {
+        filter: brightness(1.1);
+      }
+
+      /* Selector de tema (F3-21). `<select>` nativo a propósito: el control
+         existe por accesibilidad, así que se maneja con teclado y lo lee un
+         lector de pantalla sin tener que implementar nada de eso. */
+      .dlv-barra__tema {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--texto-tenue);
+        font-size: 13px;
+      }
+
+      .dlv-barra__tema select {
+        background: var(--fondo);
+        color: var(--texto);
+        border: 1px solid var(--panel-borde);
+        border-radius: 4px;
+        padding: 5px 8px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .dlv-barra__estado {
+        color: var(--texto-tenue);
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Cuerpo: lateral + área principal                                */
+      /* -------------------------------------------------------------- */
+      .dlv-cuerpo {
+        flex: 1 1 auto;
+        display: flex;
+        min-height: 0;
+      }
+
+      .dlv-lateral {
+        flex: 0 0 280px;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--panel-borde);
+        overflow-y: auto;
+        background: var(--panel);
+      }
+
+      .dlv-lateral__canales,
+      .dlv-lateral__unidades {
+        padding: 8px;
+        border-bottom: 1px solid var(--panel-borde);
+      }
+
+      .dlv-principal {
+        flex: 1 1 auto;
+        position: relative;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .dlv-mensaje-vacio {
+        margin: auto;
+        color: var(--texto-tenue);
+      }
+
+      .dlv-paneles {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Paneles apilados (F1-26)                                        */
+      /* -------------------------------------------------------------- */
+      .dlv-panel {
+        border-bottom: 1px solid var(--panel-borde);
+      }
+
+      .dlv-panel-cabecera {
+        padding: 4px 6px;
+        background: var(--panel);
+      }
+
+      .dlv-panel-contenido {
+        background: #0b0d10;
+      }
+
+      .dlv-panel-divisor {
+        background: var(--eje);
+        opacity: 0.4;
+        transition: opacity 0.15s ease-out, background 0.15s ease-out;
+      }
+
+      .dlv-panel-divisor:hover {
+        background: var(--acento) !important;
+        opacity: 1 !important;
+      }
+
+      .dlv-panel-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--panel-borde);
+        font-size: 12px;
+        user-select: none;
+      }
+
+      .dlv-panel-chip--arrastrando {
+        opacity: 0.5;
+      }
+
+      .dlv-panel--destino-arrastre {
+        outline: 2px dashed var(--acento);
+        outline-offset: -2px;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Ejes SVG (F1-25)                                                */
+      /* -------------------------------------------------------------- */
+      .dlv-ejes-rejilla {
+        stroke: var(--rejilla);
+        stroke-width: 1;
+      }
+
+      .dlv-ejes-eje {
+        stroke: var(--eje);
+        stroke-width: 1;
+      }
+
+      .dlv-ejes-etiqueta {
+        fill: var(--texto-tenue);
+        font-size: 10px;
+      }
+
+      .dlv-ejes-titulo {
+        fill: var(--texto);
+        font-size: 11px;
+      }
+
+      .dlv-ejes-leyenda-fondo {
+        fill: rgba(0, 0, 0, 0.55);
+      }
+
+      .dlv-ejes-leyenda-texto {
+        fill: var(--texto);
+        font-size: 11px;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Cursor (F1-29)                                                  */
+      /* -------------------------------------------------------------- */
+      .cursor-linea {
+        width: 1px;
+        background: var(--acento);
+      }
+
+      .cursor-tabla {
+        border-collapse: collapse;
+        background: rgba(10, 12, 15, 0.85);
+        border: 1px solid var(--panel-borde);
+        border-radius: 4px;
+        font-size: 11px;
+        pointer-events: none;
+      }
+
+      .cursor-tabla th,
+      .cursor-tabla td {
+        padding: 2px 6px;
+        text-align: left;
+      }
+
+      .cursor-celda--canal {
+        color: var(--texto-tenue);
+      }
+
+      .cursor-valor--real {
+        color: var(--texto);
+      }
+
+      .cursor-valor--rango {
+        color: #ffcf6b;
+      }
+
+      .cursor-valor--vacio {
+        color: var(--texto-tenue);
+        font-style: italic;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Selector de canales (F1-33)                                     */
+      /* -------------------------------------------------------------- */
+      .selector-canales__busqueda {
+        width: 100%;
+        padding: 4px 6px;
+        margin-bottom: 4px;
+        background: var(--fondo);
+        border: 1px solid var(--panel-borde);
+        color: var(--texto);
+        border-radius: 4px;
+      }
+
+      .selector-canales__toggle {
+        display: block;
+        color: var(--texto-tenue);
+        margin-bottom: 4px;
+      }
+
+      .selector-canales__resumen {
+        color: var(--texto-tenue);
+        font-size: 11px;
+        margin: 4px 0;
+      }
+
+      .selector-canales__lista {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 40vh;
+        overflow-y: auto;
+      }
+
+      .selector-canales__fila {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 0;
+      }
+
+      .selector-canales__fila--inactivo {
+        opacity: 0.5;
+      }
+
+      .selector-canales__rol {
+        color: var(--acento);
+        font-size: 10px;
+      }
+
+      .selector-canales__motivo {
+        color: var(--texto-tenue);
+        font-size: 10px;
+      }
+
+      /* -------------------------------------------------------------- */
+      /* Selector de unidad (F1-31)                                      */
+      /* -------------------------------------------------------------- */
+      .selector-unidad__fila {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 0;
+      }
+
+      .selector-unidad__etiqueta {
+        flex: 1 1 100px;
+      }
+
+      .selector-unidad__select {
+        background: var(--fondo);
+        color: var(--texto);
+        border: 1px solid var(--panel-borde);
+        border-radius: 4px;
+      }
+
+      .selector-unidad__nota,
+      .selector-unidad__aviso {
+        flex-basis: 100%;
+        color: var(--texto-tenue);
+        font-size: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">Cargando…</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,800 @@
+#  DataLogViewer — catálogo de dimensiones y unidades
+#
+#  Tarea F0-08.  Especificación: docs/06-sistema-de-unidades.md
+#  PUERTA G1: los factores de este fichero llegan a decisiones de tuning.
+#  Ninguna entrada se cambia sin que una persona lea el diff.
+#
+#  MODELO (docs/06 §6.3)
+#      entero crudo --escala de origen--> VALOR CANÓNICO --desde_canonica--> mostrado
+#
+#  La escala de origen NO está aquí: vive en data/formats/<formato>.toml (F0-09),
+#  porque depende del fabricante.  Aquí solo está canónica -> mostrada.
+#
+#  `desde_canonica` es la conversión que aplica el renderizador:
+#      tipo = "afin"          y = a*x + b
+#      tipo = "reciproca"     y = a/x
+#      tipo = "parametrizada" y = a(p)*x, con `p` tomado de un canal del log
+#
+#  SEMÁNTICA DE PUNTO / INTERVALO (docs/06 §6.5) — la trampa principal
+#      Un valor absoluto usa `a` y `b`.  Una DIFERENCIA usa solo `a`.
+#      Por eso un Δ de 10 K son 10 °C y 18 °F, no −263,15 °C.
+#      Las unidades con b != 0 están marcadas con `origen_desplazado = true`
+#      para que el motor no pueda ignorarlo por descuido.
+
+[meta]
+version = 1
+especificacion = "docs/06-sistema-de-unidades.md"
+tarea = "F0-08"
+
+# =========================================================================== #
+#  TEMPERATURA — canónica: kelvin
+#  Los logs Haltech traen deciKelvin (§1.8), de ahí que la canónica sea K.
+# =========================================================================== #
+[dimensiones.temperature]
+canonica = "K"
+etiqueta = "Temperatura"
+
+[dimensiones.temperature.unidades.K]
+etiqueta = "K"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.temperature.unidades.degC]
+etiqueta = "°C"
+desde_canonica = { tipo = "afin", a = 1.0, b = -273.15 }
+decimales = 1
+origen_desplazado = true
+
+[dimensiones.temperature.unidades.degF]
+etiqueta = "°F"
+desde_canonica = { tipo = "afin", a = 1.8, b = -459.67 }
+decimales = 1
+origen_desplazado = true
+
+[dimensiones.temperature.unidades.degR]
+etiqueta = "°R"
+desde_canonica = { tipo = "afin", a = 1.8, b = 0.0 }
+decimales = 1
+
+# =========================================================================== #
+#  PRESIÓN — canónica: kPa ABSOLUTOS
+#  Absoluto/relativo NO es una unidad: es un cambio de origen (docs/06 §6.6),
+#  combinable con cualquier unidad de aquí.  Ver [presion_referencia].
+# =========================================================================== #
+[dimensiones.pressure]
+canonica = "kPa"
+etiqueta = "Presión"
+admite_referencia = true
+
+[dimensiones.pressure.unidades.kPa]
+etiqueta = "kPa"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.pressure.unidades.hPa]
+etiqueta = "hPa"
+alias = ["mbar"]
+desde_canonica = { tipo = "afin", a = 10.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.pressure.unidades.bar]
+etiqueta = "bar"
+desde_canonica = { tipo = "afin", a = 0.01, b = 0.0 }
+decimales = 2
+
+[dimensiones.pressure.unidades.psi]
+etiqueta = "psi"
+desde_canonica = { tipo = "afin", a = 0.1450377377, b = 0.0 }
+decimales = 1
+
+[dimensiones.pressure.unidades.atm]
+etiqueta = "atm"
+desde_canonica = { tipo = "afin", a = 0.009869232667, b = 0.0 }
+decimales = 3
+
+[dimensiones.pressure.unidades.inHg]
+etiqueta = "inHg"
+desde_canonica = { tipo = "afin", a = 0.2952998751, b = 0.0 }
+decimales = 2
+
+[dimensiones.pressure.unidades.mmHg]
+etiqueta = "mmHg"
+alias = ["Torr"]
+desde_canonica = { tipo = "afin", a = 7.500615613, b = 0.0 }
+decimales = 1
+
+# Modos de referencia para pasar de absoluto a relativo.
+# El valor de referencia se resta ANTES de la conversión de unidad, y solo a
+# los valores de clase «punto», nunca a las diferencias.
+[presion_referencia]
+modos = ["ninguna", "constante", "canal", "auto"]
+constante_por_omision_kPa = 101.325
+# `auto`: mediana de la presión de colector con el motor parado al inicio del log.
+auto_rol = "manifold_pressure"
+auto_condicion = "engine_speed == 0"
+# No hay canal barométrico en los logs de muestra (docs/01 §1.9): si se usa la
+# constante, la interfaz debe marcar la presión relativa como estimada.
+nota = "docs/01-formato-log.md §1.9"
+
+# =========================================================================== #
+#  RELACIÓN DE MEZCLA — canónica: lambda
+#  El tipo Haltech se llama «AFR» pero contiene lambda (docs/01 §1.8).
+# =========================================================================== #
+[dimensiones.mixture_ratio]
+canonica = "lambda"
+etiqueta = "Mezcla"
+
+[dimensiones.mixture_ratio.unidades.lambda]
+etiqueta = "λ"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 3
+
+# AFR real: usa la estequiometría del PROPIO log, no 14,7 cableado.
+# Sin esto, cualquier log de E85 o metanol saldría mal.
+[dimensiones.mixture_ratio.unidades.afr]
+etiqueta = "AFR"
+desde_canonica = { tipo = "parametrizada", parametro_rol = "stoichiometry", a_por_omision = 14.7 }
+decimales = 2
+
+[dimensiones.mixture_ratio.unidades.afr_gasolina]
+etiqueta = "AFR (gasolina)"
+desde_canonica = { tipo = "afin", a = 14.7, b = 0.0 }
+decimales = 2
+
+# Relación de equivalencia: phi = 1/lambda.  Conversión recíproca.
+[dimensiones.mixture_ratio.unidades.phi]
+etiqueta = "φ"
+desde_canonica = { tipo = "reciproca", a = 1.0 }
+decimales = 3
+
+# =========================================================================== #
+#  RÉGIMEN — canónica: rpm
+# =========================================================================== #
+[dimensiones.angular_speed]
+canonica = "rpm"
+etiqueta = "Régimen"
+
+[dimensiones.angular_speed.unidades.rpm]
+etiqueta = "rpm"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.angular_speed.unidades."rad/s"]
+etiqueta = "rad/s"
+desde_canonica = { tipo = "afin", a = 0.1047197551, b = 0.0 }
+decimales = 1
+
+[dimensiones.angular_speed.unidades.Hz]
+etiqueta = "Hz"
+desde_canonica = { tipo = "afin", a = 0.01666666667, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  VELOCIDAD — canónica: km/h
+# =========================================================================== #
+[dimensiones.speed]
+canonica = "km/h"
+etiqueta = "Velocidad"
+
+[dimensiones.speed.unidades."km/h"]
+etiqueta = "km/h"
+alias = ["kph", "KPH"]
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.speed.unidades.mph]
+etiqueta = "mph"
+desde_canonica = { tipo = "afin", a = 0.6213711922, b = 0.0 }
+decimales = 1
+
+[dimensiones.speed.unidades."m/s"]
+etiqueta = "m/s"
+desde_canonica = { tipo = "afin", a = 0.2777777778, b = 0.0 }
+decimales = 2
+
+[dimensiones.speed.unidades.kn]
+etiqueta = "kn"
+desde_canonica = { tipo = "afin", a = 0.5399568035, b = 0.0 }
+decimales = 1
+
+# =========================================================================== #
+#  ÁNGULO — canónica: grados de cigüeñal
+# =========================================================================== #
+[dimensiones.angle]
+canonica = "deg"
+etiqueta = "Ángulo"
+
+[dimensiones.angle.unidades.deg]
+etiqueta = "°"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.angle.unidades.rad]
+etiqueta = "rad"
+desde_canonica = { tipo = "afin", a = 0.01745329252, b = 0.0 }
+decimales = 3
+
+# Grados de árbol de levas: la mitad de los de cigüeñal.
+[dimensiones.angle.unidades.deg_cam]
+etiqueta = "° árbol"
+desde_canonica = { tipo = "afin", a = 0.5, b = 0.0 }
+decimales = 1
+
+# =========================================================================== #
+#  ADIMENSIONAL — canónica: fracción (0..1)
+# =========================================================================== #
+[dimensiones.ratio]
+canonica = "fraccion"
+etiqueta = "Relación"
+
+[dimensiones.ratio.unidades.fraccion]
+etiqueta = ""
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 4
+
+[dimensiones.ratio.unidades.pct]
+etiqueta = "%"
+desde_canonica = { tipo = "afin", a = 100.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.ratio.unidades.permil]
+etiqueta = "‰"
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.ratio.unidades.ppm]
+etiqueta = "ppm"
+desde_canonica = { tipo = "afin", a = 1000000.0, b = 0.0 }
+decimales = 0
+
+# =========================================================================== #
+#  TENSIÓN — canónica: V
+# =========================================================================== #
+[dimensiones.voltage]
+canonica = "V"
+etiqueta = "Tensión"
+
+[dimensiones.voltage.unidades.V]
+etiqueta = "V"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.voltage.unidades.mV]
+etiqueta = "mV"
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 0
+
+# =========================================================================== #
+#  TIEMPO — canónica: s
+# =========================================================================== #
+[dimensiones.time]
+canonica = "s"
+etiqueta = "Tiempo"
+
+[dimensiones.time.unidades.s]
+etiqueta = "s"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 3
+
+[dimensiones.time.unidades.ms]
+etiqueta = "ms"
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.time.unidades.us]
+etiqueta = "µs"
+desde_canonica = { tipo = "afin", a = 1000000.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.time.unidades.min]
+etiqueta = "min"
+desde_canonica = { tipo = "afin", a = 0.01666666667, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  FRECUENCIA — canónica: Hz
+#  Periodo <-> frecuencia es recíproca: la misma maquinaria que lambda <-> phi.
+# =========================================================================== #
+[dimensiones.frequency]
+canonica = "Hz"
+etiqueta = "Frecuencia"
+
+[dimensiones.frequency.unidades.Hz]
+etiqueta = "Hz"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.frequency.unidades.kHz]
+etiqueta = "kHz"
+desde_canonica = { tipo = "afin", a = 0.001, b = 0.0 }
+decimales = 3
+
+[dimensiones.frequency.unidades.rpm]
+etiqueta = "rpm"
+desde_canonica = { tipo = "afin", a = 60.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.frequency.unidades.periodo_us]
+etiqueta = "µs (periodo)"
+desde_canonica = { tipo = "reciproca", a = 1000000.0 }
+decimales = 0
+
+# =========================================================================== #
+#  RESISTENCIA — canónica: ohm
+# =========================================================================== #
+[dimensiones.resistance]
+canonica = "ohm"
+etiqueta = "Resistencia"
+
+[dimensiones.resistance.unidades.ohm]
+etiqueta = "Ω"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.resistance.unidades.kohm]
+etiqueta = "kΩ"
+desde_canonica = { tipo = "afin", a = 0.001, b = 0.0 }
+decimales = 3
+
+[dimensiones.resistance.unidades.mohm]
+etiqueta = "mΩ"
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 0
+
+# =========================================================================== #
+#  NIVEL DE SONIDO — canónica: dB
+#  Escala LOGARÍTMICA: no admite cambio de unidad afín.  Una sola unidad,
+#  y `convertible = false` para que el selector se desactive en la interfaz.
+# =========================================================================== #
+[dimensiones.sound_level]
+canonica = "dB"
+etiqueta = "Nivel de sonido"
+convertible = false
+
+[dimensiones.sound_level.unidades.dB]
+etiqueta = "dB"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+# =========================================================================== #
+#  CAUDAL MÁSICO — canónica: kg/h
+# =========================================================================== #
+[dimensiones.mass_flow]
+canonica = "kg/h"
+etiqueta = "Caudal másico"
+
+[dimensiones.mass_flow.unidades."kg/h"]
+etiqueta = "kg/h"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.mass_flow.unidades."g/s"]
+etiqueta = "g/s"
+desde_canonica = { tipo = "afin", a = 0.2777777778, b = 0.0 }
+decimales = 2
+
+[dimensiones.mass_flow.unidades."lb/h"]
+etiqueta = "lb/h"
+desde_canonica = { tipo = "afin", a = 2.204622622, b = 0.0 }
+decimales = 1
+
+[dimensiones.mass_flow.unidades."lb/min"]
+etiqueta = "lb/min"
+desde_canonica = { tipo = "afin", a = 0.03674371036, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  CAUDAL VOLUMÉTRICO — canónica: L/h
+# =========================================================================== #
+[dimensiones.volume_flow]
+canonica = "L/h"
+etiqueta = "Caudal volumétrico"
+
+[dimensiones.volume_flow.unidades."L/h"]
+etiqueta = "L/h"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.volume_flow.unidades."cc/min"]
+etiqueta = "cc/min"
+desde_canonica = { tipo = "afin", a = 16.66666667, b = 0.0 }
+decimales = 1
+
+[dimensiones.volume_flow.unidades."gal/h"]
+etiqueta = "gal/h"
+desde_canonica = { tipo = "afin", a = 0.2641720524, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  VOLUMEN — canónica: L
+# =========================================================================== #
+[dimensiones.volume]
+canonica = "L"
+etiqueta = "Volumen"
+
+[dimensiones.volume.unidades.L]
+etiqueta = "L"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 3
+
+[dimensiones.volume.unidades.cc]
+etiqueta = "cc"
+alias = ["mL"]
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.volume.unidades.in3]
+etiqueta = "in³"
+desde_canonica = { tipo = "afin", a = 61.02374409, b = 0.0 }
+decimales = 2
+
+[dimensiones.volume.unidades.gal]
+etiqueta = "gal"
+desde_canonica = { tipo = "afin", a = 0.2641720524, b = 0.0 }
+decimales = 3
+
+# =========================================================================== #
+#  MASA — canónica: kg
+# =========================================================================== #
+[dimensiones.mass]
+canonica = "kg"
+etiqueta = "Masa"
+
+[dimensiones.mass.unidades.kg]
+etiqueta = "kg"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 3
+
+[dimensiones.mass.unidades.g]
+etiqueta = "g"
+desde_canonica = { tipo = "afin", a = 1000.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.mass.unidades.lb]
+etiqueta = "lb"
+desde_canonica = { tipo = "afin", a = 2.204622622, b = 0.0 }
+decimales = 2
+
+[dimensiones.mass.unidades.oz]
+etiqueta = "oz"
+desde_canonica = { tipo = "afin", a = 35.27396195, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  MASA POR CILINDRO — canónica: mg
+#  Dimensión propia porque su escala útil es 3 órdenes menor que la masa.
+# =========================================================================== #
+[dimensiones.mass_per_cyl]
+canonica = "mg"
+etiqueta = "Masa por cilindro"
+
+[dimensiones.mass_per_cyl.unidades.mg]
+etiqueta = "mg"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.mass_per_cyl.unidades.g]
+etiqueta = "g"
+desde_canonica = { tipo = "afin", a = 0.001, b = 0.0 }
+decimales = 5
+
+[dimensiones.mass_per_cyl.unidades.grain]
+etiqueta = "gr"
+desde_canonica = { tipo = "afin", a = 0.01543235835, b = 0.0 }
+decimales = 3
+
+# =========================================================================== #
+#  DENSIDAD — canónica: kg/m³
+# =========================================================================== #
+[dimensiones.density]
+canonica = "kg/m3"
+etiqueta = "Densidad"
+
+[dimensiones.density.unidades.kg_m3]
+etiqueta = "kg/m³"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.density.unidades.g_cm3]
+etiqueta = "g/cm³"
+desde_canonica = { tipo = "afin", a = 0.001, b = 0.0 }
+decimales = 4
+
+[dimensiones.density.unidades.lb_ft3]
+etiqueta = "lb/ft³"
+desde_canonica = { tipo = "afin", a = 0.06242796058, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  DISTANCIA — canónica: m
+# =========================================================================== #
+[dimensiones.distance]
+canonica = "m"
+etiqueta = "Distancia"
+
+[dimensiones.distance.unidades.m]
+etiqueta = "m"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.distance.unidades.km]
+etiqueta = "km"
+desde_canonica = { tipo = "afin", a = 0.001, b = 0.0 }
+decimales = 3
+
+[dimensiones.distance.unidades.mi]
+etiqueta = "mi"
+desde_canonica = { tipo = "afin", a = 0.0006213711922, b = 0.0 }
+decimales = 3
+
+[dimensiones.distance.unidades.ft]
+etiqueta = "ft"
+desde_canonica = { tipo = "afin", a = 3.280839895, b = 0.0 }
+decimales = 1
+
+[dimensiones.distance.unidades.in]
+etiqueta = "in"
+desde_canonica = { tipo = "afin", a = 39.37007874, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  CONSUMO — canónica: L/100 km
+#  Tres de las cuatro unidades son RECÍPROCAS.  Ojo: un Δ de consumo no es
+#  linealmente convertible entre L/100km y mpg; ver docs/06 §6.5.
+# =========================================================================== #
+[dimensiones.fuel_economy]
+canonica = "L/100km"
+etiqueta = "Consumo"
+
+[dimensiones.fuel_economy.unidades."L/100km"]
+etiqueta = "L/100 km"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.fuel_economy.unidades."km/L"]
+etiqueta = "km/L"
+desde_canonica = { tipo = "reciproca", a = 100.0 }
+decimales = 2
+
+[dimensiones.fuel_economy.unidades.mpg_us]
+etiqueta = "mpg (US)"
+desde_canonica = { tipo = "reciproca", a = 235.2145833 }
+decimales = 1
+
+[dimensiones.fuel_economy.unidades.mpg_uk]
+etiqueta = "mpg (UK)"
+desde_canonica = { tipo = "reciproca", a = 282.4809363 }
+decimales = 1
+
+# =========================================================================== #
+#  PAR — canónica: N·m
+# =========================================================================== #
+[dimensiones.torque]
+canonica = "Nm"
+etiqueta = "Par"
+
+[dimensiones.torque.unidades.Nm]
+etiqueta = "N·m"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.torque.unidades.lbft]
+etiqueta = "lb·ft"
+desde_canonica = { tipo = "afin", a = 0.7375621493, b = 0.0 }
+decimales = 1
+
+[dimensiones.torque.unidades.kgfm]
+etiqueta = "kgf·m"
+desde_canonica = { tipo = "afin", a = 0.1019716213, b = 0.0 }
+decimales = 2
+
+# =========================================================================== #
+#  POTENCIA — canónica: kW
+# =========================================================================== #
+[dimensiones.power]
+canonica = "kW"
+etiqueta = "Potencia"
+
+[dimensiones.power.unidades.kW]
+etiqueta = "kW"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 1
+
+[dimensiones.power.unidades.hp]
+etiqueta = "hp"
+desde_canonica = { tipo = "afin", a = 1.34102209, b = 0.0 }
+decimales = 1
+
+[dimensiones.power.unidades.PS]
+etiqueta = "PS"
+alias = ["CV"]
+desde_canonica = { tipo = "afin", a = 1.359621617, b = 0.0 }
+decimales = 1
+
+# =========================================================================== #
+#  ACELERACIÓN — canónica: m/s²
+# =========================================================================== #
+[dimensiones.acceleration]
+canonica = "m/s2"
+etiqueta = "Aceleración"
+
+[dimensiones.acceleration.unidades.m_s2]
+etiqueta = "m/s²"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 2
+
+[dimensiones.acceleration.unidades.g]
+etiqueta = "g"
+desde_canonica = { tipo = "afin", a = 0.1019716213, b = 0.0 }
+decimales = 3
+
+# =========================================================================== #
+#  SIN UNIDAD — contadores, enums, máscaras de bits.
+#  75 canales del AutoLog caen aquí (docs/01 §1.10).  El selector de unidad
+#  debe estar DESACTIVADO para estas dimensiones.
+# =========================================================================== #
+[dimensiones.count]
+canonica = "count"
+etiqueta = "Contador"
+convertible = false
+[dimensiones.count.unidades.count]
+etiqueta = ""
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.enum]
+canonica = "enum"
+etiqueta = "Estado"
+convertible = false
+render = "carril_estado"
+[dimensiones.enum.unidades.enum]
+etiqueta = ""
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+[dimensiones.bitmask]
+canonica = "bitmask"
+etiqueta = "Máscara de bits"
+convertible = false
+render = "carriles_bits"
+[dimensiones.bitmask.unidades.bitmask]
+etiqueta = ""
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+# `unknown` es la dimensión de los canales cuya escala NO se ha confirmado.
+# Se muestran en CRUDO, sin unidad y con marca visual, y el selector de unidad
+# está desactivado.  Es la mitigación del riesgo R1: nunca una unidad inventada.
+[dimensiones.unknown]
+canonica = "raw"
+etiqueta = "Sin confirmar"
+convertible = false
+mostrar_en_crudo = true
+[dimensiones.unknown.unidades.raw]
+etiqueta = "(crudo)"
+desde_canonica = { tipo = "afin", a = 1.0, b = 0.0 }
+decimales = 0
+
+# =========================================================================== #
+#  DIMENSIONES COMPUESTAS (docs/06 §6.7)
+#  La unidad mostrada se DERIVA de las unidades activas del numerador y del
+#  denominador.  Fijarlas a mano produciría incoherencias dentro de un panel.
+# =========================================================================== #
+[compuestas.pct_per_rpm]
+numerador = "ratio"
+denominador = "angular_speed"
+etiqueta = "Relación por régimen"
+
+[compuestas.pct_per_kPa]
+numerador = "ratio"
+denominador = "pressure"
+etiqueta = "Relación por presión"
+
+[compuestas.pct_per_lambda]
+numerador = "ratio"
+denominador = "mixture_ratio"
+etiqueta = "Relación por mezcla"
+
+# =========================================================================== #
+#  PRESETS (docs/06 §6.9)
+#  Cubren «tuner estadounidense que quiere psi, °F y AFR de un clic».
+#  El usuario puede definir los suyos; estos son los de fábrica.
+# =========================================================================== #
+[presets.si]
+etiqueta = "SI puro"
+temperature = "K"
+pressure = "kPa"
+pressure_referencia = "ninguna"
+speed = "m/s"
+mixture_ratio = "lambda"
+volume = "L"
+distance = "m"
+time = "s"
+ratio = "fraccion"
+
+[presets.metrico]
+etiqueta = "Métrico"
+por_omision = true
+temperature = "degC"
+pressure = "bar"
+pressure_referencia = "auto"
+speed = "km/h"
+mixture_ratio = "lambda"
+volume = "L"
+distance = "km"
+time = "ms"
+ratio = "pct"
+
+[presets.imperial]
+etiqueta = "Imperial"
+temperature = "degF"
+pressure = "psi"
+pressure_referencia = "auto"
+speed = "mph"
+mixture_ratio = "afr"
+volume = "gal"
+distance = "mi"
+time = "ms"
+ratio = "pct"
+
+[presets.motorsport_eu]
+etiqueta = "Motorsport EU"
+temperature = "degC"
+pressure = "bar"
+pressure_referencia = "auto"
+speed = "km/h"
+mixture_ratio = "lambda"
+volume = "L"
+distance = "km"
+time = "ms"
+ratio = "pct"
+angle = "deg"
+
+[presets.motorsport_us]
+etiqueta = "Motorsport US"
+temperature = "degF"
+pressure = "psi"
+pressure_referencia = "auto"
+speed = "mph"
+mixture_ratio = "afr"
+volume = "gal"
+distance = "mi"
+time = "ms"
+ratio = "pct"
+angle = "deg"
+
+# =========================================================================== #
+#  CENTINELAS DE «SIN DATO» / SATURACIÓN (docs/01 §1.13)
+#  Observados repetidamente en el AutoLog real.  NO son medidas: si se
+#  promedian, contaminan cualquier estadística.  Se tratan como valor ausente.
+# =========================================================================== #
+[centinelas]
+i32 = [2147483647, -2147483648, -2147483645, -2147483628, -2147483639, 8388607, 8388608]
+# Cadenas que un CSV genérico puede traer como «sin dato» (docs/07 §7.10).
+texto = ["", "NaN", "nan", "inf", "-inf", "#N/A", "N/A", "n/a", "NULL", "null", "---", "-"]
+
+# =========================================================================== #
+#  CLASES DE MAGNITUD (docs/06 §6.5)
+#  Declarativo, para que el motor no pueda «olvidarse» de la regla.
+#  Toda métrica del sistema debe declarar una de estas clases.
+# =========================================================================== #
+[clases.punto]
+descripcion = "Valor absoluto: aplica a y b."
+usa_desplazamiento = true
+ejemplos = ["valor bajo el cursor", "media", "minimo", "maximo", "percentil", "umbral"]
+
+[clases.intervalo]
+descripcion = "Diferencia: aplica solo a. Un Δ de 10 K son 10 °C y 18 °F."
+usa_desplazamiento = false
+ejemplos = ["delta del doble cursor", "rango", "desviacion tipica", "RMS", "pico a pico"]
+
+[clases.tasa]
+descripcion = "Cociente: parte lineal del numerador entre la unidad del denominador."
+usa_desplazamiento = false
+ejemplos = ["derivada", "pendiente"]
+
+[clases.varianza]
+descripcion = "Cuadrática: aplica a al cuadrado."
+usa_desplazamiento = false
+factor_al_cuadrado = true
+ejemplos = ["varianza"]

@@ -1,0 +1,16 @@
+[project]
+name = "dlv-core"
+version = "0.1.0"
+description = "Núcleo de datos de DataLogViewer: formatos, almacén columnar, pirámide de decimación, unidades, roles, motor de tiempo, detectores, expresiones, malla RPM×MAP y caché. Biblioteca Python pura (§3.3, ADR-002): no depende de dlv-api/dlv-ui/dlv-app ni accede al sistema de ficheros por su cuenta."
+requires-python = ">=3.12"
+dependencies = [
+    "polars>=1.9",
+    "numpy>=2.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dlv_core"]

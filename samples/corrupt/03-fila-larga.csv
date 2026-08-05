@@ -1,0 +1,128 @@
+%DataLog%
+DataLogVersion : 1.1
+Software : Haltech NSP
+SoftwareVersion : 999.999.999.999
+DownloadDateTime : 20260729 06:59:01
+Channel : Target Lambda
+ID : 132
+Type : AFR
+DisplayMaxMin : 1361,476
+Channel : Vehicle Speed Drive Train Sensor
+ID : 463
+Type : Speed
+DisplayMaxMin : 4000,0
+Channel : Oil Pressure
+ID : 236
+Type : Pressure
+DisplayMaxMin : 31013,1013
+Channel : O2 Control Bank 1 Short Term Fuel Trim
+ID : 1400
+Type : Percentage
+DisplayMaxMin : 500,-500
+Channel : Wideband O2 1
+ID : 230
+Type : AFR
+DisplayMaxMin : 1361,-110
+Channel : RPM
+ID : 384
+Type : EngineSpeed
+DisplayMaxMin : 20000,0
+Channel : Throttle Position
+ID : 225
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Manifold Pressure
+ID : 224
+Type : Pressure
+DisplayMaxMin : 6013,13
+Channel : Injection Stage 1 Average Duty Cycle
+ID : 5666
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Ignition Angle
+ID : 518
+Type : Angle
+DisplayMaxMin : 600,-600
+Channel : Knock Sensor 1 Knock Count
+ID : 696
+Type : Raw
+DisplayMaxMin : 50000,0
+Channel : Trigger System Errors
+ID : 1353
+Type : Raw
+DisplayMaxMin : 31,0
+Channel : Knock Sensor 2 Knock Count
+ID : 697
+Type : Raw
+DisplayMaxMin : 50000,0
+Channel : Transient Throttle Fuel Disenrichment Rate
+ID : 4023
+Type : Percentage
+DisplayMaxMin : 0,-30000
+Channel : Transient Throttle Disenrichment Load Derivative
+ID : 5289
+Type : Percentage
+DisplayMaxMin : 0,-20000
+Channel : Transient Throttle Fuel Enrichment Rate
+ID : 146
+Type : Percentage
+DisplayMaxMin : 30000,0
+Channel : Transient Throttle Enrichment Load Derivative
+ID : 5287
+Type : Percentage
+DisplayMaxMin : 20000,0
+Channel : Transient Throttle Enrichment Start Load
+ID : 5286
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Boost Control Target Pressure
+ID : 181
+Type : Pressure
+DisplayMaxMin : 15013,1013
+Channel : Boost Control Output
+ID : 1462
+Type : Percentage
+DisplayMaxMin : 1000,0
+Channel : Boost Control Short Term Trim
+ID : 3301
+Type : Percentage
+DisplayMaxMin : 1000,-1000
+Channel : Boost Control State
+ID : 8953
+Type : Raw
+DisplayMaxMin : 10,0
+Channel : Idle Control State
+ID : 8952
+Type : Raw
+DisplayMaxMin : 3,-8
+Channel : Coolant Temperature
+ID : 229
+Type : Temperature
+DisplayMaxMin : 4731,2331
+Channel : Intake Air Temperature
+ID : 228
+Type : Temperature
+DisplayMaxMin : 4731,2331
+Log Source : 8
+Log Number : 2768
+Log : 19800101 01:01:01
+01:01:01.005,873,527,4155,0,797,3411,551,1254,197,264,0,0,0,-43,0,3,0,549,2288,1000,0,1,-7,3720,3199
+01:01:01.055,872,527,4148,0,794,3418,555,1264,204,263,0,0,0,,,,,,,,,,,,
+01:01:01.106,870,527,4153,0,789,3418,552,1274,203,262,0,0,0,-100,0,19,0,553,2288,1000,0,,,,
+01:01:01.160,869,527,4153,0,786,3415,553,1284,204,260,0,0,0,,,,,,,,,,,,
+01:01:01.209,,,,,,,,,,,,,,-100,0,19,0,553,2288,1000,0,1,-7,3721,3200
+01:01:01.214,867,527,4150,0,782,3410,558,1293,206,259,0,0,0,,,,,,,,,,,,
+01:01:01.264,866,527,4150,0,782,3418,547,1302,207,258,0,0,0,,,,,,,,,,,,
+01:01:01.310,,,,,,,,,,,,,,-33,0,19,0,553,2288,1000,0,,,,
+01:01:01.315,865,528,4150,0,780,3414,541,1309,209,257,0,0,0,,,,,,,,,,,,
+01:01:01.366,864,528,4150,0,777,3422,550,1317,212,256,0,0,0,,,,,,,,,,,,
+01:01:01.411,,,,,,,,,,,,,,-33,0,10,0,548,2288,1000,0,1,-7,3724,3202,999,888,777
+01:01:01.416,863,528,4153,-24,770,3425,548,1324,208,256,0,0,0,,,,,,,,,,,,
+01:01:01.470,861,528,4158,-27,767,3418,549,1332,209,254,0,0,0,,,,,,,,,,,,
+01:01:01.515,,,,,,,,,,,,,,-33,0,8,0,546,2288,1000,0,,,,
+01:01:01.521,860,528,4155,-27,768,3425,547,1337,210,254,0,0,0,,,,,,,,,,,,
+01:01:01.575,859,528,4158,0,769,3421,455,1346,169,252,0,0,0,,,,,,,,,,,,
+01:01:01.614,,,,,,,,,,,,,,,,,,,,,,1,-7,3725,3202
+01:01:01.619,,,,,,,,,,,,,,-513,-1814,8,0,546,2288,1000,0,,,,
+01:01:01.625,858,528,4163,0,770,3425,362,1351,138,253,0,0,0,,,,,,,,,,,,
+01:01:01.675,859,529,4173,0,774,3403,312,1349,126,250,0,0,0,,,,,,,,,,,,

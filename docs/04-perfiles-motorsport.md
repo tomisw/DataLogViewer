@@ -1,7 +1,22 @@
 # 04 — Perfiles de análisis, detectores y alertas para ECU tuning y motorsport
 
 > Todos los canales citados existen en el AutoLog de muestra con el nombre
-> indicado. Los perfiles se resuelven por `ID`, no por nombre.
+> indicado. **Los perfiles y detectores se resuelven por rol semántico**
+> (`engine_speed`, `knock_count[n]`, `coolant_temp`…), con reserva al `ID` nativo
+> para los canales muy específicos de Haltech que no tienen equivalente
+> universal. Los nombres de este documento son la lectura humana del rol; el
+> catálogo de roles está en
+> [`07-formatos-y-csv-generico.md`](07-formatos-y-csv-generico.md) §7.7.
+>
+> Esa indirección es lo que hace que estos diez perfiles funcionen igual sobre un
+> log de Haltech, uno de MoTeC o un CSV escrito a mano. Un perfil declara sus
+> roles **requeridos** y **opcionales**, y oculta los paneles sin datos en lugar
+> de fallar.
+>
+> Las unidades de los umbrales de este documento se expresan en la unidad de
+> lectura habitual del tuner, pero **se almacenan en canónica** y se muestran en
+> la unidad que el usuario tenga activa
+> ([`06-sistema-de-unidades.md`](06-sistema-de-unidades.md) §6.3).
 
 ## 4.1 Por qué perfiles y no gráficos a mano
 
@@ -159,6 +174,26 @@ Todos los detectores comparten el mismo motor y el mismo modelo de resultado
 (`{ tipo, severidad, t_inicio, t_fin, valor_pico, contexto }`), así que añadir
 uno nuevo es un fichero de configuración, no código.
 
+### Los umbrales son configurables, no constantes
+
+**Todos los números de esta sección son valores por omisión**, no límites fijos.
+Viven en `data/umbrales.toml` y se sustituyen con esta precedencia, la misma que
+las unidades (`06-sistema-de-unidades.md` §6.9) y por el mismo motivo:
+
+1. **Anulación por canal** — «este canal con este límite y no otro».
+2. **Perfil activo** (`.dlvprofile`) — es donde un equipo fija sus criterios y
+   los comparte como un fichero suelto.
+3. **Preferencias de usuario.**
+4. **`data/umbrales.toml`** — por omisión.
+
+El criterio de cuándo un motor está en problemas depende del motor, del
+combustible y de para qué se usa. Un umbral cableado en el código sería una
+opinión disfrazada de física, y además convertiría cada ajuste en un cambio de
+código con su ciclo de revisión.
+
+Los umbrales se guardan en **unidad canónica**, así que se pueden editar en la
+unidad que el usuario tenga activa sin reescribir nada (§6.11).
+
 ### Primitivas
 
 | Primitiva | Parámetros | Uso |
@@ -189,7 +224,7 @@ función. Por omisión, 3 muestras o 100 ms, el mayor de los dos.
 | D6 | Sobrepresión | `Boost Control Actual Pressure` > `Overboost Cut Max Pressure` × 0,97 | alta |
 | D7 | Sobreoscilación de boost | pico > objetivo + 5 % tras subida | media |
 | D8 | Saturación de inyectores | *duty* > 85 % | alta; crítica > 95 % |
-| D9 | Sobretemperatura de refrigerante | curva de umbral, permanencia 3 s | alta |
+| D9 | Sobretemperatura de refrigerante | umbral con permanencia de 3 s | alta |
 | D10 | Presión de aceite baja | por debajo de la curva mínima en función de RPM | **crítica** |
 | D11 | Baja tensión de batería | < 11,5 V con motor en marcha | media |
 | D12 | Error de trigger | cualquier bit de `Trigger System Errors`, o incremento de `Trigger System Error Count` | **crítica** |
