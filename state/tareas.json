@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-05 11:25:55Z"
+    "actualizado": "2026-08-05 11:28:38Z"
   },
   "tareas": [
     {
@@ -1628,10 +1628,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "Opus 5 (orquestador)",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "3eec0d4"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-05 11:28:38Z",
+          "texto": "CORS expose_headers + rol/clasificacion en abrir-log + eleccion por rol. Verificado contra los tres logs reales: abren con RPM, MAP, TPS, lambda y temperaturas."
+        }
+      ]
     },
     {
       "id": "FG-01",
