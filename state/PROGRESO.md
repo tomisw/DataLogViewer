@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-05 13:42:34Z
+Actualizado: 2026-08-05 13:44:51Z
 
-**192 / 709 pts cerrados (27.1 %)** · 131 pts esperando revisión humana → 45.6 % entregado
+**192 / 709 pts cerrados (27.1 %)** · 139 pts esperando revisión humana → 46.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 153 | 60 | 8 | 5 | 0 | 226 |
+| F1 | 153 | 68 | 0 | 5 | 0 | 226 |
 | FG | 5 | 39 | 0 | 48 | 0 | 92 |
 | F2 | 4 | 8 | 5 | 63 | 0 | 80 |
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
@@ -39,7 +39,7 @@ Actualizado: 2026-08-05 13:42:34Z
 | `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
 | `F1-30` Doble cursor con delta usando la clase inter | revision_humana | Opus 5 | G1 | PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMER |
-| `F1-45` E13 llega a la ventana: conversiones reales  | en_curso | Opus 5 | G1 | — |
+| `F1-45` E13 llega a la ventana: conversiones reales  | revision_humana | Opus 5 | G1 | PUERTA G1: revisar los numeros de data/combustibles.toml (14,7 / 9,77  |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
@@ -72,7 +72,7 @@ Actualizado: 2026-08-05 13:42:34Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 213/226 pts
+## F1 — 221/226 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -120,7 +120,7 @@ Actualizado: 2026-08-05 13:42:34Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
-| ▶  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | — |
+| ⏳ | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 
 ## FG — 44/92 pts
 

@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-05 13:42:34Z"
+    "actualizado": "2026-08-05 13:44:51Z"
   },
   "tareas": [
     {
@@ -1661,10 +1661,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "Opus 5 (orquestador)",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "1fff834"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-05 13:44:51Z",
+          "texto": "PUERTA G1: revisar los numeros de data/combustibles.toml (14,7 / 9,77 / 6,4) y comprobar en la ventana que refrigerante, colector y lambda salen en el rango fisico correcto. Antes la temperatura salia x10."
+        }
+      ]
     },
     {
       "id": "FG-01",
