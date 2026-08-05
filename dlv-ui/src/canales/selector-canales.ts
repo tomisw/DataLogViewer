@@ -39,6 +39,15 @@ export interface OpcionesSelectorCanales {
    * desincronizarse de él.
    */
   readonly onSeleccionCambia: (seleccionados: ReadonlySet<string>) => void;
+  /**
+   * Superficie minima de `Document`. Por omision el global, igual que en el
+   * resto de componentes (`unidades/dom.ts`, `cursor/contexto-dom.ts`).
+   *
+   * Existe para que `Aplicacion` pueda montarse en una prueba: sin ella este
+   * constructor tocaba `document` directamente y el ensamblado entero no se
+   * podia construir en Node (`vitest.config.ts`, `environment: "node"`).
+   */
+  readonly documento?: Pick<Document, "createElement" | "createTextNode">;
 }
 
 const ETIQUETA_MOTIVO: Record<MotivoOculto, string> = {
@@ -69,6 +78,7 @@ export function textoResumenOcultos(ocultos: ResumenOcultos, mostrarInactivos: b
 export class SelectorCanales {
   readonly #contenedor: HTMLElement;
   readonly #onSeleccionCambia: (seleccionados: ReadonlySet<string>) => void;
+  readonly #documento: Pick<Document, "createElement" | "createTextNode">;
   readonly #seleccionados = new Set<string>();
 
   readonly #entradaBusqueda: HTMLInputElement;
@@ -84,11 +94,12 @@ export class SelectorCanales {
     this.#contenedor = opciones.contenedor;
     this.#canales = opciones.canales;
     this.#onSeleccionCambia = opciones.onSeleccionCambia;
+    this.#documento = opciones.documento ?? globalThis.document;
 
-    const raiz = document.createElement("div");
+    const raiz = this.#documento.createElement("div");
     raiz.className = "selector-canales";
 
-    this.#entradaBusqueda = document.createElement("input");
+    this.#entradaBusqueda = this.#documento.createElement("input");
     this.#entradaBusqueda.type = "text";
     this.#entradaBusqueda.placeholder = "Buscar por nombre, rol semántico o ID…";
     this.#entradaBusqueda.className = "selector-canales__busqueda";
@@ -97,20 +108,20 @@ export class SelectorCanales {
       this.#renderizarLista();
     });
 
-    const etiquetaCasilla = document.createElement("label");
+    const etiquetaCasilla = this.#documento.createElement("label");
     etiquetaCasilla.className = "selector-canales__toggle";
-    this.#casillaInactivos = document.createElement("input");
+    this.#casillaInactivos = this.#documento.createElement("input");
     this.#casillaInactivos.type = "checkbox";
     this.#casillaInactivos.addEventListener("change", () => {
       this.#mostrarInactivos = this.#casillaInactivos.checked;
       this.#renderizarLista();
     });
-    etiquetaCasilla.append(this.#casillaInactivos, document.createTextNode(" mostrar inactivos"));
+    etiquetaCasilla.append(this.#casillaInactivos, this.#documento.createTextNode(" mostrar inactivos"));
 
-    this.#resumen = document.createElement("p");
+    this.#resumen = this.#documento.createElement("p");
     this.#resumen.className = "selector-canales__resumen";
 
-    this.#lista = document.createElement("ul");
+    this.#lista = this.#documento.createElement("ul");
     this.#lista.className = "selector-canales__lista";
 
     raiz.append(this.#entradaBusqueda, etiquetaCasilla, this.#resumen, this.#lista);
@@ -207,25 +218,25 @@ export class SelectorCanales {
 
   #filaCanal(filtrado: CanalFiltrado): HTMLLIElement {
     const { canal, motivoInactivo } = filtrado;
-    const fila = document.createElement("li");
+    const fila = this.#documento.createElement("li");
     fila.className = "selector-canales__fila";
     if (motivoInactivo !== null) fila.classList.add("selector-canales__fila--inactivo");
 
-    const casilla = document.createElement("input");
+    const casilla = this.#documento.createElement("input");
     casilla.type = "checkbox";
     casilla.checked = this.#seleccionados.has(canal.idNativo);
     casilla.addEventListener("change", () =>
       this.#alternarSeleccion(canal.idNativo, casilla.checked),
     );
 
-    const nombre = document.createElement("span");
+    const nombre = this.#documento.createElement("span");
     nombre.className = "selector-canales__nombre";
     nombre.textContent = canal.nombre;
 
     const partes: Node[] = [casilla, nombre];
 
     if (canal.rol !== null) {
-      const rol = document.createElement("span");
+      const rol = this.#documento.createElement("span");
       rol.className = "selector-canales__rol";
       rol.textContent = canal.rol;
       partes.push(rol);
@@ -233,7 +244,7 @@ export class SelectorCanales {
 
     if (motivoInactivo !== null) {
       const texto = textoMotivo(motivoInactivo);
-      const motivo = document.createElement("span");
+      const motivo = this.#documento.createElement("span");
       motivo.className = "selector-canales__motivo";
       motivo.textContent = texto;
       motivo.title = texto;

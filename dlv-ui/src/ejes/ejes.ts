@@ -31,10 +31,22 @@ const ALTO_FILA_LEYENDA = 16;
 /** Margen desde la esquina superior derecha del SVG hasta la leyenda. */
 const MARGEN_LEYENDA = 8;
 
+/**
+ * Crea un nodo SVG en el MISMO documento que `svg`, no en el `document`
+ * global.
+ *
+ * `ownerDocument` es la via natural del DOM para esto y evita anadir un
+ * parametro a `ConfiguracionEjes`. Lo que arregla: con el global, esta
+ * funcion no se podia ejecutar en una prueba (`vitest.config.ts` corre en
+ * `environment: "node"`, sin `document`), y con ella se quedaba fuera todo
+ * el montaje de la aplicacion -- que es donde estaban los fallos de la
+ * etiqueta de unidad congelada y del nombre de canal.
+ */
 function crear<K extends keyof SVGElementTagNameMap>(
+  svg: SVGSVGElement,
   etiqueta: K,
 ): SVGElementTagNameMap[K] {
-  return document.createElementNS(NS_SVG, etiqueta) as SVGElementTagNameMap[K];
+  return svg.ownerDocument.createElementNS(NS_SVG, etiqueta) as SVGElementTagNameMap[K];
 }
 
 function atributos(elemento: SVGElement, valores: Readonly<Record<string, string>>): void {
@@ -53,14 +65,14 @@ function vaciar(svg: SVGSVGElement): void {
 
 function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
   const { area } = geometria;
-  const grupo = crear("g");
+  const grupo = crear(svg, "g");
   grupo.setAttribute("class", "dlv-ejes-area");
   grupo.setAttribute("transform", `translate(${area.x}, ${area.y})`);
   svg.appendChild(grupo);
 
   // Rejilla vertical (una línea por tick de tiempo) + etiqueta bajo el eje X.
   for (const tick of geometria.ticksX) {
-    const linea = crear("line");
+    const linea = crear(svg, "line");
     atributos(linea, {
       class: "dlv-ejes-rejilla dlv-ejes-rejilla-x",
       x1: String(tick.pixel),
@@ -70,7 +82,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
     });
     grupo.appendChild(linea);
 
-    const etiqueta = crear("text");
+    const etiqueta = crear(svg, "text");
     atributos(etiqueta, {
       class: "dlv-ejes-etiqueta dlv-ejes-etiqueta-x",
       x: String(tick.pixel),
@@ -83,7 +95,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
 
   // Rejilla horizontal (una línea por tick de valor) + etiqueta a la izquierda.
   for (const tick of geometria.ticksY) {
-    const linea = crear("line");
+    const linea = crear(svg, "line");
     atributos(linea, {
       class: "dlv-ejes-rejilla dlv-ejes-rejilla-y",
       x1: "0",
@@ -93,7 +105,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
     });
     grupo.appendChild(linea);
 
-    const etiqueta = crear("text");
+    const etiqueta = crear(svg, "text");
     atributos(etiqueta, {
       class: "dlv-ejes-etiqueta dlv-ejes-etiqueta-y",
       x: "-8",
@@ -107,7 +119,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
 
   // Marco del área de dibujo: los dos ejes (izquierdo y de abajo), no los
   // cuatro lados — la rejilla ya marca los otros dos bordes con su propio tick.
-  const ejeX = crear("line");
+  const ejeX = crear(svg, "line");
   atributos(ejeX, {
     class: "dlv-ejes-eje",
     x1: "0",
@@ -117,12 +129,12 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
   });
   grupo.appendChild(ejeX);
 
-  const ejeY = crear("line");
+  const ejeY = crear(svg, "line");
   atributos(ejeY, { class: "dlv-ejes-eje", x1: "0", x2: "0", y1: "0", y2: String(area.alto) });
   grupo.appendChild(ejeY);
 
   // Título del eje Y (unidad ya mostrada), girado, en el margen izquierdo.
-  const tituloY = crear("text");
+  const tituloY = crear(svg, "text");
   atributos(tituloY, {
     class: "dlv-ejes-titulo dlv-ejes-titulo-y",
     x: "0",
@@ -134,7 +146,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
   grupo.appendChild(tituloY);
 
   // Unidad del eje X, junto a la última etiqueta.
-  const tituloX = crear("text");
+  const tituloX = crear(svg, "text");
   atributos(tituloX, {
     class: "dlv-ejes-titulo dlv-ejes-titulo-x",
     x: String(area.ancho),
@@ -149,7 +161,7 @@ function pintarRejillaYEje(svg: SVGSVGElement, geometria: GeometriaEjes): void {
 function pintarLeyenda(svg: SVGSVGElement, geometria: GeometriaEjes): void {
   if (geometria.leyenda.length === 0) return;
 
-  const grupo = crear("g");
+  const grupo = crear(svg, "g");
   grupo.setAttribute("class", "dlv-ejes-leyenda");
   svg.appendChild(grupo);
 
@@ -161,7 +173,7 @@ function pintarLeyenda(svg: SVGSVGElement, geometria: GeometriaEjes): void {
 
   // Fondo semitransparente: sin él, la leyenda se confunde con la rejilla que
   // tiene detrás cuando el panel está lleno de canales.
-  const fondo = crear("rect");
+  const fondo = crear(svg, "rect");
   atributos(fondo, {
     class: "dlv-ejes-leyenda-fondo",
     x: "0",
@@ -175,7 +187,7 @@ function pintarLeyenda(svg: SVGSVGElement, geometria: GeometriaEjes): void {
   geometria.leyenda.forEach((entrada, indice) => {
     const y = indice * ALTO_FILA_LEYENDA;
 
-    const muestra = crear("rect");
+    const muestra = crear(svg, "rect");
     atributos(muestra, {
       class: "dlv-ejes-leyenda-muestra",
       x: "4",
@@ -186,7 +198,7 @@ function pintarLeyenda(svg: SVGSVGElement, geometria: GeometriaEjes): void {
     });
     grupo.appendChild(muestra);
 
-    const texto = crear("text");
+    const texto = crear(svg, "text");
     atributos(texto, {
       class: "dlv-ejes-leyenda-texto",
       x: String(4 + LADO_MUESTRA_LEYENDA + 4),

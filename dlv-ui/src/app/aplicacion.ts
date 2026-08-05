@@ -33,6 +33,7 @@ import { CacheDeCubos, type ClaveCubos, type Rango } from "../datos/cache-cubos.
 import type { CanalDeFuente, FuenteDeDatos, LogAbierto } from "../datos/fuente.ts";
 import { pintarEjes } from "../ejes/ejes.ts";
 import { CursorDeTabla, type CanalCursor } from "../cursor/cursor.ts";
+import type { ContextoDOM as ContextoCursor } from "../cursor/contexto-dom.ts";
 import {
   deltaDeTiempo,
   deltaEntre,
@@ -44,6 +45,7 @@ import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts"
 import { ControladorDeNavegacion } from "../navegacion/controlador.ts";
 import type { DefinicionPanel } from "../paneles/paneles.ts";
 import { PanelesApilados } from "../paneles/paneles.ts";
+import { contextoDesdeDocumento } from "../paneles/contexto-dom.ts";
 import { ajustarLienzo, Renderizador } from "../render/renderizador.ts";
 import { elegirNivel, type ResumenNivel } from "../render/escala.ts";
 import type { Color, CubosContinuos, Vista, Viewport } from "../render/tipos.ts";
@@ -72,6 +74,61 @@ import { alCambiarTema, obtenerTemaActual, parametrosDeSerie } from "../tema/tem
 import { montarSelectorDeTema } from "../tema/selector-tema.ts";
 
 const EJE_PRINCIPAL = "principal";
+
+/**
+ * Lo que `Aplicacion` necesita del navegador, en un solo objeto inyectable.
+ *
+ * POR QUÉ EXISTE ESTA COSTURA
+ * ===========================
+ * Hasta ahora este fichero usaba `document`, `window` y `requestAnimationFrame`
+ * globales, y `Renderizador.desdeLienzo` directamente. La consecuencia es que
+ * **el ensamblado entero no se podía construir en una prueba**:
+ * `vitest.config.ts` corre en `environment: "node"`, sin `document`. Todo el
+ * código de montaje quedaba sin ejecutar, y de ahí salieron tres fallos que
+ * encontró el propietario abriendo la ventana: un factor de diez en la
+ * temperatura, la etiqueta de la unidad congelada al crear el panel, y un
+ * formateador único para toda la tabla del cursor.
+ *
+ * Cada componente de `dlv-ui` ya declaraba su propia superficie mínima de DOM
+ * con su doble (`unidades/dom.ts`, `paneles/contexto-dom.ts`,
+ * `cursor/contexto-dom.ts`, `render/contexto.ts`). Esto es lo mismo para el
+ * ensamblado, que era la única capa sin costura — y la que los tenía.
+ *
+ * `crearRenderizador` está aquí y no dentro de `documento` porque lo que hay
+ * que sustituir no es el lienzo sino el CONTEXTO WebGL2: `render/doble-gl.ts`
+ * ya existe para eso, y `Renderizador` acepta un `ContextoGL` por constructor
+ * precisamente para poder recibirlo. Es también el motivo por el que jsdom no
+ * habría servido: no implementa WebGL.
+ */
+export interface EntornoApp {
+  readonly documento: Pick<Document, "createElement" | "createElementNS">;
+  readonly ventana: {
+    readonly devicePixelRatio: number;
+    addEventListener(tipo: string, manejador: (evento: unknown) => void): void;
+    requestAnimationFrame(callback: () => void): number;
+    cancelAnimationFrame(id: number): void;
+  };
+  readonly crearRenderizador: (lienzo: HTMLCanvasElement) => Renderizador;
+}
+
+/** El navegador de verdad. Es el valor por omisión: nadie tiene que pasarlo. */
+export const ENTORNO_REAL: EntornoApp = {
+  documento: globalThis.document,
+  get ventana() {
+    return {
+      get devicePixelRatio(): number {
+        // Se lee en cada acceso y no se captura: cambia al mover la ventana a
+        // otra pantalla, y un valor congelado dejaría el lienzo borroso.
+        return window.devicePixelRatio || 1;
+      },
+      addEventListener: (tipo: string, manejador: (evento: unknown) => void): void =>
+        window.addEventListener(tipo, manejador as EventListener),
+      requestAnimationFrame: (cb: () => void): number => window.requestAnimationFrame(cb),
+      cancelAnimationFrame: (id: number): void => window.cancelAnimationFrame(id),
+    };
+  },
+  crearRenderizador: (lienzo) => Renderizador.desdeLienzo(lienzo),
+};
 
 const MAXIMO_PROTAGONISTAS = 8;
 
@@ -232,24 +289,28 @@ export class Aplicacion {
    */
   #generacion = 0;
 
-  constructor(raiz: HTMLElement, fuente: FuenteDeDatos) {
+  readonly #entorno: EntornoApp;
+
+  constructor(raiz: HTMLElement, fuente: FuenteDeDatos, entorno: EntornoApp = ENTORNO_REAL) {
+    this.#entorno = entorno;
+    const { documento, ventana } = entorno;
     this.#raiz = raiz;
     this.#fuente = fuente;
 
     this.#raiz.textContent = "";
     this.#raiz.classList.add("dlv-app");
 
-    this.#barra = document.createElement("div");
+    this.#barra = documento.createElement("div");
     this.#barra.className = "dlv-barra";
-    const boton = document.createElement("button");
+    const boton = documento.createElement("button");
     boton.textContent = "Abrir log sintético";
     boton.addEventListener("click", () => void this.abrirLog("autolog-sintetico"));
-    this.#estadoTexto = document.createElement("span");
+    this.#estadoTexto = documento.createElement("span");
     this.#estadoTexto.className = "dlv-barra__estado";
     this.#estadoTexto.textContent = `fuente: ${fuente.nombre}`;
-    this.#barra.append(boton, montarSelectorDeTema(), this.#estadoTexto);
+    this.#barra.append(boton, montarSelectorDeTema(documento as unknown as Document), this.#estadoTexto);
 
-    this.#barraDelta = document.createElement("div");
+    this.#barraDelta = documento.createElement("div");
     this.#barraDelta.className = "dlv-barra-delta";
     this.#barraDelta.title =
       "Doble cursor: haz clic sobre los paneles para fijar el ancla, y otro clic para quitarla.";
@@ -263,16 +324,16 @@ export class Aplicacion {
       this.#dispararRedibujado();
     });
 
-    const cuerpo = document.createElement("div");
+    const cuerpo = documento.createElement("div");
     cuerpo.className = "dlv-cuerpo";
 
-    this.#barraLateral = document.createElement("div");
+    this.#barraLateral = documento.createElement("div");
     this.#barraLateral.className = "dlv-lateral";
-    this.#contenedorSelectorCanales = document.createElement("div");
+    this.#contenedorSelectorCanales = documento.createElement("div");
     this.#contenedorSelectorCanales.className = "dlv-lateral__canales";
-    this.#contenedorSelectorUnidad = document.createElement("div");
+    this.#contenedorSelectorUnidad = documento.createElement("div");
     this.#contenedorSelectorUnidad.className = "dlv-lateral__unidades";
-    this.#contenedorSelectorCombustible = document.createElement("div");
+    this.#contenedorSelectorCombustible = documento.createElement("div");
     this.#contenedorSelectorCombustible.className = "dlv-lateral__combustible";
     this.#barraLateral.append(
       this.#contenedorSelectorCanales,
@@ -280,19 +341,19 @@ export class Aplicacion {
       this.#contenedorSelectorCombustible,
     );
 
-    this.#areaPrincipal = document.createElement("div");
+    this.#areaPrincipal = documento.createElement("div");
     this.#areaPrincipal.className = "dlv-principal";
-    this.#mensajeVacio = document.createElement("p");
+    this.#mensajeVacio = documento.createElement("p");
     this.#mensajeVacio.className = "dlv-mensaje-vacio";
     this.#mensajeVacio.textContent = "Selecciona canales en la izquierda para verlos aquí.";
-    this.#contenedorPaneles = document.createElement("div");
+    this.#contenedorPaneles = documento.createElement("div");
     this.#contenedorPaneles.className = "dlv-paneles";
     this.#areaPrincipal.append(this.#mensajeVacio, this.#contenedorPaneles);
 
     cuerpo.append(this.#barraLateral, this.#areaPrincipal);
     this.#raiz.append(this.#barra, this.#barraDelta, cuerpo);
 
-    window.addEventListener("resize", () => {
+    ventana.addEventListener("resize", () => {
       this.#paneles?.redimensionarContenedor();
       for (const estado of this.#porPanel.values()) this.#reajustarLienzo(estado);
       this.#dispararRedibujado();
@@ -343,6 +404,7 @@ export class Aplicacion {
       clasificacion: c.clasificacion,
     }));
     this.#selectorCanales = new SelectorCanales({
+      documento: this.#entorno.documento as Pick<Document, "createElement" | "createTextNode">,
       contenedor: this.#contenedorSelectorCanales,
       canales,
       onSeleccionCambia: (seleccionados) => this.#onSeleccionCambia(seleccionados),
@@ -405,7 +467,7 @@ export class Aplicacion {
       etiqueta: c.nombre,
       dimensionId: c.dimensionId,
     }));
-    this.#selectorUnidad = new SelectorUnidad(fabricaDesdeDocumento(document), {
+    this.#selectorUnidad = new SelectorUnidad(fabricaDesdeDocumento(this.#entorno.documento), {
       catalogo: this.#catalogo,
       canales,
       onCambio: (cambio) => {
@@ -449,7 +511,7 @@ export class Aplicacion {
     // que el campo de estequiometría manual necesita y la de `unidades/dom.ts`
     // no tiene. Cada componente declara la superficie mínima que usa (ese es el
     // patrón que permite probarlos sin jsdom), así que no comparten fábrica.
-    this.#selectorCombustible = new SelectorCombustible(fabricaCombustible(document), {
+    this.#selectorCombustible = new SelectorCombustible(fabricaCombustible(this.#entorno.documento), {
       catalogo: this.#catalogo.combustibles,
       // Sin `estequiometriaDelLog`: leerla exige pedir la serie del canal de
       // rol `stoichiometry` para pintar OTRO canal, y ese camino (una serie que
@@ -537,6 +599,11 @@ export class Aplicacion {
     this.#paneles = PanelesApilados.montar(this.#contenedorPaneles, definiciones, {
       alCambiarAsignacion: () => this.#alCambiarAsignacion(),
       alRedimensionar: () => this.#dispararRedibujado(),
+      // `PanelesApilados` y `CursorDeTabla` ya declaraban su superficie
+      // minima de DOM (`paneles/contexto-dom.ts`, `cursor/contexto-dom.ts`)
+      // con su doble; lo que faltaba era que el ensamblado se la pasara en
+      // vez de dejarles caer al `document` global.
+      documento: contextoDesdeDocumento(this.#entorno.documento),
     });
 
     for (const definicion of definiciones) {
@@ -564,14 +631,14 @@ export class Aplicacion {
   #montarPanel(definicion: DefinicionPanel): EstadoPanel {
     const contenido = this.#paneles!.contenidoDe(definicion.id) as unknown as HTMLElement;
 
-    const canvas = document.createElement("canvas");
+    const canvas = this.#entorno.documento.createElement("canvas");
     canvas.style.setProperty("position", "absolute");
     canvas.style.setProperty("inset", "0");
     canvas.style.setProperty("width", "100%");
     canvas.style.setProperty("height", "100%");
     contenido.appendChild(canvas);
 
-    const svg = document.createElementNS(NS_SVG, "svg") as SVGSVGElement;
+    const svg = this.#entorno.documento.createElementNS(NS_SVG, "svg") as SVGSVGElement;
     svg.style.setProperty("position", "absolute");
     svg.style.setProperty("inset", "0");
     svg.style.setProperty("width", "100%");
@@ -579,7 +646,7 @@ export class Aplicacion {
     svg.style.setProperty("pointer-events", "none");
     contenido.appendChild(svg);
 
-    const tablaCursor = document.createElement("table");
+    const tablaCursor = this.#entorno.documento.createElement("table");
     tablaCursor.className = "cursor-tabla";
     tablaCursor.style.setProperty("position", "absolute");
     // Esquina opuesta a la leyenda de `ejes.ts` (arriba-derecha, `MARGEN_LEYENDA`
@@ -589,13 +656,14 @@ export class Aplicacion {
     tablaCursor.style.setProperty("right", "4px");
     contenido.appendChild(tablaCursor);
 
-    const renderizador = Renderizador.desdeLienzo(canvas);
+    const renderizador = this.#entorno.crearRenderizador(canvas);
     const gestor = new GestorEscalas();
     const primerCanal = definicion.canales[0];
     gestor.crearEje(EJE_PRINCIPAL, this.#etiquetaUnidadDe(primerCanal?.id));
     for (const canal of definicion.canales) gestor.asignarSerie(canal.id, EJE_PRINCIPAL);
 
     const cursor = new CursorDeTabla(contenido, tablaCursor, this.#cache, {
+      documento: this.#entorno.documento as ContextoCursor,
       // El canal sale de la CLAVE de cada fila, no del primero del panel, y la
       // unidad se resuelve en el momento de formatear y no al crear el panel.
       // Las dos cosas se leían antes de variables capturadas aquí, y las dos
@@ -622,7 +690,7 @@ export class Aplicacion {
   }
 
   #reajustarLienzo(estado: EstadoPanel): void {
-    const viewport: Viewport = ajustarLienzo(estado.canvas, window.devicePixelRatio || 1);
+    const viewport: Viewport = ajustarLienzo(estado.canvas, this.#entorno.ventana.devicePixelRatio || 1);
     estado.renderizador.redimensionar(viewport);
   }
 
@@ -938,9 +1006,9 @@ export class Aplicacion {
     const paso = (): void => {
       for (const estado of this.#porPanel.values()) estado.cursor.aplicar();
       this.#pintarDeltas();
-      this.#idFrameCursor = requestAnimationFrame(paso);
+      this.#idFrameCursor = this.#entorno.ventana.requestAnimationFrame(paso);
     };
-    this.#idFrameCursor = requestAnimationFrame(paso);
+    this.#idFrameCursor = this.#entorno.ventana.requestAnimationFrame(paso);
   }
 
   /**
@@ -1010,7 +1078,7 @@ export class Aplicacion {
 
   /** Libera temporizadores y listeners globales. Útil para pruebas manuales en la consola. */
   destruir(): void {
-    if (this.#idFrameCursor !== null) cancelAnimationFrame(this.#idFrameCursor);
+    if (this.#idFrameCursor !== null) this.#entorno.ventana.cancelAnimationFrame(this.#idFrameCursor);
     this.#reconstruir(null);
   }
 }
