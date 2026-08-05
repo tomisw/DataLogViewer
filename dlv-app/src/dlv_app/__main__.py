@@ -40,9 +40,18 @@ def _argumentos() -> argparse.Namespace:
             "`npm run dev` corriendo. Sin esto se sirve dlv-ui/dist/."
         ),
     )
+    analizador.add_argument(
+        "--depurar",
+        action="store_true",
+        help=(
+            "abre las herramientas de desarrollo del motor web. Es la unica via "
+            "para ver un error de JavaScript: la suite de dlv-ui corre en Node "
+            "sin DOM, asi que el codigo de montaje no se ejecuta en ninguna prueba."
+        ),
+    )
     return analizador.parse_args()
 
 
 if __name__ == "__main__":
     args = _argumentos()
-    main(url_frontend=args.url_frontend, log=args.log)
+    main(url_frontend=args.url_frontend, log=args.log, depurar=args.depurar)

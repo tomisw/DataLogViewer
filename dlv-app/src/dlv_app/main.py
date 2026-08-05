@@ -310,6 +310,21 @@ def _manejador_estatico(directorio: Path) -> type[http.server.SimpleHTTPRequestH
         def log_message(self, format: str, *args: Any) -> None:
             pass
 
+        def end_headers(self) -> None:
+            # NADA de este servidor se cachea, y no es una precaucion generica.
+            # `vite build` pone una huella del contenido en el nombre del
+            # paquete (`assets/index-SRCsy-47.js`) y la cambia en cada build.
+            # Si el motor web reutiliza un `index.html` cacheado, ese HTML
+            # apunta al paquete ANTERIOR, que ya no existe en `dist/`: el
+            # servidor responde 404 y la ventana sale en blanco despues de
+            # recompilar. Es un fallo que aparece justo cuando acabas de
+            # cambiar algo, que es cuando menos ayuda.
+            #
+            # `no-store` en vez de `no-cache`: `no-cache` permite guardar la
+            # copia y revalidar, y WebView2 puede servirla sin preguntar.
+            self.send_header("Cache-Control", "no-store, must-revalidate")
+            super().end_headers()
+
     return _Manejador
 
 
@@ -342,7 +357,7 @@ def detener_servidor_ui_de_fondo(estado: ServidorUiDeFondo, *, timeout_s: float 
     estado.servidor.server_close()
 
 
-def main(*, url_frontend: str | None = None, log: str | None = None) -> None:
+def main(*, url_frontend: str | None = None, log: str | None = None, depurar: bool = False) -> None:
     """Arranca `dlv-api` y abre la ventana de `pywebview`.
 
     `log` es la ruta del fichero a abrir. Sin ella, la ventana arranca con la
@@ -382,7 +397,15 @@ def main(*, url_frontend: str | None = None, log: str | None = None) -> None:
                 )
             else:
                 webview.create_window("DataLogViewer", html=_pagina_placeholder(estado.info))
-        webview.start()
+        # `debug=True` abre las herramientas de desarrollo del motor web, y con
+        # ellas la consola. Es la unica forma de ver un error de JavaScript en
+        # esta aplicacion: las pruebas de `dlv-ui` corren en Node sin DOM
+        # (`vitest.config.ts`, `environment: "node"`), asi que TODO el codigo
+        # de montaje --crear elementos, engancharlos al arbol, pedir un
+        # contexto WebGL2-- no se ejecuta nunca en la suite. Una excepcion en
+        # ese camino deja la ventana en blanco o a medias, sin que ni `pytest`
+        # ni `npm test` ni `tsc` digan nada.
+        webview.start(debug=depurar)
     finally:
         if estado_ui is not None:
             detener_servidor_ui_de_fondo(estado_ui)
