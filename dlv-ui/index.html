@@ -107,6 +107,24 @@
         color: var(--texto-tenue);
       }
 
+      /* Barra del doble cursor (E3.4). Vacía y sin borde mientras no haya
+         ancla puesta: una franja permanente que casi siempre está vacía roba
+         altura al área de trazado, que es lo único que de verdad se mira. */
+      .dlv-barra-delta:not(:empty) {
+        padding: 6px 12px;
+        border-bottom: 1px solid var(--panel-borde);
+        background: var(--panel);
+        font-variant-numeric: tabular-nums;
+        font-size: 0.9em;
+        white-space: nowrap;
+        overflow-x: auto;
+      }
+
+      .dlv-lateral__combustible:not(:empty) {
+        padding: 10px 12px;
+        border-top: 1px solid var(--panel-borde);
+      }
+
       /* -------------------------------------------------------------- */
       /* Cuerpo: lateral + área principal                                */
       /* -------------------------------------------------------------- */

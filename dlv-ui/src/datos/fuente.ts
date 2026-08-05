@@ -76,6 +76,18 @@ export interface CanalDeFuente {
    */
   readonly dimensionId: string;
   readonly clasificacion: ClasificacionCanalFuente;
+  /**
+   * Conversión afín de la muestra CRUDA del canal a la unidad canónica de su
+   * dimensión (`ChannelSeries.to_canon`, ADR-003): `canonica = a·crudo + b`.
+   *
+   * Es propia de CADA CANAL y viene del descriptor del formato, no del catálogo
+   * de unidades: la temperatura de refrigerante de un Haltech llega como el
+   * entero `3748` con `a = 0,1`, y son 374,8 K. Sin esto, los cubos —que la
+   * pirámide construye sobre la muestra cruda— se tratarían como si ya
+   * estuvieran en canónica, y la temperatura saldría multiplicada por diez con
+   * su unidad correcta al lado. Ver `unidades/conversion.ts#convertirDesdeCrudo`.
+   */
+  readonly aCanonica: { readonly a: number; readonly b: number };
 }
 
 /** Un nivel de pirámide disponible para un canal, tal y como lo pide `elegirNivel`. */

@@ -20,9 +20,9 @@ export function catalogoDePrueba(): CatalogoUnidades {
         unidadCanonica: "K",
         convertible: true,
         unidades: [
-          { id: "K", etiqueta: "K", decimales: 1 },
-          { id: "degC", etiqueta: "°C", decimales: 1 },
-          { id: "degF", etiqueta: "°F", decimales: 1 },
+          { id: "K", etiqueta: "K", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "degC", etiqueta: "°C", decimales: 1, conversion: { tipo: "afin", a: 1, b: -273.15 } },
+          { id: "degF", etiqueta: "°F", decimales: 1, conversion: { tipo: "afin", a: 1.8, b: -459.67 } },
         ],
       },
       {
@@ -31,9 +31,9 @@ export function catalogoDePrueba(): CatalogoUnidades {
         unidadCanonica: "kPa",
         convertible: true,
         unidades: [
-          { id: "kPa", etiqueta: "kPa", decimales: 0 },
-          { id: "bar", etiqueta: "bar", decimales: 2 },
-          { id: "psi", etiqueta: "psi", decimales: 1 },
+          { id: "kPa", etiqueta: "kPa", decimales: 0, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "bar", etiqueta: "bar", decimales: 2, conversion: { tipo: "afin", a: 0.01, b: 0 } },
+          { id: "psi", etiqueta: "psi", decimales: 1, conversion: { tipo: "afin", a: 0.14503773773, b: 0 } },
         ],
       },
       {
@@ -42,8 +42,8 @@ export function catalogoDePrueba(): CatalogoUnidades {
         unidadCanonica: "lambda",
         convertible: true,
         unidades: [
-          { id: "lambda", etiqueta: "λ", decimales: 3 },
-          { id: "afr", etiqueta: "AFR", decimales: 2 },
+          { id: "lambda", etiqueta: "λ", decimales: 3, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "afr", etiqueta: "AFR", decimales: 2, conversion: { tipo: "afin", a: 1, b: 0 } },
         ],
       },
       {
@@ -51,7 +51,7 @@ export function catalogoDePrueba(): CatalogoUnidades {
         etiqueta: "Nivel de sonido",
         unidadCanonica: "dB",
         convertible: false,
-        unidades: [{ id: "dB", etiqueta: "dB", decimales: 1 }],
+        unidades: [{ id: "dB", etiqueta: "dB", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "unknown",
@@ -59,7 +59,7 @@ export function catalogoDePrueba(): CatalogoUnidades {
         unidadCanonica: "raw",
         convertible: false,
         mostrarEnCrudo: true,
-        unidades: [{ id: "raw", etiqueta: "(crudo)", decimales: 0 }],
+        unidades: [{ id: "raw", etiqueta: "(crudo)", decimales: 0, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
     ],
     presets: [
@@ -82,5 +82,6 @@ export function catalogoDePrueba(): CatalogoUnidades {
       },
     ],
     presetPorOmision: "metrico",
+    combustibles: [],
   };
 }

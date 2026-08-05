@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-05 11:28:38Z"
+    "actualizado": "2026-08-05 13:42:34Z"
   },
   "tareas": [
     {
@@ -1639,6 +1639,32 @@
           "texto": "CORS expose_headers + rol/clasificacion en abrir-log + eleccion por rol. Verificado contra los tres logs reales: abren con RPM, MAP, TPS, lambda y temperaturas."
         }
       ]
+    },
+    {
+      "id": "F1-45",
+      "fase": "F1",
+      "titulo": "E13 llega a la ventana: conversiones reales por HTTP, motor de las cuatro clases en el frontend, escalado `to_canon` del canal, y montaje del selector de combustible y del doble cursor",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "F1-13",
+        "F1-30",
+        "F1-41",
+        "F1-44"
+      ],
+      "deps_backlog": [
+        "F1-13",
+        "F1-30",
+        "F1-41",
+        "F1-44"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "en_curso",
+      "agente": "Opus 5 (orquestador)",
+      "commits": [],
+      "notas": []
     },
     {
       "id": "FG-01",

@@ -33,6 +33,13 @@ import { CacheDeCubos, type ClaveCubos, type Rango } from "../datos/cache-cubos.
 import type { CanalDeFuente, FuenteDeDatos, LogAbierto } from "../datos/fuente.ts";
 import { pintarEjes } from "../ejes/ejes.ts";
 import { CursorDeTabla, type CanalCursor } from "../cursor/cursor.ts";
+import {
+  deltaDeTiempo,
+  deltaEntre,
+  leerEn,
+  textoDeDelta,
+  type FormaConversion,
+} from "../cursor/doble.ts";
 import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts";
 import { ControladorDeNavegacion } from "../navegacion/controlador.ts";
 import type { DefinicionPanel } from "../paneles/paneles.ts";
@@ -52,7 +59,15 @@ import type {
   CatalogoUnidades,
   UnidadResuelta,
 } from "../unidades/tipos.ts";
-import { convertirCubos, convertirValor, factorDe } from "./conversion-demo.ts";
+import {
+  convertirCubos,
+  convertirDesdeCrudo,
+  IDENTIDAD,
+  type Conversion,
+  type ConversionAfin,
+} from "../unidades/conversion.ts";
+import { SelectorCombustible } from "../combustible/selector-combustible.ts";
+import { fabricaDesdeDocumento as fabricaCombustible } from "../combustible/dom.ts";
 import { alCambiarTema, obtenerTemaActual, parametrosDeSerie } from "../tema/tema.ts";
 import { montarSelectorDeTema } from "../tema/selector-tema.ts";
 
@@ -169,9 +184,11 @@ export class Aplicacion {
 
   readonly #barra: HTMLElement;
   readonly #estadoTexto: HTMLElement;
+  readonly #barraDelta: HTMLElement;
   readonly #barraLateral: HTMLElement;
   readonly #contenedorSelectorCanales: HTMLElement;
   readonly #contenedorSelectorUnidad: HTMLElement;
+  readonly #contenedorSelectorCombustible: HTMLElement;
   readonly #areaPrincipal: HTMLElement;
   readonly #contenedorPaneles: HTMLElement;
   readonly #mensajeVacio: HTMLElement;
@@ -183,12 +200,22 @@ export class Aplicacion {
 
   #selectorCanales: SelectorCanales | null = null;
   #selectorUnidad: SelectorUnidad | null = null;
+  #selectorCombustible: SelectorCombustible | null = null;
   #resueltasUnidad = new Map<string, UnidadResuelta>();
 
   #paneles: PanelesApilados | null = null;
   #nav: ControladorDeNavegacion | null = null;
   #porPanel = new Map<string, EstadoPanel>();
   #colorPorCanal = new Map<string, Color>();
+
+  /**
+   * Instante del cursor móvil y del ancla del doble cursor (E3.4), en segundos
+   * absolutos. `#tAncla` es `null` mientras no se haya fijado con un clic, y
+   * entonces la barra de Δ está vacía: un Δ contra un ancla que el usuario no
+   * ha puesto sería un número sin pregunta detrás.
+   */
+  #tCursor: number | null = null;
+  #tAncla: number | null = null;
 
   #idFrameCursor: number | null = null;
   #redibujando = false;
@@ -220,6 +247,11 @@ export class Aplicacion {
     this.#estadoTexto.textContent = `fuente: ${fuente.nombre}`;
     this.#barra.append(boton, montarSelectorDeTema(), this.#estadoTexto);
 
+    this.#barraDelta = document.createElement("div");
+    this.#barraDelta.className = "dlv-barra-delta";
+    this.#barraDelta.title =
+      "Doble cursor: haz clic sobre los paneles para fijar el ancla, y otro clic para quitarla.";
+
     // El color de una serie se calcula en TypeScript y se sube a la GPU, así que
     // cambiar el tema no lo toca: hay que olvidar los colores cacheados y volver
     // a pintar. Sin esto, cambiar a alto contraste reteñía la interfaz y dejaba
@@ -238,7 +270,13 @@ export class Aplicacion {
     this.#contenedorSelectorCanales.className = "dlv-lateral__canales";
     this.#contenedorSelectorUnidad = document.createElement("div");
     this.#contenedorSelectorUnidad.className = "dlv-lateral__unidades";
-    this.#barraLateral.append(this.#contenedorSelectorCanales, this.#contenedorSelectorUnidad);
+    this.#contenedorSelectorCombustible = document.createElement("div");
+    this.#contenedorSelectorCombustible.className = "dlv-lateral__combustible";
+    this.#barraLateral.append(
+      this.#contenedorSelectorCanales,
+      this.#contenedorSelectorUnidad,
+      this.#contenedorSelectorCombustible,
+    );
 
     this.#areaPrincipal = document.createElement("div");
     this.#areaPrincipal.className = "dlv-principal";
@@ -250,7 +288,7 @@ export class Aplicacion {
     this.#areaPrincipal.append(this.#mensajeVacio, this.#contenedorPaneles);
 
     cuerpo.append(this.#barraLateral, this.#areaPrincipal);
-    this.#raiz.append(this.#barra, cuerpo);
+    this.#raiz.append(this.#barra, this.#barraDelta, cuerpo);
 
     window.addEventListener("resize", () => {
       this.#paneles?.redimensionarContenedor();
@@ -382,6 +420,47 @@ export class Aplicacion {
     );
   }
 
+  /**
+   * Monta el selector de combustible si hay algún canal cuya unidad activa use
+   * una conversión `parametrizada` — hoy, λ→AFR.
+   *
+   * POR QUÉ APARECE Y DESAPARECE
+   * ============================
+   * Es el único control de la barra lateral que solo tiene sentido a veces: si
+   * ningún panel muestra la sonda lambda en AFR, la estequiometría no afecta a
+   * nada de lo que hay en pantalla, y un desplegable que no cambia nada invita
+   * a tocarlo y a concluir que la aplicación no responde. Al cambiar la sonda a
+   * AFR aparece; al volver a λ, desaparece.
+   *
+   * El catálogo viene de `data/combustibles.toml` por HTTP, no de este código.
+   */
+  #reconstruirSelectorCombustible(): void {
+    const hace = this.#log?.canales.some(
+      (c) => this.#conversionDe(c.idNativo).tipo === "parametrizada",
+    );
+    this.#contenedorSelectorCombustible.textContent = "";
+    if (hace !== true || this.#catalogo === null || this.#catalogo.combustibles.length === 0) {
+      this.#selectorCombustible = null;
+      return;
+    }
+    // Fábrica de DOM propia: la de `combustible/dom.ts` expone `crearInput`,
+    // que el campo de estequiometría manual necesita y la de `unidades/dom.ts`
+    // no tiene. Cada componente declara la superficie mínima que usa (ese es el
+    // patrón que permite probarlos sin jsdom), así que no comparten fábrica.
+    this.#selectorCombustible = new SelectorCombustible(fabricaCombustible(document), {
+      catalogo: this.#catalogo.combustibles,
+      // Sin `estequiometriaDelLog`: leerla exige pedir la serie del canal de
+      // rol `stoichiometry` para pintar OTRO canal, y ese camino (una serie que
+      // alimenta la conversión de otra) es trabajo de F3. Mientras tanto el
+      // selector marca el factor como SUPUESTO, que es justo la señal que
+      // distingue un AFR fiable de uno que no lo es.
+      onCambio: () => this.#dispararRedibujado(),
+    });
+    this.#contenedorSelectorCombustible.appendChild(
+      this.#selectorCombustible.elemento as unknown as HTMLElement,
+    );
+  }
+
   // ------------------------------------------------------------------ //
   // Cambios de selección / arrastre entre paneles: reconstruyen los paneles
   // ------------------------------------------------------------------ //
@@ -390,6 +469,7 @@ export class Aplicacion {
     if (this.#log === null) return;
     const canalesVisibles = this.#log.canales.filter((c) => seleccionados.has(c.idNativo));
     this.#reconstruirSelectorUnidad(canalesVisibles);
+    this.#reconstruirSelectorCombustible();
     const definiciones: DefinicionPanel[] = canalesVisibles.map((c) => ({
       id: `panel-${c.idNativo}`,
       canales: [{ id: c.idNativo, etiqueta: c.nombre }],
@@ -516,8 +596,20 @@ export class Aplicacion {
 
     const cursor = new CursorDeTabla(contenido, tablaCursor, this.#cache, {
       formatear: (valor) => {
-        const factor = primerCanal !== undefined ? this.#factorDeCanal(primerCanal.id) : { a: 1, b: 0 };
-        return formatearNumeroLocale(convertirValor(valor, factor), unidadPanel?.unidad.decimales ?? 2);
+        // El cursor lee un valor puntual de la serie, así que clase `punto`:
+        // con el desplazamiento de origen incluido. Es lo contrario del Δ del
+        // doble cursor, que es `intervalo`.
+        if (primerCanal === undefined) return formatearNumeroLocale(valor, 2);
+        return formatearNumeroLocale(
+          convertirDesdeCrudo(
+            valor,
+            this.#aCanonicaDe(primerCanal.id),
+            this.#conversionDe(primerCanal.id),
+            "punto",
+            this.#parametroDe(primerCanal.id),
+          ),
+          unidadPanel?.unidad.decimales ?? 2,
+        );
       },
     });
 
@@ -544,11 +636,47 @@ export class Aplicacion {
     return this.#resueltasUnidad.get(canalId);
   }
 
-  #factorDeCanal(canalId: string): { a: number; b: number } {
+  /**
+   * La conversión activa de un canal: la de la unidad que el selector resolvió
+   * para él, tal como la sirve `data/units.toml`.
+   *
+   * `IDENTIDAD` cuando todavía no hay unidad resuelta (el catálogo no ha
+   * llegado, o el canal es de una dimensión sin unidades). No es un repliegue
+   * silencioso como el de antes: la identidad aquí significa «este canal se
+   * muestra en canónica», que es lo que el selector está enseñando.
+   */
+  #conversionDe(canalId: string): Conversion {
+    return this.#unidadDe(canalId)?.unidad.conversion ?? IDENTIDAD;
+  }
+
+  /**
+   * El `to_canon` del canal: de la muestra cruda del log a canónica.
+   *
+   * Es el primer paso de los dos que hay que dar, y el que llevaba sin darse:
+   * los cubos que sirve `/comandos/cubos` salen de la pirámide, que se
+   * construye sobre `serie.v` —enteros escalados— y no sobre canónica. Ver
+   * `unidades/conversion.ts#convertirDesdeCrudo`.
+   */
+  #aCanonicaDe(canalId: string): ConversionAfin {
     const canal = this.#log?.canales.find((c) => c.idNativo === canalId);
-    const unidad = this.#unidadDe(canalId);
-    if (canal === undefined || unidad === undefined) return { a: 1, b: 0 };
-    return factorDe(canal.dimensionId, unidad.unidad.id);
+    if (canal === undefined) return IDENTIDAD;
+    return { tipo: "afin", a: canal.aCanonica.a, b: canal.aCanonica.b };
+  }
+
+  /**
+   * El parámetro de una conversión `parametrizada`, o `undefined`.
+   *
+   * Hoy solo existe un caso: λ→AFR necesita la estequiometría del combustible
+   * (`docs/06` §6.6). Sale del selector de combustible, que es lo que el
+   * propietario pidió poder cambiar a mano. Un log que traiga el canal con rol
+   * `stoichiometry` lo usaría con preferencia, pero eso exige leer una serie
+   * para pintar otra —trabajo de F3— así que hoy manda el selector, y su valor
+   * por omisión es el del catálogo, no una cifra escrita aquí.
+   */
+  #parametroDe(canalId: string): number | undefined {
+    const conversion = this.#conversionDe(canalId);
+    if (conversion.tipo !== "parametrizada") return undefined;
+    return this.#selectorCombustible?.factorResuelto.estequiometria;
   }
 
   async #nivelesDe(canalId: string): Promise<readonly ResumenNivel[]> {
@@ -643,18 +771,29 @@ export class Aplicacion {
         }
 
         const unidadResuelta = this.#unidadDe(canalId);
-        const factorConv = unidadResuelta === undefined
-          ? { a: 1, b: 0 }
-          : factorDe(this.#dimensionDe(canalId), unidadResuelta.unidad.id);
+        const conversion = this.#conversionDe(canalId);
+        const parametro = this.#parametroDe(canalId);
+        const aCanonica = this.#aCanonicaDe(canalId);
 
         // El tema entra en la clave porque el COLOR va en la misma subida a la
         // GPU que los datos: sin él, un cambio de tema no volvía a subir nada y
         // las curvas se quedaban con el color del tema anterior aunque el resto
         // de la interfaz ya hubiera cambiado. La clave tiene que nombrar todo lo
-        // que `renderizadorSubir` mete en la GPU, no solo los datos.
-        const claveSubida = `${factor}|${entrada.cubre.t0}|${entrada.cubre.t1}|${unidadResuelta?.unidad.id ?? ""}|${obtenerTemaActual()}`;
+        // que `renderizadorSubir` mete en la GPU, no solo los datos — y por eso
+        // el parámetro de estequiometría también entra: cambiar de gasolina a
+        // E85 no cambia la unidad (sigue siendo AFR), pero sí todos los valores
+        // subidos. Sin él, elegir E85 no repintaba nada.
+        const claveSubida = `${factor}|${entrada.cubre.t0}|${entrada.cubre.t1}|${unidadResuelta?.unidad.id ?? ""}|${parametro ?? ""}|${obtenerTemaActual()}`;
         if (estado.ultimaSubida.get(canalId) !== claveSubida) {
-          renderizadorSubir(estado.renderizador, canalId, entrada.cubos, factorConv, color);
+          renderizadorSubir(
+            estado.renderizador,
+            canalId,
+            entrada.cubos,
+            aCanonica,
+            conversion,
+            parametro,
+            color,
+          );
           estado.ultimaSubida.set(canalId, claveSubida);
         }
         if (estado.ultimoFactor.get(canalId) !== factor) {
@@ -667,10 +806,7 @@ export class Aplicacion {
           canalId,
           rangoRaw === null
             ? null
-            : {
-                min: convertirValor(rangoRaw.min, factorConv),
-                max: convertirValor(rangoRaw.max, factorConv),
-              },
+            : rangoConvertido(rangoRaw, aCanonica, conversion, parametro),
         );
 
         canalesCursor.push({ clave, etiqueta: canalId });
@@ -698,10 +834,6 @@ export class Aplicacion {
         })),
       });
     }
-  }
-
-  #dimensionDe(canalId: string): string {
-    return this.#log?.canales.find((c) => c.idNativo === canalId)?.dimensionId ?? "unknown";
   }
 
   // ------------------------------------------------------------------ //
@@ -736,6 +868,7 @@ export class Aplicacion {
       const anchoPx = this.#paneles.anchoContenidoPx();
       const fraccion = anchoPx > 0 ? xLocal / anchoPx : 0;
       const tAbsoluto = vista.t0 + fraccion * (vista.t1 - vista.t0);
+      this.#tCursor = tAbsoluto;
       for (const estado of this.#porPanel.values()) estado.cursor.mover(tAbsoluto, xLocal);
     };
     this.#areaPrincipal.addEventListener("pointermove", sobreMovimiento);
@@ -743,11 +876,85 @@ export class Aplicacion {
       for (const estado of this.#porPanel.values()) estado.cursor.ocultar();
     });
 
+    // Clic = poner o quitar el ancla del doble cursor (E3.4). Se elige el clic
+    // y no una tecla porque el cursor ya sigue al puntero: el gesto natural es
+    // «fija aquí y muévete», y no hace falta explicarlo.
+    this.#contenedorPaneles.addEventListener("click", () => {
+      this.#tAncla = this.#tAncla === null ? this.#tCursor : null;
+      this.#pintarDeltas();
+    });
+
     const paso = (): void => {
       for (const estado of this.#porPanel.values()) estado.cursor.aplicar();
+      this.#pintarDeltas();
       this.#idFrameCursor = requestAnimationFrame(paso);
     };
     this.#idFrameCursor = requestAnimationFrame(paso);
+  }
+
+  /**
+   * Escribe la barra de Δ: Δt y, por canal visible, el Δ de valor.
+   *
+   * TRES RESULTADOS DISTINTOS, Y NINGUNO FINGE SER OTRO
+   * ===================================================
+   * `deltaEntre` (F1-30) distingue un Δ exacto de un Δ que es un RANGO —porque
+   * a zoom alejado cada cubo agrega muchas muestras y los dos extremos no son
+   * lecturas, son intervalos— y de un Δ que no existe. Esta barra escribe los
+   * tres tal cual: «Δ 10,0 °C», «Δ 8,0 … 12,0 °C» o «—» con el motivo. Redondear
+   * el segundo caso a un número sería inventarse una precisión que el nivel de
+   * pirámide no tiene.
+   *
+   * El Δ de un canal en una unidad recíproca (φ) sale indefinido, y eso es la
+   * respuesta correcta: `a/x` no es lineal y la diferencia de dos valores
+   * convertidos no es la conversión de la diferencia.
+   */
+  #pintarDeltas(): void {
+    if (this.#tAncla === null || this.#tCursor === null || this.#log === null) {
+      if (this.#barraDelta.textContent !== "") this.#barraDelta.textContent = "";
+      return;
+    }
+    const partes: string[] = [
+      `Δt ${formatearNumeroLocale(deltaDeTiempo(this.#tAncla, this.#tCursor), 3)} s`,
+    ];
+    for (const estado of this.#porPanel.values()) {
+      for (const canalId of estado.canalesIds) {
+        const factor = estado.ultimoFactor.get(canalId);
+        if (factor === undefined) continue;
+        const clave: ClaveCubos = { canal: canalId, factor };
+        const conversion = this.#conversionDe(canalId);
+        const parametro = this.#parametroDe(canalId);
+        const unidad = this.#unidadDe(canalId)?.unidad;
+        // Los dos extremos se leen en CANÓNICA y se convierten aquí como
+        // `intervalo`: solo la parte lineal. Es la regla 4 aplicada donde de
+        // verdad importa.
+        const delta = deltaEntre(
+          leerEn(this.#cache, clave, this.#tAncla, parametro),
+          leerEn(this.#cache, clave, this.#tCursor, parametro),
+          formaConversion(conversion),
+        );
+        const texto = textoDeDelta(
+          delta,
+          (v) =>
+            formatearNumeroLocale(
+              // `intervalo`: los dos desplazamientos de origen quedan fuera, el
+              // del canal y el de la unidad.
+              convertirDesdeCrudo(
+                v,
+                this.#aCanonicaDe(canalId),
+                conversion,
+                "intervalo",
+                parametro,
+              ),
+              unidad?.decimales ?? 2,
+            ),
+          unidad?.etiqueta ?? "",
+        );
+        const nombre = this.#log.canales.find((c) => c.idNativo === canalId)?.nombre ?? canalId;
+        partes.push(`${nombre}: ${texto.texto}${texto.nota ? " ⚠" : ""}`);
+      }
+    }
+    const nuevo = partes.join("  ·  ");
+    if (this.#barraDelta.textContent !== nuevo) this.#barraDelta.textContent = nuevo;
   }
 
   /** Libera temporizadores y listeners globales. Útil para pruebas manuales en la consola. */
@@ -757,13 +964,63 @@ export class Aplicacion {
   }
 }
 
+/**
+ * Traduce la conversión del catálogo a lo que `cursor/doble.ts` necesita saber.
+ *
+ * Ese módulo pide adrede MENOS de lo que hay: de una afín recibe solo el factor
+ * `a`, nunca el desplazamiento `b`. No es una simplificación, es el mecanismo:
+ * si `b` no está en la estructura, no se puede aplicar a un Δ ni por descuido,
+ * y la trampa del delta —convertir Δ10 K en −263,15 °C— deja de ser posible por
+ * construcción en vez de por acordarse. Este adaptador es el único punto donde
+ * `b` se descarta a propósito, y por eso está aquí y no dentro de `doble.ts`.
+ */
+function formaConversion(conversion: Conversion): FormaConversion {
+  switch (conversion.tipo) {
+    case "afin":
+      return { tipo: "afin", factor: conversion.a };
+    case "reciproca":
+      return { tipo: "reciproca" };
+    case "parametrizada":
+      return {
+        tipo: "parametrizada",
+        factor: conversion.aPorOmision,
+        parametroRol: conversion.parametroRol,
+      };
+  }
+}
+
 /** Sube una serie ya convertida a la unidad activa. Función libre para no ensuciar el método de arriba. */
 function renderizadorSubir(
   renderizador: Renderizador,
   canalId: string,
   cubos: CubosContinuos,
-  factor: { a: number; b: number },
+  aCanonica: ConversionAfin,
+  conversion: Conversion,
+  parametro: number | undefined,
   color: Color,
 ): void {
-  renderizador.subirSerie(canalId, convertirCubos(cubos, factor), color);
+  renderizador.subirSerie(
+    canalId,
+    convertirCubos(cubos, aCanonica, conversion, parametro),
+    color,
+  );
+}
+
+/**
+ * El rango visible de un canal, en la unidad activa.
+ *
+ * Los dos extremos son valores puntuales, así que clase `punto`. El orden se
+ * recompone después de convertir porque una conversión recíproca lo invierte
+ * (`a/x` es decreciente): sin esto, el eje de un canal en φ saldría con `min`
+ * por encima de `max` y la autoescala calcularía una altura negativa.
+ */
+function rangoConvertido(
+  rango: RangoValor,
+  aCanonica: ConversionAfin,
+  conversion: Conversion,
+  parametro: number | undefined,
+): RangoValor {
+  const a = convertirDesdeCrudo(rango.min, aCanonica, conversion, "punto", parametro);
+  const b = convertirDesdeCrudo(rango.max, aCanonica, conversion, "punto", parametro);
+  return { min: Math.min(a, b), max: Math.max(a, b) };
 }

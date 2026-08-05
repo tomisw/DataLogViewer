@@ -9,13 +9,29 @@
  * de traducir el catálogo servido por `dlv-api` a este tipo; ese cableado no
  * es parte de F1-31 (ver el informe de la tarea).
  *
- * Deliberadamente NO hay aquí ningún campo de conversión (`a`, `b`, tipo
- * afín/recíproca/parametrizada): ese es el trabajo de `dlv_core.unidades`, y
- * el comentario de cabecera de `resolucion.ts` explica por qué este módulo no
- * lo reimplementa.
+ * SOBRE LA CONVERSIÓN, QUE ANTES NO ESTABA AQUÍ
+ * =============================================
+ * Este fichero decía que deliberadamente no llevaba ningún campo de conversión,
+ * porque «ese es el trabajo de `dlv_core.unidades`». La intención era buena —no
+ * reimplementar el motor de unidades en TypeScript— pero el resultado fue el
+ * contrario del buscado: como los factores no llegaban por ningún sitio, la
+ * aplicación acabó usando una tabla cableada de mentira en `app/
+ * conversion-demo.ts`, con tres dimensiones, que devolvía la identidad para
+ * todo lo demás sin avisar.
+ *
+ * `UnidadInfo.conversion` transporta ahora el dato tal como está en
+ * `data/units.toml`, servido por `/comandos/unidades`. Sigue sin haber aquí
+ * ninguna CIFRA cableada (regla 2 de `CLAUDE.md`) y sigue sin haber aritmética:
+ * eso vive en `unidades/conversion.ts`, que es el espejo exacto de
+ * `dlv_core.unidades` y nada más. La conversión la aplica el frontend, y no el
+ * servidor, porque ADR-004 quiere que cambiar de unidad sea un repintado y no
+ * una petición de varios megabytes.
  */
 
-/** Una unidad tal como la necesita el selector: sin conversión, solo lo que se muestra. */
+import type { CombustibleInfo } from "../combustible/tipos.ts";
+import type { Conversion } from "./conversion.ts";
+
+/** Una unidad tal como la necesita el selector, con su conversión desde la canónica. */
 export interface UnidadInfo {
   readonly id: string;
   /** Texto para el desplegable y para `formatearValor` (p. ej. "°C", "λ", ""). */
@@ -28,6 +44,19 @@ export interface UnidadInfo {
   readonly decimales: number;
   /** Alias reconocidos además de `id` (p. ej. "kph" para "km/h"). */
   readonly alias?: readonly string[];
+  /**
+   * Cómo se pasa de la unidad canónica de la dimensión a ESTA (`unidades/
+   * conversion.ts`). Viene de `data/units.toml` por `/comandos/unidades`.
+   *
+   * Es OBLIGATORIO a propósito. Antes no existía: el selector ofrecía las
+   * unidades reales del catálogo y la aplicación las convertía con una tabla
+   * cableada de tres dimensiones que devolvía la identidad para todo lo demás,
+   * en silencio — elegir «%» o «AFR» no hacía nada. Si este campo fuese
+   * opcional con la identidad por omisión, una unidad nueva volvería a
+   * comportarse así, y no hay síntoma que lo delate: la curva se dibuja, con la
+   * escala equivocada.
+   */
+  readonly conversion: Conversion;
 }
 
 /** Una dimensión física con sus unidades alternativas (`docs/06` §6.7). */
@@ -70,6 +99,15 @@ export interface CatalogoUnidades {
   readonly presets: readonly PresetInfo[];
   /** Preset activo cuando no se pasa `preset` explícito a `resolverUnidad`. */
   readonly presetPorOmision: string;
+  /**
+   * Combustibles de `data/combustibles.toml`, con su estequiometría.
+   *
+   * Viaja con el catálogo de unidades porque es parte del mismo sistema: el
+   * factor de la conversión `parametrizada` λ→AFR no está en el catálogo de
+   * unidades —depende de lo que haya en el depósito, no de la unidad— pero sin
+   * él esa conversión no se puede aplicar.
+   */
+  readonly combustibles: readonly CombustibleInfo[];
 }
 
 /** Un canal que el nivel «canal» del selector puede anular individualmente. */

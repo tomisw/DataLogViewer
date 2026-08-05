@@ -168,3 +168,60 @@ def test_arrow_sigue_siendo_lo_que_sale_si_nadie_pide_nada(cliente: TestClient) 
         headers=cabeceras(),
     )
     assert r.headers["content-type"] == MEDIA_TYPE_ARROW_IPC
+
+
+# --------------------------------------------------------------------------- #
+# Conversiones y combustibles (F1-45)
+# --------------------------------------------------------------------------- #
+# Hasta F1-45, esta ruta servía la etiqueta y los decimales de cada unidad pero
+# NO su conversión, así que el frontend tenía el desplegable lleno de unidades
+# reales y ningún factor con el que aplicarlas: usaba una tabla cableada de
+# mentira con tres dimensiones y devolvía la identidad para todo lo demás, en
+# silencio. Estas pruebas son las que impiden que ese hueco vuelva.
+def test_toda_unidad_trae_su_conversion(cliente: TestClient) -> None:
+    """Sin excepciones: una unidad sin conversión no da error en ningún sitio,
+    simplemente no convierte, y la curva se dibuja con la escala equivocada."""
+    catalogo = cliente.get("/comandos/unidades", headers=cabeceras()).json()
+    sin_conversion = [
+        f"{d['id']}.{u['id']}"
+        for d in catalogo["dimensiones"]
+        for u in d["unidades"]
+        if "conversion" not in u
+    ]
+    assert not sin_conversion, f"unidades sin conversión: {sin_conversion}"
+
+
+def test_las_tres_formas_de_conversion_llegan_discriminadas(cliente: TestClient) -> None:
+    """`afin`, `reciproca` y `parametrizada` NO son intercambiables: una
+    recíproca no es lineal y una parametrizada necesita un valor que no está en
+    el catálogo. Aplanarlas a un par a/b obligaría al frontend a adivinar."""
+    catalogo = cliente.get("/comandos/unidades", headers=cabeceras()).json()
+    por_id = {
+        f"{d['id']}.{u['id']}": u["conversion"]
+        for d in catalogo["dimensiones"]
+        for u in d["unidades"]
+    }
+
+    assert por_id["temperature.degC"] == {"tipo": "afin", "a": 1.0, "b": -273.15}
+    # φ es λ invertida: si esto llegara como afín, un Δ de λ se convertiría
+    # linealmente y el número saldría plausible y falso.
+    assert por_id["mixture_ratio.phi"]["tipo"] == "reciproca"
+    # AFR depende del combustible del depósito, no de la unidad.
+    afr = por_id["mixture_ratio.afr"]
+    assert afr["tipo"] == "parametrizada"
+    assert afr["parametroRol"] == "stoichiometry"
+
+
+def test_los_combustibles_viajan_con_el_catalogo(cliente: TestClient) -> None:
+    """Van en la misma respuesta y no en una ruta propia: sin ellos la
+    conversión λ→AFR no se puede aplicar, así que pedirlos aparte sería una
+    segunda ida y vuelta para pintar el primer trazo."""
+    catalogo = cliente.get("/comandos/unidades", headers=cabeceras()).json()
+    combustibles = catalogo["combustibles"]
+    assert combustibles, "data/combustibles.toml tiene que llegar al frontend"
+    por_omision = [c for c in combustibles if c["porOmision"]]
+    assert len(por_omision) == 1, "exactamente uno marcado por omisión"
+    # No se comprueban las CIFRAS: son dato del propietario (puerta G1 de
+    # `data/combustibles.toml`) y fijarlas aquí convertiría este fichero en una
+    # segunda copia que habría que cambiar a la vez.
+    assert all(c["estequiometria"] > 0 for c in combustibles)

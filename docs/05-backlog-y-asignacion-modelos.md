@@ -151,8 +151,9 @@ v1.0 se va a ~67 semanas.
 | F1-42 | **Apertura en < 4 s**: `detectar_grupos_de_muestreo` usa `np.unique(axis=0)` y se lleva el 98 % del tiempo de apertura | módulo + banco | **Opus 5** | 5 | F1-05, F1-06, F1-40 | G2 |
 | F1-43 | **La aplicación abre un log de verdad**: cablear `FuenteApi`, búfer de tipado fijo para el navegador, catálogo de unidades por HTTP y arranque con ruta de log | módulo + pruebas | **Opus 5** | 5 | F1-39, F1-40, F1-35 | G2 |
 | F1-44 | **Un log real abierto enseña sus datos**: CORS con `expose_headers`, rol semántico y clasificación en `/comandos/abrir-log`, y elección de canales por rol | módulo + pruebas | **Opus 5** | 3 | F1-43 | G2 |
+| F1-45 | **E13 llega a la ventana**: conversiones reales por HTTP, motor de las cuatro clases en el frontend, escalado `to_canon` del canal, y montaje del selector de combustible y del doble cursor | módulo + pruebas | **Opus 5** | 8 | F1-13, F1-30, F1-41, F1-44 | **G1** |
 
-**Subtotal F1: 218 pts** · Hito **M1**
+**Subtotal F1: 226 pts** · Hito **M1**
 
 > **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
 > aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:
@@ -205,6 +206,30 @@ v1.0 se va a ~67 semanas.
 >   de F1 verifican el backend contra clientes de Python, y el cliente real es
 >   un navegador.** Todo lo que solo el navegador impone —CORS, contextos WebGL,
 >   el orden en que el DOM entrega los eventos— es invisible para esa suite.
+> - **F1-45 salió de auditar el alcance de `docs/02` contra la GUI**, a petición
+>   del propietario. E13 está marcada «completa» en el hito M1 y sus tareas
+>   estaban cerradas, pero el motor vivía entero en `dlv_core.unidades` y no
+>   llegaba a la ventana: `/comandos/unidades` servía la etiqueta y los
+>   decimales de cada unidad y **no su conversión**, así que el frontend
+>   convertía con una tabla cableada de tres dimensiones (`app/
+>   conversion-demo.ts`) que devolvía la identidad para todo lo demás sin
+>   avisar. Elegir «%» o «AFR» no hacía nada.
+>
+>   **Y al medirlo apareció un fallo peor, que llevaba ahí desde F1-43.** Los
+>   cubos salen de la pirámide, que se construye sobre `serie.v` —enteros
+>   escalados (ADR-003)— y el frontend los trataba como si ya estuvieran en
+>   canónica. `Coolant Temperature` llega como `3748` con `to_canon` a=0,1: son
+>   374,8 K = 101,65 °C, y la aplicación enseñaba **3 474,85 °C**. El dato
+>   estaba bien servido —`/comandos/abrir-log` mandaba `factor_a` y `factor_b`
+>   desde el principio— y nadie los leía.
+>
+>   Es la forma más cara de equivocarse que tiene este proyecto y por eso esta
+>   tarea es **G1**: no hay excepción, ni hueco, ni traza rara. Hay un número
+>   con su unidad correcta al lado, diez veces más grande, en la pantalla de
+>   quien decide si una mezcla está pobre. Ninguna de las 1075 pruebas de Python
+>   podía verlo, porque todas se detienen en la canónica; y la fuente sintética
+>   tampoco, porque genera sus series ya en canónica y su `to_canon` es la
+>   identidad — trabajar solo con datos sintéticos NO reproduce este fallo.
 
 ## 5.5 Fase FG — Formatos y CSV genérico (semanas 10–12)
 

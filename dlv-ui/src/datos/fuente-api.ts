@@ -70,6 +70,8 @@ interface CanalDeApi {
   readonly confianza_rol: string | null;
   readonly vacio: boolean;
   readonly constante: boolean;
+  readonly factor_a: number;
+  readonly factor_b: number;
 }
 
 interface RespuestaAbrirLog {
@@ -125,6 +127,9 @@ export class FuenteApi implements FuenteDeDatos {
         // sin unidad»—, no la ausencia de una.
         dimensionId: c.dimension ?? "unknown",
         clasificacion: { vacio: c.vacio, constante: c.constante },
+        // `to_canon` del canal, que `/comandos/abrir-log` ya servía y nadie
+        // usaba: los cubos llegan en la muestra CRUDA del log, no en canónica.
+        aCanonica: { a: c.factor_a, b: c.factor_b },
       };
     });
     this.#nivelesPorLog.set(datos.id_sesion, niveles);

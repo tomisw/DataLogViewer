@@ -55,6 +55,7 @@ from __future__ import annotations
 import os
 import secrets
 import socket
+import tomllib
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -95,12 +96,13 @@ from dlv_core.transporte import (
     cubos_a_binario,
     serie_a_arrow_ipc,
 )
-from dlv_core.unidades import Catalogo, cargar_catalogo
+from dlv_core.unidades import Afin, Catalogo, Conversion, Reciproca, cargar_catalogo
 
 _RAIZ_REPO = Path(__file__).resolve().parents[3]
 _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
 _UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
 _ROLES_TOML = _RAIZ_REPO / "data" / "roles.toml"
+_COMBUSTIBLES_TOML = _RAIZ_REPO / "data" / "combustibles.toml"
 
 CABECERAS_EXPUESTAS = (
     "X-Factor",
@@ -189,6 +191,33 @@ def _catalogo_unidades() -> Catalogo:
     descriptor de formato: no cambia entre peticiones."""
     with _UNITS_TOML.open("rb") as fh:
         return cargar_catalogo(fh)
+
+
+@lru_cache(maxsize=1)
+def _catalogo_combustibles() -> list[dict[str, object]]:
+    """`data/combustibles.toml` en la forma que pide `SelectorCombustible`.
+
+    Es un TOML plano de tres entradas, así que se lee aquí con `tomllib` en vez
+    de dar a `dlv-core` un módulo entero para ello: no hay ninguna decisión que
+    tomar sobre estos datos —ni conversión, ni resolución, ni validación
+    cruzada— más allá de leerlos. La precedencia (usuario > canal del log >
+    `por_omision`) sí es lógica, y ya vive en
+    `dlv-ui/src/combustible/resolucion.ts`.
+
+    `evidencia` no se sirve: es para quien revisa el fichero, no para la
+    interfaz.
+    """
+    with _COMBUSTIBLES_TOML.open("rb") as fh:
+        bruto = tomllib.load(fh)
+    return [
+        {
+            "id": cid,
+            "etiqueta": str(c.get("etiqueta", cid)),
+            "estequiometria": float(c["estequiometria"]),
+            "porOmision": bool(c.get("por_omision", False)),
+        }
+        for cid, c in bruto.get("combustibles", {}).items()
+    ]
 
 
 @lru_cache(maxsize=1)
@@ -617,6 +646,45 @@ def cubos(comando: ComandoCubos, request: Request) -> Response:
     )
 
 
+def _conversion_json(conversion: Conversion) -> dict[str, object]:
+    """La conversión de una unidad, en forma discriminada por `tipo`.
+
+    POR QUÉ VIAJA LA CONVERSIÓN Y NO EL VALOR YA CONVERTIDO
+    =======================================================
+    ADR-004 quiere que cambiar de unidad sea un REPINTADO, no una petición: los
+    cubos se cachean en canónica (`CacheDeCubos`, F1-24) y «cambiar de unidad no
+    invalida nada». Si convirtiera el servidor, cada clic en el selector de
+    unidad tiraría la caché y volvería a pedir varios megabytes por la red para
+    multiplicar por una constante.
+
+    Esta ruta servía hasta ahora la etiqueta y los decimales de cada unidad,
+    pero **no** su conversión, así que el frontend tenía las unidades reales en
+    el desplegable y ningún factor con el que aplicarlas: usaba una tabla
+    cableada de mentira con tres dimensiones, y elegir cualquier otra unidad no
+    hacía nada, en silencio. Este campo es el que faltaba.
+
+    Las tres variantes van discriminadas por `tipo` y no aplanadas a un par
+    `a`/`b`, porque NO son intercambiables: una recíproca no es lineal y una
+    diferencia no se puede convertir con ella (`Reciproca._exige_punto`), y una
+    parametrizada necesita un valor que no está en el catálogo sino en un canal
+    del log. Aplanarlas obligaría al frontend a adivinar cuál es cuál, y la
+    forma de equivocarse —convertir un Δ de λ como si fuera lineal— da un
+    número plausible y falso.
+    """
+    if isinstance(conversion, Afin):
+        return {"tipo": "afin", "a": conversion.a, "b": conversion.b}
+    if isinstance(conversion, Reciproca):
+        return {"tipo": "reciproca", "a": conversion.a}
+    return {
+        "tipo": "parametrizada",
+        # El rol del canal que lleva el parámetro (la estequiometría, para
+        # λ→AFR): el frontend lo necesita para saber a qué canal mirar, o para
+        # ofrecer el selector de combustible cuando el log no lo trae.
+        "parametroRol": conversion.parametro_rol,
+        "aPorOmision": conversion.a_por_omision,
+    }
+
+
 def catalogo_unidades() -> dict[str, object]:
     """El catálogo de `data/units.toml` en la forma que pide el frontend.
 
@@ -649,6 +717,7 @@ def catalogo_unidades() -> dict[str, object]:
                     "etiqueta": u.etiqueta,
                     "decimales": u.decimales,
                     "alias": list(u.alias),
+                    "conversion": _conversion_json(u.conversion),
                 }
                 for u in d.unidades.values()
             ],
@@ -666,6 +735,12 @@ def catalogo_unidades() -> dict[str, object]:
     return {
         "dimensiones": dimensiones,
         "presets": presets,
+        # Va aquí y no en una ruta propia porque es parte del mismo sistema: el
+        # factor de la conversión `parametrizada` λ→AFR no está en el catálogo
+        # de unidades —depende del combustible del depósito, no de la unidad—
+        # pero sin él esa conversión no se puede aplicar. Servirlo aparte
+        # obligaría a una segunda ida y vuelta para pintar el primer trazo.
+        "combustibles": _catalogo_combustibles(),
         # El preset por omisión no lo decide esta ruta: sale del catálogo si lo
         # declara y, si no, del métrico, que es el que corresponde al locale de
         # la aplicación. Inventarlo aquí sería una opinión disfrazada de dato.

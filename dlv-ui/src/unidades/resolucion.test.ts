@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 
 import { catalogoDePrueba } from "./fixtures-catalogo.ts";
 import { buscarDimension, buscarUnidad, ErrorDeUnidad, formatearValor, resolverUnidad } from "./resolucion.ts";
-import { Capa } from "./tipos.ts";
+import { Capa, type UnidadInfo } from "./tipos.ts";
 
 describe("resolverUnidad: precedencia de docs/06 §6.9", () => {
   const catalogo = catalogoDePrueba();
@@ -147,7 +147,12 @@ describe("formatearValor: decimales por unidad (docs/06 §6.10)", () => {
   });
 
   it("una unidad sin etiqueta (fracción adimensional) no deja un espacio colgando", () => {
-    const sinEtiqueta = { id: "fraccion", etiqueta: "", decimales: 4 };
+    const sinEtiqueta: UnidadInfo = {
+      id: "fraccion",
+      etiqueta: "",
+      decimales: 4,
+      conversion: { tipo: "afin", a: 1, b: 0 },
+    };
     expect(formatearValor(sinEtiqueta, 0.5)).toBe("0,5000");
   });
 });

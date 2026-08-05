@@ -1,0 +1,61 @@
+#  DataLogViewer — catálogo de combustibles
+#
+#  Tarea F1-41.  Especificación: docs/06-sistema-de-unidades.md §6.6
+#  PUERTA G1: estos números convierten λ en AFR. Un AFR calculado con la
+#  estequiometría equivocada tiene EXACTAMENTE el mismo aspecto que uno
+#  correcto —los mismos decimales, la misma unidad— y se usa para decidir si
+#  una mezcla está pobre. No se cambia una entrada sin que una persona lea el
+#  diff.
+#
+#  POR QUÉ EXISTE ESTE FICHERO
+#
+#  La conversión λ → AFR es `Parametrizada` en data/units.toml: su factor no
+#  está en el catálogo de unidades porque depende del combustible que hay en el
+#  depósito, no de la unidad. Este fichero es de dónde sale ese factor cuando
+#  el log no trae el canal de rol `stoichiometry`, y qué opciones ofrece el
+#  selector para cambiarlo a mano.
+#
+#  Precedencia (docs/06 §6.6, implementada en
+#  dlv-ui/src/combustible/resolucion.ts): elección del usuario > canal
+#  `stoichiometry` del log > combustible marcado `por_omision` aquí.
+#
+#  POR QUÉ SOLO HAY TRES
+#
+#  Los tres tienen evidencia dentro de este repositorio:
+#
+#    - 14,7 gasolina, 9,77 E85 y 6,4 metanol están citados en
+#      data/roles.toml [roles.stoichiometry].
+#    - 14,7 está además medido en data/formats/haltech_nsp.toml
+#      [tipos.Stoichiometry], cuya evidencia dice «14700 -> 14,7 (gasolina)».
+#
+#  Etanol puro (E100) y diésel NO están aquí a propósito, aunque son fáciles de
+#  buscar: sus cifras serían de referencia general y no medidas sobre un log
+#  del propietario, y este fichero es la clase de sitio donde un número
+#  plausible sin respaldo acaba tratándose como un hecho. Se añaden cuando haya
+#  un log que los sostenga, o cuando el propietario los confirme — que es una
+#  decisión suya, no de quien escribe el código.
+#
+#  El usuario siempre puede teclear una estequiometría a mano (mezcla propia,
+#  E70 de invierno, metanol con agua): esa vía no depende de este catálogo, y
+#  lo que teclee se guarda en el perfil del coche.
+
+[meta]
+version = 1
+tarea = "F1-41"
+especificacion = "docs/06-sistema-de-unidades.md §6.6"
+
+[combustibles.gasolina]
+etiqueta = "Gasolina"
+estequiometria = 14.7
+por_omision = true   # el caso mayoritario de los logs del propietario
+evidencia = "data/formats/haltech_nsp.toml [tipos.Stoichiometry]: 14700 -> 14,7"
+
+[combustibles.e85]
+etiqueta = "E85"
+estequiometria = 9.77
+evidencia = "data/roles.toml [roles.stoichiometry]"
+
+[combustibles.metanol]
+etiqueta = "Metanol"
+estequiometria = 6.4
+evidencia = "data/roles.toml [roles.stoichiometry]"

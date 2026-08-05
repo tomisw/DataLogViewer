@@ -22,11 +22,13 @@
  * LA CONVERSIÓN DE UNIDADES NO VIVE AQUÍ
  * =======================================
  * `pedirCubos` devuelve los cubos SIEMPRE en la unidad canónica de su
- * dimensión (K, kPa...), igual que haría `dlv-api` de verdad (ADR-007: el
- * backend entrega canónica, el frontend convierte para pintar). La tabla de
- * factores afines que usa `app/aplicacion.ts` para mostrarlos convertidos
- * vive en `app/conversion-demo.ts`, marcada como un sustituto temporal de
- * `dlv_core.unidades` — ver esa cabecera para el porqué.
+ * dimensión (K, kPa...), y por eso el `aCanonica` de sus canales es la
+ * identidad. Un log de verdad NO es así: `dlv-api` entrega la muestra cruda del
+ * canal —enteros escalados, ADR-003— y su factor `to_canon` aparte, así que el
+ * frontend deshace ese escalado antes de convertir a la unidad mostrada (ver
+ * `unidades/conversion.ts#convertirDesdeCrudo`). Es una diferencia real entre
+ * esta fuente y la de verdad, y conviene tenerla presente: un fallo en ese
+ * primer paso NO se reproduce trabajando solo con datos sintéticos.
  *
  * GENERACIÓN PEREZOSA
  * ====================
@@ -248,9 +250,9 @@ function catalogoIlustrativo(): CatalogoUnidades {
         unidadCanonica: "K",
         convertible: true,
         unidades: [
-          { id: "K", etiqueta: "K", decimales: 1 },
-          { id: "degC", etiqueta: "°C", decimales: 1 },
-          { id: "degF", etiqueta: "°F", decimales: 1 },
+          { id: "K", etiqueta: "K", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "degC", etiqueta: "°C", decimales: 1, conversion: { tipo: "afin", a: 1, b: -273.15 } },
+          { id: "degF", etiqueta: "°F", decimales: 1, conversion: { tipo: "afin", a: 1.8, b: -459.67 } },
         ],
       },
       {
@@ -259,9 +261,9 @@ function catalogoIlustrativo(): CatalogoUnidades {
         unidadCanonica: "kPa",
         convertible: true,
         unidades: [
-          { id: "kPa", etiqueta: "kPa", decimales: 0 },
-          { id: "bar", etiqueta: "bar", decimales: 2 },
-          { id: "psi", etiqueta: "psi", decimales: 1 },
+          { id: "kPa", etiqueta: "kPa", decimales: 0, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "bar", etiqueta: "bar", decimales: 2, conversion: { tipo: "afin", a: 0.01, b: 0 } },
+          { id: "psi", etiqueta: "psi", decimales: 1, conversion: { tipo: "afin", a: 0.14503773773, b: 0 } },
         ],
       },
       {
@@ -269,28 +271,28 @@ function catalogoIlustrativo(): CatalogoUnidades {
         etiqueta: "Porcentaje",
         unidadCanonica: "percent",
         convertible: false,
-        unidades: [{ id: "percent", etiqueta: "%", decimales: 1 }],
+        unidades: [{ id: "percent", etiqueta: "%", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "mixture_ratio",
         etiqueta: "Mezcla",
         unidadCanonica: "lambda",
         convertible: false,
-        unidades: [{ id: "lambda", etiqueta: "λ", decimales: 3 }],
+        unidades: [{ id: "lambda", etiqueta: "λ", decimales: 3, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "rpm",
         etiqueta: "Régimen de giro",
         unidadCanonica: "rpm",
         convertible: false,
-        unidades: [{ id: "rpm", etiqueta: "rpm", decimales: 0 }],
+        unidades: [{ id: "rpm", etiqueta: "rpm", decimales: 0, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "voltage",
         etiqueta: "Tensión",
         unidadCanonica: "V",
         convertible: false,
-        unidades: [{ id: "V", etiqueta: "V", decimales: 2 }],
+        unidades: [{ id: "V", etiqueta: "V", decimales: 2, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "speed",
@@ -298,8 +300,8 @@ function catalogoIlustrativo(): CatalogoUnidades {
         unidadCanonica: "km/h",
         convertible: true,
         unidades: [
-          { id: "km/h", etiqueta: "km/h", decimales: 0 },
-          { id: "mph", etiqueta: "mph", decimales: 0 },
+          { id: "km/h", etiqueta: "km/h", decimales: 0, conversion: { tipo: "afin", a: 1, b: 0 } },
+          { id: "mph", etiqueta: "mph", decimales: 0, conversion: { tipo: "afin", a: 0.62137119224, b: 0 } },
         ],
       },
       {
@@ -307,7 +309,7 @@ function catalogoIlustrativo(): CatalogoUnidades {
         etiqueta: "Ángulo",
         unidadCanonica: "deg",
         convertible: false,
-        unidades: [{ id: "deg", etiqueta: "°", decimales: 1 }],
+        unidades: [{ id: "deg", etiqueta: "°", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
       {
         id: "unknown",
@@ -315,7 +317,7 @@ function catalogoIlustrativo(): CatalogoUnidades {
         unidadCanonica: "raw",
         convertible: false,
         mostrarEnCrudo: true,
-        unidades: [{ id: "raw", etiqueta: "(crudo)", decimales: 1 }],
+        unidades: [{ id: "raw", etiqueta: "(crudo)", decimales: 1, conversion: { tipo: "afin", a: 1, b: 0 } }],
       },
     ],
     presets: [
@@ -336,6 +338,11 @@ function catalogoIlustrativo(): CatalogoUnidades {
       },
     ],
     presetPorOmision: "metrico",
+    // Vacío a propósito: la fuente sintética no tiene ninguna dimensión con
+    // conversión parametrizada (su `mixture_ratio` solo trae λ), así que un
+    // catálogo de combustibles aquí serían cifras sin uso. El selector de
+    // combustible no se monta cuando esta lista está vacía.
+    combustibles: [],
   };
 }
 
@@ -360,6 +367,9 @@ export class FuenteSintetica implements FuenteDeDatos {
         rol: plantilla.rol,
         dimensionId: plantilla.dimensionId,
         clasificacion: { vacio: false, constante: false },
+        // Esta fuente genera sus series ya en canónica, así que no hay
+        // escalado de canal que deshacer.
+        aCanonica: { a: 1, b: 0 },
       });
     }
     for (let i = canales.length; i < N_CANALES; i += 1) {
@@ -370,6 +380,7 @@ export class FuenteSintetica implements FuenteDeDatos {
         rol: null,
         dimensionId: "unknown",
         clasificacion: { vacio: variante === 0, constante: variante === 1 },
+        aCanonica: { a: 1, b: 0 },
       });
     }
 
