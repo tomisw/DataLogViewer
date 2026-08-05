@@ -234,3 +234,32 @@ describe("CursorDeTabla", () => {
     expect(() => cursor.destruir()).not.toThrow();
   });
 });
+
+describe("el formateador recibe el canal, no solo el valor", () => {
+  /**
+   * La tabla del cursor tenía UN formateador para todas sus filas, atado al
+   * primer canal del panel. La conversión a la unidad mostrada depende del
+   * canal (su `to_canon` y la unidad que el selector le resolvió), así que un
+   * panel con dos canales convertía los dos con los factores del primero: uno
+   * de los dos enseñaba un número equivocado, sin ningún síntoma.
+   */
+  it("cada fila se convierte con los factores de SU canal", () => {
+    const cache = new CacheDeCubos();
+    // `factor: 1` => sin decimar => la celda enseña un solo numero (`ultimo`),
+    // que `cubosDePrueba` fija en 200.
+    const cubos = cubosDePrueba(4, 0, 0.25, 1);
+    cache.guardar({ canal: "clt", factor: 1 }, { cubos, cubre: { t0: 0, t1: 1 } });
+    cache.guardar({ canal: "rpm", factor: 1 }, { cubos, cubre: { t0: 0, t1: 1 } });
+
+    // El mismo valor crudo, dos canales con escalados distintos: 0,1 y 1,0.
+    const escalados: Record<string, number> = { clt: 0.1, rpm: 1 };
+    const formatear = (valor: number, clave: { canal: string }): string =>
+      String(valor * escalados[clave.canal]!);
+
+    const clt = contenidoDeCelda(cache, { canal: "clt", factor: 1 }, 0.5, formatear);
+    const rpm = contenidoDeCelda(cache, { canal: "rpm", factor: 1 }, 0.5, formatear);
+
+    expect(clt.texto).toBe("20");
+    expect(rpm.texto).toBe("200");
+  });
+});

@@ -81,7 +81,7 @@ export interface OpcionesCursor {
    * clase: es la costura deliberada para no acoplar el cursor a un módulo que
    * todavía no existe.
    */
-  readonly formatear?: (valor: number) => string;
+  readonly formatear?: (valor: number, clave: ClaveCubos) => string;
 }
 
 /**
@@ -129,8 +129,15 @@ export function contenidoDeCelda(
   cache: CacheDeCubos,
   clave: ClaveCubos,
   tAbsoluto: number,
-  formatear: (valor: number) => string,
+  formatear: (valor: number, clave: ClaveCubos) => string,
 ): ContenidoCelda {
+  // `formatear` recibe la CLAVE además del valor, y eso no es comodidad: la
+  // conversión a la unidad mostrada depende del canal (su `to_canon` y la
+  // unidad que el selector le resolvió), así que un formateador único para
+  // toda la tabla convierte las filas de los demás canales con los factores
+  // del primero. Con un canal por panel no se nota; en cuanto se arrastran dos
+  // canales al mismo panel, uno de los dos enseña un número equivocado.
+  const fmt = (valor: number): string => formatear(valor, clave);
   const entrada = cache.mirar(clave);
   if (entrada === undefined) return SIN_DATOS;
   // `mirar` no comprueba cobertura (no es su trabajo: eso es `consultar`).
@@ -146,7 +153,7 @@ export function contenidoDeCelda(
     // número, y la columna «Nivel» lo deja explícito para que no haga falta
     // recordar qué factor tenía este canal para saber si lo que se ve es real.
     return {
-      texto: formatear(valor.ultimo),
+      texto: fmt(valor.ultimo),
       nivel: "muestra",
       clase: "cursor-valor cursor-valor--real",
       titulo: "Muestra real: este nivel de pirámide no decima (factor 1).",
@@ -154,7 +161,7 @@ export function contenidoDeCelda(
   }
 
   const hayRango = valor.maximo > valor.minimo;
-  const texto = hayRango ? `${formatear(valor.minimo)} – ${formatear(valor.maximo)}` : formatear(valor.ultimo);
+  const texto = hayRango ? `${fmt(valor.minimo)} – ${fmt(valor.maximo)}` : fmt(valor.ultimo);
   return {
     texto,
     nivel: `×${clave.factor}`,
@@ -163,7 +170,7 @@ export function contenidoDeCelda(
       `Rango decimado ×${clave.factor}: cada cubo agrega ${clave.factor} muestras. ` +
       `«${texto}» es el mínimo–máximo real del intervalo, no "el valor": un pico puede ` +
       "estar oculto en el máximo aunque el trazo parezca plano a este zoom. " +
-      `Tendencia dentro del intervalo: ${formatear(valor.primero)} → ${formatear(valor.ultimo)}.`,
+      `Tendencia dentro del intervalo: ${fmt(valor.primero)} → ${fmt(valor.ultimo)}.`,
   };
 }
 
@@ -183,7 +190,7 @@ interface FilaTabla {
 export class CursorDeTabla {
   readonly #documento: ContextoDOM;
   readonly #cache: CacheDeCubos;
-  readonly #formatear: (valor: number) => string;
+  readonly #formatear: (valor: number, clave: ClaveCubos) => string;
   readonly #linea: HTMLElement;
   readonly #cuerpo: HTMLElement;
 

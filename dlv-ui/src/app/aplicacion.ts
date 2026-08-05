@@ -123,8 +123,10 @@ interface EstadoPanel {
   cursor: CursorDeTabla;
   /** `${canalId}` -> clave textual de lo último subido a la GPU, para no repetir `subirSerie`. */
   readonly ultimaSubida: Map<string, string>;
-  /** Factor de pirámide vigente por canal, para saber cuándo `actualizarCanales` del cursor. */
+  /** Factor de pirámide vigente por canal. Es el que va en la `ClaveCubos`. */
   ultimoFactor: Map<string, number>;
+  /** `factor|unidad` de la última fila escrita en la tabla del cursor: si cambia, hay que rehacerla. */
+  readonly ultimaFilaCursor: Map<string, string>;
 }
 
 const NS_SVG = "http://www.w3.org/2000/svg";
@@ -590,27 +592,18 @@ export class Aplicacion {
     const renderizador = Renderizador.desdeLienzo(canvas);
     const gestor = new GestorEscalas();
     const primerCanal = definicion.canales[0];
-    const unidadPanel = primerCanal !== undefined ? this.#unidadDe(primerCanal.id) : undefined;
-    gestor.crearEje(EJE_PRINCIPAL, unidadPanel?.unidad.etiqueta ?? "");
+    gestor.crearEje(EJE_PRINCIPAL, this.#etiquetaUnidadDe(primerCanal?.id));
     for (const canal of definicion.canales) gestor.asignarSerie(canal.id, EJE_PRINCIPAL);
 
     const cursor = new CursorDeTabla(contenido, tablaCursor, this.#cache, {
-      formatear: (valor) => {
-        // El cursor lee un valor puntual de la serie, así que clase `punto`:
-        // con el desplazamiento de origen incluido. Es lo contrario del Δ del
-        // doble cursor, que es `intervalo`.
-        if (primerCanal === undefined) return formatearNumeroLocale(valor, 2);
-        return formatearNumeroLocale(
-          convertirDesdeCrudo(
-            valor,
-            this.#aCanonicaDe(primerCanal.id),
-            this.#conversionDe(primerCanal.id),
-            "punto",
-            this.#parametroDe(primerCanal.id),
-          ),
-          unidadPanel?.unidad.decimales ?? 2,
-        );
-      },
+      // El canal sale de la CLAVE de cada fila, no del primero del panel, y la
+      // unidad se resuelve en el momento de formatear y no al crear el panel.
+      // Las dos cosas se leían antes de variables capturadas aquí, y las dos
+      // daban un número equivocado sin ningún síntoma: un panel con dos canales
+      // convertía los dos con los factores del primero, y al cambiar de unidad
+      // los valores se reconvertían mientras la etiqueta del eje seguía siendo
+      // la anterior — «92,05» con una «K» al lado.
+      formatear: (valor, clave) => this.#formatearValorDeCanal(valor, clave.canal),
     });
 
     return {
@@ -624,6 +617,7 @@ export class Aplicacion {
       cursor,
       ultimaSubida: new Map(),
       ultimoFactor: new Map(),
+      ultimaFilaCursor: new Map(),
     };
   }
 
@@ -657,6 +651,39 @@ export class Aplicacion {
    * construye sobre `serie.v` —enteros escalados— y no sobre canónica. Ver
    * `unidades/conversion.ts#convertirDesdeCrudo`.
    */
+  /** El nombre legible de un canal, o su id si el log ya no lo tiene. */
+  #nombreDe(canalId: string): string {
+    return this.#log?.canales.find((c) => c.idNativo === canalId)?.nombre ?? canalId;
+  }
+
+  /** La etiqueta de la unidad activa de un canal, resuelta AHORA. */
+  #etiquetaUnidadDe(canalId: string | undefined): string {
+    if (canalId === undefined) return "";
+    return this.#unidadDe(canalId)?.unidad.etiqueta ?? "";
+  }
+
+  /**
+   * Un valor crudo de la caché, en la unidad activa de SU canal y con los
+   * decimales de esa unidad.
+   *
+   * Clase `punto`: el cursor lee una lectura de la serie, con el desplazamiento
+   * de origen incluido. Es lo contrario del Δ del doble cursor, que es
+   * `intervalo` y no lo lleva.
+   */
+  #formatearValorDeCanal(valor: number, canalId: string): string {
+    const unidad = this.#unidadDe(canalId)?.unidad;
+    return formatearNumeroLocale(
+      convertirDesdeCrudo(
+        valor,
+        this.#aCanonicaDe(canalId),
+        this.#conversionDe(canalId),
+        "punto",
+        this.#parametroDe(canalId),
+      ),
+      unidad?.decimales ?? 2,
+    );
+  }
+
   #aCanonicaDe(canalId: string): ConversionAfin {
     const canal = this.#log?.canales.find((c) => c.idNativo === canalId);
     if (canal === undefined) return IDENTIDAD;
@@ -796,8 +823,17 @@ export class Aplicacion {
           );
           estado.ultimaSubida.set(canalId, claveSubida);
         }
-        if (estado.ultimoFactor.get(canalId) !== factor) {
-          estado.ultimoFactor.set(canalId, factor);
+        estado.ultimoFactor.set(canalId, factor);
+        // La unidad entra en el disparador de `actualizarCanales` junto al
+        // factor, porque la etiqueta de cada fila la lleva («Coolant
+        // Temperature (°C)»): con solo el factor, cambiar de unidad reconvertía
+        // los números y dejaba el rótulo anterior — el mismo fallo que había en
+        // el eje. Va en su propio mapa y no dentro de `ultimoFactor`, que tiene
+        // que seguir siendo el número que `#pintarDeltas` mete en la clave de
+        // caché.
+        const filaCursor = `${factor}|${unidadResuelta?.unidad.id ?? ""}`;
+        if (estado.ultimaFilaCursor.get(canalId) !== filaCursor) {
+          estado.ultimaFilaCursor.set(canalId, filaCursor);
           factorCambio = true;
         }
 
@@ -809,7 +845,15 @@ export class Aplicacion {
             : rangoConvertido(rangoRaw, aCanonica, conversion, parametro),
         );
 
-        canalesCursor.push({ clave, etiqueta: canalId });
+        // Con el nombre y la unidad activa: la tabla rotulaba las filas con el
+        // id nativo («5841») y no decía en qué unidad estaba el número.
+        const etiquetaUnidad = this.#etiquetaUnidadDe(canalId);
+        canalesCursor.push({
+          clave,
+          etiqueta: etiquetaUnidad
+            ? `${this.#nombreDe(canalId)} (${etiquetaUnidad})`
+            : this.#nombreDe(canalId),
+        });
       }
 
       estado.gestor.actualizar(rangosVisibles);
@@ -820,17 +864,24 @@ export class Aplicacion {
 
       const ejeEstado = estado.gestor.eje(EJE_PRINCIPAL);
       const altoPanel = alturasPx.get(estado.panelId) ?? 0;
+      // La unidad se resuelve en cada repintado y NO se toma de `ejeEstado`:
+      // `GestorEscalas.crearEje` la fija al dar de alta el eje y no ofrece
+      // forma de cambiarla, así que al conmutar K→°C los números se
+      // reconvertían y el eje seguía rotulado «K». `tituloConModo` solo pide
+      // `titulo` y `modo`, así que se le pasa el título vivo y el modo real.
+      const etiquetaY = this.#etiquetaUnidadDe(estado.canalesIds[0]);
       pintarEjes(estado.svg, {
         vista: { t0: vista.t0, t1: vista.t1, v0: ejeEstado.rango.min, v1: ejeEstado.rango.max },
         anchoPx,
         altoPx: altoPanel,
-        unidadY: ejeEstado.unidad,
-        tituloY: tituloConModo(ejeEstado),
+        unidadY: etiquetaY,
+        tituloY: tituloConModo({ titulo: etiquetaY, modo: ejeEstado.modo }),
         series: estado.canalesIds.map((id) => ({
           id,
-          nombre: id,
+          // El NOMBRE del canal, no su id nativo: la leyenda decía «5841».
+          nombre: this.#nombreDe(id),
           color: this.#colorPorCanal.get(id) ?? { r: 1, g: 1, b: 1, a: 1 },
-          unidad: ejeEstado.unidad,
+          unidad: this.#etiquetaUnidadDe(id),
         })),
       });
     }
