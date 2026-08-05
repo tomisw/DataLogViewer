@@ -284,6 +284,10 @@ más de lo estrictamente necesario —el modelo va a leer `CLAUDE.md` de todas
 formas— porque las tres cosas que no puede deducir del repositorio son **qué hacer
 primero**, **qué no hacer sin preguntar** y **cómo informar**.
 
+Las cifras de «dónde está el proyecto» envejecen. Si no cuadran con
+`tools/estado.py next`, gana `estado.py`: el estado vive en el repositorio y este
+párrafo es solo para orientar antes de la primera orden.
+
 ```
 Continúa el desarrollo de DataLogViewer en esta máquina.
 Rama de trabajo: claude/log-visualization-app-plan-5lhr8x
@@ -301,28 +305,33 @@ Luego ejecuta esto y dime qué sale ANTES de empezar ninguna tarea:
     python tools/estado.py next
 
 DÓNDE ESTÁ EL PROYECTO
-136 tareas, 669 puntos. Se arrancó en un contenedor remoto SIN acceso a PyPI, así
-que está hecho todo lo que no necesitaba dependencias —catálogos de datos, motor
-de unidades, parser de cabecera, reconciliación de reloj— y nada de lo que sí:
-parseo con Polars, almacén columnar, pirámide de decimación, API, frontend. 13 de
-los 14 presupuestos de rendimiento están sin medir.
+136 tareas, 698 puntos, ~190 hechos. Se arrancó en un contenedor remoto SIN
+acceso a PyPI, así que hay una asimetría que explica todo lo demás: está hecho lo
+que no necesitaba dependencias —catálogos de datos, motor de unidades, parser de
+cabecera, reconciliación de reloj, la cadena entera del importador genérico— y
+está a medias lo que sí. La mayoría de los presupuestos de rendimiento siguen sin
+medir, porque medirlos exige Polars y NumPy instalados. Eso es justo lo que tú
+tienes y el contenedor no.
 
-TU PRIMERA TAREA ES F0-01, Y SOLO ESA
-Confirma o refuta la viabilidad de la base Python, lleva bloqueada desde el
-arranque y es la única del plan que no puede avanzar de ninguna otra manera.
+TU PRIMERA TAREA: CERRAR LAS CUATRO TAREAS QUE SOLO LES FALTA VERIFICACIÓN
+    python tools/estado.py next        # las lista como EN CURSO
 
-    python tools/estado.py show F0-01
-    python tools/banco.py spike-polars    # mide sobre samples/synth/autolog-1h.csv (67 MB)
-    python tools/banco.py presupuestos
+Hay cuatro tareas con el código completo y revisado que NO se pudieron cerrar en
+remoto por falta de entorno, no por falta de trabajo. Cada una lleva en su nota
+qué está verificado y qué falta exactamente. Léelas con `estado.py show <id>`.
 
-Decide el presupuesto `parseo_nativo` >= 100 MB/s agregado (docs/02 §2.6).
+Empieza por ejecutar `python tools/verificar.py` entero, con las seis
+comprobaciones en verde de verdad. Si alguna se cae, arréglalo antes de nada:
+significa que algo que en remoto no se podía ejecutar está roto.
 
-  - Si Polars lo cumple: dímelo con el número medido y sigue el bucle de §8.4. El
-    camino natural después es F1-02, F1-03, F1-05 y F1-09, que es la cadena que
-    sostiene todos los demás presupuestos.
-  - Si NO lo cumple: no ajustes el presupuesto para que pase. Es el riesgo R9 de
-    docs/02 §2.8. Mide dónde se va el tiempo, escríbelo y pregúntame: esa
-    medición cambia decisiones de arquitectura, y esas son mías.
+Presta atención especial a la malla (F4-01): sus pruebas usan una implementación
+del protocolo `Vectorial` hecha con biblioteca estándar, y ya se demostró que ESA
+implementación puede esconder una diferencia con NumPy. Un canal con huecos daba
+un resultado distinto con `numpy.min` que con el `min` de la biblioteca estándar.
+Está arreglado, pero la pasada con NumPy de verdad no es una formalidad.
+
+Cuando las cuatro estén cerradas, sigue el bucle de §8.4 con `estado.py next`. El
+camino natural es la cadena de rendimiento: F1-02, F1-05 y F1-09.
 
 REGLAS QUE NO SE SALTAN  (el motivo de cada una, en docs/09 §9.7)
   - ADR-009: cero bucles por muestra en Python. Polars o NumPy hacen el trabajo;
@@ -335,6 +344,9 @@ REGLAS QUE NO SE SALTAN  (el motivo de cada una, en docs/09 §9.7)
     diga qué tengo que revisar, ordenada por consecuencia si el número está mal.
   - `python tools/verificar.py` en verde antes de cada commit, las seis
     comprobaciones. No ejecutes las herramientas a mano en su lugar.
+  - Si un agente te entrega trabajo, su informe NO es evidencia: revísalo tú antes
+    de integrarlo. En remoto salieron defectos reales en los cuatro entregables de
+    agente, incluido uno donde la función principal era inalcanzable.
 
 NO HAGAS NADA DE ESTO SIN PREGUNTARME
 Ajustar un presupuesto para que pase; rellenar un `confianza = "unknown"` de
@@ -345,8 +357,9 @@ reescribir la historia de la rama.
 CÓMO QUIERO QUE ME INFORMES
 Al terminar cada tarea: qué quedó hecho, qué no, y qué necesitas de mí, en dos o
 tres líneas. Si es G1, dime exactamente qué números tengo que revisar y por qué
-importan. Hay ocho puertas G1 esperando de la etapa remota (40 pts, listadas en
-state/PROGRESO.md); si te estorban sin aprobar, pídemelas.
+importan. Hay unas dos docenas de puertas G1 esperando (más de 130 pts, listadas
+en state/PROGRESO.md); no bloquean a sus dependientes, así que sigue trabajando,
+pero si te estorban sin aprobar, pídemelas por orden de cuántas desbloquean.
 ```
 
 Lo demás no hace falta ponerlo: el protocolo, el estado y las especificaciones
