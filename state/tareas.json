@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-09 19:25:39Z"
+    "actualizado": "2026-08-09 19:39:19Z"
   },
   "tareas": [
     {
@@ -1884,8 +1884,8 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
@@ -1904,8 +1904,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
@@ -2033,8 +2033,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
@@ -2422,8 +2422,8 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
