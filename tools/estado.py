@@ -42,7 +42,7 @@ ESTADOS = ("pendiente", "en_curso", "revision_humana", "hecho", "bloqueado")
 CERRADOS = ("hecho", "revision_humana")
 
 FILA = re.compile(
-    r"^\|\s*((?:F\d|FG)-\d\d)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|"
+    r"^\|\s*((?:F\d|FG|FE)-\d\d)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|"
     r"\s*(\d+)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$",
     re.M,
 )
@@ -110,7 +110,7 @@ def cmd_seed(args: argparse.Namespace) -> None:
     tareas = []
     for tid, titulo, entregable, modelo, pts, deps, gate in FILA.findall(texto):
         brutas = [d.strip() for d in limpiar(deps).split(",") if d.strip()]
-        dependencias = [d for d in brutas if re.fullmatch(r"(?:F\d|FG)-\d\d", d)]
+        dependencias = [d for d in brutas if re.fullmatch(r"(?:F\d|FG|FE)-\d\d", d)]
         # "todo" en el backlog significa «al final, cuando el resto esté cerrado».
         dep_todo = any(b.lower() == "todo" for b in brutas)
         tareas.append(
@@ -195,7 +195,7 @@ def cmd_next(args: argparse.Namespace) -> None:
         print("Nada listo para empezar.")
         return
 
-    orden = {"F0": 0, "F1": 1, "FG": 2, "F2": 3, "F3": 4, "F4": 5, "F5": 6}
+    orden = {"F0": 0, "F1": 1, "FG": 2, "F2": 3, "F3": 4, "F4": 5, "FE": 6, "F5": 7}
     listas.sort(key=lambda x: (orden.get(x[0]["fase"], 9), x[0]["id"]))
 
     print("LISTAS PARA EMPEZAR:")
@@ -292,7 +292,7 @@ SIMBOLO = {
 def cmd_render(_args: argparse.Namespace) -> None:
     datos = cargar()
     tareas = datos["tareas"]
-    orden = ["F0", "F1", "FG", "F2", "F3", "F4", "F5"]
+    orden = ["F0", "F1", "FG", "F2", "F3", "F4", "FE", "F5"]
     total = sum(t["pts"] for t in tareas)
     hechos = sum(t["pts"] for t in tareas if t["estado"] == "hecho")
     revision = sum(t["pts"] for t in tareas if t["estado"] == "revision_humana")

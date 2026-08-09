@@ -1,3009 +1,3027 @@
 [
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2771a41",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-29 22:06:14Z",
-    "commit": "2771a41",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 2.0,
-    "unidad": "ocurrencias",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-29 22:06:14Z",
     "commit": "2771a41",
-    "maquina": {
-      "sistema": "Linux",
-      "maquina": "x86_64",
-      "python": "3.11.15",
-      "nucleos": 4
-    },
     "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-29 22:06:14Z",
+    "maquina": {
+      "maquina": "x86_64",
+      "nucleos": 4,
+      "python": "3.11.15",
+      "sistema": "Linux"
+    },
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
+  },
+  {
+    "commit": "2771a41",
+    "detalle": {
+      "ficheros_inspeccionados": 12,
       "hallazgos": [
         "dlv-core/src/dlv_core/_viol_tmp.py:3: iterrows() recorre fila a fila en Python",
         "dlv-core/src/dlv_core/_viol_tmp.py:5: apply(lambda) aplica una función Python por elemento"
-      ],
-      "ficheros_inspeccionados": 12
-    }
-  },
-  {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
-    "estado": "CUMPLE",
-    "fecha": "2026-07-29 22:06:14Z",
-    "commit": "2771a41",
-    "maquina": {
-      "sistema": "Linux",
-      "maquina": "x86_64",
-      "python": "3.11.15",
-      "nucleos": 4
+      ]
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-29 22:06:14Z",
+    "maquina": {
+      "maquina": "x86_64",
+      "nucleos": 4,
+      "python": "3.11.15",
+      "sistema": "Linux"
+    },
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 2.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2771a41",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-29 22:07:01Z",
-    "commit": "2771a41",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "parseo_nativo",
-    "valor": 44.87008036882392,
-    "unidad": "MB/s",
+    "commit": "2771a41",
+    "detalle": {
+      "canales": 475,
+      "celdas": 18381550,
+      "es_linea_base": true,
+      "factor_necesario_vs_stdlib": 2.23,
+      "fichero": "samples/synth/autolog-1h.csv",
+      "filas": 38698,
+      "motor": "stdlib.csv",
+      "pico_memoria_mb": 15.3,
+      "segundos": 1.563,
+      "tamano_mb": 70.13
+    },
     "estado": "NO_MEDIBLE",
     "fecha": "2026-07-29 22:07:03Z",
-    "commit": "2771a41",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "motor": "stdlib.csv",
-      "es_linea_base": true,
-      "fichero": "samples/synth/autolog-1h.csv",
-      "tamano_mb": 70.13,
-      "segundos": 1.563,
-      "filas": 38698,
-      "celdas": 18381550,
-      "canales": 475,
-      "pico_memoria_mb": 15.3,
-      "factor_necesario_vs_stdlib": 2.23
-    }
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 44.87008036882392
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "217d88b",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-29 22:54:10Z",
-    "commit": "217d88b",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "217d88b",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-29 22:55:42Z",
-    "commit": "217d88b",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "02140f8",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-29 23:15:20Z",
-    "commit": "02140f8",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "efc4f55",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 04:53:26Z",
-    "commit": "efc4f55",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "efc4f55",
+    "detalle": {
+      "ficheros_inspeccionados": 11,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 04:54:22Z",
-    "commit": "efc4f55",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 11
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "0cac953",
+    "detalle": {
+      "ficheros_inspeccionados": 12,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 08:59:21Z",
-    "commit": "0cac953",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 12
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "0cac953",
+    "detalle": {
+      "ficheros_inspeccionados": 12,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 08:59:52Z",
-    "commit": "0cac953",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 12
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "1aa0fc4",
+    "detalle": {
+      "ficheros_inspeccionados": 12,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:20:06Z",
-    "commit": "1aa0fc4",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 12
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "1aa0fc4",
+    "detalle": {
+      "ficheros_inspeccionados": 12,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:22:27Z",
-    "commit": "1aa0fc4",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 12
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:36:50Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:37:44Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:38:10Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:38:21Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:38:34Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "db227ff",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:39:22Z",
-    "commit": "db227ff",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "59df9a8",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:43:55Z",
-    "commit": "59df9a8",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "59df9a8",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:44:31Z",
-    "commit": "59df9a8",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "59df9a8",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:45:43Z",
-    "commit": "59df9a8",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:51:38Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:51:57Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:52:05Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:52:17Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:52:47Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:53:12Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:53:38Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:53:38Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:54:13Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:54:13Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:54:35Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:54:40Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "parseo_nativo",
-    "valor": 0.0,
-    "unidad": "MB/s",
+    "commit": "8a56233",
+    "detalle": {
+      "motivo": "polars no instalado",
+      "motor": "polars"
+    },
     "estado": "NO_MEDIBLE",
     "fecha": "2026-07-30 09:55:03Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "motor": "polars",
-      "motivo": "polars no instalado"
-    }
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:58:00Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:58:18Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 09:59:13Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:00:08Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:00:21Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:00:26Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:00:41Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:00:58Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8a56233",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:01:35Z",
-    "commit": "8a56233",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "111af6b",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:11:16Z",
-    "commit": "111af6b",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.11.15",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4699545",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:31:02Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4699545",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 10:32:11Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4699545",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 11:29:13Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "parseo_nativo",
-    "valor": 38.152225438883676,
-    "unidad": "MB/s",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 11:31:02Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
-      "motor": "polars 1.43.1",
+      "es_cota_inferior": true,
+      "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
+    },
+    "estado": "NO_MEDIBLE",
+    "fecha": "2026-07-30 11:31:02Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.11708029999863356
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "pico_memoria_mb": 0.0,
+      "tamano_csv_mb": 4.47
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 11:31:02Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 0.0
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\real\\AutoLog_20260729_1830.csv",
-      "tamano_mb": 4.47,
+      "filas": 2636,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 0.0,
       "segundos_mejor": 0.117,
       "segundos_todos": [
         0.117,
         0.123,
         0.127
       ],
-      "filas": 2636,
-      "columnas": 476,
-      "pico_memoria_mb": 0.0
-    }
+      "tamano_mb": 4.47
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 11:31:02Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 38.152225438883676
   },
   {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.11708029999863356,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:31:02Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "es_cota_inferior": true,
       "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
+    },
+    "estado": "NO_MEDIBLE",
+    "fecha": "2026-07-30 11:32:16Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.27956269995775074
   },
   {
-    "presupuesto": "memoria_residente",
-    "valor": 0.0,
-    "unidad": "x CSV",
-    "estado": "CUMPLE",
-    "fecha": "2026-07-30 11:31:02Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "pico_memoria_mb": 0.0,
-      "tamano_csv_mb": 4.47
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 250.85829408071456,
-    "unidad": "MB/s",
+      "tamano_csv_mb": 70.13
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 11:32:16Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 0.0
+  },
+  {
+    "commit": "4699545",
     "detalle": {
-      "motor": "polars 1.43.1",
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 0.0,
       "segundos_mejor": 0.28,
       "segundos_todos": [
         0.28,
         0.298,
         0.303
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 0.0
-    }
+      "tamano_mb": 70.13
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 11:32:16Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 250.85829408071456
   },
   {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.27956269995775074,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:32:16Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "es_cota_inferior": true,
       "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 0.0,
-    "unidad": "x CSV",
-    "estado": "CUMPLE",
-    "fecha": "2026-07-30 11:32:16Z",
-    "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
     },
-    "detalle": {
-      "pico_memoria_mb": 0.0,
-      "tamano_csv_mb": 70.13
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 249.10930625972705,
-    "unidad": "MB/s",
-    "estado": "CUMPLE",
+    "estado": "NO_MEDIBLE",
     "fecha": "2026-07-30 11:33:15Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.28152550000231713
+  },
+  {
+    "commit": "4699545",
     "detalle": {
-      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 488.3,
+      "tamano_csv_mb": 70.13
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 11:33:15Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 6.962398590304817
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 488.3,
       "segundos_mejor": 0.282,
       "segundos_todos": [
         0.286,
         0.31,
         0.282
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 488.3
-    }
+      "tamano_mb": 70.13
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 11:33:15Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 249.10930625972705
   },
   {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.28152550000231713,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:33:15Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
+    "detalle": {
+      "canales": 475,
+      "celdas": 18381550,
+      "es_linea_base": true,
+      "factor_necesario_vs_stdlib": 2.13,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "filas": 38698,
+      "motor": "stdlib.csv",
+      "pico_memoria_mb": 26.1,
+      "segundos": 1.491,
+      "tamano_mb": 70.13
     },
+    "estado": "NO_MEDIBLE",
+    "fecha": "2026-07-30 11:33:30Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 47.02105013376629
+  },
+  {
+    "commit": "4699545",
     "detalle": {
       "es_cota_inferior": true,
       "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 6.962398590304817,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 11:33:15Z",
-    "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
     },
-    "detalle": {
-      "pico_memoria_mb": 488.3,
-      "tamano_csv_mb": 70.13
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 47.02105013376629,
-    "unidad": "MB/s",
     "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:33:30Z",
-    "commit": "4699545",
+    "fecha": "2026-07-30 11:33:54Z",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "stdlib.csv",
-      "es_linea_base": true,
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
-      "segundos": 1.491,
-      "filas": 38698,
-      "celdas": 18381550,
-      "canales": 475,
-      "pico_memoria_mb": 26.1,
-      "factor_necesario_vs_stdlib": 2.13
-    }
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.2704884000122547
   },
   {
-    "presupuesto": "parseo_nativo",
-    "valor": 259.2740464908021,
-    "unidad": "MB/s",
-    "estado": "CUMPLE",
-    "fecha": "2026-07-30 11:33:54Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
-      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 491.8,
+      "tamano_csv_mb": 70.13
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 11:33:54Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 7.0130852575355735
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 491.8,
       "segundos_mejor": 0.27,
       "segundos_todos": [
         0.27,
         0.29,
         0.322
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 491.8
-    }
+      "tamano_mb": 70.13
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 11:33:54Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 259.2740464908021
   },
   {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.2704884000122547,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:33:54Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "es_cota_inferior": true,
       "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 7.0130852575355735,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 11:33:54Z",
-    "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
     },
-    "detalle": {
-      "pico_memoria_mb": 491.8,
-      "tamano_csv_mb": 70.13
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 261.73318594075164,
-    "unidad": "MB/s",
-    "estado": "CUMPLE",
+    "estado": "NO_MEDIBLE",
     "fecha": "2026-07-30 11:37:22Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.26794700010214
+  },
+  {
+    "commit": "4699545",
     "detalle": {
-      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 309.5,
+      "tamano_csv_mb": 70.13
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 11:37:22Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 4.412525030791827
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 309.5,
       "segundos_mejor": 0.268,
       "segundos_todos": [
         0.268
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 309.5
-    }
+      "tamano_mb": 70.13
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 11:37:22Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 261.73318594075164
   },
   {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.26794700010214,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:37:22Z",
     "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "es_cota_inferior": true,
       "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 4.412525030791827,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 11:37:22Z",
-    "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
     },
-    "detalle": {
-      "pico_memoria_mb": 309.5,
-      "tamano_csv_mb": 70.13
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 247.2839625505613,
-    "unidad": "MB/s",
-    "estado": "CUMPLE",
+    "estado": "NO_MEDIBLE",
     "fecha": "2026-07-30 11:38:17Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "apertura_primer_grafico",
+    "unidad": "s",
+    "valor": 0.28360359999351203
+  },
+  {
+    "commit": "4699545",
     "detalle": {
-      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 310.1,
+      "tamano_csv_mb": 70.13
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 11:38:17Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 4.421102774477032
+  },
+  {
+    "commit": "4699545",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "polars 1.43.1",
+      "pico_memoria_mb": 310.1,
       "segundos_mejor": 0.284,
       "segundos_todos": [
         0.308,
         0.295,
         0.284
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 310.1
-    }
-  },
-  {
-    "presupuesto": "apertura_primer_grafico",
-    "valor": 0.28360359999351203,
-    "unidad": "s",
-    "estado": "NO_MEDIBLE",
-    "fecha": "2026-07-30 11:38:17Z",
-    "commit": "4699545",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
+      "tamano_mb": 70.13
     },
-    "detalle": {
-      "es_cota_inferior": true,
-      "nota": "solo parseo; falta indexado, pirámide y primer dibujado"
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 4.421102774477032,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
+    "estado": "CUMPLE",
     "fecha": "2026-07-30 11:38:17Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "pico_memoria_mb": 310.1,
-      "tamano_csv_mb": 70.13
-    }
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 247.2839625505613
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4699545",
+    "detalle": {
+      "ficheros_inspeccionados": 14,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 11:43:41Z",
-    "commit": "4699545",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 14
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "parseo_nativo",
-    "valor": 348.42095109421734,
-    "unidad": "MB/s",
-    "estado": "CUMPLE",
-    "fecha": "2026-07-30 12:16:00Z",
     "commit": "a7cd93a",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "pico_memoria_mb": 368.2,
+      "tamano_csv_mb": 70.13
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 12:16:00Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 5.250526029128902
+  },
+  {
+    "commit": "a7cd93a",
+    "detalle": {
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "pico_memoria_mb": 368.2,
       "segundos_mejor": 0.201,
       "segundos_todos": [
         0.212,
         0.224,
         0.201
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 368.2
-    }
-  },
-  {
-    "presupuesto": "memoria_residente",
-    "valor": 5.250526029128902,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 12:16:00Z",
-    "commit": "a7cd93a",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
+      "tamano_mb": 70.13
     },
-    "detalle": {
-      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
-      "pico_memoria_mb": 368.2,
-      "tamano_csv_mb": 70.13
-    }
-  },
-  {
-    "presupuesto": "parseo_nativo",
-    "valor": 402.86062416393,
-    "unidad": "MB/s",
     "estado": "CUMPLE",
-    "fecha": "2026-07-30 12:20:13Z",
-    "commit": "a7cd93a",
+    "fecha": "2026-07-30 12:16:00Z",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 348.42095109421734
+  },
+  {
+    "commit": "a7cd93a",
     "detalle": {
-      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "columnas": 476,
       "es_linea_base": false,
       "fichero": "samples\\synth\\autolog-1h.csv",
-      "tamano_mb": 70.13,
+      "filas": 38698,
+      "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
+      "pico_memoria_mb": 301.6,
       "segundos_mejor": 0.174,
       "segundos_todos": [
         0.181,
         0.178,
         0.174
       ],
-      "filas": 38698,
-      "columnas": 476,
-      "pico_memoria_mb": 301.6
-    }
+      "tamano_mb": 70.13
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-07-30 12:20:13Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "parseo_nativo",
+    "unidad": "MB/s",
+    "valor": 402.86062416393
   },
   {
-    "presupuesto": "memoria_residente",
-    "valor": 4.299844670563452,
-    "unidad": "x CSV",
-    "estado": "INCUMPLE",
-    "fecha": "2026-07-30 12:20:14Z",
     "commit": "a7cd93a",
-    "maquina": {
-      "sistema": "Windows",
-      "maquina": "AMD64",
-      "python": "3.14.6",
-      "nucleos": 8
-    },
     "detalle": {
       "motor": "dlv_core.formatos.cuerpo.parsear_cuerpo",
       "pico_memoria_mb": 301.6,
       "tamano_csv_mb": 70.13
-    }
+    },
+    "estado": "INCUMPLE",
+    "fecha": "2026-07-30 12:20:14Z",
+    "maquina": {
+      "maquina": "AMD64",
+      "nucleos": 8,
+      "python": "3.14.6",
+      "sistema": "Windows"
+    },
+    "presupuesto": "memoria_residente",
+    "unidad": "x CSV",
+    "valor": 4.299844670563452
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a7cd93a",
+    "detalle": {
+      "ficheros_inspeccionados": 15,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 12:20:39Z",
-    "commit": "a7cd93a",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 15
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a7cd93a",
+    "detalle": {
+      "ficheros_inspeccionados": 15,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 12:22:42Z",
-    "commit": "a7cd93a",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 15
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e968ba5",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 12:39:30Z",
-    "commit": "e968ba5",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "9c80a89",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 12:49:14Z",
-    "commit": "9c80a89",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "21a701f",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:03:42Z",
-    "commit": "21a701f",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "21a701f",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:04:26Z",
-    "commit": "21a701f",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "c1296dd",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:09:32Z",
-    "commit": "c1296dd",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "c1296dd",
+    "detalle": {
+      "ficheros_inspeccionados": 17,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:10:18Z",
-    "commit": "c1296dd",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 17
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "815a8e4",
+    "detalle": {
+      "ficheros_inspeccionados": 19,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:15:54Z",
-    "commit": "815a8e4",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 19
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "815a8e4",
+    "detalle": {
+      "ficheros_inspeccionados": 19,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:16:34Z",
-    "commit": "815a8e4",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 19
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a521091",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:27:06Z",
-    "commit": "a521091",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a521091",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:28:17Z",
-    "commit": "a521091",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4471cbc",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:29:50Z",
-    "commit": "4471cbc",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "d05c389",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:41:48Z",
-    "commit": "d05c389",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "d05c389",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:43:04Z",
-    "commit": "d05c389",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "d05c389",
+    "detalle": {
+      "ficheros_inspeccionados": 21,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:43:31Z",
-    "commit": "d05c389",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 21
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8f51688",
+    "detalle": {
+      "ficheros_inspeccionados": 22,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:50:03Z",
-    "commit": "8f51688",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 22
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8f51688",
+    "detalle": {
+      "ficheros_inspeccionados": 22,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:50:36Z",
-    "commit": "8f51688",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 22
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "3296f2e",
+    "detalle": {
+      "ficheros_inspeccionados": 23,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 13:56:04Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 23
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 672.8120000334457,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 654.3,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:00:57Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 654.3
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 672.8120000334457
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 648.6364000011235,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 653.9,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:01:20Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 653.9
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 648.6364000011235
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 674.8444999102503,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 632.3,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:01:31Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 632.3
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 674.8444999102503
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 786.3566000014544,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 571.2,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "INCUMPLE",
     "fecha": "2026-07-30 14:01:42Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 571.2
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 786.3566000014544
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "3296f2e",
+    "detalle": {
+      "ficheros_inspeccionados": 23,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:02:30Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 23
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 638.9211999485269,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 578.1,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:03:16Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 578.1
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 638.9211999485269
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 937.0480999350548,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 923.3,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "INCUMPLE",
     "fecha": "2026-07-30 14:03:27Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 923.3
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 937.0480999350548
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 635.4216999607161,
-    "unidad": "ms",
+    "commit": "3296f2e",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 543.2,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:03:38Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 543.2
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 635.4216999607161
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "3296f2e",
+    "detalle": {
+      "ficheros_inspeccionados": 23,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:04:14Z",
-    "commit": "3296f2e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 23
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 328.028199961409,
-    "unidad": "ms",
+    "commit": "b15f5b9",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 601.4,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:11:36Z",
-    "commit": "b15f5b9",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 601.4
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 328.028199961409
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 405.4889000253752,
-    "unidad": "ms",
+    "commit": "b15f5b9",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 549.0,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:11:46Z",
-    "commit": "b15f5b9",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 549.0
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 405.4889000253752
   },
   {
-    "presupuesto": "segunda_apertura",
-    "valor": 354.5349999330938,
-    "unidad": "ms",
+    "commit": "b15f5b9",
+    "detalle": {
+      "canales": 475,
+      "escritura_ms": 594.6,
+      "fichero": "samples\\synth\\autolog-1h.csv",
+      "motor": "dlv_core.cache"
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:11:56Z",
-    "commit": "b15f5b9",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "motor": "dlv_core.cache",
-      "fichero": "samples\\synth\\autolog-1h.csv",
-      "canales": 475,
-      "escritura_ms": 594.6
-    }
+    "presupuesto": "segunda_apertura",
+    "unidad": "ms",
+    "valor": 354.5349999330938
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "b15f5b9",
+    "detalle": {
+      "ficheros_inspeccionados": 23,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:12:30Z",
-    "commit": "b15f5b9",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 23
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "f34c90c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:56:02Z",
-    "commit": "f34c90c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "f34c90c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 14:56:53Z",
-    "commit": "f34c90c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a26fb1b",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 15:08:38Z",
-    "commit": "a26fb1b",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "a26fb1b",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-30 15:09:27Z",
-    "commit": "a26fb1b",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "ee4fb16",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-31 06:34:50Z",
-    "commit": "ee4fb16",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "ee4fb16",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-31 06:36:37Z",
-    "commit": "ee4fb16",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2aef6b3",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-07-31 07:07:37Z",
-    "commit": "2aef6b3",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "19b39cc",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:39:02Z",
-    "commit": "19b39cc",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "19b39cc",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:40:18Z",
-    "commit": "19b39cc",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "33f6e92",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:44:03Z",
-    "commit": "33f6e92",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2e92399",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:45:33Z",
-    "commit": "2e92399",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2e92399",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:47:39Z",
-    "commit": "2e92399",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "ae9a226",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:49:45Z",
-    "commit": "ae9a226",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "2f2b67c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:52:06Z",
-    "commit": "2f2b67c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "aa48667",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:52:39Z",
-    "commit": "aa48667",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "f66226a",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 11:55:30Z",
-    "commit": "f66226a",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e382352",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 12:02:44Z",
-    "commit": "e382352",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "cc06c82",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 12:06:25Z",
-    "commit": "cc06c82",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "7aa2781",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 12:17:15Z",
-    "commit": "7aa2781",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "4f572d8",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:32:53Z",
-    "commit": "4f572d8",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "15174d5",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:42:38Z",
-    "commit": "15174d5",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8e82d5c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:50:23Z",
-    "commit": "8e82d5c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8e82d5c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:52:09Z",
-    "commit": "8e82d5c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "8e82d5c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:55:17Z",
-    "commit": "8e82d5c",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "128ca89",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 14:58:13Z",
-    "commit": "128ca89",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "6aa05a1",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 18:49:03Z",
-    "commit": "6aa05a1",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "beef203",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:04:24Z",
-    "commit": "beef203",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "beef203",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:04:51Z",
-    "commit": "beef203",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "beef203",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:05:40Z",
-    "commit": "beef203",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "beef203",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:06:13Z",
-    "commit": "beef203",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "1610738",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:09:48Z",
-    "commit": "1610738",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "1610738",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 20:11:13Z",
-    "commit": "1610738",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "c9bd9ac",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-03 23:46:40Z",
-    "commit": "c9bd9ac",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "c4e6e6c",
+    "detalle": {
+      "ficheros_inspeccionados": 26,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 10:44:35Z",
-    "commit": "c4e6e6c",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 26
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "7c78a2c",
+    "detalle": {
+      "ficheros_inspeccionados": 27,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 11:24:30Z",
-    "commit": "7c78a2c",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 27
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e6504cf",
+    "detalle": {
+      "ficheros_inspeccionados": 28,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 11:35:55Z",
-    "commit": "e6504cf",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 28
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "61af05c",
+    "detalle": {
+      "ficheros_inspeccionados": 29,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 12:07:54Z",
-    "commit": "61af05c",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 29
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e09905f",
+    "detalle": {
+      "ficheros_inspeccionados": 31,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 13:06:37Z",
-    "commit": "e09905f",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 31
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "dadd9b6",
+    "detalle": {
+      "ficheros_inspeccionados": 32,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 16:23:39Z",
-    "commit": "dadd9b6",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 32
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "0a590f9",
+    "detalle": {
+      "ficheros_inspeccionados": 33,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 22:43:34Z",
-    "commit": "0a590f9",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 33
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "0a590f9",
+    "detalle": {
+      "ficheros_inspeccionados": 33,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 22:43:44Z",
-    "commit": "0a590f9",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 33
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "0a590f9",
+    "detalle": {
+      "ficheros_inspeccionados": 33,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 22:45:52Z",
-    "commit": "0a590f9",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 33
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "23c3c4e",
+    "detalle": {
+      "ficheros_inspeccionados": 33,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 22:50:34Z",
-    "commit": "23c3c4e",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 33
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "c6d222d",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-04 23:03:44Z",
-    "commit": "c6d222d",
     "maquina": {
-      "sistema": "Linux",
       "maquina": "x86_64",
+      "nucleos": 4,
       "python": "3.12.3",
-      "nucleos": 4
+      "sistema": "Linux"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "7f0f7a5",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 09:52:53Z",
-    "commit": "7f0f7a5",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "7f0f7a5",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 10:00:19Z",
-    "commit": "7f0f7a5",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "507f391",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 11:02:52Z",
-    "commit": "507f391",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "507f391",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 11:24:46Z",
-    "commit": "507f391",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "507f391",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 11:27:21Z",
-    "commit": "507f391",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e095d8e",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 13:41:47Z",
-    "commit": "e095d8e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "e095d8e",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 13:44:00Z",
-    "commit": "e095d8e",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "88b877f",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 16:24:06Z",
-    "commit": "88b877f",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "88b877f",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 16:25:31Z",
-    "commit": "88b877f",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "555a42d",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 16:33:41Z",
-    "commit": "555a42d",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
-    "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   },
   {
-    "presupuesto": "bucles_por_muestra",
-    "valor": 0.0,
-    "unidad": "ocurrencias",
+    "commit": "bd7fad6",
+    "detalle": {
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
     "estado": "CUMPLE",
     "fecha": "2026-08-05 16:57:53Z",
-    "commit": "bd7fad6",
     "maquina": {
-      "sistema": "Windows",
       "maquina": "AMD64",
+      "nucleos": 8,
       "python": "3.14.6",
-      "nucleos": 8
+      "sistema": "Windows"
     },
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
+  },
+  {
+    "commit": "534480f",
     "detalle": {
-      "hallazgos": [],
-      "ficheros_inspeccionados": 34
-    }
+      "ficheros_inspeccionados": 34,
+      "hallazgos": []
+    },
+    "estado": "CUMPLE",
+    "fecha": "2026-08-09 19:12:46Z",
+    "maquina": {
+      "maquina": "x86_64",
+      "nucleos": 4,
+      "python": "3.12.3",
+      "sistema": "Linux"
+    },
+    "presupuesto": "bucles_por_muestra",
+    "unidad": "ocurrencias",
+    "valor": 0.0
   }
 ]

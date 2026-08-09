@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-05 13:44:51Z
+Actualizado: 2026-08-09 19:25:39Z
 
-**192 / 709 pts cerrados (27.1 %)** · 139 pts esperando revisión humana → 46.7 % entregado
+**192 / 761 pts cerrados (25.2 %)** · 139 pts esperando revisión humana → 43.5 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -16,6 +16,7 @@ Actualizado: 2026-08-05 13:44:51Z
 | F2 | 4 | 8 | 5 | 63 | 0 | 80 |
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
 | F4 | 0 | 0 | 4 | 59 | 0 | 63 |
+| FE | 0 | 0 | 0 | 52 | 0 | 52 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
 ## Requieren atención
@@ -208,6 +209,23 @@ Actualizado: 2026-08-05 13:44:51Z
 | ·  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
 | ·  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | — |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
+
+## FE — 0/52 pts
+
+| | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
+|---|---|---|---|---|---|---|---|
+| ·  | `FE-01` | Recorrido de carpeta e índice con huella (ruta, tamaño, fecha  | Opus 5 | 5 | F1-11 | G2 | — |
+| ·  | `FE-02` | Resumen por log con columnas proyectadas: agregados exactos po | Opus 5 | 8 | FE-01, FG-09, F4-10 | G1 | — |
+| ·  | `FE-03` | `data/metricas_explorador.toml`: métricas por omisión, con su  | Sonnet 5 | 3 | FE-02 | G1 | — |
+| ·  | `FE-04` | Celda sin dato ≠ 0: rol ausente, canal vacío o agregado no cal | Opus 5 | 4 | FE-02 | G1 | — |
+| ·  | `FE-05` | Tabla del explorador: una fila por log, orden en canónica y pr | Sonnet 5 | 5 | FE-03, F1-19 | G3 | — |
+| ·  | `FE-06` | Filtros por métrica combinables («λ mín < 0,80» y «más de 5 ev | Sonnet 5 | 5 | FE-05 | G3 | — |
+| ·  | `FE-07` | Personalización de columnas: añadir, quitar y reordenar métric | Sonnet 5 | 4 | FE-03, FE-05 | G3 | — |
+| ·  | `FE-08` | Escaneo incremental y cancelable, con filas apareciendo a medi | Sonnet 5 | 4 | FE-01 | G3 | — |
+| ·  | `FE-09` | Abrir la selección en el espacio de trabajo, uno o varios logs | Sonnet 5 | 3 | FE-05 | G3 | — |
+| ·  | `FE-10` | Prueba de coherencia: el resumen de cada log del corpus coinci | Opus 5 | 5 | FE-02 | G1 | — |
+| ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
+| ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
 ## F5 — 0/76 pts
 

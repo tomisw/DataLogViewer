@@ -13,7 +13,7 @@ logs —de cualquier formato CSV—, seleccione un **perfil de análisis**
 relevantes alineadas, en las unidades que él usa, con las tiradas a plena carga
 detectadas automáticamente y una lista de incidencias enlazada al instante exacto.
 
-- **Duración a v1.0**: 25 semanas en 7 fases.
+- **Duración a v1.0**: 26 semanas en 8 fases.
 - **Base tecnológica**: Python 3.12+ con el trabajo por muestra delegado a
   Polars y NumPy; interfaz web con renderizador WebGL2; contenedor `pywebview`.
   Justificación y costes en `03-arquitectura.md` §3.1 y §3.11.
@@ -188,6 +188,43 @@ Detalle completo en `07-formatos-y-csv-generico.md`.
 - E14.9 **Descriptores de formato nativo declarativos**: añadir un fabricante es un TOML, no código. El formato Haltech es el primer descriptor y la prueba de que basta.
 - E14.10 Perfiles y detectores reescritos para operar **por rol**, independientes del fabricante.
 
+### E15 — Explorador de logs: triaje de una carpeta *(prioridad del cliente)*
+
+El problema que resuelve: tras una jornada de pista hay decenas de logs en una
+carpeta y no hay forma de saber cuáles merecen análisis sin abrirlos uno a uno.
+Abrir cada uno cuesta 4 s en el mejor caso, así que revisar 200 logs son trece
+minutos de espera antes de empezar a trabajar. El explorador convierte esa
+carpeta en una tabla ordenable.
+
+- E15.1 Selección de una carpeta y **tabla de los logs que contiene**, una fila por log.
+- E15.2 Una columna por métrica: máximo, mínimo, media o duración según qué tenga sentido para cada rol, más los metadatos del propio log (fecha, duración, número de muestras, formato).
+- E15.3 **Métricas configurables**: el conjunto por omisión vive en un fichero de datos, y el usuario añade o quita columnas y lo conserva en su espacio de trabajo.
+- E15.4 **Ordenar y filtrar por cualquier métrica** («λ mínima < 0,80», «más de 5 eventos de knock», «duración > 10 min»), que es lo que convierte la tabla en una herramienta de selección y no en un listado.
+- E15.5 Abrir desde la tabla los logs elegidos, uno o varios, directamente en el espacio de trabajo.
+- E15.6 Índice en disco con **huella (ruta, tamaño, fecha de modificación)**: la segunda vez que se abre la misma carpeta, la tabla es inmediata; solo se recalculan los logs que cambiaron o son nuevos.
+- E15.7 Escaneo **incremental y cancelable**: las filas aparecen a medida que se calculan y la carpeta se puede explorar antes de que termine.
+
+Cuatro reglas de diseño que no son negociables, porque cada una corresponde a una
+forma concreta de mandar al usuario a analizar el log equivocado:
+
+1. **Las columnas son roles, no nombres de canal.** Una carpeta mezcla logs
+   nativos y CSV genéricos; `RPM`, `Engine Speed` y `N_motor` tienen que caer en
+   la misma columna o la tabla no se puede ordenar. Depende de E14.4.
+2. **Los agregados son exactos, no muestreados.** El resumen no estima: proyecta
+   *solo las columnas que las métricas configuradas necesitan* y agrega sobre
+   ellas enteras. Leer 6 columnas de 475 es barato de verdad —es la ventaja de un
+   formato columnar—, y así el número de la tabla es el mismo que el de la vista
+   completa. Un resumen aproximado que discrepa del log abierto destruye la
+   confianza en la herramienta entera.
+3. **Se ordena en canónica y se muestra en la unidad activa.** Si la ordenación
+   usara el valor mostrado, una carpeta con un log en °C y otro en °F quedaría
+   ordenada por un número sin significado común. Los agregados llevan además su
+   clase de magnitud (E13): un máximo es un punto, un rango es un intervalo y una
+   desviación típica es una varianza.
+4. **Una celda sin dato se queda vacía, nunca a cero.** Un log que no registra
+   knock no tiene «0 eventos de knock»: no tiene la columna. Mostrar 0 haría que
+   el log más peligroso de la carpeta pareciera el más limpio.
+
 ## 2.6 Presupuestos de rendimiento (criterios de aceptación)
 
 Máquina de referencia: portátil de 4 núcleos, 16 GB RAM, GPU integrada.
@@ -204,6 +241,9 @@ justificación están en `03-arquitectura.md` §3.8.
 | Latencia del cursor a tabla actualizada | **< 16 ms** | traza de fotogramas |
 | Pan/zoom que requiere cubos nuevos del backend | **< 120 ms** p95 | traza de red |
 | **Cambio de unidad con 8 logs abiertos** | **< 100 ms**, sin recarga ni invalidación de caché | banco automatizado |
+| **Indexado de una carpeta de 200 logs** (primera vez, en frío) | **< 60 s**, con filas apareciendo desde la primera | banco automatizado |
+| **Reapertura de una carpeta ya indexada** | **< 500 ms** hasta la tabla completa | banco automatizado |
+| **Resumen de un log de 66 MB** (6 métricas proyectadas) | **< 900 ms** | banco de microtest |
 | Memoria residente con el log de 66 MB abierto | **≤ 3,5×** el tamaño del CSV | medida de RSS |
 | Arranque en frío hasta ventana interactiva | **< 2,5 s** | banco automatizado |
 | Tamaño del paquete portable | **< 150 MB sin comprimir / < 60 MB en ZIP** | comprobación de artefacto |
@@ -224,7 +264,8 @@ arquitectura Python a lo largo del tiempo.
 | **F2 — Multi-log** | 12–14 | E2 completa, E3.7 | **M2**: los tres logs de muestra en paralelo con autoalineación, 2768+2769 concatenados, y un log Haltech superpuesto con un CSV genérico emparejado por rol |
 | **F3 — Motorsport** | 15–19 | E4, E5, E3.5, E6 | **M3**: perfil «Knock» detecta y lista los eventos de knock del corpus con 0 falsos negativos conocidos, en formato nativo y en CSV genérico |
 | **F4 — Análisis avanzado** | 20–22 | E7, E8 | **M4**: tabla de corrección λ generada y exportada desde un log de tirada |
-| **F5 — Endurecimiento y v1.0** | 23–25 | E10, E11 completa, E9.2/E9.4/E9.5/E9.6, corrección de defectos | **M5 = v1.0**: paquetes firmados, todos los presupuestos de §2.6 en verde |
+| **FE — Explorador de logs** | 23 | E15 | **ME**: una carpeta con los logs de una jornada se abre como tabla, se ordena por λ mínima, se filtra por «tiene eventos de knock» y los tres logs elegidos se abren juntos |
+| **F5 — Endurecimiento y v1.0** | 24–26 | E10, E11 completa, E9.2/E9.4/E9.5/E9.6, corrección de defectos | **M5 = v1.0**: paquetes firmados, todos los presupuestos de §2.6 en verde |
 | **F6 — Post v1.0** | — | E12, móvil como cliente del backend, telemetría en vivo, más descriptores de formato | fuera del alcance comprometido |
 
 Camino crítico: **E1.3 (almacén columnar) → E13.2 (conversiones) → E3.1
@@ -233,8 +274,9 @@ Camino crítico: **E1.3 (almacén columnar) → E13.2 (conversiones) → E3.1
 los perfiles y los detectores; por eso FG va **antes** de F2 y F3, y no al final:
 retrofitear roles sobre perfiles ya escritos costaría más que hacerlos primero.
 
-> El calendario pasó de 18 a 25 semanas. No es holgura añadida: son **190 puntos
-> de alcance nuevo** (479 → 669), repartidos entre E13 (≈44), E14 (≈92), el trabajo
+> El calendario pasó de 18 a 26 semanas. No es holgura añadida: son **271 puntos
+> de alcance nuevo** (479 → 750), repartidos entre E13 (≈44), E14 (≈92), E15 (≈52),
+> el trabajo
 > por rol que E14 arrastra a F2/F3/F4 (≈30) y el reajuste a la base Python (≈24).
 > Y la fase FG además reordena el plan para no pagar dos veces los perfiles.
 
@@ -255,6 +297,8 @@ retrofitear roles sobre perfiles ya escritos costaría más que hacerlos primero
 | R11 | **Conversión de unidades aplicada a diferencias**: Δ de temperatura absurdo, desviaciones típicas corruptas | Media | Alto | Clase punto/intervalo/tasa/varianza obligatoria en cada métrica; prueba de regresión dedicada (Δ10 K = 10 °C = 18 °F) que bloquea la fusión |
 | R12 | La vía móvil con Python es más indirecta de lo previsto en la revisión 1 | Media | Medio | Interfaz web desde el día uno (ADR-002) y frontera de comandos HTTP: la fase 6 se compromete al teléfono como cliente del backend, que es maduro, y deja Pyodide como exploración. Documentado sin adornos en `03-arquitectura.md` §3.11 |
 | R13 | El paquete de ~150 MB genera rechazo frente a los ~25 MB prometidos antes | Baja | Bajo | `onedir` en ZIP (~60 MB), sin PyArrow, exclusión agresiva de módulos. El requisito real era «sin instalación», y se cumple |
+| R14 | **El explorador manda a analizar el log equivocado**: un resumen que no coincide con lo que se ve al abrirlo, o un hueco mostrado como 0 que hace pasar por limpio el log más peligroso | Media | **Crítico** | Agregados exactos sobre columnas proyectadas, nunca muestreados, calculados con el mismo código que la vista completa; una prueba compara resumen contra apertura completa en todo el corpus; celda sin dato vacía y distinguible de un cero real |
+| R15 | **El índice en disco queda obsoleto** y la tabla describe una carpeta que ya no existe: logs borrados, reescritos por la ECU o con el mismo nombre y otro contenido | Media | Medio | Huella de (ruta, tamaño, fecha de modificación) por entrada, revalidada en cada apertura; una huella que no cuadra recalcula, no avisa y sigue; el índice es una caché reconstruible y borrarlo nunca pierde datos del usuario |
 
 ## 2.9 Calidad y datasets de prueba
 
