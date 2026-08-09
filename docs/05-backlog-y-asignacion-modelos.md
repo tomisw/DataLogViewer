@@ -2,8 +2,9 @@
 
 > **Revisión 2.** Incorpora la base **Python** (`03-arquitectura.md` rev. 2), el
 > **sistema de unidades intercambiables** (E13) y la **extensibilidad a cualquier
-> CSV** (E14). El alcance pasa de 479 a **669 puntos** y el calendario de 18 a
-> **25 semanas**.
+> CSV** (E14). El alcance pasa de 479 a **698 puntos** y el calendario de 18 a
+> **25 semanas**. La revisión 3 añade el **explorador de logs** (E15, fase FE):
+> 52 puntos y una semana más, hasta **750 puntos y 26 semanas**.
 
 ## 5.1 Criterio de asignación
 
@@ -63,9 +64,9 @@ plausible y llega a una decisión de tuning:
 - cualquier **asignación de rol** o regla del importador genérico.
 
 Esfuerzo en **puntos**: 1 punto ≈ media jornada de trabajo asistido más su
-revisión. Total: **136 tareas, 669 puntos** ≈ 335 jornadas. Con la capacidad
+revisión. Total: **153 tareas, 750 puntos** ≈ 375 jornadas. Con la capacidad
 supuesta de **27 puntos/semana** (≈ 2,7 flujos de trabajo en paralelo), salen las
-**25 semanas** del calendario de `02-alcance-y-plan.md` §2.7. Con un solo flujo,
+**26 semanas** del calendario de `02-alcance-y-plan.md` §2.7. Con un solo flujo,
 v1.0 se va a ~67 semanas.
 
 ---
@@ -277,7 +278,45 @@ v1.0 se va a ~67 semanas.
 
 **Subtotal F4: 63 pts** · Hito **M4**
 
-## 5.9 Fase F5 — Endurecimiento y v1.0 (semanas 23–25)
+## 5.9 Fase FE — Explorador de logs (semana 23)
+
+Épica E15. Va **después de F3 y F4** y no antes, por una razón concreta: las
+columnas que de verdad deciden qué log merece análisis no son el máximo de RPM,
+son «12 eventos de knock» y «λ mínima 0,74», y esas las producen los detectores de
+F3 y la maquinaria de estadística con clase de magnitud de F4-10. Adelantar la
+fase daría una tabla que ordena por lo que es fácil de calcular en vez de por lo
+que importa.
+
+El presupuesto de indexado (§2.6) es la restricción que da forma a toda la fase:
+200 logs en menos de 60 s solo sale si el resumen **proyecta las columnas que las
+métricas necesitan** en vez de abrir el log entero. No se muestrea: se leen 6
+columnas de 475, que es exacto y además barato.
+
+| ID | Tarea | Entregable | Modelo | Pts | Dep. | Puerta |
+|---|---|---|---|---|---|---|
+| FE-01 | Recorrido de carpeta e **índice con huella** (ruta, tamaño, fecha de modificación) en disco, revalidado en cada apertura | módulo + pruebas | **Opus 5** | 5 | F1-11 | G2 |
+| FE-02 | **Resumen por log con columnas proyectadas**: agregados exactos por rol sin abrir el log entero, dentro del presupuesto | módulo + banco | **Opus 5** | 8 | FE-01, FG-09, F4-10 | **G1** |
+| FE-03 | `data/metricas_explorador.toml`: métricas por omisión, con su rol, su agregado y su clase de magnitud | datos | Sonnet 5 | 3 | FE-02 | **G1** |
+| FE-04 | **Celda sin dato ≠ 0**: rol ausente, canal vacío o agregado no calculable, distinguibles entre sí y de un cero real | módulo + pruebas | **Opus 5** | 4 | FE-02 | **G1** |
+| FE-05 | Tabla del explorador: una fila por log, orden **en canónica** y presentación en la unidad activa | componente | Sonnet 5 | 5 | FE-03, F1-19 | G3 |
+| FE-06 | Filtros por métrica combinables («λ mín < 0,80» y «más de 5 eventos de knock»), escritos en la unidad activa | componente | Sonnet 5 | 5 | FE-05 | G3 |
+| FE-07 | Personalización de columnas: añadir, quitar y reordenar métricas, persistido en el espacio de trabajo | componente | Sonnet 5 | 4 | FE-03, FE-05 | G3 |
+| FE-08 | Escaneo **incremental y cancelable**, con filas apareciendo a medida que se calculan | módulo | Sonnet 5 | 4 | FE-01 | G3 |
+| FE-09 | Abrir la selección en el espacio de trabajo, uno o varios logs, conservando el perfil activo | componente | Sonnet 5 | 3 | FE-05 | G3 |
+| FE-10 | **Prueba de coherencia**: el resumen de cada log del corpus coincide con abrirlo entero, agregado a agregado | suite de pruebas | **Opus 5** | 5 | FE-02 | **G1** |
+| FE-11 | Presupuestos de §2.6 del explorador: carpeta de 200 logs en frío, reapertura desde índice y resumen de un log de 66 MB | banco + CI | **Opus 5** | 4 | FE-02 | G2 |
+| FE-12 | Documentación: cómo se triagea una carpeta y qué significa exactamente cada agregado | guía | Haiku 4.5 | 2 | FE-07 | G4 |
+
+**Subtotal FE: 52 pts** · Hito **ME**: una carpeta con los logs de una jornada se
+abre como tabla, se ordena por λ mínima, se filtra por «tiene eventos de knock» y
+los tres logs elegidos se abren juntos en el espacio de trabajo.
+
+FE-10 es la tarea que sostiene la credibilidad de la fase entera y por eso lleva
+puerta G1: si el número de la tabla no es el mismo que el del log abierto, el
+explorador deja de ser una herramienta de selección y pasa a ser una fuente de
+decisiones equivocadas (riesgo R14).
+
+## 5.10 Fase F5 — Endurecimiento y v1.0 (semanas 24–26)
 
 | ID | Tarea | Entregable | Modelo | Pts | Dep. | Puerta |
 |---|---|---|---|---|---|---|
@@ -301,20 +340,24 @@ v1.0 se va a ~67 semanas.
 
 **Subtotal F5: 76 pts** · Hito **M5 = v1.0**
 
-## 5.10 Resumen de asignación
+## 5.11 Resumen de asignación
 
 | Modelo | Puntos | % del esfuerzo | Tareas | Concentración |
 |---|---|---|---|---|
-| **Opus 5** | 391 | 58 % | 66 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
-| **Sonnet 5** | 247 | 37 % | 58 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
-| **Haiku 4.5** | 31 | 5 % | 12 | *fixtures*, CI, catálogos mecánicos, i18n, documentación mecánica |
-| **Total** | **669** | 100 % | **136** | |
+| **Opus 5** | 435 | 58 % | 74 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
+| **Sonnet 5** | 282 | 38 % | 66 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
+| **Haiku 4.5** | 33 | 4 % | 13 | *fixtures*, CI, catálogos mecánicos, i18n, documentación mecánica |
+| **Total** | **750** | 100 % | **153** | |
 
-Reparto por fase: F0 54 · F1 186 · FG 92 · F2 80 · F3 118 · F4 63 · F5 76.
+Reparto por fase: F0 54 · F1 215 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
 
-Distribución de puertas: **47 tareas en G1** (revisión humana obligatoria), 25 en
-G2, 54 en G3, 10 en G4. El esfuerzo de revisión de G1 y G2 es **adicional** a los
-669 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
+(Las cifras anteriores de esta sección decían 669 puntos en 136 tareas y F1 186.
+No cuadraban con la suma de las propias tablas desde la revisión 2 —el libro de
+estado ya sembraba 698— y se corrigen aquí junto con el alcance nuevo.)
+
+Distribución de puertas: **51 tareas en G1** (revisión humana obligatoria), 30 en
+G2, 61 en G3, 11 en G4. El esfuerzo de revisión de G1 y G2 es **adicional** a los
+750 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
 requieren.
 
 La proporción de Opus 5 sube del 52 % al 58 % con las dos épicas nuevas, y no por
@@ -322,10 +365,10 @@ inercia: **E13 y E14 son casi enteramente trabajo de corrección sutil**. Una
 conversión de unidades mal clasificada como punto en lugar de intervalo, o un rol
 asignado por parecido de nombre a una columna con otra escala, produce un número
 plausible y falso. Es exactamente el perfil de error que justifica el modelo más
-capaz y la puerta de revisión más estricta — y es la razón de que 47 de 136 tareas
+capaz y la puerta de revisión más estricta — y es la razón de que 51 de 153 tareas
 lleven revisión humana obligatoria.
 
-## 5.11 Higiene de contexto por modelo
+## 5.12 Higiene de contexto por modelo
 
 Lo que hace fallar estas asignaciones no es la capacidad del modelo, es el
 contexto que recibe:

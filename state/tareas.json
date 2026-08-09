@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-04 23:14:56Z"
+    "actualizado": "2026-08-09 19:12:34Z"
   },
   "tareas": [
     {
@@ -3144,6 +3144,254 @@
       ],
       "dep_todo": false,
       "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-01",
+      "fase": "FE",
+      "titulo": "Recorrido de carpeta e índice con huella (ruta, tamaño, fecha de modificación) en disco, revalidado en cada apertura",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F1-11"
+      ],
+      "deps_backlog": [
+        "F1-11"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-02",
+      "fase": "FE",
+      "titulo": "Resumen por log con columnas proyectadas: agregados exactos por rol sin abrir el log entero, dentro del presupuesto",
+      "entregable": "módulo + banco",
+      "modelo": "Opus 5",
+      "pts": 8,
+      "deps": [
+        "FE-01",
+        "FG-09",
+        "F4-10"
+      ],
+      "deps_backlog": [
+        "FE-01",
+        "FG-09",
+        "F4-10"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-03",
+      "fase": "FE",
+      "titulo": "`data/metricas_explorador.toml`: métricas por omisión, con su rol, su agregado y su clase de magnitud",
+      "entregable": "datos",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "FE-02"
+      ],
+      "deps_backlog": [
+        "FE-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-04",
+      "fase": "FE",
+      "titulo": "Celda sin dato ≠ 0: rol ausente, canal vacío o agregado no calculable, distinguibles entre sí y de un cero real",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "FE-02"
+      ],
+      "deps_backlog": [
+        "FE-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-05",
+      "fase": "FE",
+      "titulo": "Tabla del explorador: una fila por log, orden en canónica y presentación en la unidad activa",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "FE-03",
+        "F1-19"
+      ],
+      "deps_backlog": [
+        "FE-03",
+        "F1-19"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-06",
+      "fase": "FE",
+      "titulo": "Filtros por métrica combinables («λ mín < 0,80» y «más de 5 eventos de knock»), escritos en la unidad activa",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 5,
+      "deps": [
+        "FE-05"
+      ],
+      "deps_backlog": [
+        "FE-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-07",
+      "fase": "FE",
+      "titulo": "Personalización de columnas: añadir, quitar y reordenar métricas, persistido en el espacio de trabajo",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "FE-03",
+        "FE-05"
+      ],
+      "deps_backlog": [
+        "FE-03",
+        "FE-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-08",
+      "fase": "FE",
+      "titulo": "Escaneo incremental y cancelable, con filas apareciendo a medida que se calculan",
+      "entregable": "módulo",
+      "modelo": "Sonnet 5",
+      "pts": 4,
+      "deps": [
+        "FE-01"
+      ],
+      "deps_backlog": [
+        "FE-01"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-09",
+      "fase": "FE",
+      "titulo": "Abrir la selección en el espacio de trabajo, uno o varios logs, conservando el perfil activo",
+      "entregable": "componente",
+      "modelo": "Sonnet 5",
+      "pts": 3,
+      "deps": [
+        "FE-05"
+      ],
+      "deps_backlog": [
+        "FE-05"
+      ],
+      "dep_todo": false,
+      "gate": "G3",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-10",
+      "fase": "FE",
+      "titulo": "Prueba de coherencia: el resumen de cada log del corpus coincide con abrirlo entero, agregado a agregado",
+      "entregable": "suite de pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "FE-02"
+      ],
+      "deps_backlog": [
+        "FE-02"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-11",
+      "fase": "FE",
+      "titulo": "Presupuestos de §2.6 del explorador: carpeta de 200 logs en frío, reapertura desde índice y resumen de un log de 66 MB",
+      "entregable": "banco + CI",
+      "modelo": "Opus 5",
+      "pts": 4,
+      "deps": [
+        "FE-02"
+      ],
+      "deps_backlog": [
+        "FE-02"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
+    },
+    {
+      "id": "FE-12",
+      "fase": "FE",
+      "titulo": "Documentación: cómo se triagea una carpeta y qué significa exactamente cada agregado",
+      "entregable": "guía",
+      "modelo": "Haiku 4.5",
+      "pts": 2,
+      "deps": [
+        "FE-07"
+      ],
+      "deps_backlog": [
+        "FE-07"
+      ],
+      "dep_todo": false,
+      "gate": "G4",
       "estado": "pendiente",
       "agente": null,
       "commits": [],

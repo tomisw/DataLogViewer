@@ -40,7 +40,7 @@ def test_presupuestos_bien_formados() -> None:
         assert p.comparador in ("<=", ">="), f"{p.id}: comparador inválido"
         assert p.unidad, f"{p.id}: falta unidad"
         assert p.descripcion, f"{p.id}: falta descripción"
-        assert p.fase in ("F0", "F1", "FG", "F2", "F3", "F4", "F5"), f"{p.id}: fase inválida"
+        assert p.fase in ("F0", "F1", "FG", "F2", "F3", "F4", "FE", "F5"), f"{p.id}: fase inválida"
 
 
 def test_ids_de_presupuesto_unicos() -> None:
