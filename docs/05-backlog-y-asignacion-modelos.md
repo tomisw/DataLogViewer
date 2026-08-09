@@ -4,7 +4,9 @@
 > **sistema de unidades intercambiables** (E13) y la **extensibilidad a cualquier
 > CSV** (E14). El alcance pasa de 479 a **698 puntos** y el calendario de 18 a
 > **25 semanas**. La revisión 3 añade el **explorador de logs** (E15, fase FE):
-> 52 puntos y una semana más, hasta **750 puntos y 26 semanas**.
+> 52 puntos y una semana más, hasta **750 puntos y 26 semanas**. Sumadas F1-44
+> y F1-45, que salieron de abrir la aplicación con un log real, el total es de
+> **761 puntos en 155 tareas**.
 
 ## 5.1 Criterio de asignación
 
@@ -64,7 +66,7 @@ plausible y llega a una decisión de tuning:
 - cualquier **asignación de rol** o regla del importador genérico.
 
 Esfuerzo en **puntos**: 1 punto ≈ media jornada de trabajo asistido más su
-revisión. Total: **153 tareas, 750 puntos** ≈ 375 jornadas. Con la capacidad
+revisión. Total: **155 tareas, 761 puntos** ≈ 380 jornadas. Con la capacidad
 supuesta de **27 puntos/semana** (≈ 2,7 flujos de trabajo en paralelo), salen las
 **26 semanas** del calendario de `02-alcance-y-plan.md` §2.7. Con un solo flujo,
 v1.0 se va a ~67 semanas.
@@ -393,20 +395,20 @@ decisiones equivocadas (riesgo R14).
 
 | Modelo | Puntos | % del esfuerzo | Tareas | Concentración |
 |---|---|---|---|---|
-| **Opus 5** | 435 | 58 % | 74 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
-| **Sonnet 5** | 282 | 38 % | 66 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
+| **Opus 5** | 446 | 59 % | 76 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
+| **Sonnet 5** | 282 | 37 % | 66 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
 | **Haiku 4.5** | 33 | 4 % | 13 | *fixtures*, CI, catálogos mecánicos, i18n, documentación mecánica |
-| **Total** | **750** | 100 % | **153** | |
+| **Total** | **761** | 100 % | **155** | |
 
-Reparto por fase: F0 54 · F1 215 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
+Reparto por fase: F0 54 · F1 226 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
 
 (Las cifras anteriores de esta sección decían 669 puntos en 136 tareas y F1 186.
 No cuadraban con la suma de las propias tablas desde la revisión 2 —el libro de
 estado ya sembraba 698— y se corrigen aquí junto con el alcance nuevo.)
 
-Distribución de puertas: **51 tareas en G1** (revisión humana obligatoria), 30 en
+Distribución de puertas: **52 tareas en G1** (revisión humana obligatoria), 31 en
 G2, 61 en G3, 11 en G4. El esfuerzo de revisión de G1 y G2 es **adicional** a los
-750 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
+761 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
 requieren.
 
 La proporción de Opus 5 sube del 52 % al 58 % con las dos épicas nuevas, y no por
@@ -414,7 +416,7 @@ inercia: **E13 y E14 son casi enteramente trabajo de corrección sutil**. Una
 conversión de unidades mal clasificada como punto en lugar de intervalo, o un rol
 asignado por parecido de nombre a una columna con otra escala, produce un número
 plausible y falso. Es exactamente el perfil de error que justifica el modelo más
-capaz y la puerta de revisión más estricta — y es la razón de que 51 de 153 tareas
+capaz y la puerta de revisión más estricta — y es la razón de que 52 de 155 tareas
 lleven revisión humana obligatoria.
 
 ## 5.12 Higiene de contexto por modelo

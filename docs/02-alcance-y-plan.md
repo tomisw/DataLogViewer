@@ -279,6 +279,13 @@ retrofitear roles sobre perfiles ya escritos costaría más que hacerlos primero
 > el trabajo
 > por rol que E14 arrastra a F2/F3/F4 (≈30) y el reajuste a la base Python (≈24).
 > Y la fase FG además reordena el plan para no pagar dos veces los perfiles.
+>
+> Esa cuenta es la del ALCANCE: qué épicas se añadieron y cuánto pesan. El total
+> vigente del plan son **761 puntos en 155 tareas**, once puntos más, y la
+> diferencia no es alcance nuevo sino dos tareas de defecto (F1-44 y F1-45) que
+> salieron de abrir la aplicación con un log real. Se anotan aparte a propósito:
+> mezclarlas con las épicas haría creer que el alcance crece cuando lo que pasó
+> fue que algo no funcionaba.
 
 ## 2.8 Riesgos
 

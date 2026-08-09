@@ -68,7 +68,7 @@ la historia de la rama. El detalle y el motivo de cada uno, en `docs/09` §9.11.
 | `docs/02-alcance-y-plan.md` | objetivos, épicas, presupuestos §2.6, riesgos |
 | `docs/03-arquitectura.md` | ADR-001…009, pirámide, motor de tiempo |
 | `docs/04-perfiles-motorsport.md` | perfiles y los 18 detectores |
-| `docs/05-backlog-y-asignacion-modelos.md` | las 153 tareas y su modelo |
+| `docs/05-backlog-y-asignacion-modelos.md` | las 155 tareas y su modelo |
 | `docs/06-sistema-de-unidades.md` | canónica, clases, presión relativa |
 | `docs/07-formatos-y-csv-generico.md` | CSV genérico y roles semánticos |
 | `docs/08-ejecucion-y-reanudacion.md` | protocolo de ejecución |
