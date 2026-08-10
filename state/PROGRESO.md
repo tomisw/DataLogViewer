@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 07:48:34Z
+Actualizado: 2026-08-10 08:19:54Z
 
 **204 / 761 pts cerrados (26.8 %)** · 143 pts esperando revisión humana → 45.6 % entregado
 
@@ -12,10 +12,10 @@ Actualizado: 2026-08-10 07:48:34Z
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 153 | 68 | 0 | 5 | 0 | 226 |
-| FG | 12 | 43 | 0 | 37 | 0 | 92 |
+| FG | 12 | 43 | 4 | 33 | 0 | 92 |
 | F2 | 9 | 8 | 5 | 58 | 0 | 80 |
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
-| F4 | 0 | 0 | 4 | 59 | 0 | 63 |
+| F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 0 | 0 | 0 | 52 | 0 | 52 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
@@ -48,12 +48,14 @@ Actualizado: 2026-08-10 07:48:34Z
 | `FG-06` Unidad declarada en el nombre o en la fila d | revision_humana | Sonnet 5 | G1 | Entregado por agente Sonnet, revisado e integrado por Opus. Commits 45 |
 | `FG-07` Valores no numéricos, unidad embebida en la  | revision_humana | Sonnet 5 | G1 | PUERTA G1: revisar (1) que caracteres cuentan como unidad embebida, (2 |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
+| `FG-15` Fuzzing del importador genérico sobre el cor | en_curso | Opus 5 | G2 | — |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
+| `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | — |
 
 ## F0 — 54/54 pts
 
@@ -142,7 +144,7 @@ Actualizado: 2026-08-10 07:48:34Z
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ·  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | — |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
-| ·  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | — |
+| ▶  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | — |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ·  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
 
@@ -208,7 +210,7 @@ Actualizado: 2026-08-10 07:48:34Z
 | ·  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | — |
 | ·  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
 | ·  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
-| ·  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | — |
+| ▶  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | — |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
 
 ## FE — 0/52 pts
