@@ -17,7 +17,8 @@ import { describe, expect, it } from "vitest";
 
 import { Aplicacion, type EntornoApp } from "./aplicacion.ts";
 import { crearDocumentoFalso, crearVentanaFalsa, type ElementoFalso } from "../dom/doble-documento.ts";
-import { crearDobleGL } from "../render/doble-gl.ts";
+import { crearDobleGL, type DobleGL } from "../render/doble-gl.ts";
+import { ALFA_SILUETA } from "../render/progresivo.ts";
 import { Renderizador } from "../render/renderizador.ts";
 import type { CubosContinuos } from "../render/tipos.ts";
 import type { Rango } from "../datos/cache-cubos.ts";
@@ -323,5 +324,244 @@ describe("la aplicación montada de extremo a extremo", () => {
     // Mismo valor crudo (3748), escalados 0,1 y 1,0: números distintos.
     expect(tabla.get("Coolant Temperature (K)")).toBe("374,8");
     expect(tabla.get("RPM (rpm)")).toBe("3748");
+  });
+});
+
+// --------------------------------------------------------------------------- //
+// F2-14 — renderizado progresivo: silueta inmediata, refinamiento de fondo
+// --------------------------------------------------------------------------- //
+// Aquí no basta con montar: hay que CONDUCIR un gesto (rueda) y retener la
+// respuesta del backend, porque lo que esta tarea cambia solo existe en el
+// hueco entre el gesto y la llegada de los cubos. Con una fuente que contesta
+// al instante ese hueco no se puede observar, y es exactamente el hueco en el
+// que antes no se dibujaba nada.
+
+/**
+ * Pirámide de cuatro niveles sobre un log de 64 s, elegida para que el zoom
+ * CAMBIE de nivel con un panel de 800 px:
+ *
+ * - con el log entero a la vista, el nivel más barato que da un cubo por píxel
+ *   es el de 1 000 cubos → ×64;
+ * - al ampliar ~3,3×, ese nivel se queda en 300 cubos visibles y hay que bajar
+ *   al de 4 000 → ×16.
+ *
+ * Sin ese salto no hay nada que refinar y la prueba pasaría sin probar nada.
+ */
+const NIVELES_PIRAMIDE: readonly ResumenNivelFuente[] = [
+  { factor: 1, nCubos: 64_000 },
+  { factor: 16, nCubos: 4_000 },
+  { factor: 64, nCubos: 1_000 },
+  { factor: 256, nCubos: 250 },
+];
+
+const CANAL_UNICO: CanalDeFuente[] = [
+  {
+    idNativo: "0",
+    nombre: "RPM",
+    rol: "engine_speed",
+    confianzaRol: "EXACTA",
+    dimensionId: "angular_speed",
+    clasificacion: { vacio: false, constante: false },
+    aCanonica: { a: 1, b: 0 },
+  },
+];
+
+function cubosDe(rango: Rango, factor: number): CubosContinuos {
+  const n = 8;
+  const t = new Float32Array(n);
+  const v = new Float32Array(n);
+  for (let i = 0; i < n; i += 1) {
+    t[i] = (i * (rango.t1 - rango.t0)) / (n - 1);
+    v[i] = 1000 + i * 100;
+  }
+  return { t, tOrigen: rango.t0, minimo: v, maximo: v, primero: v, ultimo: v, factor };
+}
+
+/** Una fuente que puede quedarse callada, que es lo que hace observable la silueta. */
+class FuenteConEspera implements FuenteDeDatos {
+  readonly nombre = "prueba-progresiva";
+  /** Cuando está puesto, `pedirCubos` no contesta hasta `soltar()`. */
+  retener = false;
+  readonly pedidos: Array<{ canal: string; factor: number }> = [];
+  #pendientes: Array<() => void> = [];
+
+  abrirLog(referencia: string): Promise<LogAbierto> {
+    return Promise.resolve({
+      logId: "log-1",
+      nombre: referencia,
+      tInicio: 0,
+      tFin: 64,
+      canales: CANAL_UNICO,
+      avisos: [],
+    });
+  }
+
+  cerrarLog(): void {}
+
+  catalogoUnidades(): Promise<CatalogoUnidades> {
+    return Promise.resolve(CATALOGO);
+  }
+
+  nivelesDe(): Promise<readonly ResumenNivelFuente[]> {
+    return Promise.resolve(NIVELES_PIRAMIDE);
+  }
+
+  pedirCubos(
+    _logId: string,
+    canalId: string,
+    rango: Rango,
+    factor: number,
+  ): Promise<CubosContinuos> {
+    this.pedidos.push({ canal: canalId, factor });
+    const cubos = cubosDe(rango, factor);
+    if (!this.retener) return Promise.resolve(cubos);
+    return new Promise((listo) => {
+      this.#pendientes.push(() => listo(cubos));
+    });
+  }
+
+  /** Contesta a todo lo retenido y deja de retener. */
+  soltar(): void {
+    this.retener = false;
+    const cola = this.#pendientes;
+    this.#pendientes = [];
+    for (const contestar of cola) contestar();
+  }
+}
+
+interface MontajeProgresivo {
+  readonly raiz: ElementoFalso;
+  readonly ventana: ReturnType<typeof crearVentanaFalsa>;
+  readonly fuente: FuenteConEspera;
+  readonly gl: DobleGL[];
+}
+
+async function montarProgresivo(): Promise<MontajeProgresivo> {
+  const documento = crearDocumentoFalso();
+  const ventana = crearVentanaFalsa();
+  const raiz = documento.createElement("div");
+  const fuente = new FuenteConEspera();
+  const gl: DobleGL[] = [];
+  const entorno: EntornoApp = {
+    documento: documento as unknown as Pick<Document, "createElement" | "createElementNS">,
+    ventana,
+    crearRenderizador: () => {
+      const doble = crearDobleGL();
+      gl.push(doble);
+      return new Renderizador(doble);
+    },
+  };
+  const app = new Aplicacion(raiz as unknown as HTMLElement, fuente, entorno);
+  await app.abrirLog("log-de-prueba");
+  await asentar(ventana);
+  darGeometria(raiz);
+  // El primer redibujado corrió con el panel a 0 px de ancho (Node no calcula
+  // layout), así que eligió el nivel más barato de todos. Un `resize` con la
+  // geometría ya puesta deja la aplicación en el estado del que parte la
+  // prueba: el log entero a la vista, con SU nivel y sin nada provisional.
+  ventana.disparar("resize");
+  await asentar(ventana);
+  return { raiz, ventana, fuente, gl };
+}
+
+/** El texto del aviso de silueta del primer (y único) panel. */
+function notaDeSilueta(raiz: ElementoFalso): string {
+  return raiz.buscarPorClase("dlv-nota-silueta")?.textContent ?? "(no hay nota)";
+}
+
+/** Rueda sobre el área de paneles: `deltaY` negativo amplía (`controlador.ts`). */
+function rueda(raiz: ElementoFalso, deltaY: number): void {
+  const paneles = raiz.buscarPorClase("dlv-paneles");
+  if (paneles === null) throw new Error("no se encontró el contenedor de paneles");
+  paneles.disparar("wheel", { deltaY, clientX: 400, clientY: 100, preventDefault: () => {} });
+}
+
+/**
+ * Las opacidades con las que se pintó cada serie, en orden.
+ *
+ * El uniforme de color es el único `uniform4f` cuyos tres primeros componentes
+ * están en [0, 1]: el de la transformación lleva escalas y desplazamientos de
+ * recorte, que se salen de ese rango en cuanto la vista no es exactamente
+ * [-1, 1] — y en estas pruebas nunca lo es.
+ */
+function alfasDibujadas(gl: DobleGL): number[] {
+  return gl.llamadas
+    .filter((l) => l.nombre === "uniform4f")
+    .map((l) => l.argumentos.slice(1) as number[])
+    .filter((a) => a.slice(0, 3).every((c) => c >= 0 && c <= 1))
+    .map((a) => a[3]!);
+}
+
+describe("renderizado progresivo (F2-14)", () => {
+  it("con el nivel bueno ya en memoria no hay ningún aviso", async () => {
+    const { raiz } = await montarProgresivo();
+    expect(notaDeSilueta(raiz)).toBe("");
+  });
+
+  it("al ampliar dibuja la silueta EN EL MISMO TURNO, sin esperar al backend", async () => {
+    const { raiz, ventana, fuente, gl } = await montarProgresivo();
+    fuente.retener = true;
+    gl[0]!.olvidar();
+    const pedidosAntes = fuente.pedidos.length;
+
+    rueda(raiz, -800);
+    // Un solo fotograma y ni un `await`: si la silueta necesitara una vuelta
+    // del bucle de eventos, esta prueba se pondría roja, y ese aplazamiento es
+    // justo lo que se ve como «la pantalla no responde al gesto».
+    ventana.correrFotogramas(1);
+
+    // Ni siquiera se ha PEDIDO nada todavía: la fase 2 vive detrás de un
+    // `await`, así que a estas alturas del turno la petición del nivel bueno
+    // aún no ha salido. Esa es la medida exacta de «inmediato».
+    expect(fuente.pedidos).toHaveLength(pedidosAntes);
+    const nota = notaDeSilueta(raiz);
+    expect(nota).toContain("silueta ×64");
+    expect(nota).toContain("×16");
+    // Y se ha dibujado de verdad, con la opacidad de silueta: la nota sola no
+    // demuestra que en el lienzo haya algo.
+    expect(alfasDibujadas(gl[0]!)).toContain(ALFA_SILUETA);
+  });
+
+  it("cuando llegan los cubos buenos, el trazo se vuelve opaco y el aviso desaparece", async () => {
+    const { raiz, ventana, fuente, gl } = await montarProgresivo();
+    fuente.retener = true;
+    rueda(raiz, -800);
+    ventana.correrFotogramas(1);
+    expect(notaDeSilueta(raiz)).not.toBe("");
+
+    gl[0]!.olvidar();
+    fuente.soltar();
+    await asentar(ventana);
+
+    expect(notaDeSilueta(raiz)).toBe("");
+    expect(alfasDibujadas(gl[0]!)).toContain(1);
+    expect(alfasDibujadas(gl[0]!)).not.toContain(ALFA_SILUETA);
+    // Y lo que se pidió fue el nivel que corresponde al zoom nuevo, no otro.
+    expect(fuente.pedidos.at(-1)!.factor).toBe(16);
+  });
+
+  it("un refinamiento que llega tarde no se tira: se guarda y el gesto converge", async () => {
+    // El usuario sigue moviéndose mientras el backend contesta. La pasada vieja
+    // se abandona (`motivoDeAbandono` → «vista-movida»), pero sus cubos quedan
+    // en la caché: si se tiraran, la pasada nueva volvería a pedir lo mismo y
+    // un gesto largo no llegaría nunca al nivel bueno.
+    const { raiz, ventana, fuente } = await montarProgresivo();
+    fuente.retener = true;
+
+    rueda(raiz, -800);
+    ventana.correrFotogramas(1);
+    // Segundo gesto, más corto, mientras el primero sigue en vuelo: amplía un
+    // poco más sin cambiar de nivel de pirámide.
+    rueda(raiz, -100);
+    ventana.correrFotogramas(1);
+    // Mientras tanto se sigue viendo algo, no un hueco.
+    expect(notaDeSilueta(raiz)).toContain("silueta ×64");
+
+    fuente.soltar();
+    await asentar(ventana);
+
+    expect(notaDeSilueta(raiz)).toBe("");
+    const peticionesDelNivelBueno = fuente.pedidos.filter((p) => p.factor === 16);
+    expect(peticionesDelNivelBueno).toHaveLength(1);
   });
 });

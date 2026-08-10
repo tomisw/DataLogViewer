@@ -183,6 +183,22 @@
         background: #0b0d10;
       }
 
+      /* Aviso de silueta (F2-14): mientras se ve un nivel de pirámide más
+         grueso del que corresponde al zoom. Vacío y sin caja mientras no haya
+         nada provisional, igual que la barra del doble cursor: un rótulo
+         permanente en medio del trazado se deja de leer a los dos minutos, y
+         entonces deja de avisar. La opacidad reducida de la propia curva
+         (`render/progresivo.ts`) y este texto son las dos mitades de la misma
+         señal: una se ve de reojo, la otra dice cuánto está decimado. */
+      .dlv-nota-silueta:not(:empty) {
+        padding: 2px 8px;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.55);
+        color: var(--texto-tenue);
+        font-size: 0.8em;
+        white-space: nowrap;
+      }
+
       .dlv-panel-divisor {
         background: var(--eje);
         opacity: 0.4;

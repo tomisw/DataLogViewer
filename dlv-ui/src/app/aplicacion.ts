@@ -48,6 +48,13 @@ import { PanelesApilados } from "../paneles/paneles.ts";
 import { contextoDesdeDocumento } from "../paneles/contexto-dom.ts";
 import { ajustarLienzo, Renderizador } from "../render/renderizador.ts";
 import { elegirNivel, type ResumenNivel } from "../render/escala.ts";
+import {
+  marcaDeSilueta,
+  motivoDeAbandono,
+  notaCombinada,
+  planificar,
+  type NivelEnMemoria,
+} from "../render/progresivo.ts";
 import type { Color, CubosContinuos, Vista, Viewport } from "../render/tipos.ts";
 import { GestorEscalas, tituloConModo } from "../escalas/gestor.ts";
 import type { RangoValor } from "../escalas/rango.ts";
@@ -175,6 +182,11 @@ interface EstadoPanel {
   readonly canvas: HTMLCanvasElement;
   readonly svg: SVGSVGElement;
   readonly tablaCursor: HTMLTableElement;
+  /**
+   * Dónde se avisa de que lo que se ve es una silueta y no el dato (F2-14).
+   * Es texto, así que es DOM y no GPU — ADR-006 manda los adornos a DOM/SVG.
+   */
+  readonly notaSilueta: HTMLElement;
   readonly renderizador: Renderizador;
   gestor: GestorEscalas;
   cursor: CursorDeTabla;
@@ -615,7 +627,17 @@ export class Aplicacion {
       this.#contenedorPaneles,
       { t0: log.tInicio, t1: log.tFin, v0: 0, v1: 1 },
       () => this.#dispararRedibujado(),
-      { limites: { t0: log.tInicio, t1: log.tFin, v0: 0, v1: 1 } },
+      {
+        limites: { t0: log.tInicio, t1: log.tFin, v0: 0, v1: 1 },
+        // El programador de fotogramas sale del entorno inyectable y no del
+        // global. `ControladorDeNavegacion` ya ofrecía la costura («inyectable
+        // por las pruebas», `controlador.ts`) y aquí no se usaba, así que un
+        // gesto de rueda era lo único del ensamblado que seguía necesitando un
+        // navegador de verdad — justamente el gesto que dispara el renderizado
+        // progresivo, y por tanto el que hay que poder conducir en una prueba.
+        programarFotograma: (resolver) => this.#entorno.ventana.requestAnimationFrame(resolver),
+        cancelarFotograma: (id) => this.#entorno.ventana.cancelAnimationFrame(id),
+      },
     );
 
     this.#dispararRedibujado();
@@ -656,6 +678,21 @@ export class Aplicacion {
     tablaCursor.style.setProperty("right", "4px");
     contenido.appendChild(tablaCursor);
 
+    // Arriba y centrado: las otras tres zonas del panel ya están ocupadas
+    // —leyenda arriba a la derecha (`MARGEN_LEYENDA` de `ejes/ejes.ts`), tabla
+    // del cursor abajo a la derecha, rótulos del eje Y a la izquierda— y un
+    // aviso que se solapa con un número es peor que no ponerlo.
+    const notaSilueta = this.#entorno.documento.createElement("div");
+    notaSilueta.className = "dlv-nota-silueta";
+    notaSilueta.style.setProperty("position", "absolute");
+    notaSilueta.style.setProperty("top", "4px");
+    notaSilueta.style.setProperty("left", "50%");
+    notaSilueta.style.setProperty("transform", "translateX(-50%)");
+    // No captura el puntero: el panel entero es zona de arrastre y de cursor, y
+    // un rótulo que se traga los eventos deja un agujero muerto en medio.
+    notaSilueta.style.setProperty("pointer-events", "none");
+    contenido.appendChild(notaSilueta);
+
     const renderizador = this.#entorno.crearRenderizador(canvas);
     const gestor = new GestorEscalas();
     const primerCanal = definicion.canales[0];
@@ -680,6 +717,7 @@ export class Aplicacion {
       canvas,
       svg,
       tablaCursor,
+      notaSilueta,
       renderizador,
       gestor,
       cursor,
@@ -828,17 +866,26 @@ export class Aplicacion {
     const anchoPx = this.#paneles.anchoContenidoPx();
     const alturasPx = this.#paneles.alturasPx();
 
+    // FASE 1 — la silueta, sin un solo `await` (F2-14).
+    //
+    // Va en su propio bucle sobre TODOS los paneles y antes de la fase 2 por
+    // una razón concreta: en cuanto la fase 2 espera datos del primer panel,
+    // el resto se queda sin dibujar hasta la vuelta siguiente. Los dos bucles
+    // son la diferencia entre «todos los paneles responden al gesto» y «el
+    // primero responde y los demás esperan».
     for (const estado of this.#porPanel.values()) {
       this.#reajustarLienzo(estado);
+      this.#pintarSilueta(estado, vista, fraccionVisible, anchoPx);
+    }
+
+    // FASE 2 — el nivel que de verdad corresponde a este zoom.
+    for (const estado of this.#porPanel.values()) {
       const rangosVisibles = new Map<string, RangoValor | null>();
       const canalesCursor: CanalCursor[] = [];
       let factorCambio = false;
 
       for (const canalId of estado.canalesIds) {
-        if (!this.#colorPorCanal.has(canalId)) {
-          this.#colorPorCanal.set(canalId, colorPorIndice(this.#colorPorCanal.size));
-        }
-        const color = this.#colorPorCanal.get(canalId)!;
+        const color = this.#colorDe(canalId);
 
         const niveles = await this.#nivelesDe(canalId);
         // Una reconstrucción (`#reconstruir`) más reciente pudo destruir este
@@ -860,9 +907,27 @@ export class Aplicacion {
         if (entrada === undefined) {
           const pedir = resultado.estado === "fallo" ? resultado.pedir : rangoPedido;
           const cubos = await this.#fuente.pedirCubos(log.logId, canalId, pedir, factor);
-          if (generacion !== this.#generacion) return;
           entrada = { cubos, cubre: pedir };
-          this.#cache.guardar(clave, entrada);
+          // Se guarda ANTES de decidir si esta pasada sigue valiendo, salvo si
+          // hubo reconstrucción: `abrirLog` cambia `this.#cache` por una nueva,
+          // así que guardar entonces metería cubos del log anterior en la caché
+          // del log nuevo. Sin reconstrucción, guardar aunque se abandone es lo
+          // que hace converger un gesto largo: los cubos ya están pagados y la
+          // pasada siguiente los encuentra en vez de volver a pedirlos.
+          if (generacion === this.#generacion) this.#cache.guardar(clave, entrada);
+          const motivo = motivoDeAbandono({
+            generacionAlPedir: generacion,
+            generacionAhora: this.#generacion,
+            hayPasadaPendiente: this.#pendienteOtraVuelta,
+          });
+          // `reconstruccion`: este `estado` puede estar destruido y su
+          // `Renderizador` con él (ver la nota de `#generacion`).
+          // `vista-movida`: el panel vive, pero ya hay otra pasada encolada con
+          // un encuadre más reciente; subir esto a la GPU sería trabajo tirado.
+          // En los dos casos la silueta de la fase 1 se queda en pantalla con
+          // su aviso puesto, que es la respuesta correcta a «el refinamiento
+          // llegó tarde»: nunca un hueco.
+          if (motivo !== null) return;
         }
 
         const unidadResuelta = this.#unidadDe(canalId);
@@ -870,15 +935,7 @@ export class Aplicacion {
         const parametro = this.#parametroDe(canalId);
         const aCanonica = this.#aCanonicaDe(canalId);
 
-        // El tema entra en la clave porque el COLOR va en la misma subida a la
-        // GPU que los datos: sin él, un cambio de tema no volvía a subir nada y
-        // las curvas se quedaban con el color del tema anterior aunque el resto
-        // de la interfaz ya hubiera cambiado. La clave tiene que nombrar todo lo
-        // que `renderizadorSubir` mete en la GPU, no solo los datos — y por eso
-        // el parámetro de estequiometría también entra: cambiar de gasolina a
-        // E85 no cambia la unidad (sigue siendo AFR), pero sí todos los valores
-        // subidos. Sin él, elegir E85 no repintaba nada.
-        const claveSubida = `${factor}|${entrada.cubre.t0}|${entrada.cubre.t1}|${unidadResuelta?.unidad.id ?? ""}|${parametro ?? ""}|${obtenerTemaActual()}`;
+        const claveSubida = this.#claveSubida(canalId, factor, entrada.cubre, "definitivo");
         if (estado.ultimaSubida.get(canalId) !== claveSubida) {
           renderizadorSubir(
             estado.renderizador,
@@ -905,13 +962,7 @@ export class Aplicacion {
           factorCambio = true;
         }
 
-        const rangoRaw = rangoVisibleDeCubos(entrada.cubos, vista);
-        rangosVisibles.set(
-          canalId,
-          rangoRaw === null
-            ? null
-            : rangoConvertido(rangoRaw, aCanonica, conversion, parametro),
-        );
+        rangosVisibles.set(canalId, this.#rangoVisibleEnUnidad(canalId, entrada.cubos, vista));
 
         // Con el nombre y la unidad activa: la tabla rotulaba las filas con el
         // id nativo («5841») y no decía en qué unidad estaba el número.
@@ -952,7 +1003,159 @@ export class Aplicacion {
           unidad: this.#etiquetaUnidadDe(id),
         })),
       });
+
+      // Llegar aquí significa que todos los canales del panel están dibujados
+      // con SU nivel, así que ya no hay nada provisional que avisar. Si la
+      // pasada se hubiera abandonado por el camino, este `return` no se
+      // alcanzaría y el aviso de la fase 1 seguiría puesto, que es justo lo
+      // que se quiere mientras el dato bueno no esté.
+      this.#escribirNota(estado, "");
     }
+  }
+
+  /**
+   * Dibuja YA la mejor aproximación que hay en memoria, marcada como tal
+   * (F2-14, E3.7).
+   *
+   * SIN UN SOLO `await`, Y ESO ES EL MÓDULO ENTERO
+   * ==============================================
+   * Lo que hace que esto sea «inmediato» no es que sea rápido: es que no cede
+   * el control. Todo lo que necesita —qué niveles tiene el canal, qué hay en
+   * la caché, qué unidad está activa— ya está en memoria, así que la silueta
+   * se sube y se dibuja en el mismo turno del bucle de eventos en el que
+   * llegó el gesto. Un `await` aquí, aunque resolviera al instante, movería el
+   * dibujo al turno siguiente y devolvería el problema que esta tarea viene a
+   * quitar. `#nivelesPorCanal` se lee directamente y no por `#nivelesDe`, que
+   * es asíncrono, por esa misma razón: si el canal todavía no tiene niveles
+   * conocidos es que se acaba de abrir el log y no hay nada que dibujar.
+   *
+   * QUÉ NO HACE
+   * ===========
+   * No pide nada. Si no hay nada utilizable en memoria, deja el panel como
+   * estaba y se calla: reutilizar los cubos del rango de tiempo anterior sería
+   * un trazo que no corresponde a los segundos que rotula el eje.
+   */
+  #pintarSilueta(
+    estado: EstadoPanel,
+    vista: Vista,
+    fraccionVisible: number,
+    anchoPx: number,
+  ): void {
+    const rangos = new Map<string, RangoValor | null>();
+    const notas: string[] = [];
+
+    for (const canalId of estado.canalesIds) {
+      const niveles = this.#nivelesPorCanal.get(canalId);
+      if (niveles === undefined || niveles.length === 0) continue;
+      const factorObjetivo = niveles[elegirNivel(niveles, fraccionVisible, anchoPx)]!.factor;
+      const plan = planificar(factorObjetivo, this.#nivelesEnMemoria(canalId, niveles), vista);
+      if (plan.tipo !== "silueta") continue;
+      const entrada = this.#cache.mirar({ canal: canalId, factor: plan.factor });
+      if (entrada === undefined) continue; // no debería pasar: de ahí salió el plan
+
+      const marca = marcaDeSilueta(this.#colorDe(canalId), plan.factor, plan.factorObjetivo);
+      const claveSubida = this.#claveSubida(canalId, plan.factor, entrada.cubre, "silueta");
+      if (estado.ultimaSubida.get(canalId) !== claveSubida) {
+        renderizadorSubir(
+          estado.renderizador,
+          canalId,
+          entrada.cubos,
+          this.#aCanonicaDe(canalId),
+          this.#conversionDe(canalId),
+          this.#parametroDe(canalId),
+          marca.color,
+        );
+        estado.ultimaSubida.set(canalId, claveSubida);
+      }
+      rangos.set(canalId, this.#rangoVisibleEnUnidad(canalId, entrada.cubos, vista));
+      notas.push(marca.nota);
+    }
+
+    const nota = notaCombinada(notas);
+    this.#escribirNota(estado, nota);
+    if (nota === "") return;
+
+    // La autoescala se recalcula con la silueta y no se hereda del fotograma
+    // anterior: tras ampliar mucho, el rango de valores del encuadre nuevo
+    // puede no tener nada que ver con el del anterior, y dibujar la silueta
+    // con la escala vieja la dejaría fuera del panel. Que el eje se ajuste dos
+    // veces (silueta y dato) es el precio, y es visible pero honesto; la
+    // alternativa —no ajustar— es un trazo plano o invisible.
+    estado.gestor.actualizar(rangos);
+    estado.renderizador.dibujar(
+      { t0: vista.t0, t1: vista.t1, v0: 0, v1: 1 },
+      estado.gestor.vistaPorSerie({ t0: vista.t0, t1: vista.t1 }),
+    );
+  }
+
+  /**
+   * Los niveles de un canal que YA están en la caché, con el tramo que cubren.
+   *
+   * Se pregunta con `mirar` y no con `consultar` a propósito: sondear qué hay
+   * no es usar la caché, y contarlo como acierto o fallo dejaría las
+   * estadísticas de F1-24 midiendo otra cosa distinta de la que dicen medir.
+   */
+  #nivelesEnMemoria(canalId: string, niveles: readonly ResumenNivel[]): NivelEnMemoria[] {
+    const enMemoria: NivelEnMemoria[] = [];
+    for (const nivel of niveles) {
+      const entrada = this.#cache.mirar({ canal: canalId, factor: nivel.factor });
+      if (entrada !== undefined) enMemoria.push({ factor: nivel.factor, cubre: entrada.cubre });
+    }
+    return enMemoria;
+  }
+
+  /**
+   * La clave de lo último subido a la GPU para un canal.
+   *
+   * Tiene que nombrar TODO lo que `renderizadorSubir` mete en la GPU, no solo
+   * los datos. El tema entra porque el color va en la misma subida: sin él, un
+   * cambio de tema no volvía a subir nada y las curvas se quedaban con el
+   * color anterior. El parámetro de estequiometría entra porque cambiar de
+   * gasolina a E85 no cambia la unidad (sigue siendo AFR) pero sí todos los
+   * valores. Y `calidad` entra desde F2-14, porque los mismos cubos se suben
+   * con dos alfas distintas según sean silueta o dato: sin ella, refinar un
+   * nivel que ya estaba subido como silueta no repintaba y el trazo se quedaba
+   * translúcido para siempre.
+   */
+  #claveSubida(
+    canalId: string,
+    factor: number,
+    cubre: Rango,
+    calidad: "silueta" | "definitivo",
+  ): string {
+    const unidadId = this.#unidadDe(canalId)?.unidad.id ?? "";
+    const parametro = this.#parametroDe(canalId) ?? "";
+    return `${factor}|${cubre.t0}|${cubre.t1}|${unidadId}|${parametro}|${obtenerTemaActual()}|${calidad}`;
+  }
+
+  /** El rango visible de unos cubos, ya en la unidad activa del canal. */
+  #rangoVisibleEnUnidad(
+    canalId: string,
+    cubos: CubosContinuos,
+    vista: Pick<Vista, "t0" | "t1">,
+  ): RangoValor | null {
+    const rangoRaw = rangoVisibleDeCubos(cubos, vista);
+    if (rangoRaw === null) return null;
+    return rangoConvertido(
+      rangoRaw,
+      this.#aCanonicaDe(canalId),
+      this.#conversionDe(canalId),
+      this.#parametroDe(canalId),
+    );
+  }
+
+  /** El color de un canal, asignándoselo la primera vez que se pide. */
+  #colorDe(canalId: string): Color {
+    const existente = this.#colorPorCanal.get(canalId);
+    if (existente !== undefined) return existente;
+    const color = colorPorIndice(this.#colorPorCanal.size);
+    this.#colorPorCanal.set(canalId, color);
+    return color;
+  }
+
+  /** Escribe el aviso de silueta de un panel, sin tocar el DOM si no cambia. */
+  #escribirNota(estado: EstadoPanel, texto: string): void {
+    if (estado.notaSilueta.textContent !== texto) estado.notaSilueta.textContent = texto;
   }
 
   // ------------------------------------------------------------------ //
