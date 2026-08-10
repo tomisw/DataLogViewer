@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 19:06:54Z"
+    "actualizado": "2026-08-10 19:15:14Z"
   },
   "tareas": [
     {
@@ -3264,13 +3264,19 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "d6a1d39"
+      ],
       "notas": [
         {
           "fecha": "2026-08-10 19:06:54Z",
           "texto": "Opus en linea (SS8.5), en paralelo con F5-09 (agente Sonnet, dlv-ui). Primera tarea de la fase FE del explorador de logs. Ficheros previstos: dlv-core/src/dlv_core/explorador/ + su prueba."
+        },
+        {
+          "fecha": "2026-08-10 19:15:14Z",
+          "texto": "Puerta G2: implementada por Opus en linea con pasada de revision propia. Primera tarea de la fase FE. dlv-core/src/dlv_core/explorador/indice.py + huella.py + 31 pruebas.\n\nHALLAZGO DE LA PASADA DE REVISION, y es el que mas conviene conocer: la huella que FE-01 necesita ya existia en cache.py (F1-11), pero cache.py importa NumPy y Polars EN LA CABECERA, asi que reutilizarla arrastraba las dos dependencias a un planificador que solo compara enteros y cadenas, y dejaba FE-01 inejecutable en un entorno sin ellas. Duplicar la huella era peor: dos definiciones de 'este fichero ha cambiado' que divergen producen exactamente el fallo de R14, que la tabla del explorador y el log abierto discrepen. Solucion: la huella sale a dlv_core/huella.py, sin ninguna dependencia, y cache.py la reexporta con __all__ explicito, igual que formatos/haltech.py sigue reexportando Aviso desde que se mudo a informes.py. COMPROBADO estaticamente que los 17 nombres que importan sesiones.py, test_cache.py y banco.py de dlv_core.cache siguen disponibles; no se pudo ejecutar test_cache.py porque necesita NumPy.\n\nEs el MISMO defecto que anote en FG-15 sobre robustez_csv.py y valores_csv.py. Van tres modulos con dependencia pesada en la cabecera cuando su parte pura no la necesita, y el patron correcto ya existe en el proyecto (reloj.py y malla.py con Protocol + importacion diferida). Conviene decidir si se arreglan los otros dos o si se acepta la asimetria.\n\nDECISIONES DE DISENO QUE CONVIENE CONOCER PARA FE-02 Y FE-08:\n- ADR-002: este modulo NO recorre la carpeta ni hace stat(). Recibe EntradaDeCarpeta ya leidas de quien recorre (dlv-api). Efecto colateral util: se puede planificar una carpeta de 5000 ficheros, o una donde el mtime va hacia atras, sin tocar el disco. Hay prueba de las dos.\n- El resumen es OPACO para el indice: lo produce e interpreta FE-02. Cambiar que metricas trae no obliga a tocar el planificador ni el formato del indice.\n- aplicar_resumenes acepta resumenes INCOMPLETOS, que es lo que hace posible el escaneo cancelable de E15.7. Un fichero sin resumen NO entra en el indice; no se rellena con un resumen vacio, porque eso seria indistinguible de un resumen que salio de verdad sin datos (R14). Un resumen vacio EXPLICITO si se guarda, porque es un hecho sobre el log.\n- plan.total_de_filas se conoce ANTES de calcular nada, para que E15.7 pueda enseñar '37 de 200' desde la primera fila en vez de una barra que no sabe cuanto queda.\n- El indice es una cache reconstruible: un indice corrupto, truncado o de otra version se DESCARTA y se recalcula (leer_indice devuelve None, no lanza). Es lo contrario de proyecto.py, que si lanza porque alli hay trabajo del usuario. Ocho casos probados.\n\nVERIFICACION: 31 pruebas nuevas en verde con pytest REAL. Suite del entorno: 841 pasan con los 2 fallos preexistentes de 3.11 contra PEP 695. ruff, ruff format y ADR-009 en verde. mypy NO puede comprobar este modulo aqui porque sigue las importaciones hasta piramide.py y no sabe parsear su sintaxis PEP 695; con --follow-imports=skip el unico aviso es un artefacto del salto (ClaveInvalidacion pasa a ser Any). En una maquina con mypy sobre 3.12 se comprueba solo.\n\nLO QUE FALTA: nada de esta tarea. FE-02 es la siguiente y es la que tiene el presupuesto duro (200 logs en menos de 60 s proyectando columnas)."
         }
       ]
     },
