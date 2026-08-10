@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 16:00:19Z
+Actualizado: 2026-08-10 19:06:54Z
 
 **208 / 761 pts cerrados (27.3 %)** · 143 pts esperando revisión humana → 46.1 % entregado
 
@@ -16,7 +16,7 @@ Actualizado: 2026-08-10 16:00:19Z
 | F2 | 9 | 8 | 5 | 58 | 0 | 80 |
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
-| FE | 0 | 0 | 0 | 52 | 0 | 52 |
+| FE | 0 | 0 | 5 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 0 | 76 | 0 | 76 |
 
 ## Requieren atención
@@ -55,6 +55,7 @@ Actualizado: 2026-08-10 16:00:19Z
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON PO |
+| `FE-01` Recorrido de carpeta e índice con huella (ru | en_curso | Opus 5 | G2 | Opus en linea (SS8.5), en paralelo con F5-09 (agente Sonnet, dlv-ui).  |
 
 ## F0 — 54/54 pts
 
@@ -216,7 +217,7 @@ Actualizado: 2026-08-10 16:00:19Z
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ·  | `FE-01` | Recorrido de carpeta e índice con huella (ruta, tamaño, fecha  | Opus 5 | 5 | F1-11 | G2 | — |
+| ▶  | `FE-01` | Recorrido de carpeta e índice con huella (ruta, tamaño, fecha  | Opus 5 | 5 | F1-11 | G2 | — |
 | ·  | `FE-02` | Resumen por log con columnas proyectadas: agregados exactos po | Opus 5 | 8 | FE-01, FG-09, F4-10 | G1 | — |
 | ·  | `FE-03` | `data/metricas_explorador.toml`: métricas por omisión, con su  | Sonnet 5 | 3 | FE-02 | G1 | — |
 | ·  | `FE-04` | Celda sin dato ≠ 0: rol ausente, canal vacío o agregado no cal | Opus 5 | 4 | FE-02 | G1 | — |

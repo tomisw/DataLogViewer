@@ -93,6 +93,12 @@ import numpy as np
 import polars as pl
 
 from dlv_core.almacen import ChannelSeries, Storage
+from dlv_core.huella import (
+    VERSION_ESQUEMA_CACHE,
+    ClaveInvalidacion,
+    construir_clave,
+    es_valida,
+)
 from dlv_core.piramide import (
     NivelBits,
     NivelContador,
@@ -104,6 +110,27 @@ from dlv_core.piramide import (
 from dlv_core.roles import ChannelKey
 from dlv_core.unidades import Afin
 
+__all__ = [
+    "VERSION_ESQUEMA_CACHE",
+    "ClaveInvalidacion",
+    "MetadatosCache",
+    "MetadatosCanal",
+    "Piramide",
+    "construir_clave",
+    "es_valida",
+    "escribir",
+    "generar_series_sinteticas",
+    "leer",
+    "leer_metadatos",
+    "medir_ciclo_escritura_lectura",
+]
+
+# `VERSION_ESQUEMA_CACHE`, `ClaveInvalidacion`, `construir_clave` y `es_valida`
+# viven ahora en `huella.py` y se reexportan aquí para que el código que los
+# importaba de este módulo no cambie — igual que `formatos/haltech.py` sigue
+# reexportando `Aviso` desde que se mudó a `informes.py`. Salieron porque este
+# módulo importa NumPy y Polars y la huella no necesita ninguno de los dos.
+
 # --------------------------------------------------------------------------- #
 # Versión del ESQUEMA de la caché (no la versión del parser/descriptor de
 # formato del log de origen, que llega de fuera): sube cuando cambia la FORMA
@@ -111,8 +138,7 @@ from dlv_core.unidades import Afin
 # esquema de columnas Parquet/JSON de este módulo. Cambiar este módulo sin
 # subir la versión es un error de revisión, no algo que el código pueda
 # detectar por sí solo.
-# --------------------------------------------------------------------------- #
-VERSION_ESQUEMA_CACHE = "1"
+
 
 # Unión de las cuatro variantes de pirámide de un solo canal (mismo tipo que
 # devuelve `piramide.construir_piramide`, con nombre para no repetir la unión
@@ -134,53 +160,6 @@ _DTYPE_POR_STORAGE: dict[Storage, type[np.generic]] = {
     Storage.ENUM_U16: np.uint16,
     Storage.BITS_U32: np.uint32,
 }
-
-
-@dataclass(slots=True, frozen=True)
-class ClaveInvalidacion:
-    """Clave de invalidación de caché (ADR-005): ruta, tamaño, mtime y versiones.
-
-    `ruta` se compara por igualdad de valor (dos `Path` iguales si su
-    representación en texto lo es): quien llama es responsable de pasar
-    siempre la misma forma (resuelta/absoluta o relativa, pero consistente)
-    tanto al escribir como al comprobar, o la invalidación disparará en falso
-    por una diferencia puramente cosmética de la ruta.
-    """
-
-    ruta: Path
-    tamano_bytes: int
-    mtime_ns: int
-    version_parser: str
-    version_descriptor_formato: str
-    # Ver docstring del módulo: no estaba en el stub original.
-    version_esquema_cache: str = VERSION_ESQUEMA_CACHE
-
-
-def construir_clave(
-    ruta: Path,
-    *,
-    tamano_bytes: int,
-    mtime_ns: int,
-    version_parser: str,
-    version_descriptor_formato: str,
-) -> ClaveInvalidacion:
-    """Fábrica de `ClaveInvalidacion` que fija `version_esquema_cache` al
-    valor que entiende ESTE código (`VERSION_ESQUEMA_CACHE`), para que quien
-    llama no tenga que conocer ni propagar ese detalle interno del módulo.
-
-    `ruta`/`tamano_bytes`/`mtime_ns` los obtiene quien llama (p. ej. `dlv-api`
-    con `Path.stat()`): este módulo no toca el sistema de ficheros por su
-    cuenta para construir la clave (ADR-002), solo empaqueta los valores que
-    se le dan.
-    """
-    return ClaveInvalidacion(
-        ruta=ruta,
-        tamano_bytes=tamano_bytes,
-        mtime_ns=mtime_ns,
-        version_parser=version_parser,
-        version_descriptor_formato=version_descriptor_formato,
-        version_esquema_cache=VERSION_ESQUEMA_CACHE,
-    )
 
 
 @dataclass(slots=True, frozen=True)
@@ -227,24 +206,6 @@ class MetadatosCache:
     canales: tuple[MetadatosCanal, ...]
 
 
-def es_valida(clave_almacenada: ClaveInvalidacion | None, clave_actual: ClaveInvalidacion) -> bool:
-    """Compara dos claves de invalidación campo a campo, sin tocar disco (ni
-    siquiera necesita que el JSON de metadatos exista más allá de haberse
-    leído antes: esta función en sí no hace E/S).
-
-    `clave_almacenada` es `None` cuando todavía no hay caché (primera
-    apertura, o el JSON de metadatos se ha borrado/corrompido): en ese caso
-    la función NO lanza, responde `False` ("hace falta reconstruir"), que es
-    la respuesta correcta para "no hay nada que invalidar todavía".
-    """
-    if clave_almacenada is None:
-        return False
-    return clave_almacenada == clave_actual
-
-
-# --------------------------------------------------------------------------- #
-# Esquema físico
-# --------------------------------------------------------------------------- #
 def _ruta_metadatos(base: Path) -> Path:
     return base.with_name(base.name + ".json")
 

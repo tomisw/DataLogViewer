@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 16:00:19Z"
+    "actualizado": "2026-08-10 19:06:54Z"
   },
   "tareas": [
     {
@@ -3264,10 +3264,15 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-10 19:06:54Z",
+          "texto": "Opus en linea (SS8.5), en paralelo con F5-09 (agente Sonnet, dlv-ui). Primera tarea de la fase FE del explorador de logs. Ficheros previstos: dlv-core/src/dlv_core/explorador/ + su prueba."
+        }
+      ]
     },
     {
       "id": "FE-02",
