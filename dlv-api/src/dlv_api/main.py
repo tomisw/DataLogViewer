@@ -68,6 +68,14 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 
 from dlv_api import __version__ as version_dlv_api
+from dlv_api.exportacion import (
+    MEDIA_TYPE_CSV,
+    MEDIA_TYPE_PARQUET,
+    ColumnaAExportar,
+    ErrorDeExportacion,
+    exportar_csv,
+    exportar_parquet,
+)
 from dlv_api.sesiones import (
     MAXIMO_SESIONES,
     CanalSesion,
@@ -96,7 +104,15 @@ from dlv_core.transporte import (
     cubos_a_binario,
     serie_a_arrow_ipc,
 )
-from dlv_core.unidades import Afin, Catalogo, Conversion, Reciproca, cargar_catalogo
+from dlv_core.unidades import (
+    Afin,
+    Catalogo,
+    Clase,
+    Conversion,
+    ErrorDeUnidad,
+    Reciproca,
+    cargar_catalogo,
+)
 
 _RAIZ_REPO = Path(__file__).resolve().parents[3]
 _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
@@ -814,6 +830,131 @@ def cerrar_log(comando: ComandoCerrarLog, request: Request) -> RespuestaCerrarLo
     return RespuestaCerrarLog(cerrado=cerrado, sesiones_abiertas=len(registro))
 
 
+# --------------------------------------------------------------------------- #
+# Exportación de datos a CSV/Parquet con unidad declarada por columna (F4-12)
+# --------------------------------------------------------------------------- #
+class ComandoExportarDatos(BaseModel):
+    """Cuerpo de `/comandos/exportar-datos`: qué sesión, qué canales, en qué
+    formato y en qué unidad.
+
+    Exporta la serie COMPLETA de cada canal (igual que `/comandos/serie`, no
+    recortada a un rango visible): recortar por `[t0, t1]` es una extensión
+    razonable pero queda fuera de esta tarea, que es la del módulo de
+    exportación, no la del recorte por rango — ver el informe de F4-12.
+    """
+
+    id_sesion: str
+    canales_ids: list[int]
+    formato: Literal["csv", "parquet"]
+    unidades: dict[int, str] | None = None
+    """`canal_id -> unidad de destino`. Un canal ausente del diccionario (o
+    `unidades=None`) se exporta en su unidad CANÓNICA, no en la que esté
+    mostrando la interfaz en ese momento: `dlv-api` no sabe qué unidad tiene
+    activa el frontend (ADR-004, la conversión de presentación vive en el
+    navegador), así que quien pide la exportación es quien tiene que decir en
+    qué unidad la quiere, igual que ya decide `canales_ids`."""
+    referencia_kpa: float | None = None
+    """Pasa a relativo los canales de presión (`docs/06` §6.6). No se aplica a
+    ninguna otra dimensión: pedirlo para un canal que no sea `pressure` se
+    ignora, no es un error, porque este campo es intencionadamente global a
+    la petición y no por canal."""
+
+
+def exportar_datos(comando: ComandoExportarDatos, request: Request) -> Response:
+    """CSV o Parquet de los canales pedidos, con la unidad de cada columna
+    declarada en el propio fichero (`dlv_api.exportacion`, ver su docstring
+    para el porqué de cada decisión).
+
+    Todos los canales pedidos tienen que compartir el mismo eje de tiempo
+    (mismo grupo de muestreo, ADR-003): unir canales de grupos distintos en
+    una sola tabla exige una política de interpolación o de unión que este
+    comando no toma, porque no es suya la decisión — R4 de `docs/02` §2.8 es
+    tajante en que el desfase entre segmentos nunca se interpola en silencio.
+    Pedirlo da 422, no una tabla con huecos rellenados a ciegas.
+    """
+    try:
+        sesion = _registro(request).obtener(comando.id_sesion)
+    except SesionNoEncontrada as e:
+        raise HTTPException(status_code=404, detail=str(e)) from e
+
+    if not comando.canales_ids:
+        raise HTTPException(status_code=422, detail="hay que pedir al menos un canal")
+
+    canales: list[CanalSesion] = []
+    for canal_id in comando.canales_ids:
+        canal = sesion.por_id.get(canal_id)
+        if canal is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"la sesión {comando.id_sesion} no tiene el canal {canal_id}",
+            )
+        canales.append(canal)
+
+    primero = canales[0]
+    for canal in canales[1:]:
+        if canal.t_segundos is not primero.t_segundos:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"el canal {canal.id} no comparte el eje de tiempo del canal "
+                    f"{primero.id}: exportar canales de grupos de muestreo distintos "
+                    "en una sola tabla exige una política de unión o interpolación "
+                    "que este comando no decide"
+                ),
+            )
+
+    unidades_por_canal = comando.unidades or {}
+    columnas = [
+        ColumnaAExportar(
+            nombre="t",
+            valores=primero.t_segundos,
+            clase=Clase.PUNTO,
+            dimension_id="time",
+        ),
+        *(
+            ColumnaAExportar(
+                nombre=canal.nombre,
+                valores=canal.serie.v,
+                clase=Clase.PUNTO,
+                dimension_id=canal.dimension,
+                confianza=canal.confianza,
+                to_canon=canal.serie.to_canon,
+                unidad_destino=unidades_por_canal.get(canal.id),
+                # Solo tiene sentido para `pressure`: `ColumnaAExportar` no
+                # comprueba la dimensión, así que se filtra aquí y no se
+                # cuela un `referencia_kpa` en un canal que no es de presión.
+                referencia_kpa=comando.referencia_kpa if canal.dimension == "pressure" else None,
+            )
+            for canal in canales
+        ),
+    ]
+
+    catalogo = _catalogo_unidades()
+    try:
+        if comando.formato == "csv":
+            cuerpo = exportar_csv(columnas, catalogo=catalogo)
+            media_type = MEDIA_TYPE_CSV
+        else:
+            cuerpo = exportar_parquet(columnas, catalogo=catalogo)
+            media_type = MEDIA_TYPE_PARQUET
+    except ErrorDeUnidad as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    except ErrorDeExportacion as e:
+        # 501 y no 422 ni 500: lo que ha pedido el cliente es válido y esta
+        # instalación no lo puede hacer (una versión de Polars sin
+        # `write_parquet(metadata=...)`). Un 422 diría que la petición está mal y
+        # un 500 dejaría llegar la traza al usuario en vez del mensaje que
+        # explica qué actualizar.
+        raise HTTPException(status_code=501, detail=str(e)) from e
+
+    nombre_fichero = f"{Path(sesion.ruta).stem}.{comando.formato}"
+    return Response(
+        content=cuerpo,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{nombre_fichero}"'},
+    )
+
+
 def crear_app(
     *,
     token_sesion: str,
@@ -857,12 +998,19 @@ def crear_app(
     # no da ningún error: `respuesta.headers.get("X-Cubos")` devuelve `null`,
     # el frontend lee cero cubos y los paneles salen vacíos con un 200 en el
     # registro del servidor. Ver `CABECERAS_EXPUESTAS` y `tests/test_cors.py`.
+    #
+    # `Content-Disposition` no es una `X-*` (por eso no vive en
+    # `CABECERAS_EXPUESTAS`, que es la lista específica de esas) pero tampoco
+    # está en las siete cabeceras "simples" que el estándar deja leer sin
+    # exponerlas: sin esto, `/comandos/exportar-datos` (F4-12) sirve el
+    # nombre de fichero sugerido y el frontend no puede leerlo con
+    # `respuesta.headers.get(...)`, aunque la descarga en sí funcione igual.
     app.add_middleware(
         CORSMiddleware,
         allow_origin_regex=r"^http://(127\.0\.0\.1|localhost):\d+$",
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=list(CABECERAS_EXPUESTAS),
+        expose_headers=[*CABECERAS_EXPUESTAS, "Content-Disposition"],
     )
     app.state.token_sesion = token_sesion
     app.state.registro_sesiones = RegistroSesiones(
@@ -918,6 +1066,12 @@ def crear_app(
         "/comandos/unidades",
         catalogo_unidades,
         methods=["GET"],
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/exportar-datos",
+        exportar_datos,
+        methods=["POST"],
         dependencies=[Depends(verificar_token)],
     )
     return app
