@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 19:15:14Z
+Actualizado: 2026-08-10 19:28:29Z
 
 **213 / 761 pts cerrados (28.0 %)** · 143 pts esperando revisión humana → 46.8 % entregado
 
@@ -17,7 +17,7 @@ Actualizado: 2026-08-10 19:15:14Z
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
-| F5 | 0 | 0 | 0 | 76 | 0 | 76 |
+| F5 | 0 | 0 | 3 | 73 | 0 | 76 |
 
 ## Requieren atención
 
@@ -55,6 +55,7 @@ Actualizado: 2026-08-10 19:15:14Z
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON PO |
+| `F5-09` Paleta de comandos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c61 |
 
 ## F0 — 54/54 pts
 
@@ -241,7 +242,7 @@ Actualizado: 2026-08-10 19:15:14Z
 | ·  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | — |
 | ·  | `F5-07` | Espacio de trabajo `.dlvproj` persistente, con emparejamientos | Sonnet 5 | 5 | F3-01, F2-03 | G3 | — |
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
-| ·  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |
+| ▶  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |
 | ·  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | — |
 | ·  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
 | ·  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | — |

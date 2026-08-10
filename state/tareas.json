@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 19:15:14Z"
+    "actualizado": "2026-08-10 19:28:29Z"
   },
   "tareas": [
     {
@@ -3685,10 +3685,15 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "orquestador",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-10 19:28:29Z",
+          "texto": "CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c6104cf. Entregada por un agente Sonnet y revisada e integrada por Opus.\n\nSigue en_curso porque la puerta es G3 y vitest no se puede ejecutar aqui (npm da 403, no hay node_modules). Lo que SI se ha ejecutado: tsc --noEmit sin ningun error de tipos real en todo dlv-ui, y 17 comprobaciones con node --experimental-strip-types sobre el registro de comandos, el filtrado difuso, el tema con entorno inyectado y la guarda del selector, todas en verde.\n\nEL HALLAZGO IMPORTANTE ES CONTRA MI PROPIO TRABAJO DE F3-21, y conviene leerlo antes de fiarse de cualquier prueba de dlv-ui que yo haya escrito: el agente vio de paso que selector-tema.test.ts usaba document global mientras vitest.config.ts fija environment 'node' a proposito. Al comprobarlo el problema era mio y peor: tema.ts leia window, document y localStorage de los globales y sus DOS ficheros de prueba los parcheaban, asi que en CI —que es justo la puerta G4 de F3-21— habrian fallado los dos por falta de esos globales, despues de que yo cerrara la tarea diciendo que CI los correria. Arreglado en el fondo: tema.ts recibe un EntornoTema inyectable (el patron que ya usa todo dlv-ui con dom/doble-documento.ts y render/doble-gl.ts) y las pruebas inyectan dobles sin tocar ningun global. selector-tema.test.ts deja de construir un <select>: se exporta esNombreDeTema, que es su unica decision, y el cableado del DOM se queda sin prueba unitaria como selector-canales.ts y paleta-comandos.ts.\n\nCONSECUENCIA PARA F3-21: sigue en_curso y su nota ya decia que faltaba CI, pero ahora ademas sus pruebas SI pueden pasar. Antes no.\n\nQUE FALTA PARA CERRAR F5-09: npm ci y npm run test en dlv-ui. Y probar la paleta a mano, que es lo que ninguna prueba de las de hoy cubre: abrir con Ctrl+K, escribir para filtrar, moverse con las flechas, ejecutar con Enter, cerrar con Escape y comprobar que el foco vuelve donde estaba. El componente DOM (paleta-comandos.ts) no tiene prueba unitaria, y eso es deliberado y consistente con la casa, pero significa que su comportamiento real solo lo valida una persona o F5-12.\n\nDEFECTO AJENO QUE ANOTO SIN ARREGLAR, visto por el agente y que confirmo: en dlv-ui/src/app/aplicacion.ts (~419 y ~548, anteriores a esta tarea) hay casts entre dos Pick<Document,...> que no se solapan del todo; compilan porque TS es permisivo con ese patron, pero ocultan que EntornoApp.documento no declara createTextNode aunque en la practica siempre recibe algo que lo tiene. El agente repitio el patron para no introducir una inconsistencia de estilo nueva. Conviene arreglar el tipo de EntornoApp en vez de seguir castando."
+        }
+      ]
     },
     {
       "id": "F5-10",
