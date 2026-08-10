@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 08:19:54Z"
+    "actualizado": "2026-08-10 15:36:49Z"
   },
   "tareas": [
     {
@@ -2076,10 +2076,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "46d8ff6"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-10 15:36:49Z",
+          "texto": "Puerta G2: implementada por Opus en linea con pasada de revision propia. dlv-core/tests/test_fuzzing_generico.py, 9 pruebas (7 pasan, 2 saltadas por falta de Polars y Hypothesis, y la suite lo DECLARA en vez de callarlo).\n\nLa retoma un subagente local que se corto por limite de sesion sin escribir nada; empezada de cero.\n\nQUE FUZZEA: la cadena de decisiones completa, sondeo -> decimal -> estructura -> tiempo -> tipos, con las invariantes de FG-14 comprobadas aparte. Contrato: para cualquier entrada, o resultado valido con avisos, o uno de los errores declarados. UnicodeDecodeError se rechaza EXPLICITAMENTE porque hereda de ValueError y un 'except ValueError' lo daria por bueno.\n\nLO QUE NO FUZZEA Y POR QUE: la conversion de columna completa de valores_csv y enums_csv opera sobre polars.Series; fuzzearla con bytes arbitrarios probaria el manejo de errores de Polars y no el contrato de este proyecto. Es la misma exclusion que hizo F1-36 con parsear_cuerpo.\n\nDOS HALLAZGOS DE INTEGRACION que dejo anotados y NO arreglo, porque son de FG-07 y FG-14 y no mias:\n1. robustez_csv.py (FG-14) y valores_csv.py (FG-07) importan Polars en la CABECERA, no de forma diferida como reloj.py y malla.py. Consecuencia: el modulo entero es inimportable sin Polars, asi que no se puede probar ni revisar en un entorno sin el, y cualquier prueba que los toque arrastra la dependencia. El patron del proyecto para esto ya existe (Protocol + importacion diferida) y estos dos modulos no lo siguen.\n2. FG-14 devuelve un polars.DataFrame y inferir_tipos (FG-05) consume filas de cadenas: encadenarlos exige recorrer el DataFrame fila a fila en Python, que es justo lo que prohibe ADR-009. Hoy no se encadenan en produccion, asi que no hay bug, pero el asistente de importacion (FG-11) va a necesitar exactamente ese encadenado. O FG-05 necesita un camino nativo de Polars, o FG-14 tiene que exponer aparte las filas de la muestra acotada. Conviene decidirlo ANTES de FG-11.\n\nVERIFICACION: ruff check y ruff format en verde. pytest real: 7 pasan y 2 saltadas en el fichero; la suite entera del entorno 798 pasan con los 2 fallos preexistentes de 3.11 contra la sintaxis PEP 695 de piramide.py. ADR-009 en verde. mypy --strict limpio salvo los decoradores de Hypothesis, que dan 'untyped-decorator' porque el paquete no esta instalado: es la MISMA condicion que ya tiene test_fuzzing_formato.py (29 errores del mismo tipo) y se resuelve donde Hypothesis existe.\n\nLO QUE NO HE PODIDO EJECUTAR: las propiedades con reduccion de caso minimo (Hypothesis) y las invariantes de FG-14 sobre su tabla (Polars). En una maquina con uv sync se ejecutan solas, sin tocar nada."
+        }
+      ]
     },
     {
       "id": "FG-16",
