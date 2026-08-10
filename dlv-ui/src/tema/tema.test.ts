@@ -1,21 +1,24 @@
 /**
  * Pruebas de `tema.ts` (F3-21).
  *
- * LA PREFERENCIA DEL SISTEMA SE SIMULA SIEMPRE, NUNCA SE HEREDA DE JSDOM
- * ======================================================================
- * `inicializarTema` sin preferencia guardada consulta
- * `matchMedia("(prefers-color-scheme: dark)")`, y el `matchMedia` de jsdom
- * responde `matches: false` a todo. La primera versión de estas pruebas daba por
- * hecho que el tema inicial era «oscuro»: en jsdom sale «claro», así que media
- * suite afirmaba lo contrario de lo que hacía el código —incluidas las que
- * comparaban la paleta oscura con la clara y en realidad comparaban la clara con
- * la clara, pasando por casualidad o fallando según el orden—.
+ * EL ENTORNO SE INYECTA; AQUÍ NO SE TOCA NINGÚN GLOBAL
+ * ====================================================
+ * `vitest.config.ts` fija `environment: "node"` a propósito, y todo `dlv-ui` se
+ * prueba con dobles inyectables (`dom/doble-documento.ts`, `render/doble-gl.ts`).
+ * La primera versión de estas pruebas parcheaba `window`, `document` y
+ * `localStorage` globales con `Object.defineProperty`: habría fallado en CI por
+ * falta de esos globales, y además daba por hecho que el tema inicial es
+ * «oscuro» cuando el `matchMedia` de jsdom responde `matches: false` a todo y por
+ * tanto habría salido «claro» — media suite afirmando lo contrario de lo que hace
+ * el código, incluidas dos comparaciones de la paleta oscura con la clara que en
+ * realidad comparaban la clara consigo misma.
  *
- * Aquí la consulta se simula en cada prueba, con lo que además se puede
- * comprobar de verdad la precedencia de §F3-21: usuario > sistema > oscuro.
+ * Con el entorno inyectado, la preferencia del sistema es un dato de la prueba y
+ * no una propiedad del entorno de ejecución, así que la precedencia de F3-21
+ * —usuario > sistema > oscuro— se puede comprobar de verdad.
  */
 
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 
 import {
   alCambiarTema,
@@ -26,109 +29,100 @@ import {
   obtenerTemaActual,
   parametrosDeSerie,
   TEMAS_DISPONIBLES,
+  type EntornoTema,
   type NombreColor,
   type NombreTema,
 } from "./tema.ts";
 
-const almacenamientoLocal = new Map<string, string>();
-const storageOriginal = typeof localStorage !== "undefined" ? localStorage : null;
-const matchMediaOriginal = window.matchMedia;
+/** Doble del `documentElement`: solo `dataset` y `style.setProperty`. */
+function crearRaizFalsa(): {
+  dataset: Record<string, string | undefined>;
+  style: { setProperty(n: string, v: string): void };
+  leer(nombre: string): string;
+} {
+  const propiedades: Record<string, string> = {};
+  return {
+    dataset: {} as Record<string, string | undefined>,
+    style: {
+      setProperty: (n: string, v: string): void => {
+        propiedades[n] = v;
+      },
+    },
+    leer: (nombre: string): string => propiedades[nombre] ?? "",
+  };
+}
 
-/** Simula la preferencia del sistema. `null` = el navegador no la expone. */
-function simularPreferenciaDelSistema(preferencia: "dark" | "light" | null): void {
-  if (preferencia === null) {
-    Object.defineProperty(window, "matchMedia", { value: undefined, writable: true });
-    return;
-  }
-  Object.defineProperty(window, "matchMedia", {
-    value: (consulta: string) => ({
-      matches: consulta.includes("dark") && preferencia === "dark",
-      media: consulta,
-      addEventListener: () => {},
-      removeEventListener: () => {},
-    }),
-    writable: true,
-  });
+/** Doble de `localStorage`, con el contenido a la vista de la prueba. */
+function crearAlmacenFalso(inicial: Record<string, string> = {}): {
+  getItem(c: string): string | null;
+  setItem(c: string, v: string): void;
+  contenido: Record<string, string>;
+} {
+  const contenido: Record<string, string> = { ...inicial };
+  return {
+    contenido,
+    getItem: (c: string): string | null => contenido[c] ?? null,
+    setItem: (c: string, v: string): void => {
+      contenido[c] = v;
+    },
+  };
+}
+
+let raiz: ReturnType<typeof crearRaizFalsa>;
+let almacen: ReturnType<typeof crearAlmacenFalso>;
+
+/** El entorno de una prueba: preferencia del sistema explícita, siempre. */
+function entornoCon(
+  preferencia: "dark" | "light" | null,
+  guardado?: string,
+): EntornoTema {
+  raiz = crearRaizFalsa();
+  almacen = crearAlmacenFalso(guardado === undefined ? {} : { "dlv-tema-preferido": guardado });
+  return {
+    ventana:
+      preferencia === null
+        ? undefined
+        : { matchMedia: (consulta: string) => ({ matches: consulta.includes("dark") && preferencia === "dark" }) },
+    documento: { documentElement: raiz },
+    almacen,
+  };
 }
 
 beforeEach(() => {
-  almacenamientoLocal.clear();
-  Object.defineProperty(window, "localStorage", {
-    value: {
-      getItem: (clave: string) => almacenamientoLocal.get(clave) ?? null,
-      setItem: (clave: string, valor: string) => almacenamientoLocal.set(clave, valor),
-      clear: () => almacenamientoLocal.clear(),
-      removeItem: (clave: string) => almacenamientoLocal.delete(clave),
-    },
-    writable: true,
-  });
-
-  // Por omisión, sistema en oscuro: así el estado de partida de cada prueba es
-  // el mismo y no depende de lo que hiciera la anterior (`temaActual` es estado
-  // de módulo).
-  simularPreferenciaDelSistema("dark");
-  inicializarTema();
-
-  if (document.documentElement.dataset.theme) delete document.documentElement.dataset.theme;
-  for (const variable of [
-    "fondo",
-    "panel",
-    "panel-borde",
-    "texto",
-    "texto-tenue",
-    "acento",
-    "rejilla",
-    "eje",
-  ]) {
-    document.documentElement.style.removeProperty(`--${variable}`);
-  }
-});
-
-afterEach(() => {
-  if (storageOriginal) {
-    Object.defineProperty(window, "localStorage", { value: storageOriginal, writable: true });
-  }
-  Object.defineProperty(window, "matchMedia", { value: matchMediaOriginal, writable: true });
+  // Estado de partida idéntico en cada prueba: `temaActual` es estado de módulo.
+  inicializarTema(entornoCon("dark"));
 });
 
 describe("tema: precedencia al inicializar", () => {
   it("sin preferencia guardada sigue al sistema en oscuro", () => {
-    simularPreferenciaDelSistema("dark");
-    inicializarTema();
+    inicializarTema(entornoCon("dark"));
     expect(obtenerTemaActual()).toBe("oscuro");
-    expect(document.documentElement.dataset.theme).toBe("oscuro");
+    expect(raiz.dataset.theme).toBe("oscuro");
   });
 
   it("sin preferencia guardada sigue al sistema en claro", () => {
-    simularPreferenciaDelSistema("light");
-    inicializarTema();
+    inicializarTema(entornoCon("light"));
     expect(obtenerTemaActual()).toBe("claro");
   });
 
   it("la preferencia del usuario gana a la del sistema", () => {
-    simularPreferenciaDelSistema("light");
-    almacenamientoLocal.set("dlv-tema-preferido", "altContraste");
-    inicializarTema();
+    inicializarTema(entornoCon("light", "altContraste"));
     expect(obtenerTemaActual()).toBe("altContraste");
   });
 
   it("cae a oscuro si el navegador no expone la preferencia", () => {
-    simularPreferenciaDelSistema(null);
-    inicializarTema();
+    inicializarTema(entornoCon(null));
     expect(obtenerTemaActual()).toBe("oscuro");
   });
 
   it("ignora un valor inválido en el almacenamiento y no lo aplica", () => {
-    simularPreferenciaDelSistema("light");
-    almacenamientoLocal.set("dlv-tema-preferido", "morado");
-    inicializarTema();
+    inicializarTema(entornoCon("light", "morado"));
     expect(obtenerTemaActual()).toBe("claro");
   });
 
   it("aplica las variables CSS en línea, que es lo que gana a la hoja", () => {
-    simularPreferenciaDelSistema("dark");
-    inicializarTema();
-    expect(document.documentElement.style.getPropertyValue("--fondo")).toBe("#14161a");
+    inicializarTema(entornoCon("dark"));
+    expect(raiz.leer("--fondo")).toBe("#14161a");
   });
 });
 
@@ -136,8 +130,8 @@ describe("tema: cambio explícito", () => {
   it("cambia el tema y lo guarda como preferencia", () => {
     establecerTema("altContraste");
     expect(obtenerTemaActual()).toBe("altContraste");
-    expect(almacenamientoLocal.get("dlv-tema-preferido")).toBe("altContraste");
-    expect(document.documentElement.dataset.theme).toBe("altContraste");
+    expect(almacen.contenido["dlv-tema-preferido"]).toBe("altContraste");
+    expect(raiz.dataset.theme).toBe("altContraste");
   });
 
   it("se puede pasar por los tres temas", () => {
@@ -149,9 +143,9 @@ describe("tema: cambio explícito", () => {
 
   it("declara color-scheme claro solo en el tema claro", () => {
     establecerTema("claro");
-    expect(document.documentElement.style.getPropertyValue("color-scheme")).toBe("light");
+    expect(raiz.leer("color-scheme")).toBe("light");
     establecerTema("altContraste");
-    expect(document.documentElement.style.getPropertyValue("color-scheme")).toBe("dark");
+    expect(raiz.leer("color-scheme")).toBe("dark");
   });
 });
 

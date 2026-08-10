@@ -383,6 +383,101 @@
         color: var(--texto-tenue);
         font-size: 10px;
       }
+
+      /* -------------------------------------------------------------- */
+      /* Paleta de comandos (F5-09)                                      */
+      /* -------------------------------------------------------------- */
+      /* Oculta por omisión: `PaletaComandos.abrir()` añade `--abierta`.
+         `display: none` y no `visibility`/`opacity`: así el diálogo entero
+         sale del árbol de accesibilidad mientras está cerrado, sin tener que
+         gestionar `aria-hidden` a mano (ver "LO QUE NO HACE" en la cabecera
+         de `paleta-comandos.ts`). */
+      .dlv-paleta {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 12vh;
+      }
+
+      .dlv-paleta--abierta {
+        display: flex;
+      }
+
+      .dlv-paleta__caja {
+        width: min(560px, 90vw);
+        max-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--panel);
+        border: 1px solid var(--panel-borde);
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+      }
+
+      .dlv-paleta__entrada {
+        flex: 0 0 auto;
+        padding: 12px 14px;
+        font: inherit;
+        font-size: 15px;
+        background: var(--fondo);
+        color: var(--texto);
+        border: none;
+        border-bottom: 1px solid var(--panel-borde);
+      }
+
+      .dlv-paleta__entrada:focus {
+        outline: 2px solid var(--acento);
+        outline-offset: -2px;
+      }
+
+      .dlv-paleta__lista {
+        flex: 1 1 auto;
+        list-style: none;
+        margin: 0;
+        padding: 4px;
+        overflow-y: auto;
+      }
+
+      .dlv-paleta__fila {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      /* `aria-selected` es la fuente de verdad para el lector de pantalla;
+         esta clase es la fuente de verdad visual, y las dos las pone el mismo
+         sitio (`#actualizarSeleccionVisual` en `paleta-comandos.ts`) para que
+         no puedan desincronizarse. */
+      .dlv-paleta__fila--activa {
+        background: var(--acento);
+        color: #06141f;
+      }
+
+      .dlv-paleta__categoria {
+        color: var(--texto-tenue);
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .dlv-paleta__fila--activa .dlv-paleta__categoria {
+        color: inherit;
+        opacity: 0.75;
+      }
+
+      .dlv-paleta__vacio {
+        margin: 0;
+        padding: 12px 14px;
+        color: var(--texto-tenue);
+        font-size: 13px;
+      }
     </style>
   </head>
   <body>

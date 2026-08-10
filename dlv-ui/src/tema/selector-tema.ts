@@ -24,6 +24,21 @@ import {
   type NombreTema,
 } from "./tema.ts";
 
+/**
+ * ¿Es `valor` uno de los tres temas?
+ *
+ * Se exporta y se prueba aparte porque es la ÚNICA decisión de este fichero:
+ * todo lo demás es construir nodos y cablear eventos, y eso no se prueba con
+ * vitest en este proyecto —`environment: "node"`, sin DOM— igual que no se
+ * prueba `selector-canales.ts`. Lo que sí tiene que estar cubierto es que un
+ * valor que no es un tema no acabe aplicándose: `HTMLSelectElement.value` es un
+ * `string` para el tipo, así que sin esta guarda una opción añadida desde fuera
+ * dejaría `temaActual` con un nombre que no tiene paleta.
+ */
+export function esNombreDeTema(valor: string): valor is NombreTema {
+  return (TEMAS_DISPONIBLES as readonly string[]).includes(valor);
+}
+
 /** Clase del contenedor, para que el estilo viva en la hoja y no aquí. */
 export const CLASE_SELECTOR_TEMA = "dlv-barra__tema";
 
@@ -58,8 +73,7 @@ export function montarSelectorDeTema(documento: Document = document): HTMLElemen
     // `TEMAS_DISPONIBLES`, así que la conversión es segura; aun así se comprueba,
     // porque `HTMLSelectElement.value` es un `string` para el tipo y una opción
     // añadida desde fuera no debería poder aplicar un tema que no existe.
-    const elegido = selector.value as NombreTema;
-    if (TEMAS_DISPONIBLES.includes(elegido)) establecerTema(elegido);
+    if (esNombreDeTema(selector.value)) establecerTema(selector.value);
   });
 
   contenedor.append(rotulo, selector);

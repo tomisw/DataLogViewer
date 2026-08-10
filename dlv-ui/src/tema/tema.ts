@@ -132,6 +132,55 @@ const TEMAS_POR_NOMBRE: Record<NombreTema, PaletaTema> = {
   altContraste: TEMA_ALTO_CONTRASTE,
 };
 
+/**
+ * Lo que este módulo necesita del navegador, y nada más.
+ *
+ * SE INYECTA, NO SE LEE DEL GLOBAL, Y ESA ES LA CORRECCIÓN
+ * ========================================================
+ * La primera versión leía `window`, `document` y `localStorage` directamente de
+ * los globales, protegidos con `typeof x === "undefined"`. Compilaba y funcionaba
+ * en el navegador, pero dejaba el módulo sin poder probarse: `vitest.config.ts`
+ * fija `environment: "node"` a propósito —el resto de `dlv-ui` se prueba con
+ * dobles inyectables (`dom/doble-documento.ts`, `render/doble-gl.ts`)— así que
+ * ahí no hay `window` ni `document`, y las pruebas que los tocaban habrían
+ * fallado en CI. Un módulo que solo se puede probar añadiendo un DOM simulado
+ * está pidiendo la dependencia que este proyecto decidió no tener.
+ *
+ * Todo es opcional porque el módulo tiene que seguir funcionando a trozos: sin
+ * `ventana` no hay preferencia del sistema, sin `almacen` la elección no
+ * sobrevive a recargar, y sin `documento` no se pintan las variables CSS. Ningún
+ * caso es un error, y los tres se dan de verdad (Node, modo privado, primer
+ * pintado).
+ */
+export interface EntornoTema {
+  readonly ventana?: { matchMedia(consulta: string): { matches: boolean } };
+  readonly documento?: {
+    documentElement: {
+      /* `string | undefined` y no `string`: el `DOMStringMap` de verdad declara
+         los valores como opcionales, así que exigir `string` haría que el
+         `document` real no encajara en esta interfaz. */
+      dataset: Record<string, string | undefined>;
+      style: { setProperty(nombre: string, valor: string): void };
+    };
+  };
+  readonly almacen?: {
+    getItem(clave: string): string | null;
+    setItem(clave: string, valor: string): void;
+  };
+}
+
+/** El entorno real del navegador, o piezas ausentes si no hay navegador. */
+export function entornoDelNavegador(): EntornoTema {
+  return {
+    ventana: typeof window === "undefined" ? undefined : window,
+    documento: typeof document === "undefined" ? undefined : document,
+    almacen: typeof localStorage === "undefined" ? undefined : localStorage,
+  };
+}
+
+/** El entorno con el que se inicializó. `establecerTema` usa el mismo. */
+let entorno: EntornoTema = {};
+
 /** Clave de almacenamiento local para la preferencia del usuario. */
 const CLAVE_ALMACENAMIENTO = "dlv-tema-preferido";
 
@@ -146,17 +195,18 @@ let paletaActual: PaletaTema = TEMA_OSCURO;
  * Resultado: `"dark"`, `"light"`, o `null`.
  */
 function preferenciaDelSistema(): "dark" | "light" | null {
-  if (typeof window === "undefined") return null;
-  const consulta = window.matchMedia("(prefers-color-scheme: dark)");
-  return consulta.matches ? "dark" : "light";
+  const ventana = entorno.ventana;
+  if (ventana === undefined) return null;
+  return ventana.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 /**
  * Recupera la preferencia guardada del usuario del almacenamiento local.
  */
 function preferenciaDelUsuario(): NombreTema | null {
-  if (typeof localStorage === "undefined") return null;
-  const valor = localStorage.getItem(CLAVE_ALMACENAMIENTO);
+  const almacen = entorno.almacen;
+  if (almacen === undefined) return null;
+  const valor = almacen.getItem(CLAVE_ALMACENAMIENTO);
   if (valor === null) return null;
   if (valor === "oscuro" || valor === "claro" || valor === "altContraste") {
     return valor;
@@ -200,8 +250,9 @@ function aplicarTema(nombre: NombreTema): void {
   temaActual = nombre;
   paletaActual = TEMAS_POR_NOMBRE[nombre];
 
-  if (typeof document !== "undefined") {
-    const root = document.documentElement;
+  const documento = entorno.documento;
+  if (documento !== undefined) {
+    const root = documento.documentElement;
     root.dataset.theme = nombre;
     // El estilo en línea gana a la hoja de estilos: este es el único sitio que
     // decide los colores en cuanto el módulo ha cargado (ver la cabecera).
@@ -229,7 +280,8 @@ function aplicarTema(nombre: NombreTema): void {
  * 2. Preferencia del sistema (`prefers-color-scheme`).
  * 3. Oscuro (valor por omisión).
  */
-export function inicializarTema(): void {
+export function inicializarTema(entornoNuevo: EntornoTema = entornoDelNavegador()): void {
+  entorno = entornoNuevo;
   const preferencia = preferenciaDelUsuario();
   if (preferencia !== null) {
     aplicarTema(preferencia);
@@ -254,9 +306,7 @@ export function inicializarTema(): void {
  */
 export function establecerTema(nombre: NombreTema): void {
   aplicarTema(nombre);
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem(CLAVE_ALMACENAMIENTO, nombre);
-  }
+  entorno.almacen?.setItem(CLAVE_ALMACENAMIENTO, nombre);
 }
 
 /**

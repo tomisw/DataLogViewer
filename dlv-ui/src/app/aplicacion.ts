@@ -77,8 +77,17 @@ import {
 } from "../unidades/conversion.ts";
 import { SelectorCombustible } from "../combustible/selector-combustible.ts";
 import { fabricaDesdeDocumento as fabricaCombustible } from "../combustible/dom.ts";
-import { alCambiarTema, obtenerTemaActual, parametrosDeSerie } from "../tema/tema.ts";
+import {
+  alCambiarTema,
+  establecerTema,
+  ETIQUETA_DE_TEMA,
+  obtenerTemaActual,
+  parametrosDeSerie,
+  TEMAS_DISPONIBLES,
+} from "../tema/tema.ts";
 import { montarSelectorDeTema } from "../tema/selector-tema.ts";
+import { RegistroComandos, type Comando } from "../paleta/comandos.ts";
+import { PaletaComandos } from "../paleta/paleta-comandos.ts";
 
 const EJE_PRINCIPAL = "principal";
 
@@ -274,6 +283,17 @@ export class Aplicacion {
   #selectorCombustible: SelectorCombustible | null = null;
   #resueltasUnidad = new Map<string, UnidadResuelta>();
 
+  /**
+   * Registro de acciones de la paleta de comandos (F5-09) y el diálogo que las
+   * ofrece. El registro vive aquí, no dentro de `PaletaComandos`: es
+   * `Aplicacion` quien sabe qué acciones existen y son alcanzables (abrir un
+   * log, cambiar de tema, añadir un canal), y `comandos.ts` explica en su
+   * cabecera por qué eso tiene que ser un registro por grupos y no una lista
+   * fija dentro del componente que las pinta.
+   */
+  readonly #comandos = new RegistroComandos();
+  #paleta: PaletaComandos | null = null;
+
   #paneles: PanelesApilados | null = null;
   #nav: ControladorDeNavegacion | null = null;
   #porPanel = new Map<string, EstadoPanel>();
@@ -317,10 +337,25 @@ export class Aplicacion {
     const boton = documento.createElement("button");
     boton.textContent = "Abrir log sintético";
     boton.addEventListener("click", () => void this.abrirLog("autolog-sintetico"));
+    // Botón visible además del atajo de teclado (F5-09): el atajo por sí solo
+    // no es descubrible ni alcanzable sin saberlo de antemano -- exactamente
+    // el motivo por el que `selector-tema.ts` existe en vez de dejar el tema
+    // solo a `prefers-color-scheme` (ver su cabecera).
+    const botonPaleta = documento.createElement("button");
+    botonPaleta.textContent = "Comandos (Ctrl/⌘K)";
+    botonPaleta.title = "Paleta de comandos: acciones y canales por búsqueda difusa";
+    botonPaleta.addEventListener("click", () => this.#paleta?.abrir());
     this.#estadoTexto = documento.createElement("span");
     this.#estadoTexto.className = "dlv-barra__estado";
     this.#estadoTexto.textContent = `fuente: ${fuente.nombre}`;
-    this.#barra.append(boton, montarSelectorDeTema(documento as unknown as Document), this.#estadoTexto);
+    this.#barra.append(
+      boton,
+      botonPaleta,
+      montarSelectorDeTema(documento as unknown as Document),
+      this.#estadoTexto,
+    );
+
+    this.#registrarComandosEstaticos();
 
     this.#barraDelta = documento.createElement("div");
     this.#barraDelta.className = "dlv-barra-delta";
@@ -365,13 +400,111 @@ export class Aplicacion {
     cuerpo.append(this.#barraLateral, this.#areaPrincipal);
     this.#raiz.append(this.#barra, this.#barraDelta, cuerpo);
 
+    // Se cuelga de `#raiz` y NO de `cuerpo` ni de `#areaPrincipal`: es
+    // `position: fixed` sobre toda la ventana (`index.html`, `.dlv-paleta`) y
+    // tiene que quedar por encima de la barra superior también, no solo del
+    // área de paneles.
+    this.#paleta = new PaletaComandos({
+      documento: documento as unknown as Pick<Document, "createElement" | "createTextNode">,
+      contenedor: this.#raiz,
+      obtenerComandos: () => this.#comandos.todos(),
+    });
+
     ventana.addEventListener("resize", () => {
       this.#paneles?.redimensionarContenedor();
       for (const estado of this.#porPanel.values()) this.#reajustarLienzo(estado);
       this.#dispararRedibujado();
     });
 
+    // El atajo de la paleta (F5-09) tiene que funcionar desde cualquier punto
+    // de la ventana -- incluso con el foco dentro de la entrada de búsqueda
+    // del selector de canales -- así que se escucha a nivel de `ventana`
+    // (`entorno.ventana`, no un elemento concreto) y no dentro de la propia
+    // paleta. `PaletaComandos.manejarAtajoGlobal` decide si la tecla es la
+    // suya (Ctrl/⌘K); cualquier otra se ignora sin efecto.
+    ventana.addEventListener("keydown", (evento) => {
+      this.#paleta?.manejarAtajoGlobal(evento as KeyboardEvent);
+    });
+
     this.#iniciarCicloCursor();
+  }
+
+  // ------------------------------------------------------------------ //
+  // Paleta de comandos (F5-09)
+  // ------------------------------------------------------------------ //
+
+  /**
+   * Las acciones que no dependen de qué log está abierto: abrir el log
+   * sintético y cambiar de tema. Se registran una sola vez, al construirse
+   * `Aplicacion` -- a diferencia del grupo "canales" (`#registrarComandosDeCanales`),
+   * que se sustituye entero cada vez que se abre un log.
+   *
+   * NO HAY UN COMANDO POR CADA COMBINACIÓN DE UNIDAD/COMBUSTIBLE
+   * ================================================================
+   * `SelectorUnidad` y `SelectorCombustible` no aportan comandos aquí. Esta
+   * tarea es un atajo a lo que YA EXISTE como acción alcanzable en un clic
+   * (docs/02 §2.5, E9.3), no una vía para inventar accesos nuevos: elegir una
+   * unidad es elegir entre varias opciones ligadas a un canal concreto que
+   * además solo existe si hay un panel abierto con ese canal, y forzarlo a la
+   * forma "un comando, una acción" de la paleta multiplicaría entradas (una
+   * por canal por unidad disponible) sin que ninguna fuera más alcanzable de
+   * lo que ya es con el desplegable que tiene al lado.
+   */
+  #registrarComandosEstaticos(): void {
+    const comandos: Comando[] = [
+      {
+        id: "log:abrir-sintetico",
+        etiqueta: "Abrir log sintético",
+        categoria: "Log",
+        ejecutar: () => void this.abrirLog("autolog-sintetico"),
+      },
+      ...TEMAS_DISPONIBLES.map((nombre) => ({
+        id: `tema:${nombre}`,
+        etiqueta: `Cambiar tema: ${ETIQUETA_DE_TEMA[nombre]}`,
+        categoria: "Tema",
+        ejecutar: () => establecerTema(nombre),
+      })),
+    ];
+    this.#comandos.registrarGrupo("estaticos", comandos);
+  }
+
+  /**
+   * Un comando "Añadir canal: <nombre>" por cada canal del log, sin filtrar
+   * por activo/inactivo.
+   *
+   * POR QUÉ NO SE OCULTAN LOS CANALES `vacio`/`constante` AQUÍ
+   * =============================================================
+   * `SelectorCanales` los oculta por omisión (F1-33) porque ahí se navega
+   * hojeando la lista, y una fila que dibuja una recta no aporta mientras se
+   * hojea. La paleta es lo contrario: quien escribe el nombre exacto de un
+   * canal ya sabe cuál busca, y con 475 en danza no hay forma de saber desde
+   * aquí si "está apagado en ESTE log" es la razón real por la que alguien lo
+   * está buscando (comprobar exactamente eso es el caso de uso). Esconderlo
+   * sería la paleta decidiendo por quien busca.
+   */
+  #registrarComandosDeCanales(log: LogAbierto): void {
+    const comandos: Comando[] = log.canales.map((canal) => ({
+      id: `canal:${canal.idNativo}`,
+      etiqueta: `Añadir canal: ${canal.nombre}`,
+      categoria: "Canal",
+      ejecutar: () => this.#agregarCanalAPanel(canal.idNativo),
+    }));
+    this.#comandos.registrarGrupo("canales", comandos);
+  }
+
+  /**
+   * Añade un canal a la selección visible sin tocar los que ya estaban.
+   *
+   * Es la vía de la paleta hacia lo mismo que hace marcar la casilla del
+   * canal en `SelectorCanales`: reutiliza `preseleccionar`, que ya fija la
+   * selección entera de una vez y no dispara `onSeleccionCambia` si el canal
+   * ya estaba dentro (p. ej. ejecutar el mismo comando dos veces). Ningún
+   * canal se quita por este camino -- la paleta solo añade, igual que su
+   * nombre en el rótulo del comando promete.
+   */
+  #agregarCanalAPanel(idNativo: string): void {
+    if (this.#selectorCanales === null) return;
+    this.#selectorCanales.preseleccionar([...this.#selectorCanales.seleccionados, idNativo]);
   }
 
   /** Abre (o reabre) un log a través de la fuente configurada y reconstruye toda la interfaz. */
@@ -392,6 +525,7 @@ export class Aplicacion {
       (log.avisos.length > 0 ? ` · ${log.avisos[0]}` : "");
 
     this.#construirSelectorCanales(log);
+    this.#registrarComandosDeCanales(log);
     this.#reconstruirSelectorUnidad([]);
     this.#reconstruir(null);
     this.#preseleccionarProtagonistas();
@@ -1282,6 +1416,7 @@ export class Aplicacion {
   /** Libera temporizadores y listeners globales. Útil para pruebas manuales en la consola. */
   destruir(): void {
     if (this.#idFrameCursor !== null) this.#entorno.ventana.cancelAnimationFrame(this.#idFrameCursor);
+    this.#paleta?.destruir();
     this.#reconstruir(null);
   }
 }
