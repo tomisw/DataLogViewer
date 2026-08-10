@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-09 19:39:19Z"
+    "actualizado": "2026-08-10 07:48:34Z"
   },
   "tareas": [
     {
@@ -1884,10 +1884,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "90a05d4"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-10 07:48:34Z",
+          "texto": "PUERTA G1: revisar (1) que caracteres cuentan como unidad embebida, (2) que UNA celda discrepante marca la columna entera como unidad MEZCLADA, (3) que la normalizacion de miles no comprueba grupos de 3."
+        }
+      ]
     },
     {
       "id": "FG-08",
@@ -1904,10 +1911,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "4ef462e"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-10 07:48:32Z",
+          "texto": "Enum con codigo por orden alfabetico (estable entre logs) y limite de cardinalidad 512."
+        }
+      ]
     },
     {
       "id": "FG-09",
@@ -2033,10 +2047,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "682de2f"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-10 07:48:31Z",
+          "texto": "Filas ragged, columnas duplicadas con sufijo y cabecera sin nombres. Fixtures 15 y 16 nuevos."
+        }
+      ]
     },
     {
       "id": "FG-15",
@@ -2422,10 +2443,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "4a34148"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-10 07:48:33Z",
+          "texto": "Silueta con opacidad 0,45 mas nota de texto con los dos factores. ADR-006 intacto: el renderizador no gana metodos."
+        }
+      ]
     },
     {
       "id": "F2-15",

@@ -4,16 +4,16 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-09 19:39:19Z
+Actualizado: 2026-08-10 07:48:34Z
 
-**192 / 761 pts cerrados (25.2 %)** · 139 pts esperando revisión humana → 43.5 % entregado
+**204 / 761 pts cerrados (26.8 %)** · 143 pts esperando revisión humana → 45.6 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 30 | 24 | 0 | 0 | 0 | 54 |
 | F1 | 153 | 68 | 0 | 5 | 0 | 226 |
-| FG | 5 | 39 | 11 | 37 | 0 | 92 |
-| F2 | 4 | 8 | 10 | 58 | 0 | 80 |
+| FG | 12 | 43 | 0 | 37 | 0 | 92 |
+| F2 | 9 | 8 | 5 | 58 | 0 | 80 |
 | F3 | 0 | 0 | 8 | 107 | 3 | 118 |
 | F4 | 0 | 0 | 4 | 59 | 0 | 63 |
 | FE | 0 | 0 | 0 | 52 | 0 | 52 |
@@ -46,13 +46,10 @@ Actualizado: 2026-08-09 19:39:19Z
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
 | `FG-04` Columna de tiempo en las 8 variantes de §7.5 | revision_humana | Opus 5 | G1 | dlv_core/formatos/tiempo_csv.py + 39 pruebas. Las ocho variantes de SS |
 | `FG-06` Unidad declarada en el nombre o en la fila d | revision_humana | Sonnet 5 | G1 | Entregado por agente Sonnet, revisado e integrado por Opus. Commits 45 |
-| `FG-07` Valores no numéricos, unidad embebida en la  | en_curso | Sonnet 5 | G1 | — |
-| `FG-08` Columnas de texto y booleanas → enum con dic | en_curso | Sonnet 5 | G3 | — |
+| `FG-07` Valores no numéricos, unidad embebida en la  | revision_humana | Sonnet 5 | G1 | PUERTA G1: revisar (1) que caracteres cuentan como unidad embebida, (2 |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
-| `FG-14` Robustez: filas de longitud variable, column | en_curso | Sonnet 5 | G3 | — |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
-| `F2-14` Renderizado progresivo: silueta inmediata, r | en_curso | Opus 5 | G2 | — |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
@@ -127,7 +124,7 @@ Actualizado: 2026-08-09 19:39:19Z
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ⏳ | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 
-## FG — 44/92 pts
+## FG — 55/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -137,19 +134,19 @@ Actualizado: 2026-08-09 19:39:19Z
 | ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `4c99e53` |
 | ✔  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | `88d1c71` |
 | ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `45a0600` |
-| ▶  | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | — |
-| ▶  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | — |
+| ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `90a05d4` |
+| ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4ef462e` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `a26fb1b` |
 | ·  | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ·  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | — |
-| ▶  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | — |
+| ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
 | ·  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | — |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ·  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
 
-## F2 — 12/80 pts
+## F2 — 17/80 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -166,7 +163,7 @@ Actualizado: 2026-08-09 19:39:19Z
 | ·  | `F2-11` | Estadísticas y detectores que respetan las fronteras de segmen | Opus 5 | 5 | F2-09 | G2 | — |
 | ·  | `F2-12` | Eje X alternativo (RPM, velocidad, distancia) con monotonía po | Opus 5 | 8 | F2-01 | G2 | — |
 | ·  | `F2-13` | Conflictos: mismo rol con unidades de origen distintas → canón | Opus 5 | 4 | F2-02, F1-13 | G1 | — |
-| ▶  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | — |
+| ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4a34148` |
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
