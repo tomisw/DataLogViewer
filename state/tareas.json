@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 21:36:06Z"
+    "actualizado": "2026-08-10 21:44:20Z"
   },
   "tareas": [
     {
@@ -2890,13 +2890,19 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "372edba"
+      ],
       "notas": [
         {
           "fecha": "2026-08-10 21:36:06Z",
           "texto": "Opus en linea, en paralelo con F2-13 (agente Opus). Fichero: dlv-core/src/dlv_core/expresiones.py (hoy un esqueleto de 42 lineas) + su prueba."
+        },
+        {
+          "fecha": "2026-08-10 21:44:20Z",
+          "texto": "Puerta G2: implementada por Opus en linea con pasada de revision propia. dlv-core/src/dlv_core/expresiones.py (de esqueleto de 42 lineas a modulo) + 46 pruebas.\n\nLO QUE MAS CONVIENE SABER, porque F3-19, F3-20 y F5-13 se apoyan encima:\n\n1. NO HAY eval(). El analisis lo hace ast.parse pero el arbol se valida contra una LISTA BLANCA de nodos y se evalua recorriendolo a mano. Lista blanca y no negra a proposito: una negra se queda obsoleta con cada version de Python que añada sintaxis. 17 formas reales de salirse probadas (atributos, subindices, lambda, comprensiones, :=, f-strings, comparaciones, globals()). Para F5-13: la prueba test_no_se_usa_eval_ni_compile_en_el_modulo comprueba el ARBOL SINTACTICO del modulo y no su texto, porque buscar la cadena 'eval' encontraria el mode='eval' y los comentarios; es la misma leccion que ya pago el detector de ADR-009.\n\n2. Se evalua EN CANONICA y el campo se llama v_canonica para que no se pueda pasar otra cosa por descuido. La conversion la hace quien llama con unidades.py y su Clase obligatoria; este modulo NO reimplementa aritmetica de unidades y por eso no importa unidades.\n\n3. La dimension del resultado NO se deduce, la declara quien escribe la formula. Para F3-19 (biblioteca de formulas, puerta G1): cada formula del fichero de datos tiene que traer su dimension Y su clase de magnitud declaradas. Deducir la dimension de a/b exigiria un algebra de dimensiones que no existe aqui, y adivinarla daria una etiqueta de unidad plausible y falsa (R1).\n\n4. La retencion tiene LIMITE DE VALIDEZ (regla explicita de SS4.5) y la ventana la decide quien llama, porque depende del canal. Antes de la primera muestra tampoco se extrapola. Y si un operando esta en hueco, el resultado esta en hueco: si falta lambda objetivo, el lambda error no es -1, no existe.\n\n5. evaluar() devuelve (valores, valido) y NO pone NaN: este modulo no decide como se representa un hueco, solo donde esta. El resultado se calcula tambien en las marcas invalidas a proposito, por ADR-009 (filtrar antes obligaria a recomponer despues); lo que no puede pasar es que un valor invalido se lea como bueno, y para eso esta la mascara.\n\nHALLAZGO DE MI PROPIA PASADA: una de las pruebas cazo un getattr que yo habia puesto para componer un mensaje de error. Inofensivo (sobre un nodo del AST, no sobre datos del usuario), pero en un modulo que audita F5-13 no tiene por que estar; sustituido por un isinstance explicito. Arreglar el modulo en vez de debilitar la prueba.\n\nVERIFICACION: 46 pruebas con pytest REAL. Suite del entorno: 887 pasan con los 2 fallos preexistentes de 3.11 contra PEP 695. ruff, ruff format y ADR-009 en verde (este ultimo por patron Y por conducta: una prueba cuenta las llamadas a searchsorted con 20 y con 2000 marcas y exige que sigan siendo 2). mypy --strict limpio sobre el modulo con --follow-imports=skip; sin ese flag muere en piramide.py, que es el bloqueo preexistente del interprete 3.11.\n\nLO QUE NO HE EJECUTADO: el modulo con NumPy de verdad. Las pruebas usan la implementacion de biblioteca estandar del protocolo Vectorial, que ejercita el MISMO codigo, pero ya se demostro en F4-01 que ese doble puede esconder una diferencia con NumPy (el caso de bordes_por_omision con huecos). Solo se piden dos funciones —searchsorted y abs— asi que la superficie de divergencia es pequeña, pero no es nula."
         }
       ]
     },

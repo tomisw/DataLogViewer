@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 21:36:06Z
+Actualizado: 2026-08-10 21:44:20Z
 
-**213 / 761 pts cerrados (28.0 %)** · 143 pts esperando revisión humana → 46.8 % entregado
+**221 / 761 pts cerrados (29.0 %)** · 143 pts esperando revisión humana → 47.8 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-10 21:36:06Z
 | F1 | 153 | 68 | 0 | 5 | 0 | 226 |
 | FG | 16 | 43 | 0 | 33 | 0 | 92 |
 | F2 | 9 | 8 | 9 | 54 | 0 | 80 |
-| F3 | 0 | 0 | 16 | 99 | 3 | 118 |
+| F3 | 8 | 0 | 8 | 99 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
@@ -53,7 +53,6 @@ Actualizado: 2026-08-10 21:36:06Z
 | `F2-13` Conflictos: mismo rol con unidades de origen | en_curso | Opus 5 | G1 | Agente Opus 5 en segundo plano (SS8.5 asigna el MODELO, no dentro o fu |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
-| `F3-18` Evaluador de expresiones en canónica, multi- | en_curso | Opus 5 | G2 | Opus en linea, en paralelo con F2-13 (agente Opus). Fichero: dlv-core/ |
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON PO |
@@ -171,7 +170,7 @@ Actualizado: 2026-08-10 21:36:06Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 0/118 pts
+## F3 — 8/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -192,7 +191,7 @@ Actualizado: 2026-08-10 21:36:06Z
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
 | ·  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | — |
 | ·  | `F3-17` | Panel de tiradas con resumen y superposición entre tiradas | Sonnet 5 | 5 | F3-16, F2-12 | G3 | — |
-| ▶  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | — |
+| ✔  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | `372edba` |
 | ·  | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | — |
 | ·  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | — |
 | ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
