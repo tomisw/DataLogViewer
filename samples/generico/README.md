@@ -1,6 +1,6 @@
 # Corpus de CSV genéricos para prueba del importador FG
 
-**16 ficheros de prueba** para validar la **autodetección y robustez** del importador de CSV genérico de DataLogViewer (fase FG, §7.4–§7.10 de `docs/07-formatos-y-csv-generico.md`).
+**17 ficheros de prueba** para validar la **autodetección y robustez** del importador de CSV genérico de DataLogViewer (fase FG, §7.4–§7.10 de `docs/07-formatos-y-csv-generico.md`).
 
 Cada fichero ejercita un conjunto específico de características de detección y robustez. Son pequeños (~50 filas, 6–10 columnas) y contienen **valores físicamente plausibles** para un motor de combustión (RPM, MAP, TPS, CLT, Lambda, AFR, etc.).
 
@@ -24,6 +24,7 @@ Cada fichero ejercita un conjunto específico de características de detección 
 | **14-preambulo-largo.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Preámbulo de 12 líneas** de metadatos `clave: valor` antes de la fila de nombres |
 | **15-filas-longitud-variable.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Filas de longitud variable** (FG-14): una fila corta (le faltan `CLT` y `Lambda`) y una fila larga (un campo de sobra); no se aborta la carga, el hueco llega como ausente, nunca como 0 |
 | **16-cabecera-sin-nombres.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Cabecera sin nombres** (FG-14): los datos empiezan en la primera línea, sin fila de nombres; las columnas se nombran `col_1…col_n` |
+| **17-unidad-embebida-y-miles.csv** | `;` | `,` | UTF-8 | Relativo (s) | **Unidad embebida en la celda** (`Presion_Aceite`: `3,2 bar`, `3,3 bar`, …, con `NULL`/`#N/A`/vacío mezclados) y **separador de miles** (`Distancia_Total`: `1.234,5`, agrupación `.` con decimal `,`) — añadido a mano para FG-07, no por `generar_genericos.py`. Numerado `17` (no `15`) para no chocar con el corpus de FG-14 |
 
 ## Generación
 
@@ -56,7 +57,7 @@ Cada fichero contiene **~50 filas de datos** con valores **físicamente plausibl
 ✓ El fichero **02** no contiene **ni un solo punto** (`.`) en celdas numéricas (verificación: `grep -E '\d+\.\d+'`)  
 ✓ El fichero **01** no contiene **ni un solo punto y coma** (`;`) en celdas de datos (verificación: `grep ';'`)  
 ✓ El fichero **10** **no es UTF-8 válido** (genera `UnicodeDecodeError`)  
-✓ Los otros **15 ficheros sí son UTF-8 válidos**  
+✓ Los otros **16 ficheros sí son UTF-8 válidos**  
 ✓ Determinismo verificado con `sha256sum`  
 ✓ Código limpio: `ruff check` y `ruff format` satisfechos
 
