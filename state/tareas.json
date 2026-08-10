@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 19:28:29Z"
+    "actualizado": "2026-08-10 21:36:06Z"
   },
   "tareas": [
     {
@@ -2430,10 +2430,15 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-10 21:36:06Z",
+          "texto": "Agente Opus 5 en segundo plano (SS8.5 asigna el MODELO, no dentro o fuera de linea), en paralelo con F3-18 que hace el orquestador. Ficheros: dlv-core/src/dlv_core/conflictos.py (nuevo) + su prueba. Prohibido tocar expresiones.py (F3-18 en paralelo), unidades.py, resolucion_unidad.py, identidad.py, data/, state/ y hacer commit."
+        }
+      ]
     },
     {
       "id": "F2-14",
@@ -2885,10 +2890,15 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-10 21:36:06Z",
+          "texto": "Opus en linea, en paralelo con F2-13 (agente Opus). Fichero: dlv-core/src/dlv_core/expresiones.py (hoy un esqueleto de 42 lineas) + su prueba."
+        }
+      ]
     },
     {
       "id": "F3-19",
