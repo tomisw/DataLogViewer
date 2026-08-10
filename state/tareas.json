@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 21:44:20Z"
+    "actualizado": "2026-08-10 21:58:46Z"
   },
   "tareas": [
     {
@@ -2430,13 +2430,19 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "e717ffa"
+      ],
       "notas": [
         {
           "fecha": "2026-08-10 21:36:06Z",
           "texto": "Agente Opus 5 en segundo plano (SS8.5 asigna el MODELO, no dentro o fuera de linea), en paralelo con F3-18 que hace el orquestador. Ficheros: dlv-core/src/dlv_core/conflictos.py (nuevo) + su prueba. Prohibido tocar expresiones.py (F3-18 en paralelo), unidades.py, resolucion_unidad.py, identidad.py, data/, state/ y hacer commit."
+        },
+        {
+          "fecha": "2026-08-10 21:58:46Z",
+          "texto": "Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/src/dlv_core/conflictos.py (682 lineas de codigo + 240 de docstring) + 43 pruebas.\n\nQUE HAY QUE REVISAR EN LA PUERTA G1, ORDENADO POR CONSECUENCIA:\n\n1. LA AFIRMACION QUE SOSTIENE TODO LO DEMAS, y la he verificado yo leyendo el codigo: comparar los factores to_canon de dos logs es INSERVIBLE para detectar una escala incoherente, porque to_canon va del entero crudo a la canonica y absorbe la escala de ALMACENAMIENTO. almacen.py construye Afin(canal.a_canonica) y el descriptor Haltech declara 0,1 porque guarda deciKelvin: un log en deciKelvin y un CSV en kelvin flotante dan factores que difieren en 10 y los dos son correctos. Si esto fuera falso existiria un criterio mucho mas fuerte que el del rango declarado, y el modulo estaria resolviendo el problema con la evidencia mas debil de las dos. Lo he comprobado y es cierto, pero es la premisa que conviene que confirmes tu.\n\n2. RAZON_DE_AMPLITUD_MAXIMA = 10,0 y el criterio de rangos disjuntos. Laxos -> falso negativo: dos curvas que parecen comparables y no lo son, con una decision de mapa tomada encima. Estrictos -> falso positivo que impide comparar dos logs sanos. Conviene revisarlo contra rangos DisplayMaxMin reales de mas de un fabricante. NOTA MIA SOBRE LA REGLA 3: el agente lo dejo anotado como posible incumplimiento por no estar en data/umbrales.toml. Mi lectura es que NO lo incumple: umbrales.toml es de los detectores (fisica del motor), y esto es una heuristica de coherencia de metadatos, de la misma familia que sondeo.CONFIANZA_MINIMA y tipos.COBERTURA_NUMERICA_MINIMA, que tambien son constante de modulo mas parametro. Si prefieres que vaya a datos, es una decision tuya, no un defecto.\n\n3. PRESION SIN ORIGEN DECLARADO da CON_RESERVA en vez de bloqueo. Un log en relativa comparado con uno en absoluta son unos 101 kPa, un bar de boost, y solo lo delata un aviso. docs/06 SS6.6 llama a esto 'la fuente de error mas comun'. Bloquear habria convertido en falso positivo constante cada CSV generico, asi que la eleccion es defendible, pero es tuya.\n\n4. LA ASIMETRIA EXCLUSION / BLOQUEO. confianza unknown, sin dimension, unidad ajena y relativa-sin-referencia excluyen SOLO ese log; dimensiones distintas y escala incoherente bloquean el rol ENTERO. Con ocho logs abiertos, una declaracion mala bloquea los ocho. Verificado que con 3 logs y uno unknown quedan los otros dos comparables (CON_RESERVA), y que con 2 y uno unknown queda NO_COMPARABLE por falta de quorum.\n\n5. 'inferred' se compara SIN reserva. Son 11 de los 34 tipos del AutoLog. Si decides que una escala deducida no debe compararse en silencio, cambia mucho ruido de avisos.\n\n6. LA TRAMPA DEL DELTA EN SITIO NUEVO: los extremos del rango se convierten como PUNTO y la amplitud como INTERVALO. Con PUNTO, un canal en grados Celsius declararia 283 K de amplitud en vez de 10 y el criterio acusaria a un canal sano. He leido las dos pruebas que lo fijan y son asertos reales.\n\n7. EL CONTRATO CON LA INTERFAZ: CON_RESERVA tiene que pintarse distinto de COMPARABLE. Si la interfaz lo ignora, la mezcla vuelve a ser silenciosa aunque este modulo haya hecho su trabajo. Eso no lo puede garantizar el modulo y hay que atarlo en F2-09 / F1-26.\n\nTAMANO: 682 lineas de codigo para una tarea de 4 puntos es mucho. Lo he revisado y no hay relleno: las ocho clases y diez funciones cubren dimensiones distintas, escala incoherente, confianza, absoluta/relativa y origen sin declarar, que es lo que E2.7 mas docs/06 SS6.6 y SS6.8 piden entre los tres. No he recortado nada porque es codigo probado y funcionando, pero si te parece que sobra alcance, dilo y se poda.\n\nLO QUE QUEDA SIN CUBRIR (del propio informe del agente, confirmado): escala mal declarada en un canal sin DisplayMaxMin (indetectable desde metadatos); error compartido por los dos logs (los criterios son relativos entre logs); errores de factor menores de 10 salvo que ademas dejen los rangos disjuntos; escalas de origen no afines (exige Afin, igual que ChannelSeries.to_canon); dimensiones compuestas y conversiones parametrizadas. Y NADIE construye todavia DeclaracionDeCanal: los campos existen en haltech.Canal y ChannelSeries, pero el adaptador es de la tarea que consuma esto (F2-09).\n\nVERIFICACION: 43 pruebas de la tarea y 930 de la suite del entorno con los 2 fallos preexistentes de 3.11 contra PEP 695. ruff, ruff format y ADR-009 en verde. mypy --strict limpio con --follow-imports=skip. NO se ha pasado ningun log real por el modulo: haria falta el parser y con el NumPy y Polars. Los numeros de los casos vienen de docs/01 SS1.8, no de leer los ficheros."
         }
       ]
     },
