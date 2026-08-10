@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 15:36:49Z"
+    "actualizado": "2026-08-10 16:00:19Z"
   },
   "tareas": [
     {
@@ -3220,9 +3220,14 @@
       "dep_todo": false,
       "gate": "G3",
       "estado": "en_curso",
-      "agente": "subagente",
+      "agente": "orquestador",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-10 16:00:19Z",
+          "texto": "CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON POLARS Y NODE_MODULES. Commit ec9e0d8.\n\nEntregada por un agente Sonnet (el subagente local se habia cortado sin escribir nada) y revisada e integrada por Opus. Sigue en_curso porque la puerta es G3, verificacion completa, y aqui no se puede ejecutar vitest (npm da 403, no hay node_modules) ni la escritura real de Parquet (sin Polars).\n\nDEFECTO ENCONTRADO EN LA REVISION Y ARREGLADO: write_parquet(metadata=...) es un parametro reciente de Polars y pyproject.toml declara polars>=1.9, donde NO existe. uv.lock fija 1.43.1, asi que hoy no falla, pero cualquier resolucion a una version anterior reventaba con TypeError por argumento inesperado y esa traza llegaba al usuario por la respuesta HTTP. Traducido a ErrorDeExportacion con mensaje que dice que actualizar, y el endpoint lo devuelve como 501 (lo pedido es valido, es esta instalacion la que no puede). Con prueba.\n\nDECISION QUE ES TUYA: subir el minimo de polars en pyproject.toml de >=1.9 a la version en que aparece metadata= (>=1.28 segun el PR pola-rs/polars#21806). No lo toco yo porque cambia la especificacion de dependencias, que docs/09 SS9.11 reserva al propietario. Mientras no se suba, el arreglo de arriba es lo que evita la traza.\n\nVERIFICADO POR MI, no solo por el informe del agente: ruff y ruff format en verde en todo el repo; mypy --strict limpio sobre exportacion.py; tsc --noEmit sin ningun error de tipos real en dlv-ui; 12 pruebas de exportacion pasan; 27 de dlv-api pasan; ADR-009 en verde. Comprobado con git stash que los 4 modulos de prueba que no coleccionan ya fallaban ANTES de esta tarea (numpy y polars ausentes), asi que no los rompio ella. Leidas y comprobadas las dos pruebas de la trampa del delta: son asertos reales, PUNTO 10 K -> -263,15 C e INTERVALO 10 K -> 10 C. Comprobado que capturarTrazoPNG es sincrona de verdad (dibujar + toDataURL sin await), que es lo unico que garantiza que el buffer de WebGL no se ha vaciado.\n\nQUE FALTA PARA CERRAR G3: npm ci y npm run test en dlv-ui, y las dos pruebas marcadas con importorskip('polars') de test_exportacion.py. Y como es exportacion de imagen, MIRAR un PNG y un SVG exportados de verdad: que el PNG lleve los ejes y no solo la curva, y que el SVG se abra en un visor con los ejes como vector. Eso no lo puede comprobar ninguna prueba de las que hay hoy.\n\nTRES DEFECTOS AJENOS QUE ANOTO SIN ARREGLAR, vistos por el agente y que confirmo utiles: los docstrings de factor_a/factor_b en main.py (InfoCanalSesion) dicen 'v_canonica = a*v + b' sin decir que eso vale solo para Clase.PUNTO, y quien lea solo eso puede reimplementar la conversion sin la trampa del delta en mente; el docstring de sesiones.py menciona un reintento con el fichero entero en _leer_cabecera que el agente no encontro en el cuerpo; y mypy/pytest del contenedor corren sobre un interprete 3.11 que no puede parsear la sintaxis PEP 695 de piramide.py, lo que tumba dos comprobaciones de verificar.sh en CUALQUIER tarea de este repo hasta que se resuelva."
+        }
+      ]
     },
     {
       "id": "F4-13",

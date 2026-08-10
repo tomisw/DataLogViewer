@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 15:36:49Z
+Actualizado: 2026-08-10 16:00:19Z
 
 **208 / 761 pts cerrados (27.3 %)** · 143 pts esperando revisión humana → 46.1 % entregado
 
@@ -54,7 +54,7 @@ Actualizado: 2026-08-10 15:36:49Z
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
-| `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | — |
+| `F4-12` Exportación de vista a PNG/SVG y de datos a  | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON PO |
 
 ## F0 — 54/54 pts
 
