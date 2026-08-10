@@ -1,6 +1,6 @@
 # Corpus de CSV genéricos para prueba del importador FG
 
-**14 ficheros de prueba** para validar la **autodetección y robustez** del importador de CSV genérico de DataLogViewer (fase FG, §7.4–§7.10 de `docs/07-formatos-y-csv-generico.md`).
+**16 ficheros de prueba** para validar la **autodetección y robustez** del importador de CSV genérico de DataLogViewer (fase FG, §7.4–§7.10 de `docs/07-formatos-y-csv-generico.md`).
 
 Cada fichero ejercita un conjunto específico de características de detección y robustez. Son pequeños (~50 filas, 6–10 columnas) y contienen **valores físicamente plausibles** para un motor de combustión (RPM, MAP, TPS, CLT, Lambda, AFR, etc.).
 
@@ -22,6 +22,8 @@ Cada fichero ejercita un conjunto específico de características de detección 
 | **12-texto-y-booleanos.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Columna de texto enumerado** (`Marcha`: `N`,`1`,`2`,`3`) y **columna booleana** (`Limitador`: `true`/`false`) |
 | **13-columnas-duplicadas.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Dos columnas con nombre idéntico** (ambas `RPM`); el importador desambigua con sufijo y avisa |
 | **14-preambulo-largo.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Preámbulo de 12 líneas** de metadatos `clave: valor` antes de la fila de nombres |
+| **15-filas-longitud-variable.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Filas de longitud variable** (FG-14): una fila corta (le faltan `CLT` y `Lambda`) y una fila larga (un campo de sobra); no se aborta la carga, el hueco llega como ausente, nunca como 0 |
+| **16-cabecera-sin-nombres.csv** | `,` | `.` | UTF-8 | Relativo (s) | **Cabecera sin nombres** (FG-14): los datos empiezan en la primera línea, sin fila de nombres; las columnas se nombran `col_1…col_n` |
 
 ## Generación
 
@@ -54,7 +56,7 @@ Cada fichero contiene **~50 filas de datos** con valores **físicamente plausibl
 ✓ El fichero **02** no contiene **ni un solo punto** (`.`) en celdas numéricas (verificación: `grep -E '\d+\.\d+'`)  
 ✓ El fichero **01** no contiene **ni un solo punto y coma** (`;`) en celdas de datos (verificación: `grep ';'`)  
 ✓ El fichero **10** **no es UTF-8 válido** (genera `UnicodeDecodeError`)  
-✓ Los otros **13 ficheros sí son UTF-8 válidos**  
+✓ Los otros **15 ficheros sí son UTF-8 válidos**  
 ✓ Determinismo verificado con `sha256sum`  
 ✓ Código limpio: `ruff check` y `ruff format` satisfechos
 
@@ -66,7 +68,7 @@ Los ficheros están listos para ser consumidos por:
 2. **Autoasignación de roles (§7.7)**: Empareja nombres con sinónimos de `roles.toml`
 3. **Informe de plausibilidad (§7.7)**: Valida rangos de valores detectados
 4. **Asistente de importación (§7.8)**: Interfaz de 3 pasos con previsualización
-5. **Robustez (§7.10)**: Manejo de valores ausentes, duplicados, texto, booleanos, preámbulos
+5. **Robustez (§7.10)**: Manejo de valores ausentes, duplicados, texto, booleanos, preámbulos, filas de longitud variable y cabecera sin nombres (FG-14)
 
 ---
 

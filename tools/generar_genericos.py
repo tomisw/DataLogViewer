@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Generador de corpus de CSV genéricos para prueba del importador de FG.
 
-Crea 14 ficheros CSV con distintas combinaciones de:
+Crea 16 ficheros CSV con distintas combinaciones de:
   - Delimitador (coma, punto y coma, tabulador)
   - Separador decimal (punto, coma)
   - Codificación (UTF-8, latin-1)
-  - Cabecera (nombres, unidades, metadatos)
+  - Cabecera (nombres, unidades, metadatos, sin nombres)
   - Columna de tiempo (epoch, ISO-8601, relativa, ninguna)
-  - Casos de robustez (valores ausentes, duplicados, booleanos)
+  - Casos de robustez (valores ausentes, duplicados, booleanos, filas de
+    longitud variable -- FG-14)
 
-Determinista: seed fijo por defecto.
+Determinista: seed fijo por defecto. Los ficheros 01-14 son de FG-01..FG-13;
+no se tocan al añadir los 15-16 de FG-14 porque se generan DESPUÉS en la
+misma secuencia de `random.Random`, así que el estado del RNG que ven los
+quince primeros generadores no cambia.
 """
 
 import argparse
@@ -424,6 +428,58 @@ def generate_14_preambulo_largo(rng, output_dir):
             writer.writerow(formatted)
 
 
+def generate_15_filas_longitud_variable(rng, output_dir):
+    """Filas de longitud variable (FG-14, docs/07 §7.10): una fila corta (le
+    faltan CLT y Lambda) y una fila larga (un campo de sobra sin columna).
+
+    Solo dos filas ragged, y cerca del final: con más, o repartidas de otra
+    forma, la racha consistente de FG-01 (sondeo.py) baja de CONFIANZA_MINIMA
+    y el delimitador deja de detectarse -- que sondeo.py avise de
+    'campos_inconsistentes' está bien (es justo lo que se espera de un
+    fichero con filas malformadas); que deje de proponer delimitador, no.
+    """
+    rows = [["Time", "RPM", "MAP", "TPS", "CLT", "Lambda"]]
+    fila_corta = 45  # a esta fila le faltan los dos últimos campos
+    fila_larga = 48  # a esta fila le sobra uno
+
+    for i in range(50):
+        fila = [
+            i * 0.05,
+            rng.randint(800, 7000),
+            round(rng.uniform(30, 250), 2),
+            round(rng.uniform(0, 100), 1),
+            round(rng.uniform(70, 105), 1),
+            round(rng.uniform(0.75, 1.05), 3),
+        ]
+        if i == fila_corta:
+            fila = fila[:4]  # faltan CLT y Lambda: hueco, no cero (§7.10)
+        elif i == fila_larga:
+            fila = [*fila, round(rng.uniform(0, 5), 2)]  # campo de sobra
+        rows.append(fila)
+
+    write_csv(output_dir / "15-filas-longitud-variable.csv", rows, delimiter=",", decimal_sep=".")
+
+
+def generate_16_cabecera_sin_nombres(rng, output_dir):
+    """Sin fila de nombres: los datos empiezan en la primera línea del
+    fichero (FG-14, docs/07 §7.10: "se nombran col_1…col_n")."""
+    rows = []
+
+    for i in range(50):
+        rows.append(
+            [
+                i * 0.05,
+                rng.randint(800, 7000),
+                round(rng.uniform(30, 250), 2),
+                round(rng.uniform(0, 100), 1),
+                round(rng.uniform(70, 105), 1),
+                round(rng.uniform(0.75, 1.05), 3),
+            ]
+        )
+
+    write_csv(output_dir / "16-cabecera-sin-nombres.csv", rows, delimiter=",", decimal_sep=".")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generador de corpus de CSV genéricos para DataLogViewer"
@@ -465,12 +521,14 @@ def main():
         generate_12_texto_y_booleanos,
         generate_13_columnas_duplicadas,
         generate_14_preambulo_largo,
+        generate_15_filas_longitud_variable,
+        generate_16_cabecera_sin_nombres,
     ]
 
     for gen in generators:
         gen(rng, args.output)
 
-    print(f"✓ Generados 14 ficheros CSV en {args.output}")
+    print(f"✓ Generados {len(generators)} ficheros CSV en {args.output}")
 
 
 if __name__ == "__main__":
