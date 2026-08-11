@@ -294,6 +294,70 @@ severidad = "informativa"
 permanencia_s = 0.0
 
 # =========================================================================== #
+#  INFORME DE PLAUSIBILIDAD  (FG-10 · docs/07 §7.7, docs/09 §9.9 escalón 2)
+# =========================================================================== #
+#  No es un detector: no mira el motor, mira la IMPORTACIÓN. Compara los valores
+#  reales de cada canal con el rango `plausible` que data/roles.toml declara para
+#  su rol y dice si el canal está bien escalado. Es el sustituto automático de
+#  revisar los factores a mano: «contrastar con el dato real», el escalón 2 de
+#  docs/09 §9.9.
+#
+#  Un canal fuera de su rango plausible NO es un motor en problemas: es una
+#  importación mal configurada (nombre bien mapeado y escala equivocada, el fallo
+#  típico del importador genérico). Por eso estos umbrales están aquí y no en un
+#  detector: se editan igual, con la misma precedencia, y son igual de opinables.
+[plausibilidad]
+# Hasta qué fracción de muestras fuera de rango se considera una EXCURSIÓN
+# legítima del canal, y no un canal mal escalado.
+#
+# Al arrancar el motor una sonda de λ fría, una presión de aceite que todavía no
+# ha subido o una temperatura por debajo de −40 °C salen del rango durante unas
+# muestras, y eso no es un defecto de la importación: no hay nada que corregir.
+# Contarlo como defecto produciría un aviso por canal, y una lista de avisos que
+# siempre está llena se ignora entera (el mismo razonamiento que la nota de
+# `criterio_de_rango` en data/roles.toml).
+#
+# Por omisión 0,02. Sobre el AutoLog real (245 s, ~2 600 registros) son 52
+# muestras, unos 2,8 s de arranque. Un canal entero desplazado por un factor de
+# escala está fuera en el 100 % de sus muestras, así que entre las dos
+# situaciones hay casi dos órdenes de magnitud de margen: el umbral no está
+# ajustado al filo de nada.
+fraccion_maxima_excursion = 0.02
+
+# Fracción fuera que se tolera DESPUÉS de aplicar una corrección candidata para
+# aceptarla como explicación del canal.
+#
+# Mismo valor que el anterior, y a propósito: un error de escala real es exacto
+# —el factor 100 explica el canal completo o no explica nada—, así que este
+# umbral no está para darle margen al factor, sino para que un canal por lo demás
+# correcto pueda seguir teniendo su excursión de arranque después de corregido.
+# Se declara aparte porque responde a otra pregunta y se puede querer más
+# estricto: subir el de arriba (aceptar excursiones más largas) no debería
+# implicar aceptar correcciones peor ajustadas.
+fraccion_maxima_tras_corregir = 0.02
+
+# Muestras válidas mínimas para juzgar un canal. Por debajo, el informe dice
+# «pocas muestras» en vez de pronunciarse.
+#
+# No es un número redondo elegido a ojo: es 1 / fraccion_maxima_excursion. Con
+# menos muestras que esas, UNA sola fuera de rango ya supera el umbral de
+# excursión, así que la fracción no puede distinguir un canal desplazado de un
+# pico aislado y cualquier veredicto sería ruido. Si se baja la fracción de
+# arriba, este número tiene que subir en la misma proporción.
+muestras_minimas = 50
+
+# Factores de corrección a probar cuando ninguna unidad de la dimensión del rol
+# explica el canal. Son los errores de escala que de verdad ocurren:
+#   −1                       el canal viene con el signo al revés (el retardo por
+#                            knock de un fabricante que lo publica en positivo)
+#   10 · 100 · 1000          y sus inversos: deci/centi/mili contra la canónica,
+#                            porcentaje contra fracción, Pa contra kPa, ms contra s
+# Ampliar la lista es una entrada de fichero. El informe propone siempre la
+# corrección más pequeña que encaja, así que añadir factores grandes no cambia
+# los diagnósticos que ya salen con uno pequeño.
+factores_candidatos = [-1.0, 10.0, 0.1, 100.0, 0.01, 1000.0, 0.001]
+
+# =========================================================================== #
 #  DESACTIVACIÓN AUTOMÁTICA  (mitigación de R10, docs/07 §7.15)
 # =========================================================================== #
 [desactivacion_automatica]
