@@ -317,8 +317,9 @@ permanencia_s = 0.0
 # siempre está llena se ignora entera (el mismo razonamiento que la nota de
 # `criterio_de_rango` en data/roles.toml).
 #
-# Por omisión 0,02. Sobre el AutoLog real (245 s, ~2 600 registros) son 52
-# muestras, unos 2,8 s de arranque. Un canal entero desplazado por un factor de
+# Por omisión 0,02. Sobre el AutoLog real (18:30:35,506 a 18:34:40,643 = 245,1 s
+# en 2 636 registros) son 52 registros, unos 4,9 s de log: cubre de sobra el
+# arranque sin tragarse un tramo largo. Un canal entero desplazado por un factor de
 # escala está fuera en el 100 % de sus muestras, así que entre las dos
 # situaciones hay casi dos órdenes de magnitud de margen: el umbral no está
 # ajustado al filo de nada.
