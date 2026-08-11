@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 13:25:24Z
+Actualizado: 2026-08-11 13:26:49Z
 
-**239 / 761 pts cerrados (31.4 %)** · 129 pts esperando revisión humana → 48.4 % entregado
+**258 / 761 pts cerrados (33.9 %)** · 110 pts esperando revisión humana → 48.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
-| F1 | 166 | 55 | 0 | 5 | 0 | 226 |
+| F1 | 185 | 36 | 0 | 5 | 0 | 226 |
 | FG | 16 | 43 | 0 | 33 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
@@ -33,11 +33,7 @@ Actualizado: 2026-08-11 13:25:24Z
 | `F1-14` Conversiones parametrizadas por canal (λ→AFR | revision_humana | Opus 5 | G1 | resolver_parametro_de_canal(valores_canonicos, rol, tolerancia_relativ |
 | `F1-15` Presión absoluta/relativa como cambio de ori | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) DISCREPANCIA ENTRE ESPECI |
 | `F1-16` Dimensiones compuestas derivadas (`%/kPa` →  | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LA ARITMETICA ES a_num/a_ |
-| `F1-18` Presets SI / Métrico / Imperial / Motorsport | revision_humana | Sonnet 5 | G1 | REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_ |
-| `F1-19` Umbrales y perfiles en canónica, editados en | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas cost |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
-| `F1-30` Doble cursor con delta usando la clase inter | revision_humana | Opus 5 | G1 | PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMER |
-| `F1-45` E13 llega a la ventana: conversiones reales  | revision_humana | Opus 5 | G1 | PUERTA G1: revisar los numeros de data/combustibles.toml (14,7 / 9,77  |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
@@ -95,8 +91,8 @@ Actualizado: 2026-08-11 13:25:24Z
 | ⏳ | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | `f34c90c` |
 | ⏳ | `F1-16` | Dimensiones compuestas derivadas (`%/kPa` → `%/psi`) | Opus 5 | 4 | F1-13 | G1 | `f34c90c` |
 | ✔  | `F1-17` | Precedencia canal > dimensión del perfil > preset global > can | Sonnet 5 | 4 | F1-13 | G3 | `e968ba5` |
-| ⏳ | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `815a8e4` |
-| ⏳ | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | `f34c90c` |
+| ✔  | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `815a8e4` |
+| ✔  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | `f34c90c` |
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
 | ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `d05c389` |
 | ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `8f51688` |
@@ -107,7 +103,7 @@ Actualizado: 2026-08-11 13:25:24Z
 | ✔  | `F1-27` | Múltiples ejes Y, autoescala y bloqueo de escala | Sonnet 5 | 4 | F1-25 | G3 | `e145838` |
 | ✔  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | `b066759` |
 | ✔  | `F1-29` | Cursor con tabla de valores, presupuesto < 16 ms | Sonnet 5 | 4 | F1-24 | G3 | `b3057b4` |
-| ⏳ | `F1-30` | Doble cursor con delta usando la clase intervalo | Opus 5 | 4 | F1-29, F1-13 | G1 | `33a7c27` |
+| ✔  | `F1-30` | Doble cursor con delta usando la clase intervalo | Opus 5 | 4 | F1-29, F1-13 | G1 | `33a7c27` |
 | ✔  | `F1-31` | Selector de unidad a tres niveles (global, dimensión, canal) c | Sonnet 5 | 5 | F1-17 | G3 | `2f707a6` |
 | ✔  | `F1-32` | Locale numérico ES/EN (separador decimal, agrupación) | Haiku 4.5 | 2 | F1-31 | G4 | `e145838` |
 | ✔  | `F1-33` | Selector de canales con búsqueda difusa y ocultación de inacti | Sonnet 5 | 4 | F1-07 | G3 | `88c015d` |
@@ -122,7 +118,7 @@ Actualizado: 2026-08-11 13:25:24Z
 | ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
-| ⏳ | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
+| ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 
 ## FG — 59/92 pts
 

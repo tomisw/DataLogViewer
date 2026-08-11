@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 13:25:24Z"
+    "actualizado": "2026-08-11 13:26:49Z"
   },
   "tareas": [
     {
@@ -913,7 +913,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "sonnet",
       "commits": [
         "815a8e4"
@@ -922,6 +922,10 @@
         {
           "fecha": "2026-07-30 13:17:41Z",
           "texto": "REVISAR (orden de consecuencia): (1) PresetUsuario en dlv_core/preset_usuario.py NO valida en su constructor -- solo crear_preset_usuario() y .validar() explicito lo hacen, a proposito para poder reconstruir un preset guardado (desde_dict/desde_json) sin exigir un catalogo cargado en ese instante (pensando en un futuro .dlvprofile). Riesgo: un llamador futuro podria olvidar invocar validar() y colar un dimension_id/unidad_id invalido sin que nada falle hasta que resolver_unidad lo use. Confirmar que este trade-off es el querido. (2) No se toco data/units.toml ni ningun otro data/*.toml -- confirmado con git diff, los 5 presets de fabrica siguen intactos; este modulo es solo la pieza de 'el usuario puede crear el suyo' (docs/06 SS6.9 linea 194), no mas presets de catalogo. (3) unidades: Mapping[str,str] tiene la MISMA forma que preferencias_perfil de resolver_unidad (F1-17) sin conversion -- a_mapeo() se pasa directo; verificado con tests que un preset de usuario gana al preset global pero pierde ante una anulacion de canal, y que una dimension no cubierta cae al preset global. (4) Serializacion solo a dict/JSON en memoria (a_dict/a_json/desde_dict/desde_json), dlv-core no toca ficheros (ADR-002); la capa de persistencia real es .dlvprofile, todavia no implementado. 19 tests nuevos, incluidos casos de datos corruptos al deserializar. Trabajo de un agente en segundo plano (Sonnet), verificado de forma independiente: ruff/mypy/pytest en verde, sin tocar data/ ni los ficheros de otro trabajo en paralelo (almacen.py, piramide.py, formatos/, tools/banco.py)."
+        },
+        {
+          "fecha": "2026-08-11 13:26:49Z",
+          "texto": "APROBADA por el propietario tras comprobar EN LA VENTANA que las unidades se reflejan correctamente. La confirmacion visual la hizo el propietario, no el orquestador: en este contenedor no hay node_modules (npm da 403) ni Polars, asi que la GUI no se puede ejecutar aqui."
         }
       ]
     },
@@ -940,7 +944,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "opus",
       "commits": [
         "f34c90c"
@@ -949,6 +953,10 @@
         {
           "fecha": "2026-07-30 14:57:52Z",
           "texto": "REVISAR (G1, ordenado por consecuencia): (1) La propiedad que mas costaria si fallara: CAMBIAR DE UNIDAD NO REESCRIBE EL UMBRAL GUARDADO (docs/06 SS6.11: cambiar de unidad es un repintado, no una recarga). Si esto se rompiera, el fichero de umbrales del usuario se corrompe solo con mirarlo en otra unidad. UmbralEditable lleva 'valor' (unidad activa) y 'canonico' (lo persistido) juntos, y hay test explicito de que canonico queda intacto en K/degC/degF. (2) 'clase' es OBLIGATORIA sin valor por omision, igual que en el motor de F1-13: un umbral puede ser PUNTO ('temperatura sobre 373,15 K') o INTERVALO ('una subida de mas de 10 K'), y editar el segundo como el primero convierte '10 K de subida' en '-263,15 degC' -- la trampa del delta entrando por el campo de edicion. Test que exige que el mismo numero canonico de valores DISTINTOS segun la clase. (3) Ida y vuelta exacta (docs/06 SS6.12, <1 ULP) verificada en 6 combinaciones dimension/unidad: abrir el editor y cerrarlo sin tocar nada no cambia el fichero. (4) Compone con F1-15: un umbral de presion guardado absoluto (201,325 kPa) se edita como '1 bar de boost' si hay referencia_kpa, y la etiqueta lo marca 'rel'. (5) Umbrales adimensionales (histeresis_relativa, muestras_minimas) pasan sin convertir pero se siguen formateando. Los decimales salen de data/units.toml (SS6.10: lambda lleva 3 porque 0,995 con uno destruye la informacion). Probado contra un umbral REAL de data/umbrales.toml (D1.escalada_critica.manifold_pressure_min, 150 kPa abs). 18 tests nuevos."
+        },
+        {
+          "fecha": "2026-08-11 13:26:49Z",
+          "texto": "APROBADA por el propietario tras comprobar EN LA VENTANA que las unidades se reflejan correctamente. La confirmacion visual la hizo el propietario, no el orquestador: en este contenedor no hay node_modules (npm da 403) ni Polars, asi que la GUI no se puede ejecutar aqui."
         }
       ]
     },
@@ -1243,7 +1251,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "opus",
       "commits": [
         "33a7c27"
@@ -1252,6 +1260,10 @@
         {
           "fecha": "2026-08-03 12:18:24Z",
           "texto": "PUERTA G1 - QUE HAY QUE REVISAR, ORDENADO POR CONSECUENCIA SI EL NUMERO ESTA MAL:\n\n1) LA TRAMPA DEL DELTA (consecuencia: una decision de mapa tomada con un numero 273 grados desplazado, y no se ve en pantalla). Mira dlv-ui/src/cursor/doble.ts: el delta se calcula restando los dos valores YA en la unidad mostrada y FormaConversion NO expone el desplazamiento b, asi que el codigo no puede aplicarlo. La unica funcion que recibe factores es convertirDelta, y aplica solo el cociente. Prueba clave: 'convertir un delta de K a C no lo cambia' - el resultado parece que no hace nada y es justo el correcto.\n\n2) EL DELTA DE UNA UNIDAD RECIPROCA NO EXISTE (consecuencia: un delta en lambda presentado como delta en phi es un numero inventado). Decidi devolver indefinido con motivo en vez de lanzar, porque la interfaz tiene que seguir pintando. Revisa si te parece bien el texto que vera el usuario.\n\n3) EL DELTA DE UNA UNIDAD PARAMETRIZADA CON EL PARAMETRO CAMBIADO ENTRE CURSORES (consecuencia: en un log con cambio de mezcla de combustible, un delta de AFR que no es el delta de nada). Uso tolerancia relativa 1e-9 para decidir 'mismo parametro'. Ese umbral es MIO y no sale de data/: dime si quieres otro.\n\n4) A NIVEL DECIMADO EL DELTA ES UN RANGO, NO UN NUMERO (consecuencia: leer una diferencia que el dato no garantiza). Uso aritmetica de intervalos y aviso explicito cuando el rango incluye el cero. Revisa si prefieres otra presentacion.\n\nNO IMPLEMENTADO: el cableado del componente al DOM reutiliza F1-29 y no esta hecho; este commit es la logica y sus 22 pruebas."
+        },
+        {
+          "fecha": "2026-08-11 13:26:49Z",
+          "texto": "APROBADA por el propietario tras comprobar EN LA VENTANA que las unidades se reflejan correctamente. La confirmacion visual la hizo el propietario, no el orquestador: en este contenedor no hay node_modules (npm da 403) ni Polars, asi que la GUI no se puede ejecutar aqui."
         }
       ]
     },
@@ -1673,7 +1685,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "Opus 5 (orquestador)",
       "commits": [
         "1fff834"
@@ -1682,6 +1694,10 @@
         {
           "fecha": "2026-08-05 13:44:51Z",
           "texto": "PUERTA G1: revisar los numeros de data/combustibles.toml (14,7 / 9,77 / 6,4) y comprobar en la ventana que refrigerante, colector y lambda salen en el rango fisico correcto. Antes la temperatura salia x10."
+        },
+        {
+          "fecha": "2026-08-11 13:26:49Z",
+          "texto": "APROBADA por el propietario tras comprobar EN LA VENTANA que las unidades se reflejan correctamente. La confirmacion visual la hizo el propietario, no el orquestador: en este contenedor no hay node_modules (npm da 403) ni Polars, asi que la GUI no se puede ejecutar aqui."
         }
       ]
     },
