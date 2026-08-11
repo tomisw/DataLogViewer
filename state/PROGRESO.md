@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 13:55:02Z
+Actualizado: 2026-08-11 20:01:18Z
 
-**263 / 766 pts cerrados (34.3 %)** · 110 pts esperando revisión humana → 48.7 % entregado
+**271 / 766 pts cerrados (35.4 %)** · 110 pts esperando revisión humana → 49.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 36 | 0 | 5 | 0 | 231 |
-| FG | 16 | 43 | 0 | 33 | 0 | 92 |
+| FG | 24 | 43 | 0 | 25 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -121,7 +121,7 @@ Actualizado: 2026-08-11 13:55:02Z
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `8e67382` |
 
-## FG — 59/92 pts
+## FG — 67/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -137,7 +137,7 @@ Actualizado: 2026-08-11 13:55:02Z
 | ·  | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
-| ·  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | — |
+| ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `acec9a7` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `46d8ff6` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |

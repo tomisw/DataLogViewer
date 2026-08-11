@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 13:55:02Z"
+    "actualizado": "2026-08-11 20:01:18Z"
   },
   "tareas": [
     {
@@ -2084,10 +2084,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
-      "commits": [],
-      "notas": []
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "acec9a7"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-11 20:01:18Z",
+          "texto": "Motor generico dlv_core/formatos/nativo.py: lee la cabecera de un formato nativo de texto sin citar a ningun fabricante. haltech.py queda como reexport (mismo criterio con el que informes.py dejo a haltech.py reexportando Aviso); los 8 nombres que importaban otros modulos siguen resolviendo. Suben al descriptor 9 decisiones que estaban cableadas: clave_version DataLogVersion, separador_clave_valor, clave_tipo Type, clave_rango DisplayMaxMin con su separador y su orden max-min, y la seccion [cuerpo] entera (delimitador, clase_de_tiempo, patron_marca). REVISION G2 (la hice yo, el agente murio por limite de sesion sin informe y sin terminar): (1) el agente escribio el motor pero NO habia migrado el descriptor, asi que cargar_descriptor fallaba sobre haltech_nsp.toml y 52 pruebas estaban en rojo -- la seccion [cuerpo] y las claves nuevas de [cabecera] las he escrito yo; (2) faltaba la prueba que da sentido a la tarea, la he escrito: test_formato_nativo_declarativo.py define un formato INVENTADO (TorqueTrace TT-2) con las 8 decisiones distintas de Haltech y lo parsea sin una linea de Python propia; mutar cualquiera de las 5 principales en el descriptor rompe la suite, asi que el descriptor manda de verdad; (3) lint y formato en rojo, corregidos. EVIDENCIA DE QUE NO CAMBIA EL COMPORTAMIENTO: parseo de los 3 logs reales con el parser de antes (git archive de HEAD) y con el de ahora, comparando version, offset_datos, metadatos, avisos y los 8 campos de cada canal: IDENTICO en 525 canales, incluidos los 17 avisos del AutoLog. 851 pruebas pasan; el unico fallo (test_invariante_imports) tambien falla en HEAD, es el interprete 3.11 del entorno que no parsea el PEP 695 de piramide.py:318. ADR-009 cumple (0 ocurrencias). LIMITE DECLARADO PARA FG-17: solo se sabe interpretar clase_de_tiempo = hora_del_dia; un descriptor que declare otra clase valida de FG-04 se RECHAZA al cargarse con un mensaje que lo dice, en vez de cargar y producir un eje de tiempo inventado. Sin ejecutar: verificar.sh completo y las 16 suites que importan numpy/polars (limitacion preexistente del entorno)."
+        }
+      ]
     },
     {
       "id": "FG-14",

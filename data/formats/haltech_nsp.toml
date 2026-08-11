@@ -42,6 +42,10 @@ fila_de_referencia = "AutoLog_20260729_1830.csv, MAP máximo"
 primera_linea = "%DataLog%"
 version_soportada = ["1.1"]
 finales_de_linea = "CRLF nativo; también se acepta LF (docs/01 §1.13)"
+# FG-13: el NOMBRE de la clave de versión es del formato, no del motor. Hasta
+# FG-13 estaba cableado en `formatos/haltech.py`, que citaba «DataLogVersion»
+# literalmente en dos sitios. Un formato sin línea de versión omite esta clave.
+clave_version = "DataLogVersion"
 
 [cabecera]
 # Bloques Channel/ID/Type/DisplayMaxMin; DisplayMaxMin es OPCIONAL (13 de los
@@ -52,6 +56,53 @@ claves_opcionales = ["DisplayMaxMin"]
 metadatos_cierre = ["Log Source", "Log Number", "Log"]
 # La identidad del canal es el ID, nunca el nombre (docs/01 §1.3).
 identidad = "ID"
+
+# --- Lo que FG-13 sube del código al descriptor ---------------------------- #
+#  Todo lo de aquí abajo estaba cableado en `formatos/haltech.py` antes de
+#  FG-13. Cada entrada pasa el criterio de la frontera: otro fabricante lo haría
+#  de otra manera. Los VALORES no cambian —es un refactor, no un cambio de
+#  comportamiento—; lo que cambia es dónde viven.
+
+# `Clave : Valor`. El parser hacía `texto.partition(":")`. Se escribe sin los
+# espacios de alrededor a propósito: el motor recorta los extremos, y un formato
+# que separe con `=` no debería tener que declarar `" = "` con sus espacios.
+separador_clave_valor = ":"
+
+# Qué clave de bloque dice el TIPO del canal, que es lo que resuelve la
+# dimensión y el factor de escala en [tipos]. Adivinarla («será `Type`») es el
+# fallo más caro que puede tener un descriptor: produce canales con la escala
+# equivocada y un fichero que parece haberse leído bien. Por eso el motor la
+# exige y no tiene valor por omisión.
+clave_tipo = "Type"
+
+# El rango declarado por la ECU para el canal. Es `máximo,mínimo` —en ese orden,
+# que es el contrario del que cualquiera escribiría— y es la evidencia con la que
+# se confirmaron los factores de escala de [tipos]: «DisplayMaxMin 4731,2331 =
+# 473,1 K (200 °C) / 233,1 K (−40 °C)». Si el orden se declarase al revés, todos
+# los rangos saldrían invertidos sin que nada fallase.
+clave_rango = "DisplayMaxMin"
+rango_separador = ","
+rango_orden = ["max", "min"]
+
+# =========================================================================== #
+#  CUERPO  (FG-13 · docs/01 §1.2 y §1.6)
+# =========================================================================== #
+#  Cómo se reconoce y se parte una fila de datos. La mecánica de leer un CSV
+#  disperso multi-tasa NO está aquí porque no es del formato: los grupos de
+#  muestreo salen del patrón de nulos (20/10/5 Hz entrelazados), y eso lo hacen
+#  `almacen.py` y `grupos_muestreo.py` igual para cualquier fabricante.
+[cuerpo]
+delimitador = ","
+# `HH:MM:SS.mmm`, hora del día en 24 h. El vocabulario es el de `ClaseDeTiempo`
+# (FG-04); declararla es lo que permite que el motor RECHACE al cargar un
+# descriptor cuya marca no sabe interpretar, en vez de aceptarlo y producir
+# después un eje de tiempo inventado (docs/07 §7.5).
+clase_de_tiempo = "hora_del_dia"
+# Con qué forma empieza una fila de datos, y por tanto dónde acaba la cabecera.
+# El parser llevaba este patrón compilado como `_RE_FILA`. El motor lo ancla al
+# inicio y le añade el delimitador, así que aquí no se escriben ni `^` ni la
+# coma final.
+patron_marca = "\\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d"
 
 # =========================================================================== #
 #  RELOJ  (tarea F1-04 · docs/01 §1.4 y §1.5)
