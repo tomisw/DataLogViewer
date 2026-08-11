@@ -6,7 +6,7 @@
 > **25 semanas**. La revisión 3 añade el **explorador de logs** (E15, fase FE):
 > 52 puntos y una semana más, hasta **750 puntos y 26 semanas**. Sumadas F1-44
 > y F1-45, que salieron de abrir la aplicación con un log real, el total es de
-> **761 puntos en 155 tareas**.
+> **766 puntos en 156 tareas**.
 
 ## 5.1 Criterio de asignación
 
@@ -66,7 +66,7 @@ plausible y llega a una decisión de tuning:
 - cualquier **asignación de rol** o regla del importador genérico.
 
 Esfuerzo en **puntos**: 1 punto ≈ media jornada de trabajo asistido más su
-revisión. Total: **155 tareas, 761 puntos** ≈ 380 jornadas. Con la capacidad
+revisión. Total: **156 tareas, 766 puntos** ≈ 383 jornadas. Con la capacidad
 supuesta de **27 puntos/semana** (≈ 2,7 flujos de trabajo en paralelo), salen las
 **26 semanas** del calendario de `02-alcance-y-plan.md` §2.7. Con un solo flujo,
 v1.0 se va a ~67 semanas.
@@ -156,7 +156,9 @@ v1.0 se va a ~67 semanas.
 | F1-44 | **Un log real abierto enseña sus datos**: CORS con `expose_headers`, rol semántico y clasificación en `/comandos/abrir-log`, y elección de canales por rol | módulo + pruebas | **Opus 5** | 3 | F1-43 | G2 |
 | F1-45 | **E13 llega a la ventana**: conversiones reales por HTTP, motor de las cuatro clases en el frontend, escalado `to_canon` del canal, y montaje del selector de combustible y del doble cursor | módulo + pruebas | **Opus 5** | 8 | F1-13, F1-30, F1-41, F1-44 | **G1** |
 
-**Subtotal F1: 226 pts** · Hito **M1**
+| F1-46 | **Los factores del catálogo, derivados de su definición**: `data/definiciones_de_unidades.toml` declara de qué constantes exactas citadas sale cada factor de `units.toml`, y una suite ejecuta la derivación y compara | datos + pruebas | **Opus 5** | 5 | F0-08, F1-20 | G2 |
+
+**Subtotal F1: 231 pts** · Hito **M1**
 
 > **F1-39, F1-40 y F1-41 no estaban en la revisión 2 del plan.** Las tres
 > aparecieron al montar el MVP, y las tres son huecos reales, no trabajo extra:
@@ -395,12 +397,12 @@ decisiones equivocadas (riesgo R14).
 
 | Modelo | Puntos | % del esfuerzo | Tareas | Concentración |
 |---|---|---|---|---|
-| **Opus 5** | 446 | 59 % | 76 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
+| **Opus 5** | 451 | 59 % | 77 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
 | **Sonnet 5** | 282 | 37 % | 66 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
 | **Haiku 4.5** | 33 | 4 % | 13 | *fixtures*, CI, catálogos mecánicos, i18n, documentación mecánica |
-| **Total** | **761** | 100 % | **155** | |
+| **Total** | **766** | 100 % | **156** | |
 
-Reparto por fase: F0 54 · F1 226 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
+Reparto por fase: F0 54 · F1 231 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
 
 (Las cifras anteriores de esta sección decían 669 puntos en 136 tareas y F1 186.
 No cuadraban con la suma de las propias tablas desde la revisión 2 —el libro de
@@ -408,7 +410,7 @@ estado ya sembraba 698— y se corrigen aquí junto con el alcance nuevo.)
 
 Distribución de puertas: **52 tareas en G1** (revisión humana obligatoria), 31 en
 G2, 61 en G3, 11 en G4. El esfuerzo de revisión de G1 y G2 es **adicional** a los
-761 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
+766 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
 requieren.
 
 La proporción de Opus 5 sube del 52 % al 58 % con las dos épicas nuevas, y no por

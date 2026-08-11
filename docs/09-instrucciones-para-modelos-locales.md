@@ -241,6 +241,55 @@ Al cierre de la última sesión remota había **ocho puertas G1 esperando, 40 pu
 (F0-07, F0-09, F0-10, F0-13, F1-01, F1-04, F1-13, F1-20). `state/PROGRESO.md`
 tiene la lista viva con la última nota de cada una.
 
+### Antes de pedir una revisión: reducirla
+
+Pedir «revisa estos 92 números» es trasladar el trabajo, no hacerlo. La cola de
+G1 llegó a 20 puertas porque cada tarea de datos añadía sus afirmaciones a un
+montón indiferenciado, y un montón indiferenciado no se revisa: se posterga.
+
+El orden de preferencia, de arriba abajo. **No se sube un escalón sin haber
+agotado el de encima**:
+
+1. **Derivar.** Si el número es una definición, no se revisa: se calcula y se
+   compara. `data/definiciones_de_unidades.toml` (F1-46) declara de qué
+   constantes exactas citadas sale cada factor de `units.toml`, y
+   `test_definiciones_de_unidades.py` ejecuta la cuenta. Eso bajó `units.toml` de
+   37 factores «solo tu criterio» a **uno**. Al añadir una unidad nueva, la
+   prueba de cobertura exige derivarla o excluirla con un motivo, así que la
+   cobertura no puede degradarse sin ponerse en rojo.
+2. **Contrastar con el dato real.** Si el número no es una definición pero el log
+   lo contradice cuando está mal, la comprobación es contra el log. Es lo que
+   hace `confianza = "confirmed"` en `data/haltech_tipos.toml` («DisplayMaxMin
+   4731,2331 = 473,1 K»), y lo que automatiza **FG-10** contra los rangos
+   plausibles de `roles.toml`.
+3. **Enseñar la consecuencia, no el dato.** `python tools/revisar.py` genera las
+   afirmaciones físicas **ejecutando** el motor de conversión: si el factor de
+   psi estuviera mal, la línea sale visiblemente mal («1 bar = 12,3 psi») sin
+   abrir ningún TOML. Leer el número del fichero y volver a imprimirlo no
+   comprueba nada.
+4. **Preguntar.** Lo que sobrevive a los tres pasos anteriores son preguntas de
+   dominio: «¿un consumo instantáneo de 47 L/100 km en ese canal es plausible?».
+   Se hacen **contables y contestables en prosa**, nunca como un diff.
+
+```bash
+python tools/revisar.py                # el informe entero
+python tools/revisar.py --solo-dudosas # solo lo que nadie respalda todavía
+```
+
+La última línea del informe es la única cifra que importa: cuántas afirmaciones
+dependen solo del criterio del propietario. Si una tarea de datos la sube, la
+tarea no está terminada.
+
+### Lo que no se puede delegar
+
+Un modelo puede derivar, contrastar y reducir. Lo que no puede es **decidir**: qué
+`hp` quiere el propietario, si 14,7 es la estequiometría del combustible que usa,
+si el factor deducido de un canal ajeno es el correcto. Esa frontera es la razón
+de la regla, y no la mueve el hecho de que la cola sea larga. Si el propietario
+delega explícitamente una aprobación, se registra **quién la delegó** en la nota
+de `aprobar`, para que se pueda deshacer sabiendo qué se dio por bueno y con qué
+respaldo.
+
 ## 9.10 Trampas ya pagadas
 
 No las vuelvas a pagar. Todas salieron de este proyecto y cada una costó al menos

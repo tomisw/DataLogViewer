@@ -1,0 +1,623 @@
+#  DataLogViewer — de dónde sale cada factor de conversión
+#
+#  Tarea F1-46.  Especificación: docs/06-sistema-de-unidades.md §6.5.
+#  PUERTA G1 de `data/units.toml`, resuelta por derivación en vez de por lectura.
+#
+#  PARA QUÉ SIRVE ESTE FICHERO
+#  ===========================
+#  `data/units.toml` contiene ~60 factores de conversión. Cada uno es una
+#  afirmación sobre el mundo, y un factor equivocado no revienta: produce un
+#  número plausible. `3.28084` y `3.28048` se leen igual, y el segundo mete un
+#  0,01 % de error en todas las distancias del programa sin que nada avise.
+#
+#  Revisar esos 60 números a ojo no funciona: nadie distingue de memoria
+#  `0.06242796058` de `0.06427960580`. Pero casi todos son DEFINICIONES exactas,
+#  no medidas, y una definición sí se puede derivar. Este fichero declara la
+#  derivación; `dlv-core/tests/test_definiciones_de_unidades.py` la ejecuta y
+#  compara con `units.toml`. Un dígito bailado deja de ser algo que hay que ver
+#  para ser algo que falla.
+#
+#  Lo que queda fuera es lo que de verdad hay que revisar a mano: las constantes
+#  del dominio que NO son definiciones (14,7 de estequiometría de la gasolina) y
+#  los factores de escala DEDUCIDOS del log de Haltech (`confianza = "inferred"`
+#  en `data/haltech_tipos.toml`). Están enumerados en §"lo que no cubre" al final.
+#
+#  CÓMO SE LEE UNA ENTRADA
+#  =======================
+#  `canonicas_por_unidad` = cuántas unidades canónicas hay en UNA de estas
+#  unidades. Es la inversa del factor `a` que guarda `units.toml`, que va de la
+#  canónica a la unidad mostrada. Se calcula así:
+#
+#      canonicas_por_unidad = escala · Π (constantes[nombre] ^ exponente)
+#
+#  con `escala = 1` por omisión, y `escala` admite un entero, un decimal o un
+#  par `[numerador, denominador]` cuando la fracción es exacta y el decimal no
+#  (1/60 de un minuto, 1/16 de una onza).
+#
+#  `derivacion` es la misma cuenta escrita en palabras, para poder comprobarla
+#  con una calculadora sin leer nada de código. `origen` cita la fuente que hace
+#  que el número sea exacto y no una opinión.
+#
+#  NINGÚN NÚMERO DE ESTE FICHERO SE COPIA DE `units.toml`
+#  =====================================================
+#  Es la única razón por la que la comprobación vale algo. Si un día alguien
+#  arregla un desajuste copiando aquí el valor de `units.toml`, la prueba pasa a
+#  no comprobar nada. Los valores salen de `[constantes]`, y `[constantes]` solo
+#  contiene definiciones citables.
+
+[meta]
+version = 1
+tarea = "F1-46"
+especificacion = "docs/06-sistema-de-unidades.md §6.5"
+comprueba = "data/units.toml"
+
+# =========================================================================== #
+#  CONSTANTES  ·  exactas por definición, cada una con su fuente
+# =========================================================================== #
+#  Todas menos `pi` son exactas por convenio internacional: no son medidas y no
+#  tienen incertidumbre. Los dígitos que se ven son todos los que hay.
+
+[constantes]
+# Acuerdo internacional de la yarda y la libra (1959): 1 yd ≡ 0,9144 m exactos.
+# De ahí salen el pie (yd/3), la pulgada (yd/36) y la milla (1 760 yd).
+pie_en_m = 0.3048
+pulgada_en_m = 0.0254
+milla_en_m = 1609.344
+# Mismo acuerdo de 1959 para la masa: 1 lb ≡ 0,453 592 37 kg exactos.
+libra_en_kg = 0.45359237
+# El grano es lb/7000 exacto; se escribe en mg porque `mass_per_cyl` es en mg.
+grano_en_mg = 64.79891
+# Milla náutica: 1 NM ≡ 1 852 m exactos (Conferencia Hidrográfica, Mónaco 1929).
+milla_nautica_en_m = 1852.0
+# Gravedad estándar g_n ≡ 9,806 65 m/s² exactos (3ª CGPM, 1901). NO es la
+# gravedad local: es la constante que define kgf, lbf, psi, hp y PS.
+gravedad_estandar_m_s2 = 9.80665
+# Densidad convencional del mercurio a 0 °C, la que define mmHg e inHg como
+# unidades de presión (13 595,1 kg/m³; NIST SP 811 tabla B.8).
+densidad_mercurio_0c_kg_m3 = 13595.1
+# Galón imperial ≡ 4,546 09 L exactos (Weights and Measures Act 1985, RU).
+galon_uk_en_L = 4.54609
+# π con más dígitos de los que tiene un `float`, para que el redondeo sea del
+# `float` y no del fichero.
+pi = 3.14159265358979323846
+
+# =========================================================================== #
+#  TEMPERATURA  ·  la única dimensión con desplazamiento de origen
+# =========================================================================== #
+#  Aquí `b` importa tanto como `a`, y es donde vive la trampa del delta: estas
+#  entradas fijan el valor de `b`, y `data/casos_de_unidades.toml` fija que a un
+#  INTERVALO no se le aplica.
+
+[[definicion]]
+dimension = "temperature"
+unidad = "degC"
+canonicas_por_unidad = 1
+b = -273.15
+derivacion = "misma amplitud de grado que el kelvin; el origen se desplaza 273,15"
+origen = "definición del SI: t/°C = T/K − 273,15"
+
+[[definicion]]
+dimension = "temperature"
+unidad = "degF"
+canonicas_por_unidad = { escala = [5, 9] }
+b = -459.67
+derivacion = "un grado Fahrenheit son 5/9 de kelvin; el cero absoluto es −459,67 °F"
+origen = "definición: t/°F = T/K × 9/5 − 459,67"
+
+[[definicion]]
+dimension = "temperature"
+unidad = "degR"
+canonicas_por_unidad = { escala = [5, 9] }
+b = 0.0
+derivacion = "grado Rankine = grado Fahrenheit, pero con origen en el cero absoluto"
+origen = "definición: T/°R = T/K × 9/5"
+
+# =========================================================================== #
+#  PRESIÓN  ·  canónica kPa absolutos
+# =========================================================================== #
+
+[[definicion]]
+dimension = "pressure"
+unidad = "hPa"
+canonicas_por_unidad = { escala = 0.1 }
+derivacion = "1 hPa = 100 Pa = 0,1 kPa"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "pressure"
+unidad = "bar"
+canonicas_por_unidad = { escala = 100 }
+derivacion = "1 bar = 100 000 Pa = 100 kPa"
+origen = "definición: 1 bar ≡ 10⁵ Pa"
+
+[[definicion]]
+dimension = "pressure"
+unidad = "atm"
+canonicas_por_unidad = { escala = 101.325 }
+derivacion = "1 atm = 101 325 Pa = 101,325 kPa"
+origen = "definición: 1 atm ≡ 101 325 Pa (10ª CGPM, 1954)"
+
+[[definicion]]
+dimension = "pressure"
+unidad = "psi"
+canonicas_por_unidad = { escala = [1, 1000], constantes = [
+  ["libra_en_kg", 1],
+  ["gravedad_estandar_m_s2", 1],
+  ["pulgada_en_m", -2],
+] }
+derivacion = "1 psi = 1 lbf/in² = (0,45359237 kg × 9,80665 m/s²) ÷ (0,0254 m)² = 6 894,757 293 Pa"
+origen = "NIST SP 811: 1 psi = 6 894,757 293 168 Pa exactos"
+
+[[definicion]]
+dimension = "pressure"
+unidad = "inHg"
+canonicas_por_unidad = { escala = [1, 1000], constantes = [
+  ["densidad_mercurio_0c_kg_m3", 1],
+  ["gravedad_estandar_m_s2", 1],
+  ["pulgada_en_m", 1],
+] }
+derivacion = "columna de mercurio de una pulgada: 13 595,1 kg/m³ × 9,80665 m/s² × 0,0254 m = 3 386,388 640 Pa"
+origen = "NIST SP 811: 1 inHg (0 °C) = 3,386 389 E+03 Pa"
+# El catálogo guarda la inversa del valor REDONDEADO que imprime NIST
+# (3 386,389 Pa), no la del producto exacto de la columna (3 386,388 640 Pa). Son
+# 1,2 × 10⁻⁷ de diferencia relativa: 0,000 04 inHg sobre una lectura de 30 inHg,
+# invisible y sin consecuencia. Se documenta en vez de corregirse porque el valor
+# del catálogo es el que aparece en la fuente citada, y cambiar un dato de
+# `units.toml` sin que lo pida el propietario no toca.
+tolerancia_relativa = 2e-7
+motivo_tolerancia = "el catálogo usa el valor redondeado de la tabla de NIST, no el producto exacto"
+
+[[definicion]]
+dimension = "pressure"
+unidad = "mmHg"
+canonicas_por_unidad = { escala = [1, 1000000], constantes = [
+  ["densidad_mercurio_0c_kg_m3", 1],
+  ["gravedad_estandar_m_s2", 1],
+] }
+derivacion = "columna de un milímetro: 13 595,1 × 9,80665 × 0,001 m = 133,322 387 415 Pa"
+origen = "NIST SP 811: 1 mmHg (0 °C) = 1,333 224 E+02 Pa"
+# Mismo caso que `inHg`: el catálogo guarda la inversa de 133,322 39 Pa, un
+# redondeo a siete cifras del producto exacto. Diferencia relativa 1,9 × 10⁻⁸.
+tolerancia_relativa = 5e-8
+motivo_tolerancia = "el catálogo usa el valor redondeado de la tabla de NIST, no el producto exacto"
+
+# =========================================================================== #
+#  RELACIÓN DE MEZCLA  ·  canónica lambda
+# =========================================================================== #
+#  `afr` y `afr_gasolina` NO están aquí: 14,7 es una propiedad del combustible,
+#  no una definición de unidad. Ver §"lo que no cubre".
+
+[[definicion]]
+dimension = "mixture_ratio"
+unidad = "phi"
+reciproca = 1
+derivacion = "φ es la relación de equivalencia: φ = 1/λ"
+origen = "definición: φ ≡ 1/λ. Recíproca, no lineal: por eso rechaza intervalos"
+
+# =========================================================================== #
+#  VELOCIDAD ANGULAR  ·  canónica rpm
+# =========================================================================== #
+
+[[definicion]]
+dimension = "angular_speed"
+unidad = "Hz"
+canonicas_por_unidad = { escala = 60 }
+derivacion = "una vuelta por segundo son 60 vueltas por minuto"
+origen = "definición del minuto: 60 s"
+
+[[definicion]]
+dimension = "angular_speed"
+unidad = "rad/s"
+canonicas_por_unidad = { escala = 30, constantes = [["pi", -1]] }
+derivacion = "1 rad/s = 60/(2π) rpm = 30/π rpm ≈ 9,549 rpm"
+origen = "definición: una vuelta son 2π rad, un minuto son 60 s"
+
+# =========================================================================== #
+#  VELOCIDAD  ·  canónica km/h
+# =========================================================================== #
+
+[[definicion]]
+dimension = "speed"
+unidad = "m/s"
+canonicas_por_unidad = { escala = 3.6 }
+derivacion = "1 m/s = 3 600 m/h = 3,6 km/h"
+origen = "definición de la hora y del kilómetro"
+
+[[definicion]]
+dimension = "speed"
+unidad = "mph"
+canonicas_por_unidad = { escala = [1, 1000], constantes = [["milla_en_m", 1]] }
+derivacion = "1 mph = 1 609,344 m/h = 1,609 344 km/h"
+origen = "acuerdo de 1959: 1 mi ≡ 1 609,344 m"
+
+[[definicion]]
+dimension = "speed"
+unidad = "kn"
+canonicas_por_unidad = { escala = [1, 1000], constantes = [["milla_nautica_en_m", 1]] }
+derivacion = "1 kn = 1 NM/h = 1 852 m/h = 1,852 km/h"
+origen = "1 NM ≡ 1 852 m (Mónaco, 1929)"
+
+# =========================================================================== #
+#  ÁNGULO  ·  canónica grados de cigüeñal
+# =========================================================================== #
+
+[[definicion]]
+dimension = "angle"
+unidad = "rad"
+canonicas_por_unidad = { escala = 180, constantes = [["pi", -1]] }
+derivacion = "1 rad = 180/π grados ≈ 57,296°"
+origen = "definición: media vuelta son π rad y 180°"
+
+[[definicion]]
+dimension = "angle"
+unidad = "deg_cam"
+canonicas_por_unidad = { escala = 2 }
+derivacion = "el árbol de levas gira a la mitad: 1° de árbol son 2° de cigüeñal"
+origen = "geometría del cuatro tiempos, no una definición del SI. Ver docs/06 §6.5"
+
+# =========================================================================== #
+#  RAZÓN  ·  canónica fracción (1 = 100 %)
+# =========================================================================== #
+
+[[definicion]]
+dimension = "ratio"
+unidad = "pct"
+canonicas_por_unidad = { escala = 0.01 }
+derivacion = "1 % = 1/100 de la unidad"
+origen = "definición del tanto por ciento"
+
+[[definicion]]
+dimension = "ratio"
+unidad = "permil"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 ‰ = 1/1 000"
+origen = "definición del tanto por mil"
+
+[[definicion]]
+dimension = "ratio"
+unidad = "ppm"
+canonicas_por_unidad = { escala = 0.000001 }
+derivacion = "1 ppm = 1/1 000 000"
+origen = "definición de partes por millón"
+
+# =========================================================================== #
+#  TENSIÓN, TIEMPO, FRECUENCIA, RESISTENCIA  ·  prefijos decimales
+# =========================================================================== #
+#  Un prefijo decimal mal puesto es el error más fácil de cometer y el más fácil
+#  de comprobar: un factor 1 000 de más en `us` convierte 4,7 ms en 4 731 s.
+
+[[definicion]]
+dimension = "voltage"
+unidad = "mV"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 mV = 10⁻³ V"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "time"
+unidad = "ms"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 ms = 10⁻³ s"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "time"
+unidad = "us"
+canonicas_por_unidad = { escala = 0.000001 }
+derivacion = "1 µs = 10⁻⁶ s"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "time"
+unidad = "min"
+canonicas_por_unidad = { escala = 60 }
+derivacion = "1 min = 60 s"
+origen = "definición del minuto"
+
+[[definicion]]
+dimension = "frequency"
+unidad = "kHz"
+canonicas_por_unidad = { escala = 1000 }
+derivacion = "1 kHz = 10³ Hz"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "frequency"
+unidad = "rpm"
+canonicas_por_unidad = { escala = [1, 60] }
+derivacion = "1 rpm = 1/60 Hz"
+origen = "definición del minuto: 60 s"
+
+[[definicion]]
+dimension = "frequency"
+unidad = "periodo_us"
+reciproca = 1000000
+derivacion = "el periodo en µs de f hercios es 10⁶/f"
+origen = "definición: T = 1/f. Recíproca, no lineal: rechaza intervalos"
+
+[[definicion]]
+dimension = "resistance"
+unidad = "kohm"
+canonicas_por_unidad = { escala = 1000 }
+derivacion = "1 kΩ = 10³ Ω"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "resistance"
+unidad = "mohm"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 mΩ = 10⁻³ Ω"
+origen = "prefijos decimales del SI"
+
+# =========================================================================== #
+#  CAUDAL MÁSICO  ·  canónica kg/h
+# =========================================================================== #
+
+[[definicion]]
+dimension = "mass_flow"
+unidad = "g/s"
+canonicas_por_unidad = { escala = 3.6 }
+derivacion = "1 g/s = 3 600 g/h = 3,6 kg/h"
+origen = "prefijos decimales del SI y definición de la hora"
+
+[[definicion]]
+dimension = "mass_flow"
+unidad = "lb/h"
+canonicas_por_unidad = { constantes = [["libra_en_kg", 1]] }
+derivacion = "1 lb/h = 0,453 592 37 kg/h"
+origen = "acuerdo de 1959: 1 lb ≡ 0,453 592 37 kg"
+
+[[definicion]]
+dimension = "mass_flow"
+unidad = "lb/min"
+canonicas_por_unidad = { escala = 60, constantes = [["libra_en_kg", 1]] }
+derivacion = "1 lb/min = 60 lb/h = 27,215 542 2 kg/h"
+origen = "acuerdo de 1959 y definición de la hora"
+
+# =========================================================================== #
+#  CAUDAL VOLUMÉTRICO Y VOLUMEN  ·  canónicas L/h y L
+# =========================================================================== #
+#  El galón de este bloque es el estadounidense (231 in³), no el imperial. Son
+#  dos unidades distintas con el mismo nombre y un 20 % de diferencia: es
+#  exactamente la clase de confusión que este fichero existe para cerrar. El
+#  imperial solo aparece en `mpg_uk`.
+
+[[definicion]]
+dimension = "volume_flow"
+unidad = "cc/min"
+canonicas_por_unidad = { escala = 0.06 }
+derivacion = "1 cc/min = 60 cc/h = 0,06 L/h"
+origen = "definición del litro (1 L ≡ 1 000 cm³) y de la hora"
+
+[[definicion]]
+dimension = "volume_flow"
+unidad = "gal/h"
+canonicas_por_unidad = { escala = 231000, constantes = [["pulgada_en_m", 3]] }
+derivacion = "galón US = 231 in³ = 231 × (0,0254 m)³ = 0,003 785 411 784 m³ = 3,785 411 784 L"
+origen = "definición del galón líquido US: 231 in³ exactos"
+
+[[definicion]]
+dimension = "volume"
+unidad = "cc"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 cm³ = 10⁻³ L"
+origen = "definición del litro: 1 L ≡ 1 dm³ = 1 000 cm³"
+
+[[definicion]]
+dimension = "volume"
+unidad = "in3"
+canonicas_por_unidad = { escala = 1000, constantes = [["pulgada_en_m", 3]] }
+derivacion = "(0,0254 m)³ = 1,638 706 4 × 10⁻⁵ m³ = 0,016 387 064 L"
+origen = "acuerdo de 1959 y definición del litro"
+
+[[definicion]]
+dimension = "volume"
+unidad = "gal"
+canonicas_por_unidad = { escala = 231000, constantes = [["pulgada_en_m", 3]] }
+derivacion = "galón US = 231 in³ = 3,785 411 784 L"
+origen = "definición del galón líquido US: 231 in³ exactos"
+
+# =========================================================================== #
+#  MASA  ·  canónicas kg y mg
+# =========================================================================== #
+
+[[definicion]]
+dimension = "mass"
+unidad = "g"
+canonicas_por_unidad = { escala = 0.001 }
+derivacion = "1 g = 10⁻³ kg"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "mass"
+unidad = "lb"
+canonicas_por_unidad = { constantes = [["libra_en_kg", 1]] }
+derivacion = "1 lb = 0,453 592 37 kg"
+origen = "acuerdo de 1959"
+
+[[definicion]]
+dimension = "mass"
+unidad = "oz"
+canonicas_por_unidad = { escala = [1, 16], constantes = [["libra_en_kg", 1]] }
+derivacion = "1 oz = 1 lb/16 = 0,028 349 523 125 kg"
+origen = "definición de la onza avoirdupois: lb/16"
+
+[[definicion]]
+dimension = "mass_per_cyl"
+unidad = "g"
+canonicas_por_unidad = { escala = 1000 }
+derivacion = "1 g = 1 000 mg"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "mass_per_cyl"
+unidad = "grain"
+canonicas_por_unidad = { constantes = [["grano_en_mg", 1]] }
+derivacion = "1 gr = 1 lb/7 000 = 64,798 91 mg"
+origen = "definición del grano: lb/7 000 exacto"
+
+# =========================================================================== #
+#  DENSIDAD  ·  canónica kg/m³
+# =========================================================================== #
+
+[[definicion]]
+dimension = "density"
+unidad = "g_cm3"
+canonicas_por_unidad = { escala = 1000 }
+derivacion = "1 g/cm³ = 1 000 kg/m³ (el agua: 1 g/cm³ = 1 000 kg/m³)"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "density"
+unidad = "lb_ft3"
+canonicas_por_unidad = { constantes = [
+  ["libra_en_kg", 1],
+  ["pie_en_m", -3],
+] }
+derivacion = "0,453 592 37 kg ÷ (0,3048 m)³ = 16,018 463 4 kg/m³"
+origen = "acuerdo de 1959"
+
+# =========================================================================== #
+#  DISTANCIA  ·  canónica m
+# =========================================================================== #
+
+[[definicion]]
+dimension = "distance"
+unidad = "km"
+canonicas_por_unidad = { escala = 1000 }
+derivacion = "1 km = 10³ m"
+origen = "prefijos decimales del SI"
+
+[[definicion]]
+dimension = "distance"
+unidad = "mi"
+canonicas_por_unidad = { constantes = [["milla_en_m", 1]] }
+derivacion = "1 mi = 1 609,344 m"
+origen = "acuerdo de 1959: 1 mi = 1 760 yd = 1 609,344 m"
+
+[[definicion]]
+dimension = "distance"
+unidad = "ft"
+canonicas_por_unidad = { constantes = [["pie_en_m", 1]] }
+derivacion = "1 ft = 0,3048 m"
+origen = "acuerdo de 1959: 1 ft = 1 yd/3"
+
+[[definicion]]
+dimension = "distance"
+unidad = "in"
+canonicas_por_unidad = { constantes = [["pulgada_en_m", 1]] }
+derivacion = "1 in = 0,0254 m"
+origen = "acuerdo de 1959: 1 in = 1 ft/12"
+
+# =========================================================================== #
+#  CONSUMO  ·  canónica L/100 km, y las recíprocas
+# =========================================================================== #
+#  Las tres son recíprocas: el consumo y el rendimiento van al revés. Un
+#  intervalo de L/100 km NO se puede convertir a mpg, y el motor lo rechaza en
+#  vez de dar un número aproximado (data/casos_de_unidades.toml, sección
+#  [[rechazo]]).
+
+[[definicion]]
+dimension = "fuel_economy"
+unidad = "km/L"
+reciproca = 100
+derivacion = "L/100 km = 100 ÷ (km/L)"
+origen = "definición: son la misma magnitud invertida, con el factor 100 del «por 100 km»"
+
+[[definicion]]
+dimension = "fuel_economy"
+unidad = "mpg_us"
+reciproca = { escala = 23100000000, constantes = [
+  ["pulgada_en_m", 3],
+  ["milla_en_m", -1],
+] }
+derivacion = "100 × 3,785 411 784 L/gal ÷ 1,609 344 km/mi = 235,214 583 3. La escala 2,31 × 10¹⁰ es 100 (del «por 100 km») × 231 (in³ del galón) × 1 000 (m³ a L) × 1 000 (m a km)"
+origen = "definición del galón US y de la milla"
+
+[[definicion]]
+dimension = "fuel_economy"
+unidad = "mpg_uk"
+reciproca = { escala = 100000, constantes = [
+  ["galon_uk_en_L", 1],
+  ["milla_en_m", -1],
+] }
+derivacion = "100 × 4,546 09 L/gal ÷ 1,609 344 km/mi = 282,480 936 3"
+origen = "Weights and Measures Act 1985: 1 gal imperial ≡ 4,546 09 L"
+
+# =========================================================================== #
+#  PAR Y POTENCIA  ·  canónicas Nm y kW
+# =========================================================================== #
+#  Los dos caballos son distintos y se parecen en un 1,4 %: `hp` es mecánico
+#  (550 ft·lbf/s) y `PS` es métrico (75 kgf·m/s). Confundirlos son 4 CV en un
+#  motor de 300, que es justo el orden de magnitud de lo que la gente discute.
+
+[[definicion]]
+dimension = "torque"
+unidad = "lbft"
+canonicas_por_unidad = { constantes = [
+  ["libra_en_kg", 1],
+  ["gravedad_estandar_m_s2", 1],
+  ["pie_en_m", 1],
+] }
+derivacion = "1 lb·ft = 0,453 592 37 kg × 9,806 65 m/s² × 0,3048 m = 1,355 817 948 Nm"
+origen = "NIST SP 811: 1 lbf·ft = 1,355 817 948 331 4 N·m exactos"
+
+[[definicion]]
+dimension = "torque"
+unidad = "kgfm"
+canonicas_por_unidad = { constantes = [["gravedad_estandar_m_s2", 1]] }
+derivacion = "1 kgf·m = 1 kg × 9,806 65 m/s² × 1 m = 9,806 65 Nm"
+origen = "definición del kilogramo-fuerza con g_n"
+
+[[definicion]]
+dimension = "power"
+unidad = "hp"
+canonicas_por_unidad = { escala = [550, 1000], constantes = [
+  ["libra_en_kg", 1],
+  ["gravedad_estandar_m_s2", 1],
+  ["pie_en_m", 1],
+] }
+derivacion = "1 hp = 550 ft·lbf/s = 550 × 1,355 817 948 W = 745,699 871 6 W = 0,745 699 871 6 kW"
+origen = "NIST SP 811: 1 hp (550 ft·lbf/s) = 745,699 871 582 270 22 W"
+
+[[definicion]]
+dimension = "power"
+unidad = "PS"
+canonicas_por_unidad = { escala = [75, 1000], constantes = [["gravedad_estandar_m_s2", 1]] }
+derivacion = "1 PS = 75 kgf·m/s = 75 × 9,806 65 W = 735,498 75 W = 0,735 498 75 kW"
+origen = "definición del caballo de vapor métrico: 75 kgf·m/s"
+
+# =========================================================================== #
+#  ACELERACIÓN  ·  canónica m/s²
+# =========================================================================== #
+
+[[definicion]]
+dimension = "acceleration"
+unidad = "g"
+canonicas_por_unidad = { constantes = [["gravedad_estandar_m_s2", 1]] }
+derivacion = "1 g = 9,806 65 m/s²"
+origen = "3ª CGPM (1901): g_n ≡ 9,806 65 m/s² exactos"
+
+# =========================================================================== #
+#  LO QUE NO CUBRE  ·  esto sí hay que revisarlo a mano
+# =========================================================================== #
+#  Cada entrada de aquí es un factor de `units.toml` que NO sale de una
+#  definición, y por tanto no se puede derivar. La prueba comprueba que la lista
+#  es EXHAUSTIVA: si mañana alguien añade una unidad y no la declara arriba ni la
+#  excluye aquí, la prueba falla. Es lo que impide que la cobertura se degrade en
+#  silencio.
+
+[[sin_definicion]]
+dimension = "mixture_ratio"
+unidad = "afr"
+motivo = "el factor es una propiedad del combustible, no de la unidad; sale del rol `stoichiometry` del propio log (F1-14) y por omisión vale 14,7"
+
+[[sin_definicion]]
+dimension = "mixture_ratio"
+unidad = "afr_gasolina"
+motivo = "14,7 es la estequiometría de la gasolina: un dato medido del combustible. Confirmado contra el log (Fuel Tuning Current Stoichiometry = 14 700), pero no es una definición"
+
+[[sin_definicion]]
+dimension = "sound_level"
+unidad = "dB"
+motivo = "canónica de su propia dimensión, factor 1 por construcción"

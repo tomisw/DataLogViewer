@@ -135,6 +135,21 @@ def _casos_conocidos() -> dict[tuple[str, str], list[str]]:
             clave = (str(caso.get("dimension")), str(caso.get("unidad")))
             origen = str(caso.get("origen", "sin origen citado"))
             respaldos.setdefault(clave, []).append(f"{seccion}: {origen}")
+
+    # F1-46: el respaldo más fuerte de todos, porque no es un ejemplo sino una
+    # derivación. `definiciones_de_unidades.toml` declara de qué constantes
+    # exactas sale el factor, y `test_definiciones_de_unidades.py` ejecuta la
+    # cuenta y la compara con `units.toml`. Un factor así no necesita ojos: si no
+    # cuadra con su definición, la suite está en rojo.
+    definiciones = RAIZ / "data" / "definiciones_de_unidades.toml"
+    if definiciones.exists():
+        with definiciones.open("rb") as fh:
+            bruto_def = tomllib.load(fh)
+        for caso in bruto_def.get("definicion", []):
+            clave = (str(caso.get("dimension")), str(caso.get("unidad")))
+            respaldos.setdefault(clave, []).insert(
+                0, f"derivado de su definición — {caso.get('derivacion', '')}"
+            )
     return respaldos
 
 
@@ -181,28 +196,38 @@ def informe_de_unidades(cat: Catalogo) -> Informe:
             try:
                 uno = float(desde_canonica(1.0, dimension=dim, unidad=uni_id, clase=Clase.PUNTO))
                 cien = float(desde_canonica(100.0, dimension=dim, unidad=uni_id, clase=Clase.PUNTO))
-                delta = float(
-                    desde_canonica(100.0, dimension=dim, unidad=uni_id, clase=Clase.INTERVALO)
-                )
             except (ErrorDeUnidad, ZeroDivisionError, ValueError) as exc:
                 inf.afirmaciones.append(
                     Afirmacion(donde, f"NO SE PUEDE CONVERTIR: {exc}", aviso="conversión falla")
                 )
                 continue
 
+            # Que una recíproca (φ, mpg, periodo) se niegue a convertir un
+            # INTERVALO no es un fallo: es el requisito de §6.5, y lo fija la
+            # sección [[rechazo]] de `casos_de_unidades.toml`. La primera versión
+            # de esta herramienta pedía el delta junto con los puntos y perdía la
+            # línea entera de cinco unidades, presentando como cinco avisos lo que
+            # era el motor haciendo exactamente lo que se le pide.
+            delta: float | None
+            try:
+                delta = float(
+                    desde_canonica(100.0, dimension=dim, unidad=uni_id, clase=Clase.INTERVALO)
+                )
+            except (ErrorDeUnidad, ZeroDivisionError, ValueError):
+                delta = None
+
             conv = unidad.conversion
             desplazada = isinstance(conv, Afin) and conv.b != 0.0
-            if desplazada:
-                texto = (
-                    f"{dim_id}: 1 {canonica} = {uno:.6g} {unidad.etiqueta or uni_id}   ·   "
-                    f"100 {canonica} = {cien:.6g}   ·   un Δ de 100 {canonica} = {delta:.6g} "
-                    f"(origen desplazado)"
-                )
+            cabeza = (
+                f"{dim_id}: 1 {canonica} = {uno:.6g} {unidad.etiqueta or uni_id}   ·   "
+                f"100 {canonica} = {cien:.6g}"
+            )
+            if desplazada and delta is not None:
+                texto = f"{cabeza}   ·   un Δ de 100 {canonica} = {delta:.6g} (origen desplazado)"
+            elif delta is None:
+                texto = f"{cabeza}   ·   un Δ NO se convierte (recíproca, correcto)"
             else:
-                texto = (
-                    f"{dim_id}: 1 {canonica} = {uno:.6g} {unidad.etiqueta or uni_id}   ·   "
-                    f"100 {canonica} = {cien:.6g}"
-                )
+                texto = cabeza
 
             respaldo: str | None = None
             if (dim_id, uni_id) in casos:

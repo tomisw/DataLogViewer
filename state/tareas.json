@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 13:26:49Z"
+    "actualizado": "2026-08-11 13:55:02Z"
   },
   "tareas": [
     {
@@ -1698,6 +1698,35 @@
         {
           "fecha": "2026-08-11 13:26:49Z",
           "texto": "APROBADA por el propietario tras comprobar EN LA VENTANA que las unidades se reflejan correctamente. La confirmacion visual la hizo el propietario, no el orquestador: en este contenedor no hay node_modules (npm da 403) ni Polars, asi que la GUI no se puede ejecutar aqui."
+        }
+      ]
+    },
+    {
+      "id": "F1-46",
+      "fase": "F1",
+      "titulo": "Los factores del catálogo, derivados de su definición: `data/definiciones_de_unidades.toml` declara de qué constantes exactas citadas sale cada factor de `units.toml`, y una suite ejecuta la derivación y compara",
+      "entregable": "datos + pruebas",
+      "modelo": "Opus 5",
+      "pts": 5,
+      "deps": [
+        "F0-08",
+        "F1-20"
+      ],
+      "deps_backlog": [
+        "F0-08",
+        "F1-20"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "hecho",
+      "agente": "opus",
+      "commits": [
+        "8e67382"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-11 13:55:02Z",
+          "texto": "data/definiciones_de_unidades.toml declara de qué constantes exactas citadas sale cada factor de units.toml (pie=0,3048 m de 1959, g_n=9,80665, galón US=231 in³, galón imperial=4,54609 L...); test_definiciones_de_unidades.py ejecuta la derivación y la compara con el catálogo. 54 de las 57 unidades no canónicas quedan derivadas; las 3 restantes se excluyen con motivo (afr y afr_gasolina son una propiedad del combustible, no una definición). La prueba de cobertura exige que toda unidad nueva se derive o se excluya, así que no se puede degradar en silencio. Mutación comprobada: tres dígitos bailados en ft, psi y hp los caza nombrando la unidad. Dos hallazgos reales, documentados y NO corregidos porque tocar units.toml no toca sin pedirlo: inHg y mmHg guardan la inversa del valor redondeado que imprime NIST en vez del producto exacto de la columna de mercurio (1,2e-7 y 1,9e-8 relativo). Efecto en la cola de revision: units.toml pasa de 37 factores 'solo tu criterio' a 1 (el 14,7 por omision de AFR)."
         }
       ]
     },

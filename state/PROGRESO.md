@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 13:26:49Z
+Actualizado: 2026-08-11 13:55:02Z
 
-**258 / 761 pts cerrados (33.9 %)** · 110 pts esperando revisión humana → 48.4 % entregado
+**263 / 766 pts cerrados (34.3 %)** · 110 pts esperando revisión humana → 48.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
-| F1 | 185 | 36 | 0 | 5 | 0 | 226 |
+| F1 | 190 | 36 | 0 | 5 | 0 | 231 |
 | FG | 16 | 43 | 0 | 33 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
@@ -70,7 +70,7 @@ Actualizado: 2026-08-11 13:26:49Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
 
-## F1 — 221/226 pts
+## F1 — 226/231 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -119,6 +119,7 @@ Actualizado: 2026-08-11 13:26:49Z
 | ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
+| ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `8e67382` |
 
 ## FG — 59/92 pts
 
