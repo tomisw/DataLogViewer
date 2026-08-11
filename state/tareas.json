@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-10 21:58:46Z"
+    "actualizado": "2026-08-11 13:25:24Z"
   },
   "tareas": [
     {
@@ -267,7 +267,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "orquestador",
       "commits": [
         "217d88b"
@@ -280,6 +280,10 @@
         {
           "fecha": "2026-07-29 22:58:32Z",
           "texto": "data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a canonica, con confianza y evidencia. 16 confirmados / 11 inferidos / 7 desconocidos. 19 pruebas, incluidas las identidades aritmeticas. TRES ESCALAS NUEVAS CONFIRMADAS respecto a docs/01: AbsPressure (que resulta ser la presion RELATIVA, no la absoluta: Fuel Pressure Expected - Manifold Pressure = 2999 vs el canal diferencial 3000), Frequency (x1 Hz via disparo de inyector) y Time_us (x1 us via periodo de ciclo, que ademas revela 6 cilindros). REVISAR: los 11 inferidos, y en especial que MassOverTime queda desconocido a proposito porque no cuadra con la lambda medida."
+        },
+        {
+          "fecha": "2026-08-11 13:25:23Z",
+          "texto": "APROBADA por el propietario. Los 34 tipos, los 11 inferidos y MassOverTime como desconocido a proposito quedan confirmados como dato bueno."
         }
       ]
     },
@@ -437,7 +441,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "orquestador",
       "commits": [
         "0cac953"
@@ -446,6 +450,10 @@
         {
           "fecha": "2026-07-30 08:59:52Z",
           "texto": "dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido por el descriptor de F0-09. Las escalas NO estan en el codigo: se resuelven contra data/formats/haltech_nsp.toml, asi que anadir un tipo o corregir un factor no toca este fichero. Distingue error de aviso segun la regla de docs/02 E1.7: rechaza cabecera incompleta y version desconocida, avisa de tipo desconocido, escala sin confirmar, DisplayMaxMin mal formada, nombre o ID duplicado. 37 pruebas, validadas contra los 3 logs reales, el de verdad de referencia y LOS 11 FICHEROS DEL CORPUS DE CORRUPTOS, cuyo README es la especificacion ejecutable: los 5 validos cargan identicos al original, los 2 invalidos se rechazan con mensaje claro, y los 4 que estropean filas dejan la cabecera intacta. DEFECTO DE API CORREGIDO: offset_datos era relativo a los bytes SIN BOM, asi que datos[offset:] sobre el fichero original quedaba desplazado 3 bytes; ahora es relativo a lo que se pasa. Verificado el invariante sobre los 12 ficheros del corpus."
+        },
+        {
+          "fecha": "2026-08-11 13:25:23Z",
+          "texto": "APROBADA por el propietario."
         }
       ]
     },
@@ -464,7 +472,7 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "revision_humana",
+      "estado": "hecho",
       "agente": "opus",
       "commits": [
         "a7cd93a"
@@ -473,6 +481,10 @@
         {
           "fecha": "2026-07-30 12:23:45Z",
           "texto": "REVISAR: memoria_residente sigue INCUMPLE (4.30x el CSV, presupuesto <=3.5x), aunque bajo de 4.42x aplicando la mitigacion que pedia la nota de F0-01: proyectar cada canal a Int32 en vez del Int64 por omision de Polars, y evitar duplicar el cuerpo en memoria Python con datos[offset:] (bytes es inmutable y eso copia ~70MB extra) usando skip_rows en su lugar. El resto -- overhead fijo de interprete+polars+numpy (~55MB) mas el propio dataframe de cabecera -- no se investigo mas a fondo; sigue siendo el hallazgo de R9 que el propietario decidio documentar y no bloquear en F0-01, mismo estado, numero mejorado. -- parseo_nativo CUMPLE con margen muy amplio: 400+ MB/s (mejor de 3 repeticiones), 4x el presupuesto de >=100 MB/s; de hecho el read_csv con schema explicito (infer_schema_length=0) es MAS rapido que el spike original de F0-01, no solo mas ligero en memoria. -- Modulo nuevo dlv_core/formatos/cuerpo.py (parsear_cuerpo, esquema, columna_polars): parsea el paso 3 de la ruta de ingesta (docs/03 SS3.4) a partir de Cabecera.offset_datos (F1-01); NO hace consolidacion (grupos de muestreo, t compartido) ni construye ChannelSeries -- eso es F1-03/F1-05, dependencia ya declarada en el backlog. 9 tests nuevos (dlv-core/tests/test_cuerpo.py) cubriendo los 3 logs reales y los casos 02/03 del corpus de corruptos (fila corta/larga -- truncate_ragged_lines=True las carga con aviso implicito, sin excepcion, igual que exige samples/corrupt/README.md). Banco: 'python tools/banco.py parseo-cuerpo' mide el modulo real (no el read_csv crudo del spike de F0-01). tools/verificar.py: 341 tests, todo verde salvo 'presupuestos' por el memoria_residente ya conocido. -- AVISO para mas adelante (no bloquea F1-02): dlv_core/formatos/__init__.py tiene un Descriptor/sondear_formato/cargar_descriptor de juguete (todo NotImplementedError) que es una API distinta y contradictoria con la real en dlv_core/formatos/haltech.py; quedo obsoleto tras F1-01 y no se ha limpiado. No lo he tocado (fuera de alcance de F1-02) pero puede confundir a quien lo lea despues."
+        },
+        {
+          "fecha": "2026-08-11 13:25:24Z",
+          "texto": "APROBADA por el propietario. Incluye la aceptacion del estado de memoria_residente: 4,30x el CSV frente al presupuesto de 3,5x, ya registrado como desviacion aceptada."
         }
       ]
     },

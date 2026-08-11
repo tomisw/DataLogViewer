@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-10 21:58:46Z
+Actualizado: 2026-08-11 13:25:24Z
 
-**221 / 761 pts cerrados (29.0 %)** · 147 pts esperando revisión humana → 48.4 % entregado
+**239 / 761 pts cerrados (31.4 %)** · 129 pts esperando revisión humana → 48.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
-| F0 | 30 | 24 | 0 | 0 | 0 | 54 |
-| F1 | 153 | 68 | 0 | 5 | 0 | 226 |
+| F0 | 35 | 19 | 0 | 0 | 0 | 54 |
+| F1 | 166 | 55 | 0 | 5 | 0 | 226 |
 | FG | 16 | 43 | 0 | 33 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
@@ -25,11 +25,8 @@ Actualizado: 2026-08-10 21:58:46Z
 |---|---|---|---|---|
 | `F0-01` Cerrar ADR-001…009 y spike de rendimiento de | revision_humana | Opus 5 | G1 | REVISAR: memoria_residente INCUMPLE 4.42x el CSV (310 MB pico / 70.13  |
 | `F0-07` Log de verdad de referencia con knock y λ po | revision_humana | Opus 5 | G1 | RESUELTO el punto de REVISAR de la nota anterior: los umbrales ya no s |
-| `F0-09` `formats/haltech_nsp.toml`: los 34 tipos → d | revision_humana | Opus 5 | G1 | data/formats/haltech_nsp.toml: los 34 tipos -> dimension + escala a ca |
 | `F0-10` Catálogo `roles.toml`: roles semánticos, dim | revision_humana | Opus 5 | G1 | data/roles.toml: 58 roles con dimension, rango plausible en unidad can |
 | `F0-13` Log equivalente en dos formatos (nativo + ge | revision_humana | Sonnet 5 | G1 | samples/dos-formatos/ con nativo.csv (Haltech, crudo) y generico.csv ( |
-| `F1-01` Parser de cabecera Haltech dirigido por desc | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/formatos/haltech.py: parser de cabecera dirigido |
-| `F1-02` Parseo del cuerpo con Polars: ≥ 100 MB/s agr | revision_humana | Opus 5 | G1 | REVISAR: memoria_residente sigue INCUMPLE (4.30x el CSV, presupuesto < |
 | `F1-03` Celda vacía ≠ 0, centinelas de desbordamient | revision_humana | Opus 5 | G1 | Modulo dlv_core/formatos/limpieza.py, dos reglas de docs/01 SS1.13 sob |
 | `F1-04` Reconciliación de reloj: 12 h de cabecera, e | revision_humana | Opus 5 | G1 | dlv_core/reloj.py + dlv-core/tests/test_reloj.py (50 pruebas). Tres av |
 | `F1-13` Motor de conversión: afín y recíproca, con c | revision_humana | Opus 5 | G1 | dlv-core/src/dlv_core/unidades.py: motor de conversion completo. Afin  |
@@ -70,7 +67,7 @@ Actualizado: 2026-08-10 21:58:46Z
 | ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `4229523` |
 | ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `02140f8`, `7b995a3` |
 | ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
-| ⏳ | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
+| ✔  | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
 | ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `217d88b` |
 | ✔  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | `613f5f8` |
 | ✔  | `F0-12` | Corpus de CSV genéricos (matriz de `02-alcance-y-plan.md` §2.9 | Haiku 4.5 | 3 | F0-05 | G4 | `2771a41` |
@@ -81,8 +78,8 @@ Actualizado: 2026-08-10 21:58:46Z
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ⏳ | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `0cac953` |
-| ⏳ | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `a7cd93a` |
+| ✔  | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `0cac953` |
+| ✔  | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `a7cd93a` |
 | ⏳ | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | `9c80a89` |
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
 | ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
