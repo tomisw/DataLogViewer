@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 20:57:00Z"
+    "actualizado": "2026-08-11 20:57:35Z"
   },
   "tareas": [
     {
@@ -2022,7 +2022,9 @@
       "gate": "G1",
       "estado": "revision_humana",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "30666f0"
+      ],
       "notas": [
         {
           "fecha": "2026-08-11 20:57:00Z",
