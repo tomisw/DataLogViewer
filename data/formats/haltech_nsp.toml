@@ -416,10 +416,20 @@ dimension = "distance"
 a_canonica = 0.1
 confianza = "inferred"
 evidencia = """
-Distance Traveled - Current Run Cycle 8692 -> 869,2 m en el ciclo actual.
-Con x1 saldrían 8,7 km, que en 245 s exigirían 128 km/h de media, incompatible
-con el canal de velocidad (máximo 52,7 km/h en el log).
-DisplayMaxMin 10000,0 -> 1 km, coherente con /10."""
+Distance Traveled - Current Run Cycle llega a 14133 -> 1 413,3 m en el ciclo.
+Con x1 saldrían 14,1 km, que en los 245,1 s del log exigirían 207,6 km/h de
+media; el MÁXIMO instantáneo del canal de velocidad es 92,9 km/h, así que x1 es
+imposible. Con x0,1 la media sale 20,8 km/h, compatible con ese máximo.
+Corregido en FG-10 midiendo el log: la versión anterior de esta nota usaba el
+valor de la fila de referencia (8692) como si fuera el máximo, y citaba «máximo
+52,7 km/h», que es el valor de la FILA DE REFERENCIA del canal de velocidad
+(crudo 527) y no el máximo del log. La conclusión no cambia; los números sí, y
+un número mal citado en una evidencia es lo que hace que la puerta G1 no se
+pueda revisar.
+AVISO: el argumento de DisplayMaxMin es más débil de lo que parece. DMM 10000,0
+sugiere 1 km como techo, coherente con /10, pero el canal alcanza 14133 en crudo:
+se sale de su propio rango de presentación por 1,41x. Un DMM que el canal excede
+no acota la escala."""
 canales = 1
 
 [tipos.FuelEcomony]

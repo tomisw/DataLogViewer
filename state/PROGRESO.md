@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 20:19:35Z
+Actualizado: 2026-08-11 20:57:00Z
 
-**274 / 766 pts cerrados (35.8 %)** · 110 pts esperando revisión humana → 50.1 % entregado
+**274 / 766 pts cerrados (35.8 %)** · 115 pts esperando revisión humana → 50.8 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 36 | 0 | 5 | 0 | 231 |
-| FG | 27 | 43 | 0 | 22 | 0 | 92 |
+| FG | 27 | 48 | 0 | 17 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -41,6 +41,7 @@ Actualizado: 2026-08-11 20:19:35Z
 | `FG-06` Unidad declarada en el nombre o en la fila d | revision_humana | Sonnet 5 | G1 | Entregado por agente Sonnet, revisado e integrado por Opus. Commits 45 |
 | `FG-07` Valores no numéricos, unidad embebida en la  | revision_humana | Sonnet 5 | G1 | PUERTA G1: revisar (1) que caracteres cuentan como unidad embebida, (2 |
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
+| `FG-10` Informe de plausibilidad por rango declarado | revision_humana | Opus 5 | G1 | dlv_core/plausibilidad.py + 46 pruebas. Contrasta los valores REALES d |
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
@@ -121,7 +122,7 @@ Actualizado: 2026-08-11 20:19:35Z
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 
-## FG — 70/92 pts
+## FG — 75/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -134,14 +135,14 @@ Actualizado: 2026-08-11 20:19:35Z
 | ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `4311762` |
 | ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
-| ·  | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
+| ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `4311762` |
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `599596b` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
-| ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
+| ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | `d1f559d` |
 
 ## F2 — 21/80 pts
 

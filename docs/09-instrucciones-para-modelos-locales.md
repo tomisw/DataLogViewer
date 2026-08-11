@@ -306,6 +306,9 @@ una ronda.
 | Fixture que no cambia nada | «Convertir a CRLF» produjo un fichero idéntico: el log real ya es CRLF (557 CRLF, 0 LF sueltos) | comprobar que el fixture difiere del original |
 | Anotar sin comprobar | Los eventos de knock del fixture estaban a 2 674 rpm, así que la severidad «crítica» anotada (exige > 4 000 rpm) era falsa | que el fixture verifique sus propias anotaciones |
 | Desplazamientos relativos a bytes distintos | `offset_datos` era relativo a los bytes sin BOM, así que `datos[offset:]` fallaba por 3 bytes en silencio | que el contrato no obligue a recordar nada |
+| `git add -A` con un agente escribiendo | El módulo de FG-10, a medio escribir, entró en el commit de FG-17, y su sección de `umbrales.toml` en el commit del sello. Tres commits que dicen ser de otra cosa | `git add` de rutas concretas mientras haya trabajo en segundo plano |
+| Registrar el commit al cerrar la tarea | Cerrar pasa ANTES de commitear, porque `state/` va en el mismo commit; el HEAD del momento es el commit anterior. 46 de 80 referencias apuntaban a la tarea de otro | `tools/estado.py sellar` después de commitear |
+| Citar un número de otra evidencia | La nota de `ShortDistance` daba «máximo 52,7 km/h» tomándolo de la evidencia de `Speed`, donde 527 es el valor de la FILA DE REFERENCIA. El máximo real del log es 92,9 | medir el log, y decir si el número es de la fila de referencia o del máximo |
 
 ## 9.11 Qué no hacer sin preguntar
 

@@ -42,6 +42,14 @@ una causa distinta con una acción distinta:
   Es el más importante de todos precisamente porque no se puede automatizar:
   o el rol está mal asignado, o el sensor está roto, o el rango declarado en
   `roles.toml` es demasiado estrecho. Las tres exigen una persona.
+* `DIMENSION_DISTINTA_DEL_ROL` — el formato declara el canal en una dimensión
+  y el rol espera otra. Es el diagnóstico más concluyente de todos y el único
+  que no necesita ni una muestra: si el canal mide presión y el rol espera una
+  proporción, compararlo con el rango del rol no significa nada. Los dos casos
+  que lo motivan salieron de ejecutar este informe contra `samples/real/`, y el
+  segundo es el que obliga a que exista: `Fuel Flow Estimated` viene en L/h
+  (`volume_flow`) y el rol `fuel_flow` espera kg/h, pero 17,7 L/h caen DENTRO
+  del rango de 0 a 500 kg/h, así que el rango solo lo habría aprobado.
 * `SIN_ROL` — un canal sin rol **no se puede juzgar**, y se dice en el
   informe en vez de omitirlo en silencio: un canal ausente del informe es
   indistinguible de un canal aprobado.
@@ -171,6 +179,7 @@ from dlv_core.unidades import (
 )
 
 __all__ = [
+    "DIMENSION_DESCONOCIDA",
     "CanalJuzgable",
     "Diagnostico",
     "ErrorDePlausibilidad",
@@ -197,6 +206,12 @@ por definición del propio catálogo. Reconocerla por su estructura y no por su
 nombre es lo que hace que un catálogo que llame `afr_real` a esa unidad siga
 funcionando.
 """
+
+DIMENSION_DESCONOCIDA = "unknown"
+"""Lo que un descriptor de formato escribe cuando NO sabe qué magnitud es un
+canal (`data/formats/haltech_nsp.toml`, los 7 tipos `confianza = "unknown"`, que
+se muestran en crudo y sin unidad como mitigación de R1). No es una dimensión:
+es la ausencia de una, y por eso no puede chocar con la del rol."""
 
 SEVERIDADES = ("critica", "alta", "media", "baja", "informativa")
 """Mismo vocabulario y mismo tipo (`str`) que `detectores.Incidencia.severidad`
@@ -384,12 +399,21 @@ class CanalJuzgable:
     llama conoce el `a_canonica` del tipo del canal y es el único que puede
     hacer esa multiplicación. Ver «LOS CENTINELAS NO SON MEDIDAS» en la
     cabecera.
+
+    `dimension_declarada` es la dimensión que el FORMATO dice que tiene el
+    canal (`formatos.nativo.Canal.dimension`, o la unidad declarada del CSV
+    genérico de FG-06), y sirve para la comprobación más barata y más
+    concluyente de todas: si el formato dice «presión» y el rol dice
+    «proporción», compararlo con el rango del rol no significa nada. `None` y
+    `"unknown"` valen lo mismo aquí —el formato no lo sabe— y desactivan la
+    comprobación en vez de inventarse un choque.
     """
 
     nombre: str
     valores: Any
     asignacion: Asignacion | None = None
     centinelas: tuple[float, ...] = ()
+    dimension_declarada: str | None = None
 
 
 class Diagnostico(Enum):
@@ -400,6 +424,7 @@ class Diagnostico(Enum):
 
     PLAUSIBLE = "plausible"
     EXCURSION = "excursion"
+    DIMENSION_DISTINTA_DEL_ROL = "dimension_distinta_del_rol"
     UNIDAD_EQUIVOCADA = "unidad_equivocada"
     AFR_EN_VEZ_DE_LAMBDA = "afr_en_vez_de_lambda"
     PRESION_RELATIVA_SIN_REFERENCIA = "presion_relativa_sin_referencia"
@@ -429,6 +454,7 @@ class Diagnostico(Enum):
 
 _DEFECTOS = frozenset(
     {
+        Diagnostico.DIMENSION_DISTINTA_DEL_ROL,
         Diagnostico.UNIDAD_EQUIVOCADA,
         Diagnostico.AFR_EN_VEZ_DE_LAMBDA,
         Diagnostico.PRESION_RELATIVA_SIN_REFERENCIA,
@@ -832,6 +858,7 @@ def _detalle(
     minimo: float | None,
     maximo: float | None,
     rango: tuple[float | None, float | None] | None,
+    dimension_declarada: str | None,
     hipotesis: Hipotesis | None,
     factor: float | None,
     dimension_id: str | None,
@@ -850,6 +877,14 @@ def _detalle(
     # o 2 600 de 2 610, y un «0,46 %» no lo dice.
     cuantas = f"{n_fuera} de {n_validas} muestras válidas (fracción {_numero(fraccion)})"
 
+    if diagnostico is Diagnostico.DIMENSION_DISTINTA_DEL_ROL:
+        return (
+            f"el formato declara este canal en la dimensión '{dimension_declarada}' y el rol "
+            f"'{rol}' espera '{dimension_id}': el rango del rol no se le puede aplicar, porque "
+            f"no mide la misma magnitud ({observado}, {esperado}). O el rol está mal asignado, o "
+            f"data/roles.toml da como sinónimo de '{rol}' un nombre que en este formato es otra "
+            f"cosa. Mientras no se resuelva, cualquier veredicto sobre su escala sería casual."
+        )
     if diagnostico is Diagnostico.SIN_ROL:
         return (
             f"canal sin rol asignado: no hay rango declarado contra el que juzgarlo "
@@ -1026,6 +1061,7 @@ def evaluar_canal(
                 minimo=minimo,
                 maximo=maximo,
                 rango=rango,
+                dimension_declarada=canal.dimension_declarada,
                 hipotesis=hipotesis,
                 factor=factor,
                 dimension_id=rol.dimension if rol is not None else None,
@@ -1058,13 +1094,37 @@ def evaluar_canal(
         return hallazgo(Diagnostico.SIN_DATOS)
     if rol is None:
         return hallazgo(Diagnostico.SIN_ROL)
+
+    # La cuenta de muestras fuera se calcula aquí porque los diagnósticos
+    # estructurales que siguen la usan como CONTEXTO (para que el informe diga
+    # qué se observó), no como criterio.
+    n_fuera = int(xp.sum(_mascara_fuera(validos, rango[0], rango[1]))) if rango else 0
+    fraccion = n_fuera / n_validas
+
+    # El choque de dimensión va antes que el rango, y antes incluso que «el rol
+    # no declara rango» y «pocas muestras»: es estructural, no estadístico. Se
+    # sabe con una muestra o con ninguna, y mientras esté ahí el rango del rol
+    # compara magnitudes distintas -- kPa contra una fracción -- así que
+    # cualquier veredicto sobre la escala sería casual. Los dos casos que lo
+    # motivan salieron de los logs reales: `Ignition - Load` (el formato dice
+    # `pressure`, el rol `engine_load` dice `ratio`) y `Fuel Flow Estimated`
+    # (`volume_flow` contra el `mass_flow` de `fuel_flow`). El segundo es el que
+    # obliga a que esta comprobación exista: 17,7 L/h caen DENTRO del rango de
+    # 0 a 500 kg/h, así que el informe lo habría aprobado.
+    declarada = canal.dimension_declarada
+    if (
+        declarada is not None
+        and declarada != DIMENSION_DESCONOCIDA
+        and rol.dimension is not None
+        and declarada != rol.dimension
+    ):
+        return hallazgo(Diagnostico.DIMENSION_DISTINTA_DEL_ROL, n_fuera=n_fuera, fraccion=fraccion)
+
     if rango is None:
         return hallazgo(Diagnostico.SIN_RANGO)
     if n_validas < umbrales.muestras_minimas:
         return hallazgo(Diagnostico.POCAS_MUESTRAS)
 
-    n_fuera = int(xp.sum(_mascara_fuera(validos, rango[0], rango[1])))
-    fraccion = n_fuera / n_validas
     if n_fuera == 0:
         return hallazgo(Diagnostico.PLAUSIBLE)
     # La excursión se decide ANTES de buscar hipótesis: ver «EXCURSIÓN CONTRA
@@ -1082,9 +1142,21 @@ def evaluar_canal(
         try:
             corregidos = _aplicar(h, validos, dimension=dimension, estequiometria=estequiometria)
         except (ZeroDivisionError, ArithmeticError, ValueError):
-            # Una hipótesis que no se puede evaluar sobre estos valores (una
-            # recíproca con un cero, p. ej.) se descarta: es una hipótesis
-            # menos, no un informe menos. E1.7: se avisa y se sigue.
+            # Una hipótesis que no se puede evaluar sobre estos valores se
+            # descarta: es una hipótesis menos, no un informe menos (E1.7: se
+            # avisa y se sigue).
+            #
+            # El caso es una unidad RECÍPROCA (φ, km/L) sobre un canal que pasa
+            # por cero, y ahí los dos motores de cómputo se comportan distinto:
+            # con la implementación de biblioteca estándar de las pruebas salta
+            # `ZeroDivisionError` y esta rama lo recoge, mientras que NumPy
+            # devuelve `inf` con un aviso y no lanza. El resultado del informe es
+            # el mismo por los dos caminos —`inf` queda fuera de cualquier rango
+            # plausible, así que la hipótesis se rechaza igual— y esa
+            # equivalencia es deliberada: un módulo cuyo veredicto dependa de con
+            # qué implementación de `Vectorial` corre no es comprobable (la
+            # lección de `malla.py`, donde `numpy.min` y el `min` de la
+            # biblioteca estándar SÍ discrepaban ante un NaN).
             continue
         fraccion_corregida = _fraccion_fuera(corregidos, rango, xp=xp)
         if fraccion_corregida <= umbrales.fraccion_maxima_tras_corregir:
