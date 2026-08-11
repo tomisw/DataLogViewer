@@ -12,6 +12,7 @@ Uso:
     python tools/estado.py done  F0-02 --nota "..."
     python tools/estado.py block F0-02 --nota "motivo"
     python tools/estado.py show  F0-02
+    python tools/estado.py sellar          # sella el commit real de cada tarea
     python tools/estado.py render          # regenera state/PROGRESO.md
 """
 
@@ -238,15 +239,103 @@ def cmd_done(args: argparse.Namespace) -> None:
     t = buscar(datos, args.id)
     # Una puerta G1 no la cierra un modelo: queda esperando al propietario.
     t["estado"] = "revision_humana" if t["gate"] == "G1" else "hecho"
-    sha = args.commit or sha_actual()
+    # OJO: cerrar una tarea ocurre ANTES de commitearla, porque el cambio de
+    # `state/` tiene que ir en el mismo commit que el trabajo. Así que el HEAD de
+    # este momento es el commit ANTERIOR, no el de la tarea: apuntarlo como
+    # `commits` es lo que dejó 46 de 80 referencias señalando al commit de otra
+    # tarea. Se guarda como base, y `sellar` pone el de verdad después.
+    sha = args.commit
     if sha and sha not in t["commits"]:
         t["commits"].append(sha)
+    elif not sha:
+        base = sha_actual()
+        if base:
+            t["base"] = base
     _nota(t, args.nota)
     guardar(datos)
     print(f"{t['id']} → {t['estado']}" + (f" (commit {sha})" if sha else ""))
     if t["estado"] == "revision_humana":
         print("  ⚠ puerta G1: requiere que una persona lea el diff antes de considerarse hecha.")
     cmd_render(args)
+
+
+def _commit_de_la_tarea(tid: str) -> str | None:
+    """El commit cuyo ASUNTO nombra la tarea, o `None`.
+
+    Solo el asunto, a propósito. Buscar en el mensaje entero encuentra también las
+    menciones de pasada —«FG-06» citada en el cuerpo del commit de FG-04 porque
+    una arregló algo de la otra— y sellar con eso deja una referencia que parece
+    buena y no lo es. Cinco de las tareas cayeron así en el primer intento.
+
+    Un dato ausente es honesto: quien lo lea sabe que tiene que buscar el commit.
+    Un dato equivocado no se distingue de uno bueno, que es la razón de que este
+    guion exista.
+    """
+    try:
+        out = subprocess.run(
+            ["git", "log", "--format=%h%x09%s", "HEAD"],
+            cwd=RAIZ,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except Exception:
+        return None
+    # `\b` no sirve: el `-` de «F1-46» no es límite de palabra por la derecha en el
+    # sentido que hace falta, y «F1-4» no debe encontrar a «F1-46».
+    patron = re.compile(rf"(?<![\w-]){re.escape(tid)}(?![\w-])")
+    candidatos = [
+        sha
+        for linea in out.stdout.splitlines()
+        for sha, _, asunto in [linea.partition("\t")]
+        if patron.search(asunto)
+    ]
+    # El más antiguo: es el commit que entregó la tarea, no una corrección
+    # posterior que la vuelva a nombrar.
+    return candidatos[-1] if candidatos else None
+
+
+def cmd_sellar(args: argparse.Namespace) -> None:
+    """Pone en cada tarea cerrada el commit que de verdad la entregó.
+
+    POR QUÉ EXISTE
+    Cerrar una tarea pasa antes de commitearla —el cambio de `state/` va en el
+    mismo commit que el trabajo—, así que el HEAD del momento de cerrar es el
+    commit ANTERIOR. Registrarlo como el commit de la tarea dejó 46 de 80
+    referencias apuntando al commit de otra tarea: cada una plausible, ninguna
+    verificable, y nadie se entera hasta que intenta encontrar un cambio y no está
+    donde el libro de estado dice.
+
+    Es idempotente y se puede ejecutar en cualquier momento posterior: busca en el
+    historial el commit cuyo mensaje empieza por el identificador de la tarea. Lo
+    normal es ejecutarlo justo después de commitear, y que el sello viaje en el
+    commit siguiente.
+    """
+    datos = cargar()
+    corregidos: list[str] = []
+    sin_commit: list[str] = []
+    for t in datos["tareas"]:
+        if t["estado"] not in CERRADOS:
+            continue
+        real = _commit_de_la_tarea(t["id"])
+        if real is None:
+            # Se BORRA lo que hubiera: un commit equivocado es peor que ninguno.
+            if t.get("commits"):
+                corregidos.append(f"{t['id']}: {', '.join(t['commits'])} → (ninguno lo nombra)")
+                t["commits"] = []
+            sin_commit.append(t["id"])
+            continue
+        if t.get("commits") == [real]:
+            continue
+        anterior = ", ".join(t.get("commits", [])) or "—"
+        t["commits"] = [real]
+        corregidos.append(f"{t['id']}: {anterior} → {real}")
+    guardar(datos)
+    for linea in corregidos:
+        print(f"  {linea}")
+    print(f"{len(corregidos)} tareas selladas de nuevo, {len(sin_commit)} sin commit localizable")
+    if sin_commit and args.verboso:
+        print("  sin commit que las nombre: " + ", ".join(sin_commit))
 
 
 def cmd_aprobar(args: argparse.Namespace) -> None:
@@ -412,6 +501,10 @@ def main() -> None:
     s = sub.add_parser("show", help="muestra una tarea en JSON")
     s.add_argument("id")
     s.set_defaults(func=cmd_show)
+
+    s = sub.add_parser("sellar", help="pone en cada tarea cerrada el commit que la entregó")
+    s.add_argument("--verboso", action="store_true", help="lista las tareas sin commit localizable")
+    s.set_defaults(func=cmd_sellar)
 
     s = sub.add_parser("render", help="regenera state/PROGRESO.md")
     s.set_defaults(func=cmd_render)

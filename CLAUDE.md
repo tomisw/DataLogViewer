@@ -73,5 +73,6 @@ la historia de la rama. El detalle y el motivo de cada uno, en `docs/09` §9.11.
 | `docs/07-formatos-y-csv-generico.md` | CSV genérico y roles semánticos |
 | `docs/08-ejecucion-y-reanudacion.md` | protocolo de ejecución |
 | `docs/09-instrucciones-para-modelos-locales.md` | **ejecución en local** |
+| `docs/10-guia-importar-csv-y-anadir-formato.md` | guía: importar un CSV cualquiera y añadir un formato nativo |
 
 El código y los comentarios de este proyecto están en español.

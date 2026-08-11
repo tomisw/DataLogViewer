@@ -323,3 +323,65 @@ def test_el_descriptor_de_haltech_declara_todo_lo_que_fg13_le_movio() -> None:
     cue = bruto["cuerpo"]
     assert cue["delimitador"] == ","
     assert cue["clase_de_tiempo"] == "hora_del_dia"
+
+
+# --------------------------------------------------------------------------- #
+# La sección [tipos] también es estricta
+# --------------------------------------------------------------------------- #
+#  Esta parte se añadió después de FG-13, al encontrar mientras se escribía la
+#  guía de FG-17 que `[tipos]` era la única sección que cargaba sin validar: un
+#  tipo al que le faltara `a_canonica` daba un `KeyError('a_canonica')` pelado al
+#  parsear el primer fichero, sin nombre de descriptor, de tipo ni de clave.
+
+TIPO_COMPLETO = (
+    '[tipos.Revs]\ndimension = "angular_speed"\na_canonica = 1.0\nconfianza = "confirmed"'
+)
+
+
+@pytest.mark.parametrize("clave", ["dimension", "a_canonica", "confianza"])
+def test_un_tipo_sin_una_de_sus_tres_claves_no_carga(clave: str) -> None:
+    assert TIPO_COMPLETO in DESCRIPTOR_TT2, "la prueba edita un bloque que ya no existe"
+    mutilado = "\n".join(
+        linea for linea in TIPO_COMPLETO.splitlines() if not linea.startswith(f"{clave} ")
+    )
+    with pytest.raises(ErrorDeDescriptor) as exc:
+        _cargar(DESCRIPTOR_TT2.replace(TIPO_COMPLETO, mutilado))
+    mensaje = str(exc.value)
+    # El mensaje tiene que nombrar el tipo, el formato y la clave: un `KeyError`
+    # obliga a leer el motor para saber qué falta en qué fichero.
+    assert clave in mensaje
+    assert "Revs" in mensaje
+    assert "torquetrace_tt2" in mensaje
+
+
+def test_un_factor_de_escala_cero_no_carga() -> None:
+    """Convertiría el canal entero en ceros, y un canal de ceros parece un sensor
+    desconectado en lugar de un descriptor mal escrito."""
+    roto = DESCRIPTOR_TT2.replace(
+        'dimension = "angular_speed"\na_canonica = 1.0',
+        'dimension = "angular_speed"\na_canonica = 0.0',
+    )
+    with pytest.raises(ErrorDeDescriptor, match="ceros"):
+        _cargar(roto)
+
+
+def test_un_factor_de_escala_booleano_no_carga() -> None:
+    """`bool` es subclase de `int` en Python: `a_canonica = true` colaría como 1,0
+    y el canal saldría sin escalar."""
+    roto = DESCRIPTOR_TT2.replace("a_canonica = 1.0", "a_canonica = true")
+    with pytest.raises(ErrorDeDescriptor, match="no es un número"):
+        _cargar(roto)
+
+
+def test_el_descriptor_de_haltech_sobrevive_a_la_validacion_de_tipos() -> None:
+    """Los 34 tipos reales ya declaraban las tres claves: la validación no cambia
+    el comportamiento sobre el formato de verdad, solo el modo de fallar de uno mal
+    escrito."""
+    with (RAIZ_DATOS / "haltech_nsp.toml").open("rb") as fh:
+        haltech = cargar_descriptor(fh)
+    assert len(haltech.tipos) == 34
+    for nombre in haltech.tipos:
+        dimension, a, confianza = haltech.resuelve(nombre)
+        assert dimension, nombre
+        assert a != 0.0, nombre
+        assert confianza in {"confirmed", "inferred", "unknown"}, nombre

@@ -416,6 +416,56 @@ def _cuerpo(bruto: Mapping[str, Any], formato: str) -> FormaDelCuerpo:
     )
 
 
+#: Las tres claves que `Descriptor.resuelve` necesita de cada tipo. Los nombres
+#: son los de `data/formats/haltech_nsp.toml` desde F0-09.
+CLAVES_DE_TIPO = ("dimension", "a_canonica", "confianza")
+
+
+def _validar_tipos(tipos: Mapping[str, Any], formato: str) -> None:
+    """Cada `[tipos.X]` declara las tres claves, y con el tipo correcto.
+
+    Sin esto el descriptor cargaba sin protestar y el fallo salía mucho después,
+    al parsear el primer fichero con un canal de ese tipo, como un
+    `KeyError('a_canonica')` pelado: sin el nombre del descriptor, sin el del tipo
+    y sin decir qué clave falta. Es justo el modo de fallar que el resto de este
+    módulo evita a propósito —«el descriptor es estricto a propósito»— y era la
+    única sección que se quedaba fuera.
+
+    Y no es un fallo cualquiera: `a_canonica` es el factor de escala del canal. Un
+    tipo mal declarado no da un log ilegible, da un log con valores plausibles y
+    la escala equivocada, que es lo que las puertas G1 de este proyecto existen
+    para evitar. Mejor romper al cargar el descriptor, donde el mensaje puede
+    nombrar la clave, que al leer el primer fichero de un usuario.
+    """
+    for nombre, cuerpo in tipos.items():
+        donde = f"[tipos.{nombre}] del descriptor {formato}"
+        if not isinstance(cuerpo, Mapping):
+            raise ErrorDeDescriptor(f"{donde} no es una tabla")
+        faltan = [c for c in CLAVES_DE_TIPO if c not in cuerpo]
+        if faltan:
+            raise ErrorDeDescriptor(
+                f"{donde} no declara {', '.join(faltan)}. `a_canonica` es el factor de "
+                "escala del canal: sin él no se puede convertir, y adivinarlo daría "
+                "valores plausibles con la escala equivocada"
+            )
+        if not isinstance(cuerpo["dimension"], str) or not cuerpo["dimension"]:
+            raise ErrorDeDescriptor(f"{donde} declara una `dimension` que no es un texto")
+        if isinstance(cuerpo["a_canonica"], bool) or not isinstance(
+            cuerpo["a_canonica"], (int, float)
+        ):
+            # `bool` es subclase de `int` en Python: `a_canonica = true` pasaría
+            # como 1.0 y el canal saldría sin escalar.
+            raise ErrorDeDescriptor(
+                f"{donde} declara `a_canonica = {cuerpo['a_canonica']!r}`, que no es un número"
+            )
+        if float(cuerpo["a_canonica"]) == 0.0:
+            raise ErrorDeDescriptor(
+                f"{donde} declara `a_canonica = 0`, que convertiría el canal entero en ceros"
+            )
+        if not isinstance(cuerpo["confianza"], str) or not cuerpo["confianza"]:
+            raise ErrorDeDescriptor(f"{donde} declara una `confianza` que no es un texto")
+
+
 def _compilar_fila(cuerpo: FormaDelCuerpo, codificacion: str, formato: str) -> re.Pattern[bytes]:
     """La forma de una fila de datos, en bytes: marca + delimitador.
 
@@ -461,6 +511,7 @@ def cargar_descriptor(fuente: IO[bytes]) -> Descriptor:
     tipos = bruto.get("tipos")
     if not isinstance(tipos, Mapping):
         raise ErrorDeDescriptor(f"el descriptor {formato} no declara la sección [tipos]")
+    _validar_tipos(tipos, formato)
 
     cuerpo = _cuerpo(bruto, formato)
     return Descriptor(

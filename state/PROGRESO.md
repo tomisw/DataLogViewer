@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 20:01:18Z
+Actualizado: 2026-08-11 20:19:35Z
 
-**271 / 766 pts cerrados (35.4 %)** · 110 pts esperando revisión humana → 49.7 % entregado
+**274 / 766 pts cerrados (35.8 %)** · 110 pts esperando revisión humana → 50.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 36 | 0 | 5 | 0 | 231 |
-| FG | 24 | 43 | 0 | 25 | 0 | 92 |
+| FG | 27 | 43 | 0 | 22 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -55,101 +55,101 @@ Actualizado: 2026-08-11 20:01:18Z
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ⏳ | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | `4699545` |
-| ✔  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | `9c54663` |
-| ✔  | `F0-03` | CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint | Haiku 4.5 | 2 | F0-02 | G4 | `2771a41` |
-| ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `2771a41` |
-| ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `9c54663` |
-| ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `4229523` |
-| ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `02140f8`, `7b995a3` |
-| ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `b8f1005` |
-| ✔  | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `217d88b` |
-| ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `217d88b` |
-| ✔  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | `613f5f8` |
-| ✔  | `F0-12` | Corpus de CSV genéricos (matriz de `02-alcance-y-plan.md` §2.9 | Haiku 4.5 | 3 | F0-05 | G4 | `2771a41` |
+| ⏳ | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | `4229523` |
+| ✔  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | `875f57a` |
+| ✔  | `F0-03` | CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint | Haiku 4.5 | 2 | F0-02 | G4 | `4229523` |
+| ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `4229523` |
+| ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `875f57a` |
+| ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `217d88b` |
+| ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `efc4f55` |
+| ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `0fbe4ea` |
+| ✔  | `F0-09` | `formats/haltech_nsp.toml`: los 34 tipos → dimensión + escala  | Opus 5 | 5 | F0-08 | G1 | `ed16fb5` |
+| ⏳ | `F0-10` | Catálogo `roles.toml`: roles semánticos, dimensión esperada, r | Opus 5 | 6 | F0-08 | G1 | `ed16fb5` |
+| ✔  | `F0-11` | Esqueleto `enums.toml` con los 75 candidatos, sin traducir | Haiku 4.5 | 2 | F0-10 | G3 | `02140f8` |
+| ✔  | `F0-12` | Corpus de CSV genéricos (matriz de `02-alcance-y-plan.md` §2.9 | Haiku 4.5 | 3 | F0-05 | G4 | `4229523` |
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
-| ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `217d88b` |
+| ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `ed16fb5` |
 
 ## F1 — 226/231 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ✔  | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `0cac953` |
-| ✔  | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `a7cd93a` |
-| ⏳ | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | `9c80a89` |
+| ✔  | `F1-01` | Parser de cabecera Haltech dirigido por descriptor, tolerante  | Opus 5 | 5 | F0-09 | G1 | `1aa0fc4` |
+| ✔  | `F1-02` | Parseo del cuerpo con Polars: ≥ 100 MB/s agregado, cero bucles | Opus 5 | 8 | F1-01 | G1 | `e968ba5` |
+| ⏳ | `F1-03` | Celda vacía ≠ 0, centinelas de desbordamiento, filas malformad | Opus 5 | 5 | F1-02 | G1 | `21a701f` |
 | ⏳ | `F1-04` | Reconciliación de reloj: 12 h de cabecera, epoch ficticia, cru | Opus 5 | 5 | F1-01 | G1 | `ad4ada0` |
-| ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `21a701f` |
-| ✔  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | `815a8e4` |
-| ✔  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | `d05c389` |
-| ✔  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | `4471cbc` |
-| ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `c1296dd` |
-| ✔  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | `a521091` |
-| ✔  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | `3296f2e`, `b15f5b9` |
-| ✔  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | `4471cbc` |
-| ⏳ | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | `efc4f55` |
-| ⏳ | `F1-14` | Conversiones parametrizadas por canal (λ→AFR con la estequiome | Opus 5 | 5 | F1-13 | G1 | `066a396` |
-| ⏳ | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | `f34c90c` |
-| ⏳ | `F1-16` | Dimensiones compuestas derivadas (`%/kPa` → `%/psi`) | Opus 5 | 4 | F1-13 | G1 | `f34c90c` |
-| ✔  | `F1-17` | Precedencia canal > dimensión del perfil > preset global > can | Sonnet 5 | 4 | F1-13 | G3 | `e968ba5` |
-| ✔  | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `815a8e4` |
-| ✔  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | `f34c90c` |
+| ✔  | `F1-05` | Almacén columnar con `Storage` por canal y `t` compartido por  | Opus 5 | 8 | F1-03 | G2 | `c1296dd` |
+| ✔  | `F1-06` | Detección de grupos de muestreo por patrón de nulos, vectoriza | Opus 5 | 5 | F1-05 | G2 | `e1b5cf4` |
+| ✔  | `F1-07` | Indexado: mín/máx/percentiles, clasificación `activo/constante | Sonnet 5 | 4 | F1-05 | G3 | `2b24e8d` |
+| ✔  | `F1-08` | Detección de huecos de muestreo y marcas de discontinuidad | Sonnet 5 | 3 | F1-05 | G3 | `062c28a` |
+| ✔  | `F1-09` | Pirámide de decimación NumPy vectorizada (`min/max/first/last` | Opus 5 | 8 | F1-05 | G2 | `815a8e4` |
+| ✔  | `F1-10` | Variantes de agregación: suma de delta, moda de enum, OR de bi | Opus 5 | 6 | F1-09 | G2 | `4471cbc` |
+| ✔  | `F1-11` | Caché Parquet con pirámide persistida e invalidación por versi | Sonnet 5 | 5 | F1-09 | G3 | `066a396` |
+| ✔  | `F1-12` | Informe de importación acumulativo, no bloqueante | Sonnet 5 | 3 | F1-03 | G3 | `d05c389` |
+| ⏳ | `F1-13` | Motor de conversión: afín y recíproca, con clases punto / inte | Opus 5 | 8 | F0-08 | G1 | `0cac953` |
+| ⏳ | `F1-14` | Conversiones parametrizadas por canal (λ→AFR con la estequiome | Opus 5 | 5 | F1-13 | G1 | `b15f5b9` |
+| ⏳ | `F1-15` | Presión absoluta/relativa como cambio de origen combinable con | Opus 5 | 5 | F1-13 | G1 | `dcb9944` |
+| ⏳ | `F1-16` | Dimensiones compuestas derivadas (`%/kPa` → `%/psi`) | Opus 5 | 4 | F1-13 | G1 | `dcb9944` |
+| ✔  | `F1-17` | Precedencia canal > dimensión del perfil > preset global > can | Sonnet 5 | 4 | F1-13 | G3 | `9c80a89` |
+| ✔  | `F1-18` | Presets SI / Métrico / Imperial / Motorsport EU / Motorsport U | Sonnet 5 | 3 | F1-17 | G1 | `a521091` |
+| ✔  | `F1-19` | Umbrales y perfiles en canónica, editados en la unidad activa | Opus 5 | 4 | F1-13 | G1 | `dcb9944` |
 | ⏳ | `F1-20` | Prueba de la trampa del delta (Δ10 K = 10 °C = 18 °F) y tabla  | Opus 5 | 4 | F1-13 | G1 | `e94094b` |
-| ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `d05c389` |
-| ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `8f51688` |
-| ✔  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | `ff82133` |
+| ✔  | `F1-21` | `dlv-api`: FastAPI, `127.0.0.1`, puerto efímero, token de sesi | Opus 5 | 5 | F1-05 | G2 | `8f51688` |
+| ✔  | `F1-22` | Transporte binario Arrow IPC / `TypedArray` para series; JSON  | Opus 5 | 5 | F1-21 | G2 | `3296f2e` |
+| ✔  | `F1-23` | Renderizador WebGL2 de series desde la pirámide | Opus 5 | 13 | F1-09, F1-22 | G2 | `2aef6b3` |
 | ✔  | `F1-24` | Caché de cubos en el frontend — es lo que hace alcanzable el c | Opus 5 | 5 | F1-23 | G2 | `fb0548d` |
-| ✔  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | `2f707a6` |
+| ✔  | `F1-25` | Ejes, rejilla y leyenda SVG con ticks calculados en la unidad  | Sonnet 5 | 5 | F1-23, F1-17 | G3 | `aa48667` |
 | ✔  | `F1-26` | Paneles apilados con eje X compartido y arrastrar canales entr | Sonnet 5 | 5 | F1-25 | G3 | `5597b6c` |
-| ✔  | `F1-27` | Múltiples ejes Y, autoescala y bloqueo de escala | Sonnet 5 | 4 | F1-25 | G3 | `e145838` |
-| ✔  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | `b066759` |
-| ✔  | `F1-29` | Cursor con tabla de valores, presupuesto < 16 ms | Sonnet 5 | 4 | F1-24 | G3 | `b3057b4` |
+| ✔  | `F1-27` | Múltiples ejes Y, autoescala y bloqueo de escala | Sonnet 5 | 4 | F1-25 | G3 | `cc06c82` |
+| ✔  | `F1-28` | Zoom/pan por rueda, teclado y pointer events; historial de zoo | Sonnet 5 | 5 | F1-23 | G3 | `b3057b4` |
+| ✔  | `F1-29` | Cursor con tabla de valores, presupuesto < 16 ms | Sonnet 5 | 4 | F1-24 | G3 | `f66226a` |
 | ✔  | `F1-30` | Doble cursor con delta usando la clase intervalo | Opus 5 | 4 | F1-29, F1-13 | G1 | `33a7c27` |
 | ✔  | `F1-31` | Selector de unidad a tres niveles (global, dimensión, canal) c | Sonnet 5 | 5 | F1-17 | G3 | `2f707a6` |
-| ✔  | `F1-32` | Locale numérico ES/EN (separador decimal, agrupación) | Haiku 4.5 | 2 | F1-31 | G4 | `e145838` |
+| ✔  | `F1-32` | Locale numérico ES/EN (separador decimal, agrupación) | Haiku 4.5 | 2 | F1-31 | G4 | `e382352` |
 | ✔  | `F1-33` | Selector de canales con búsqueda difusa y ocultación de inacti | Sonnet 5 | 4 | F1-07 | G3 | `88c015d` |
-| ✔  | `F1-34` | Arrastrar y soltar ficheros y carpetas; apertura múltiple | Sonnet 5 | 3 | F1-12 | G3 | `dcb9944` |
-| ✔  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | `a26fb1b` |
+| ✔  | `F1-34` | Arrastrar y soltar ficheros y carpetas; apertura múltiple | Sonnet 5 | 3 | F1-12 | G3 | `a26fb1b` |
+| ✔  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | `ee4fb16` |
 | ✔  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | `b01e52e` |
-| ✔  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | `1bd6e64` |
+| ✔  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | `2e92399` |
 | ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
-| ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `e918085` |
-| ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | `128ca89` |
-| ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | `5c8068d` |
-| ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
-| ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `a0a5d55` |
+| ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `8e82d5c` |
+| ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | `8e82d5c` |
+| ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | `8e82d5c` |
+| ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `298c8ff` |
+| ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `877e8c1` |
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
-| ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `8e67382` |
+| ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 
-## FG — 67/92 pts
+## FG — 70/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ⏳ | `FG-01` | Sondeo: codificación, fin de línea, delimitador por consistenc | Opus 5 | 8 | F1-02 | G1 | `79524dd` |
-| ⏳ | `FG-02` | Separador decimal con verificación cruzada de interpretaciones | Opus 5 | 5 | FG-01 | G1 | `63f6cfa` |
-| ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `b1ed1e3` |
-| ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `4c99e53` |
+| ⏳ | `FG-01` | Sondeo: codificación, fin de línea, delimitador por consistenc | Opus 5 | 8 | F1-02 | G1 | `61af05c` |
+| ⏳ | `FG-02` | Separador decimal con verificación cruzada de interpretaciones | Opus 5 | 5 | FG-01 | G1 | `e09905f` |
+| ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `dadd9b6` |
+| ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `8adc47f` |
 | ✔  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | `88d1c71` |
-| ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `45a0600` |
-| ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `90a05d4` |
-| ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4ef462e` |
-| ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `a26fb1b` |
+| ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `0a590f9` |
+| ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `4311762` |
+| ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
+| ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ·  | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
-| ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `acec9a7` |
-| ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
-| ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `46d8ff6` |
+| ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
+| ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `4311762` |
+| ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `599596b` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
-| ·  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
+| ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | — |
 
 ## F2 — 21/80 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ▶  | `F2-01` | Modelo de segmento y eje X virtual | Opus 5 | 5 | F1-05 | G2 | `9408b4f` |
-| ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `3d15d8a` |
-| ✔  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | `b1ed1e3` |
+| ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `e6504cf` |
+| ✔  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | `dadd9b6` |
 | ·  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
 | ·  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
 | ·  | `F2-06` | Desfase manual arrastrando el segmento | Sonnet 5 | 3 | F2-04 | G3 | — |
@@ -160,7 +160,7 @@ Actualizado: 2026-08-11 20:01:18Z
 | ·  | `F2-11` | Estadísticas y detectores que respetan las fronteras de segmen | Opus 5 | 5 | F2-09 | G2 | — |
 | ·  | `F2-12` | Eje X alternativo (RPM, velocidad, distancia) con monotonía po | Opus 5 | 8 | F2-01 | G2 | — |
 | ⏳ | `F2-13` | Conflictos: mismo rol con unidades de origen distintas → canón | Opus 5 | 4 | F2-02, F1-13 | G1 | `e717ffa` |
-| ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4a34148` |
+| ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4311762` |
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 

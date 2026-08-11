@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 20:01:18Z"
+    "actualizado": "2026-08-11 20:19:35Z"
   },
   "tareas": [
     {
@@ -21,7 +21,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "4699545"
+        "4229523"
       ],
       "notas": [
         {
@@ -54,7 +54,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "9c54663"
+        "875f57a"
       ],
       "notas": [
         {
@@ -89,7 +89,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "2771a41"
+        "4229523"
       ],
       "notas": [
         {
@@ -116,7 +116,7 @@
       "estado": "hecho",
       "agente": "orquestador",
       "commits": [
-        "2771a41"
+        "4229523"
       ],
       "notas": [
         {
@@ -143,7 +143,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "9c54663"
+        "875f57a"
       ],
       "notas": [
         {
@@ -178,7 +178,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "4229523"
+        "217d88b"
       ],
       "notas": [
         {
@@ -205,8 +205,7 @@
       "estado": "revision_humana",
       "agente": null,
       "commits": [
-        "02140f8",
-        "7b995a3"
+        "efc4f55"
       ],
       "notas": [
         {
@@ -235,7 +234,7 @@
       "estado": "hecho",
       "agente": "orquestador",
       "commits": [
-        "b8f1005"
+        "0fbe4ea"
       ],
       "notas": [
         {
@@ -270,7 +269,7 @@
       "estado": "hecho",
       "agente": "orquestador",
       "commits": [
-        "217d88b"
+        "ed16fb5"
       ],
       "notas": [
         {
@@ -305,7 +304,7 @@
       "estado": "revision_humana",
       "agente": "orquestador",
       "commits": [
-        "217d88b"
+        "ed16fb5"
       ],
       "notas": [
         {
@@ -336,7 +335,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "613f5f8"
+        "02140f8"
       ],
       "notas": [
         {
@@ -363,7 +362,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "2771a41"
+        "4229523"
       ],
       "notas": [
         {
@@ -417,7 +416,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "217d88b"
+        "ed16fb5"
       ],
       "notas": [
         {
@@ -444,7 +443,7 @@
       "estado": "hecho",
       "agente": "orquestador",
       "commits": [
-        "0cac953"
+        "1aa0fc4"
       ],
       "notas": [
         {
@@ -475,7 +474,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "a7cd93a"
+        "e968ba5"
       ],
       "notas": [
         {
@@ -506,7 +505,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "9c80a89"
+        "21a701f"
       ],
       "notas": [
         {
@@ -560,7 +559,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "21a701f"
+        "c1296dd"
       ],
       "notas": [
         {
@@ -587,7 +586,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "815a8e4"
+        "e1b5cf4"
       ],
       "notas": [
         {
@@ -614,7 +613,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "d05c389"
+        "2b24e8d"
       ],
       "notas": [
         {
@@ -641,7 +640,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "4471cbc"
+        "062c28a"
       ],
       "notas": [
         {
@@ -668,7 +667,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "c1296dd"
+        "815a8e4"
       ],
       "notas": [
         {
@@ -695,7 +694,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "a521091"
+        "4471cbc"
       ],
       "notas": [
         {
@@ -722,8 +721,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "3296f2e",
-        "b15f5b9"
+        "066a396"
       ],
       "notas": [
         {
@@ -754,7 +752,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "4471cbc"
+        "d05c389"
       ],
       "notas": [
         {
@@ -781,7 +779,7 @@
       "estado": "revision_humana",
       "agente": "orquestador",
       "commits": [
-        "efc4f55"
+        "0cac953"
       ],
       "notas": [
         {
@@ -808,7 +806,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "066a396"
+        "b15f5b9"
       ],
       "notas": [
         {
@@ -835,7 +833,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "f34c90c"
+        "dcb9944"
       ],
       "notas": [
         {
@@ -862,7 +860,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "f34c90c"
+        "dcb9944"
       ],
       "notas": [
         {
@@ -889,7 +887,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "e968ba5"
+        "9c80a89"
       ],
       "notas": [
         {
@@ -916,7 +914,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "815a8e4"
+        "a521091"
       ],
       "notas": [
         {
@@ -947,7 +945,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "f34c90c"
+        "dcb9944"
       ],
       "notas": [
         {
@@ -1005,7 +1003,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "d05c389"
+        "8f51688"
       ],
       "notas": [
         {
@@ -1032,7 +1030,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "8f51688"
+        "3296f2e"
       ],
       "notas": [
         {
@@ -1061,7 +1059,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "ff82133"
+        "2aef6b3"
       ],
       "notas": [
         {
@@ -1117,7 +1115,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "2f707a6"
+        "aa48667"
       ],
       "notas": [
         {
@@ -1171,7 +1169,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "e145838"
+        "cc06c82"
       ],
       "notas": [
         {
@@ -1198,7 +1196,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "b066759"
+        "b3057b4"
       ],
       "notas": [
         {
@@ -1225,7 +1223,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "b3057b4"
+        "f66226a"
       ],
       "notas": [
         {
@@ -1312,7 +1310,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "e145838"
+        "e382352"
       ],
       "notas": [
         {
@@ -1366,7 +1364,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "dcb9944"
+        "a26fb1b"
       ],
       "notas": [
         {
@@ -1395,7 +1393,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "a26fb1b"
+        "ee4fb16"
       ],
       "notas": [
         {
@@ -1453,7 +1451,7 @@
       "estado": "hecho",
       "agente": "haiku",
       "commits": [
-        "1bd6e64"
+        "2e92399"
       ],
       "notas": [
         {
@@ -1508,7 +1506,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "e918085"
+        "8e82d5c"
       ],
       "notas": [
         {
@@ -1539,7 +1537,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "128ca89"
+        "8e82d5c"
       ],
       "notas": [
         {
@@ -1566,7 +1564,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "5c8068d"
+        "8e82d5c"
       ],
       "notas": [
         {
@@ -1597,7 +1595,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "501b77b"
+        "298c8ff"
       ],
       "notas": [
         {
@@ -1628,7 +1626,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "a0a5d55"
+        "877e8c1"
       ],
       "notas": [
         {
@@ -1721,7 +1719,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "8e67382"
+        "acec9a7"
       ],
       "notas": [
         {
@@ -1748,7 +1746,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "79524dd"
+        "61af05c"
       ],
       "notas": [
         {
@@ -1779,7 +1777,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "63f6cfa"
+        "e09905f"
       ],
       "notas": [
         {
@@ -1810,7 +1808,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "b1ed1e3"
+        "dadd9b6"
       ],
       "notas": [
         {
@@ -1841,7 +1839,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "4c99e53"
+        "8adc47f"
       ],
       "notas": [
         {
@@ -1905,7 +1903,7 @@
       "estado": "revision_humana",
       "agente": "sonnet",
       "commits": [
-        "45a0600"
+        "0a590f9"
       ],
       "notas": [
         {
@@ -1944,7 +1942,7 @@
       "estado": "revision_humana",
       "agente": "subagente",
       "commits": [
-        "90a05d4"
+        "4311762"
       ],
       "notas": [
         {
@@ -1971,7 +1969,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "4ef462e"
+        "4311762"
       ],
       "notas": [
         {
@@ -1998,7 +1996,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "a26fb1b"
+        "334a088"
       ],
       "notas": [
         {
@@ -2087,7 +2085,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "acec9a7"
+        "71c9f21"
       ],
       "notas": [
         {
@@ -2114,7 +2112,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "682de2f"
+        "4311762"
       ],
       "notas": [
         {
@@ -2143,7 +2141,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "46d8ff6"
+        "599596b"
       ],
       "notas": [
         {
@@ -2189,10 +2187,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-11 20:19:35Z",
+          "texto": "docs/10-guia-importar-csv-y-anadir-formato.md, 496 lineas, dos partes: importar un CSV cualquiera y anadir un formato nativo. Tabla completa de las claves del descriptor sacada de cargar_descriptor y sus auxiliares, tabla de errores con los mensajes literales, y un descriptor minimo de ejemplo (MiniLog ML-1). REVISION MIA, no su informe: (1) extraje TODOS los bloques toml de la guia y los cargue con cargar_descriptor -- el descriptor completo carga (minilog_ml1); (2) comprobe la tabla de claves contra el motor quitando cada clave del ejemplo una a una: 13 obligatorias y 2 opcionales, sin una sola incoherencia con lo que la guia declara; (3) verifique los tres hallazgos que reporta y los tres son ciertos. metadatos_cierre y reloj.clave_origen estan en haltech_nsp.toml y NO los lee ningun codigo (decorativos; no los quito porque es un dato de puerta G1); y la seccion [tipos] no se validaba al cargar, reproducido: KeyError('a_canonica') sin nombre de descriptor, de tipo ni de clave. Ese tercero lo he CERRADO en nativo.py (_validar_tipos, con casos propios para a_canonica = 0 y para el booleano, que colaria como 1,0 porque bool es subclase de int) y he rectificado los cuatro pasajes de la guia que lo documentaban como limite, comprobando que los mensajes que cita salen literalmente. 857 pruebas pasan. Sin ejecutar: verificar.sh completo, las 16 suites de numpy/polars, y el pipeline de sondeo de CSV completo (parte de la fase FG sigue pendiente, la guia lo dice en su 10.6 en vez de describir lo que no existe)."
+        }
+      ],
+      "base": "71c9f21"
     },
     {
       "id": "F2-01",
@@ -2247,7 +2251,7 @@
       "estado": "revision_humana",
       "agente": "opus",
       "commits": [
-        "3d15d8a"
+        "e6504cf"
       ],
       "notas": [
         {
@@ -2278,7 +2282,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "b1ed1e3"
+        "dadd9b6"
       ],
       "notas": [
         {
@@ -2528,7 +2532,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "4a34148"
+        "4311762"
       ],
       "notas": [
         {
