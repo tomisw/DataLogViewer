@@ -361,28 +361,71 @@ canales = 7
 
 [tipos.Flow]
 dimension = "volume_flow"
-# cc/min /10 -> L/h  ==  0,1 cc/min * 60/1000
-a_canonica = 0.006
-confianza = "inferred"
+# cc/min -> L/h  ==  1 cc/min * 60/1000
+a_canonica = 0.06
+confianza = "confirmed"
 evidencia = """
-Injection Stage 1 Flow Rate 620 -> 62 cc/min por inyector, valor típico.
-DisplayMaxMin 16000,1 -> hasta 1600 cc/min.
-Comprobación cruzada con InjFuelVolume: 62 cc/min durante los 12 326 µs de
-Injector 1 On Time dan 12 737 nL, frente a los 11 794 de Injector 1 Volume.
-Un 7,4 % de diferencia, compatible con el tiempo muerto del inyector, pero
-NO es una identidad: por eso queda inferido y no confirmado."""
+CORREGIDO x10 en F1-47. El valor anterior era 0,006, que daba 62 cc/min.
+
+`Injection Stage 1 Flow Rate` vale 620 en crudo y es CONSTANTE en las 2 636
+filas del AutoLog: no es una medida, es el inyector configurado en la ECU. El
+propietario declara inyectores Bosch EV14 de 640 cc/min, así que el crudo está
+en cc/min (620 cc/min, un 3 % por debajo del nominal, que es lo que un tuner
+mide o introduce) y no en décimas: 62 cc/min es diez veces menos que cualquier
+inyector moderno, y no alimenta los 102 mg de combustible por cilindro que el
+propio log registra a plena carga.
+
+POR QUÉ NO SE VIO ANTES. La evidencia anterior cruzaba este tipo con
+InjFuelVolume, y los dos estaban desviados x10 EN EL MISMO SENTIDO, así que el
+cociente cuadraba y el 7,4 % restante se atribuyó al tiempo muerto. La nota
+anterior ya avisaba —«los dos se apoyan mutuamente, ninguno se prueba solo»—;
+lo que faltaba era un dato de fuera del log, y ese dato es el inyector.
+
+AVISO, la única evidencia que apunta en contra: DisplayMaxMin 16000,1 son
+16 000 cc/min con este factor, un tope alto para un inyector (con el factor
+anterior salían 1 600 cc/min, más parecido a un límite de dimensionado). Se
+mantiene la corrección porque un DisplayMaxMin no acota la escala
+—`ShortDistance` demuestra que un canal puede excederlo— y porque enfrente hay
+una identidad aritmética exacta y una densidad de combustible imposible."""
 canales = 2
 
 [tipos.InjFuelVolume]
 dimension = "volume"
-# nanolitros -> litros
-a_canonica = 0.000000001
-confianza = "inferred"
+# decenas de nanolitros -> litros
+a_canonica = 0.00000001
+confianza = "confirmed"
 evidencia = """
-Injector 1 Volume 11794 con Injector 1 On Time 12 326 µs y un inyector de
-62 cc/min: el volumen teórico inyectado son 12 737 nL. Coincide dentro del
-7,4 %, atribuible al tiempo muerto. DisplayMaxMin 100000,0 -> 100 µL.
-Misma reserva que Flow: los dos se apoyan mutuamente, ninguno se prueba solo."""
+CORREGIDO x10 en F1-47. El valor anterior era 1e-09.
+
+IDENTIDAD ARITMÉTICA EXACTA, y esta vez sí lo es. Restando el tiempo muerto,
+que el propio log publica en `Injection Stage 1 Dead Time`:
+
+  caudal x (tiempo de apertura - tiempo muerto) = volumen inyectado
+
+En la fila del máximo de aire por cilindro: 620 cc/min x (14 245 - 925) µs =
+137,64 µL, y `Injector 1 Volume` vale 13 764 en crudo. Sobre las 744 filas del
+AutoLog con más del 20 % de ciclo de trabajo, el cociente µL/cuenta tiene
+mediana 0,009999 y DESVIACIÓN TÍPICA 0,000000, con p5 = 0,009999 y
+p95 = 0,010000. No es un ajuste dentro de una tolerancia: es la misma cuenta.
+
+Lo que fija la escala ABSOLUTA, y no solo la relativa, es el tiempo muerto. La
+evidencia anterior no lo restaba, y ese 7,4 % que sobraba —despachado como
+«atribuible al tiempo muerto»— era exactamente el tiempo muerto. Restarlo
+cierra la identidad al quinto dígito y deja al descubierto el factor 10.
+
+COMPROBACIÓN INDEPENDIENTE, la que decide. La densidad del combustible que sale
+de dividir `Fuel Mass Per Cylinder` entre este volumen:
+
+  con 1e-09 (lo anterior):  7,412 g/mL  -> la densidad del ACERO
+  con 1e-08 (lo corregido): 0,741 g/mL  -> gasolina (0,72-0,775)
+
+sobre las mismas 744 filas, con desviación típica 0,007 y p5-p95 de 0,726 a
+0,747. Un combustible de 7,4 g/mL no existe. No lo señalaba nada porque nadie
+mira la densidad, y los 13 canales de volumen inyectado se venían mostrando
+diez veces pequeños sin que ninguna cifra pareciese rara.
+
+DisplayMaxMin 100000,0 son 1 mL con este factor, coherente con un inyector
+grande a bajo régimen."""
 canales = 13
 
 [tipos.EngineVolume]
@@ -400,15 +443,34 @@ canales = 1
 [tipos.MassPerCyl]
 dimension = "mass_per_cyl"
 a_canonica = 1.0
-confianza = "inferred"
+confianza = "confirmed"
 evidencia = """
-La RELACIÓN entre los dos canales sí es informativa y sale bien:
-  Calculated Air Mass Per Cylinder 924 / Fuel Mass Per Cylinder 88 = 10,5
-  AFR esperado de λ 0,648 x 14,7 = 9,53  -> dentro del 10 %.
-Eso confirma que ambos canales COMPARTEN escala, pero no fija el factor
-absoluto: para eso hace falta la cilindrada, que no está en el log.
-Con x1 mg: 924 mg de aire por cilindro, coherente con ~0,5 L/cil a 227 kPa
-y 332 K con un llenado del ~78 %. Sin confirmar."""
+EL FACTOR NO CAMBIA; pasa de inferido a confirmado en F1-47.
+
+La relación entre los dos canales ya se sabía buena, pero un cociente es
+invariante a la escala: multiplica los dos por diez y el AFR sale igual. Nunca
+pudo fijar el factor absoluto, y la nota anterior lo decía.
+
+Lo que lo fija es el volumen inyectado, una vez `InjFuelVolume` queda anclado
+por la identidad del inyector. La densidad del combustible que sale de dividir
+masa entre volumen es 0,741 g/mL sobre 744 filas, con desviación típica 0,007:
+gasolina, en el centro de su rango. Con cualquier otro factor para este tipo la
+densidad se iría a un múltiplo de diez de la de la gasolina, que ya no es un
+combustible sino un metal.
+
+SOBRE EL LLENADO VOLUMÉTRICO, que es lo que la nota anterior intentaba usar. El
+motor es un RB26DETT: 2 568 cm³ entre 6 cilindros son 428 cm³/cilindro. En la
+fila del máximo medido (213,0 kPa, 55,1 °C de temperatura de aire calculada,
+6 449 rpm), los 1 065 mg de aire por cilindro dan un llenado del 110 % sobre la
+densidad del colector. Es alto, y NO se usa como prueba: ese 110 % sale de una
+temperatura de carga modelada que el propio log sesga con la del refrigerante
+(`Calculated Air Temperature Coolant Temperature Bias`), y una temperatura
+sobrestimada infla el llenado calculado. El argumento bueno es el de la
+densidad del combustible; este solo sirve para ver que no hay un factor 10 de
+por medio, y no lo hay.
+
+La nota anterior calculaba un 78 % con 0,5 L/cilindro y sobre la FILA DE
+REFERENCIA en vez del máximo. Ni la cilindrada ni la fila eran las correctas."""
 canales = 3
 
 [tipos.ShortDistance]

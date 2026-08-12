@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-11 20:57:00Z
+Actualizado: 2026-08-12 12:00:11Z
 
-**274 / 766 pts cerrados (35.8 %)** · 115 pts esperando revisión humana → 50.8 % entregado
+**274 / 769 pts cerrados (35.6 %)** · 118 pts esperando revisión humana → 51.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
-| F1 | 190 | 36 | 0 | 5 | 0 | 231 |
+| F1 | 190 | 39 | 0 | 5 | 0 | 234 |
 | FG | 27 | 48 | 0 | 17 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
@@ -34,6 +34,7 @@ Actualizado: 2026-08-11 20:57:00Z
 | `F1-15` Presión absoluta/relativa como cambio de ori | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) DISCREPANCIA ENTRE ESPECI |
 | `F1-16` Dimensiones compuestas derivadas (`%/kPa` →  | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LA ARITMETICA ES a_num/a_ |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
+| `F1-47` La identidad del inyector fija tres factores | revision_humana | Opus 5 | G1 | CORREGIDOS DOS FACTORES DE ESCALA, x10 los dos, y confirmado un tercer |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
@@ -71,7 +72,7 @@ Actualizado: 2026-08-11 20:57:00Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `ed16fb5` |
 
-## F1 — 226/231 pts
+## F1 — 229/234 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -121,6 +122,7 @@ Actualizado: 2026-08-11 20:57:00Z
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
+| ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | — |
 
 ## FG — 75/92 pts
 
@@ -135,7 +137,7 @@ Actualizado: 2026-08-11 20:57:00Z
 | ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `4311762` |
 | ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
-| ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | — |
+| ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
 | ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |

@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-11 20:57:35Z"
+    "actualizado": "2026-08-12 12:00:11Z"
   },
   "tareas": [
     {
@@ -1729,6 +1729,34 @@
       ]
     },
     {
+      "id": "F1-47",
+      "fase": "F1",
+      "titulo": "La identidad del inyector fija tres factores: el caudal configurado y el tiempo muerto del log, contra la especificación del inyector del propietario, corrigen `Flow` e `InjFuelVolume` (×10 los dos) y confirman `MassPerCyl`",
+      "entregable": "datos + pruebas",
+      "modelo": "Opus 5",
+      "pts": 3,
+      "deps": [
+        "F0-09",
+        "FG-10"
+      ],
+      "deps_backlog": [
+        "F0-09",
+        "FG-10"
+      ],
+      "dep_todo": false,
+      "gate": "G1",
+      "estado": "revision_humana",
+      "agente": "opus",
+      "commits": [],
+      "notas": [
+        {
+          "fecha": "2026-08-12 12:00:11Z",
+          "texto": "CORREGIDOS DOS FACTORES DE ESCALA, x10 los dos, y confirmado un tercero. Flow 0,006 -> 0,06 (2 canales) e InjFuelVolume 1e-09 -> 1e-08 (13 canales); MassPerCyl se queda en 1,0 y pasa de inferred a confirmed. QUE REVISAR, por consecuencia: (1) el dato que lo desbloquea es tuyo, no del log: inyectores Bosch EV14 de 640 cc/min. 'Injection Stage 1 Flow Rate' vale 620 en crudo y es CONSTANTE en las 2636 filas, o sea que no mide nada, declara el inyector configurado en la ECU. 620 leido como cc/min son 620 cc/min, un 3 % por debajo de tu nominal; leido como decimas serian 62 cc/min, diez veces menos que cualquier inyector moderno. Si el tuner introdujo otra cosa distinta de 620 cc/min en la ECU, todo este razonamiento se cae y hay que rehacerlo. (2) La identidad caudal x (apertura - tiempo muerto) = volumen es EXACTA: mediana 0,009999 uL por cuenta y desviacion tipica 0,000000 sobre 744 filas con duty > 20 %. Lo que fija la escala absoluta es restar el tiempo muerto, que el log publica en 'Injection Stage 1 Dead Time'; la evidencia anterior no lo restaba y ese 7,4 % que sobraba y se despacho como 'atribuible al tiempo muerto' era literalmente el tiempo muerto. (3) La comprobacion que decide es la densidad del combustible, masa entre volumen: 0,741 g/mL con los factores corregidos (gasolina, desv. tip. 0,007) contra 7,412 g/mL con los anteriores, que es la densidad del acero. Eso es lo que fija MassPerCyl en absoluto, porque un cociente aire/combustible es invariante a la escala y nunca pudo hacerlo. (4) POR QUE NO SE VIO: Flow e InjFuelVolume se cruzaban entre ellos y estaban desviados x10 en el mismo sentido, asi que el cociente cuadraba. La nota anterior del descriptor ya lo avisaba ('los dos se apoyan mutuamente, ninguno se prueba solo'); faltaba un dato de fuera del log. (5) LA UNICA EVIDENCIA EN CONTRA, y esta escrita en el descriptor: DisplayMaxMin de Flow es 16000, que con el factor nuevo son 16000 cc/min, un tope alto para un inyector; con el anterior salian 1600 cc/min, mas parecido a un limite de dimensionado. Mantengo la correccion porque un DisplayMaxMin no acota la escala (ShortDistance demuestra que un canal puede excederlo) y enfrente hay una identidad exacta y una densidad imposible, pero es lo primero que mirarias si algo no cuadra. (6) El llenado volumetrico del RB26DETT sale 110 % (428 cc/cil, 213 kPa, 55,1 C, 6449 rpm). Es alto y NO lo uso como prueba: sale de una temperatura de carga modelada que el log sesga con la del refrigerante, y sobrestimarla infla el llenado. Solo sirve para ver que no hay un factor 10, y no lo hay. GUARDA PERMANENTE: dlv-core/tests/test_identidad_inyeccion.py, 4 pruebas sobre el AutoLog real. Comprobado por mutacion que caza las tres regresiones: volver Flow a 0,006 o InjFuelVolume a 1e-09 pone 2 pruebas en rojo, y bajar MassPerCyl a 0,1 dispara la de densidad con 0,0741 g/mL. 907 pruebas pasan; el unico fallo es el preexistente del PEP 695 en el interprete 3.11. Sin ejecutar: verificar.sh completo y las 16 suites de numpy/polars."
+        }
+      ],
+      "base": "737f1b7"
+    },
+    {
       "id": "FG-01",
       "fase": "FG",
       "titulo": "Sondeo: codificación, fin de línea, delimitador por consistencia de número de campos, comillas",
@@ -2030,8 +2058,7 @@
           "fecha": "2026-08-11 20:57:00Z",
           "texto": "dlv_core/plausibilidad.py + 46 pruebas. Contrasta los valores REALES de cada canal contra el rango que roles.toml declara para su rol, y diagnostica la causa en vez de decir solo 'fuera de rango'. VERIFICACION MIA, no su informe: ruff, ruff format, mypy --strict SIN --follow-imports=skip, 46 pruebas, ADR-009 a 0 ocurrencias, y las 14 del catalogo de umbrales. Escribi mi PROPIO arnes independiente del suyo y ejecute el modulo contra los tres logs reales: reproduce los mismos hallazgos (2 dimension_distinta_del_rol, 2 escala_erronea, 1 unidad_equivocada en el AutoLog; ni un hallazgo en Log2768). Comprobe por mutacion que las dos guardas de umbrales cazan una infraccion real: un valor por omision en el ultimo campo de UmbralesPlausibilidad pone en rojo test_los_umbrales_no_tienen_valor_por_omision y test_el_modulo_no_contiene_los_umbrales_cableados. Cero literales de 0.02, 50 o 14,7 en el codigo; la estequiometria entra por el rol (F1-14) o del a_por_omision de units.toml. QUE REVISAR (G1, por consecuencia si el numero esta mal): (1) 'Fuel Flow Estimated' es volume_flow (L/h) y roles.toml lo da como sinonimo de fuel_flow, que es mass_flow (kg/h): 17,7 L/h leidos como 17,7 kg/h, ~30 % de error en un numero de consumo que hoy pasa desapercibido porque cae DENTRO del rango [0,500]. Decide si sobra el sinonimo o falta un rol de caudal volumetrico. (2) 'Ignition - Load' es Pressure/pressure y 'Fuel - Load' es Percentage/ratio, EN EL MISMO LOG, y los dos son sinonimos de engine_load en roles.toml: en Haltech el eje de carga del encendido es MAP en kPa y el de combustible es %. El mismo rol saldria con dos dimensiones segun que canal gane. (3) Los tres canales MassOverTime (confianza unknown, se muestran en crudo) reciben propuestas del informe: x0,01 para Max Mass Air Flow (76 % fuera), x0,1 para Fuel Mass Flow (33 %) y 'viene en lb/h' para Mass Air Flow (18,6 %). Son pistas para F1-38, NO conclusiones, y Max Mass Air Flow vino de asignacion difusa. (4) Cobertura: 373 de 475 canales del AutoLog no tienen rol, asi que FG-10 juzga 102. Ocho de los 11 tipos inferred no tienen NINGUN canal con rol y el informe no puede pronunciarse sobre su factor -- lo dice en vez de callarlo. Usar DisplayMaxMin como rango cuando el rol no declara ninguno subiria la cobertura a ~462, pero ShortDistance demuestra que un canal puede exceder su propio DMM (14133 crudo con DMM 10000): es tu decision y no la he tomado. (5) Los cuatro umbrales nuevos de [plausibilidad] con su derivacion al lado. RECTIFICADO EN EL DESCRIPTOR, evidencia y NO factores: la nota de ShortDistance citaba 'maximo 52,7 km/h en el log', numero copiado de la evidencia del tipo Speed donde 527 es el valor de la FILA DE REFERENCIA; el maximo medido del AutoLog es 92,9 km/h. La conclusion (x0,1) no cambia y ahora esta mejor sostenida: 1413,3 m en 245,1 s son 20,8 km/h de media, y con x1 serian 207,6 km/h. Anadido el aviso de que el canal excede su propio DisplayMaxMin por 1,41x, asi que ese argumento era mas debil de lo que parecia. a_canonica sigue en 0,1 y confianza en inferred. TRAZABILIDAD, defecto mio: hice git add -A mientras el agente escribia, asi que plausibilidad.py entro en d1f559d (commit de FG-17) y la seccion [plausibilidad] de umbrales.toml en 0b3cbb3 (commit del sello). No reescribo la historia; queda dicho aqui y en docs/09 SS9.10. Sin ejecutar: verificar.sh completo y las 20 suites que importan numpy/polars."
         }
-      ],
-      "base": "c23848e"
+      ]
     },
     {
       "id": "FG-11",
@@ -2205,8 +2232,7 @@
           "fecha": "2026-08-11 20:19:35Z",
           "texto": "docs/10-guia-importar-csv-y-anadir-formato.md, 496 lineas, dos partes: importar un CSV cualquiera y anadir un formato nativo. Tabla completa de las claves del descriptor sacada de cargar_descriptor y sus auxiliares, tabla de errores con los mensajes literales, y un descriptor minimo de ejemplo (MiniLog ML-1). REVISION MIA, no su informe: (1) extraje TODOS los bloques toml de la guia y los cargue con cargar_descriptor -- el descriptor completo carga (minilog_ml1); (2) comprobe la tabla de claves contra el motor quitando cada clave del ejemplo una a una: 13 obligatorias y 2 opcionales, sin una sola incoherencia con lo que la guia declara; (3) verifique los tres hallazgos que reporta y los tres son ciertos. metadatos_cierre y reloj.clave_origen estan en haltech_nsp.toml y NO los lee ningun codigo (decorativos; no los quito porque es un dato de puerta G1); y la seccion [tipos] no se validaba al cargar, reproducido: KeyError('a_canonica') sin nombre de descriptor, de tipo ni de clave. Ese tercero lo he CERRADO en nativo.py (_validar_tipos, con casos propios para a_canonica = 0 y para el booleano, que colaria como 1,0 porque bool es subclase de int) y he rectificado los cuatro pasajes de la guia que lo documentaban como limite, comprobando que los mensajes que cita salen literalmente. 857 pruebas pasan. Sin ejecutar: verificar.sh completo, las 16 suites de numpy/polars, y el pipeline de sondeo de CSV completo (parte de la fase FG sigue pendiente, la guia lo dice en su 10.6 en vez de describir lo que no existe)."
         }
-      ],
-      "base": "71c9f21"
+      ]
     },
     {
       "id": "F2-01",
