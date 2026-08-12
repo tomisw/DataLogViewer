@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-12 13:47:35Z"
+    "actualizado": "2026-08-12 23:26:08Z"
   },
   "tareas": [
     {
@@ -2083,10 +2083,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-12 23:26:08Z",
+          "texto": "dlv-ui/src/importacion/: 6 modulos puros con sus pruebas + el componente de 3 pasos. Campo<T> distingue deducido de confirmado, y RolPropuesto lleva la confianza EXACTA/INDEXADA/DIFUSA de FG-09; debeDesactivarDetectorCritico() es la mitigacion 4 de docs/07 SS7.15 y recibe una LISTA de roles porque a un detector le basta con que uno de los implicados sea dudoso. CeldaPrevia usa tipos disjuntos ({tipo:'hueco'} sin campo valor) para que un ?? descuidado no pueda convertir un hueco en 0. DEFECTO QUE ENCONTRE Y CORREGI, y es el importante: analizarNumero era un 'espejo simplificado' de decimal_csv._a_float, y la simplificacion era justo la parte que importaba. Quitaba el caracter contrario y dejaba opinar a Number, asi que '0,000' con punto decimal daba 0 y '12,34' daba 1234: error de factor 100, silencioso. Es LA MISMA trampa que el docstring del modulo Python documenta como ya pagada una vez ('la primera version quitaba el caracter contrario y probaba float'), re-introducida al portarlo. Porte el patron de verdad (agrupacion solo en grupos de tres empezando por 1-9) y cruce las dos implementaciones sobre un barrido de 86 casos: 0 divergencias. Anadida una suite permanente de 4 pruebas que nombra el caso del docstring, y comprobado que las 7 aserciones que ya habia siguen valiendo. VERIFICACION MIA: ejecute los modulos puros con node --experimental-transform-types (strip-types no vale, hay un enum en unidades/tipos.ts); hueco vs cero, los 6 centinelas de SS7.10, particion europea y la mitigacion 4 completa. grep confirma una sola lectura de globales, el 'opciones.documento ?? globalThis.document' inyectable, igual que selector-canales.ts. NO he podido ejecutar vitest ni tsc: npm da 403 en este contenedor, asi que las pruebas .test.ts quedan SIN EJECUTAR. El componente asistente-importacion.ts no tiene .test.ts, misma convencion que selector-canales.ts. LO QUE FALTA EN dlv-api PARA QUE FUNCIONE DE PUNTA A PUNTA: no hay NINGUN endpoint de sondeo de CSV generico (delimitador/codificacion FG-01/02, estructura FG-03, columna de tiempo FG-04, tipos FG-05/06, rol FG-09) ni ruta que sirva roles.toml como /comandos/unidades sirve units.toml. Todo ese Python existe y esta probado, pero no esta cableado a HTTP. PuertoImportacionApi lanza un error nombrando que falta en cada metodo en vez de inventar la respuesta."
+        }
+      ],
+      "base": "6861bd3"
     },
     {
       "id": "FG-12",

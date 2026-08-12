@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-12 13:47:35Z
+Actualizado: 2026-08-12 23:26:08Z
 
-**274 / 769 pts cerrados (35.6 %)** · 118 pts esperando revisión humana → 51.0 % entregado
+**282 / 769 pts cerrados (36.7 %)** · 118 pts esperando revisión humana → 52.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
-| FG | 27 | 48 | 0 | 17 | 0 | 92 |
+| FG | 35 | 48 | 0 | 9 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 0 | 8 | 99 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -124,7 +124,7 @@ Actualizado: 2026-08-12 13:47:35Z
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 | ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | `db56e94` |
 
-## FG — 75/92 pts
+## FG — 83/92 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -138,7 +138,7 @@ Actualizado: 2026-08-12 13:47:35Z
 | ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
-| ·  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
+| ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `4311762` |
