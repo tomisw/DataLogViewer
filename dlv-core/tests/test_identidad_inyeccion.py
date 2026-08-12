@@ -60,7 +60,8 @@ RAIZ = Path(__file__).resolve().parents[2]
 DESCRIPTOR = RAIZ / "data" / "formats" / "haltech_nsp.toml"
 AUTOLOG = RAIZ / "samples" / "real" / "AutoLog_20260729_1830.csv"
 
-#: Los cuatro canales de la identidad, más la masa para la densidad.
+#: Los cuatro canales de la identidad, la masa para la densidad, y el caudal y el
+#: régimen para la comprobación por aritmética de motor.
 CANALES = (
     "Injection Stage 1 Flow Rate",
     "Injection Stage 1 Dead Time",
@@ -68,7 +69,19 @@ CANALES = (
     "Injector 1 Volume",
     "Fuel Mass Per Cylinder",
     "Injector 1 Duty Cycle",
+    "Fuel Flow Estimated",
+    "RPM",
 )
+
+#: RB26DETT: seis cilindros. Es un dato del motor del propietario, no del formato,
+#: y por eso vive aquí y no en `data/formats/haltech_nsp.toml`: el descriptor
+#: describe a Haltech, que va montada en motores de cualquier número de cilindros.
+CILINDROS = 6
+
+#: La densidad que sale de la identidad del inyector, usada solo para pasar de
+#: masa a volumen en la comprobación de caudal. No es un dato de entrada: es un
+#: resultado de `test_la_densidad_del_combustible_es_la_de_un_combustible`.
+DENSIDAD_MEDIDA = 0.741
 
 #: Centinelas de «sin dato» de la ECU (docs/01 §1.13). Un centinela contado como
 #: medida convierte cualquier estadístico en ruido.
@@ -126,6 +139,21 @@ def factores() -> dict[str, float]:
     with DESCRIPTOR.open("rb") as fh:
         desc = cargar_descriptor(fh)
     return {t: float(desc.tipos[t]["a_canonica"]) for t in ("Flow", "InjFuelVolume", "MassPerCyl")}
+
+
+@pytest.fixture(scope="module")
+def filas_caudal(filas: list[dict[str, int]]) -> list[dict[str, int]]:
+    """Filas con régimen y consumo apreciables, para la aritmética de motor.
+
+    El filtro es por régimen y no por ciclo de trabajo: la predicción del consumo
+    depende de las rpm, y a ralentí los enteros de masa por cilindro son tan
+    pequeños que su cuantización domina el cociente.
+    """
+    return [
+        f
+        for f in filas
+        if f["RPM"] > 2000 and f["Fuel Mass Per Cylinder"] > 20 and f["Fuel Flow Estimated"] > 0
+    ]
 
 
 def _de_carga(filas: list[dict[str, int]], factores: dict[str, float]) -> list[dict[str, int]]:
@@ -229,6 +257,41 @@ def test_la_densidad_del_combustible_es_la_de_un_combustible(
     assert statistics.stdev(densidades) < 0.05, (
         f"dispersión {statistics.stdev(densidades):.4g} g/mL: la densidad de un "
         "combustible no varía a lo largo de un log"
+    )
+
+
+def test_el_caudal_de_combustible_cuadra_con_la_aritmetica_del_motor(
+    filas_caudal: list[dict[str, int]], factores: dict[str, float]
+) -> None:
+    """La guarda que NO depende de la especificación del inyector.
+
+    `Fuel Flow Estimated` se puede predecir sin usarlo: masa de combustible por
+    cilindro, número de cilindros, y una inyección por cilindro cada dos vueltas en
+    un cuatro tiempos. Si el canal coincide con esa predicción, `Flow` y
+    `MassPerCyl` están los dos bien a la vez.
+
+    Vale la pena tenerla aparte de la identidad del inyector porque se apoya en
+    cosas distintas —geometría del motor en vez del caudal configurado y el tiempo
+    muerto—, así que un error en la premisa del inyector no la arrastra. Dos rutas
+    independientes que dan el mismo factor es lo que convierte una deducción en un
+    hecho.
+    """
+    predichos, leidos = [], []
+    for f in filas_caudal:
+        masa_mg = f["Fuel Mass Per Cylinder"] * factores["MassPerCyl"]
+        rpm = float(f["RPM"])
+        # 6 cilindros, cuatro tiempos: rpm/2 inyecciones por cilindro y minuto.
+        kg_h = CILINDROS * masa_mg * (rpm / 2.0) * 60.0 * 1e-6
+        predichos.append(kg_h / DENSIDAD_MEDIDA)  # L/h
+        leidos.append(f["Fuel Flow Estimated"] * factores["Flow"])
+
+    razones = [leido / pred for leido, pred in zip(leidos, predichos, strict=True) if pred > 1.0]
+    assert len(razones) > 100, f"solo {len(razones)} filas con consumo apreciable"
+    mediana = statistics.median(razones)
+    assert mediana == pytest.approx(1.0, rel=0.10), (
+        f"el canal de caudal y la aritmética del motor difieren por un factor "
+        f"{mediana:.4g}. Si es 10 o 0,1, `Flow` o `MassPerCyl` se han desviado un "
+        "orden de magnitud"
     )
 
 

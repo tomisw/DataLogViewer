@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-12 12:00:11Z
+Actualizado: 2026-08-12 13:47:35Z
 
 **274 / 769 pts cerrados (35.6 %)** · 118 pts esperando revisión humana → 51.0 % entregado
 
@@ -34,7 +34,7 @@ Actualizado: 2026-08-12 12:00:11Z
 | `F1-15` Presión absoluta/relativa como cambio de ori | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) DISCREPANCIA ENTRE ESPECI |
 | `F1-16` Dimensiones compuestas derivadas (`%/kPa` →  | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LA ARITMETICA ES a_num/a_ |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
-| `F1-47` La identidad del inyector fija tres factores | revision_humana | Opus 5 | G1 | CORREGIDOS DOS FACTORES DE ESCALA, x10 los dos, y confirmado un tercer |
+| `F1-47` La identidad del inyector fija tres factores | revision_humana | Opus 5 | G1 | CUARTA COMPROBACION, independiente del inyector: aritmetica de motor c |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
 | `FG-03` Estructura: preámbulo de metadatos, fila de  | revision_humana | Opus 5 | G1 | dlv_core/formatos/estructura.py + 31 pruebas. Preambulo, nombres, fila |
@@ -122,7 +122,7 @@ Actualizado: 2026-08-12 12:00:11Z
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
-| ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | — |
+| ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | `db56e94` |
 
 ## FG — 75/92 pts
 

@@ -381,12 +381,31 @@ cociente cuadraba y el 7,4 % restante se atribuyó al tiempo muerto. La nota
 anterior ya avisaba —«los dos se apoyan mutuamente, ninguno se prueba solo»—;
 lo que faltaba era un dato de fuera del log, y ese dato es el inyector.
 
+CONFIRMACIÓN INDEPENDIENTE DEL INYECTOR, por aritmética de motor. `Fuel Flow
+Estimated` es de este tipo, y su valor se puede predecir sin usarlo: 102 mg de
+combustible por cilindro, 6 cilindros, y a 6 449 rpm un cuatro tiempos inyecta
+una vez por cilindro cada dos vueltas.
+
+  6 x 102 mg x 6449/2 ciclos/min = 118,4 kg/h = 159,8 L/h a 0,741 g/mL
+
+y el canal vale 2 699 en crudo:
+
+  con 0,06  (corregido): 161,9 L/h   -> 1,3 % de diferencia
+  con 0,006 (anterior):   16,2 L/h   -> diez veces menos
+
+Esta comprobación no usa el caudal del inyector ni el tiempo muerto, así que es
+independiente de la identidad de arriba. Y da una potencia implícita de 441 a
+529 hp según el consumo específico (0,36 a 0,30 kg/kW·h), coherente con un
+RB26DETT a 213 kPa absolutos: un número que el propietario puede juzgar de un
+vistazo, que es la clase de evidencia que hace revisable una puerta G1.
+
 AVISO, la única evidencia que apunta en contra: DisplayMaxMin 16000,1 son
 16 000 cc/min con este factor, un tope alto para un inyector (con el factor
 anterior salían 1 600 cc/min, más parecido a un límite de dimensionado). Se
 mantiene la corrección porque un DisplayMaxMin no acota la escala
 —`ShortDistance` demuestra que un canal puede excederlo— y porque enfrente hay
-una identidad aritmética exacta y una densidad de combustible imposible."""
+tres comprobaciones que concuerdan: la identidad del inyector, la densidad del
+combustible y esta."""
 canales = 2
 
 [tipos.InjFuelVolume]
