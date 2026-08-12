@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-12 23:26:39Z"
+    "actualizado": "2026-08-12 23:37:09Z"
   },
   "tareas": [
     {
@@ -2750,10 +2750,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-12 23:37:09Z",
+          "texto": "Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 lineas) con 84 pruebas. detectores.py se queda con el vocabulario compartido (Incidencia, contrato Detector). SIN NUMBA: la histeresis se vectoriza como retencion del ultimo cruce decisivo y las ventanas con searchsorted; el docstring de detectores.py que anunciaba Numba queda rectificado. ADR-009 a 0 ocurrencias. EL AGENTE MURIO POR LIMITE DE SESION con 5 pruebas en rojo; el diagnostico y el cierre son mios, y de las 5 solo UNA era defecto del modulo: (1) DEFECTO DEL DOBLE, el mas grave por lo que implica: Vec.__and__ del doble stdlib hacia el AND LOGICO en vez del bit a bit. Sobre booleanos coinciden y por eso tardo en verse; sobre enteros no, y fuera_de_mascara pide bits & mascara sobre una mascara de verdad, asi que convertia '¿esta puesto el bit 1?' en '¿hay algun bit puesto?' -- un detector disparando por la causa equivocada. El modulo estaba bien. Es la clase de divergencia que invalida el patron Vectorial entero, porque el doble existe para ejercitar el MISMO codigo que produccion. (2) DEFECTO DEL MODULO: una meseta en el maximo se partia en dos picos, porque en su interior el minimo de la ventana es el propio maximo y la prominencia sale 0. No es raro (saturacion, limitador, canal cuantizado en su tope) y los detectores que cuentan eventos contarian el doble. Corregido con una dilatacion del nucleo del pico sobre la misma ventana ya configurada: sin parametro nuevo, sin bucle, y sin ensanchar un pico de verdad hacia sus laderas porque solo se admiten muestras que ya estan en el maximo local. Limite declarado en el codigo: una meseta mas ancha que la ventana no se une entera. (3,4,5) TRES PRUEBAS MAL ESCRITAS, no defectos: la de multitasa pedia 350 en t=200 ms contradiciendo su propio comentario ('desde 200 ms, 360'); la de ventana posterior pedia a la vez ventana inclusiva (en la validez) y exclusiva (en el valor), no podia pasar; y la de D4 daba 4 muestras a 50 ms por 200 ms de permanencia cuando son 150 -- la permanencia se mide t_fin - t_inicio, como documenta el contrato de Permanencia ('3 muestras son 106 ms' = (3-1)x53). Las tres reescritas mas fuertes que antes, cada una diciendo en un comentario que pedia la version anterior. VERIFICADO POR MUTACION: las dos guardas de umbrales cazan una infraccion real (un valor por omision en el ultimo campo de Permanencia, y el 0.02 de histeresis_relativa inyectado como literal). Y comprobe la derivacion del umbral nuevo midiendo los logs: G0/G1/G2 dan dt mediano 53/102/202 ms y el AutoLog 54/221/499 ms, exactamente lo que afirma docs/01 SS1.6 y SS1.7, asi que ventana_validez_ms = 250 esta bien sostenido. ADEMAS, defecto MIO de F1-47 que esto destapo: solo habia ejecutado dlv-core/tests, y el [resumen] de haltech_nsp.toml (confirmados 16 -> 19, inferidos 11 -> 8) y una prueba de tests/test_formato_haltech.py se quedaron desincronizados. Corregidos los dos; la prueba ahora comprueba explicitamente que un cociente NO puede fijar una escala y apunta a la suite que si lo hace. 1163 pruebas pasan; los 2 fallos son los preexistentes del PEP 695 en el interprete 3.11. Sin ejecutar: verificar.sh completo y las 20 suites de numpy/polars."
+        }
+      ],
+      "base": "92627b1"
     },
     {
       "id": "F3-07",

@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-12 23:26:08Z
+Actualizado: 2026-08-12 23:37:09Z
 
-**282 / 769 pts cerrados (36.7 %)** · 118 pts esperando revisión humana → 52.0 % entregado
+**282 / 769 pts cerrados (36.7 %)** · 128 pts esperando revisión humana → 53.3 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-12 23:26:08Z
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
 | FG | 35 | 48 | 0 | 9 | 0 | 92 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 8 | 0 | 8 | 99 | 3 | 118 |
+| F3 | 8 | 10 | 8 | 89 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
@@ -46,6 +46,7 @@ Actualizado: 2026-08-12 23:26:08Z
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
+| `F3-06` Motor de detectores: las 9 primitivas de §4. | revision_humana | Opus 5 | G1 | Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 line |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
@@ -138,7 +139,7 @@ Actualizado: 2026-08-12 23:26:08Z
 | ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
-| ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | — |
+| ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | `1b76111` |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `4311762` |
@@ -167,7 +168,7 @@ Actualizado: 2026-08-12 23:26:08Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 8/118 pts
+## F3 — 18/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -176,7 +177,7 @@ Actualizado: 2026-08-12 23:26:08Z
 | ·  | `F3-03` | Los 10 perfiles de fábrica de `04-perfiles-motorsport.md` §4.2 | Sonnet 5 | 8 | F3-02 | G1 | — |
 | ·  | `F3-04` | Autosugerencia por cobertura de roles («7 de 9 disponibles») | Sonnet 5 | 4 | F3-02, F1-07 | G3 | — |
 | ·  | `F3-05` | Editor de perfiles, duplicado, importación y exportación | Sonnet 5 | 5 | F3-01 | G3 | — |
-| ·  | `F3-06` | Motor de detectores: las 9 primitivas de §4.3 con histéresis y | Opus 5 | 10 | F1-05 | G1 | — |
+| ⏳ | `F3-06` | Motor de detectores: las 9 primitivas de §4.3 con histéresis y | Opus 5 | 10 | F1-05 | G1 | — |
 | ·  | `F3-07` | Detectores D1–D18 por rol, como configuración | Opus 5 | 8 | F3-06, F0-07 | G1 | — |
 | ·  | `F3-08` | Desactivación de detectores críticos cuando su rol proviene de | Opus 5 | 4 | F3-07, FG-09 | G1 | — |
 | ·  | `F3-09` | Validación contra la verdad de referencia, en formato nativo y | Opus 5 | 5 | F3-07, F0-13 | G1 | — |

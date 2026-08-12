@@ -294,6 +294,66 @@ severidad = "informativa"
 permanencia_s = 0.0
 
 # =========================================================================== #
+#  MOTOR DE DETECTORES  (F3-06 · docs/04 §4.3, «Primitivas»)
+# =========================================================================== #
+#  Lo que necesitan las nueve primitivas de §4.3 y que ningún detector concreto
+#  puede declarar por sí solo, porque no es criterio de motor: es cómo se leen
+#  las muestras. `[general]` sigue dando la permanencia mínima y el número mínimo
+#  de muestras; esta sección añade lo que faltaba para poder ejecutar una
+#  primitiva sin cablear nada en el código (dlv_core/primitivas.py no tiene un
+#  solo valor por omisión).
+[motor_de_deteccion]
+# Multi-tasa: cuánto tiempo sigue valiendo el último valor conocido de un canal
+# cuando se compara con otro de tasa distinta (docs/04 §4.5, docs/01 §1.6). Más
+# allá de esta ventana el resultado es HUECO, no el último valor: «si el canal más
+# lento tiene 200 ms de periodo y la ventana de validez es de 100 ms, el resultado
+# es hueco en lugar de un número inventado».
+#
+# No es un número a ojo, sale de las tasas medidas en docs/01 §1.6 y §1.7 y tiene
+# que caer entre dos límites:
+#   - Por debajo NO puede bajar de 202 ms, el dt mediano del grupo más lento (G2,
+#     5 Hz: refrigerante, temperatura de aire, estados de ralentí y boost). Con
+#     una ventana más corta, comparar cualquier canal rápido con uno de G2 daría
+#     hueco en casi todas las muestras y D4, D9 y D11 no dispararían nunca.
+#   - Por encima NO debería llegar a 606 ms, que es 3x ese dt mediano y por tanto
+#     lo que D18 considera ya un hueco de muestreo. Una ventana mayor que el
+#     umbral de hueco convertiría un corte de grabación en una recta perfecta con
+#     aspecto de dato bueno, que es justo lo que la ventana existe para evitar.
+# 250 ms está por encima del periodo de G2 (202 ms) con un 24 % de margen, cubre
+# el dt p99 del AutoLog (221 ms) y se queda a menos de la mitad del umbral de
+# hueco. Es la banda entera de holgura que hay: cualquier valor entre 230 y 500
+# haría lo mismo.
+ventana_validez_ms = 250.0
+
+# Tope de eventos que una primitiva puede devolver de una sola vez. NO es un
+# umbral de física: es la salvaguarda que mantiene acotado el único bucle de
+# Python del motor (ADR-009) y que convierte una configuración que genera ruido
+# en un error explicado, en vez de en una lista que nadie puede leer.
+#
+# Derivación por consecuencia, no por el log: el panel de incidencias (§4.3) es
+# «la pantalla que responde ¿ha ido todo bien? en cinco segundos». 10 000 filas de
+# un solo detector ya no se leen, y 18 detectores en el tope son 180 000 eventos,
+# del orden de lo que ocupa el propio canal en memoria. Sobre los logs de muestra
+# no se alcanza nunca —el AutoLog entero tiene 2 636 registros—, y eso es lo
+# correcto para una salvaguarda: si salta, el problema es la configuración
+# (histéresis demasiado estrecha o permanencia demasiado corta), no el log.
+maximo_de_eventos = 10000
+
+# Ventana por omisión del detector de picos (§4.3, «Pico local: prominencia
+# mínima, ventana»). La prominencia mínima NO tiene valor por omisión aquí a
+# propósito: es una diferencia en la unidad canónica del canal —una prominencia
+# de 10 kPa y una de 10 K no se parecen en nada— así que la declara el detector
+# que la use. La ventana sí es común: es tiempo, y el tiempo se mide igual en
+# todos los canales.
+#
+# 0,5 s es la misma ventana que D15 declara para el tip-in, y es la misma escala
+# física: el tiempo de respuesta del lazo de combustible y del de boost. Con la
+# ventana centrada, medio segundo son ±250 ms, es decir ±5 muestras a 20 Hz y ±1
+# a 5 Hz -- por debajo de eso, en un canal del grupo lento un «pico» sería
+# cualquier muestra mayor que sus dos vecinas.
+ventana_pico_s = 0.5
+
+# =========================================================================== #
 #  INFORME DE PLAUSIBILIDAD  (FG-10 · docs/07 §7.7, docs/09 §9.9 escalón 2)
 # =========================================================================== #
 #  No es un detector: no mira el motor, mira la IMPORTACIÓN. Compara los valores

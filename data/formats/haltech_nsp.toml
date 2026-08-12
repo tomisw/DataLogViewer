@@ -626,8 +626,10 @@ canales = 3
 # =========================================================================== #
 [resumen]
 tipos_totales = 34
-confirmados = 16
-inferidos = 11
+# F1-47 pasó `Flow`, `InjFuelVolume` y `MassPerCyl` de inferidos a confirmados
+# con la especificación del inyector del propietario: 16 -> 19 y 11 -> 8.
+confirmados = 19
+inferidos = 8
 desconocidos = 7
 canales_totales = 475
 canales_confirmados = 422

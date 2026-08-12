@@ -255,9 +255,19 @@ def test_percentage_da_fraccion_no_porcentaje(desc: dict, fila_de_referencia: di
 
 
 def test_masa_por_cilindro_da_la_relacion_de_mezcla(desc: dict, fila_de_referencia: dict) -> None:
-    """La evidencia con la que se marcó MassPerCyl como `inferred`: el factor
-    absoluto no está probado, pero la RELACIÓN entre aire y combustible debe
-    aproximar el AFR que implica la lambda medida."""
+    """La RELACIÓN entre aire y combustible aproxima el AFR que implica la lambda.
+
+    Esta prueba nació fijando que `MassPerCyl` estuviera en `inferred`, porque la
+    relación cuadra igual con cualquier factor: un cociente es invariante a la
+    escala, y multiplicar los dos canales por diez lo deja idéntico. Ese
+    razonamiento sigue siendo correcto y por eso la comprobación se queda.
+
+    Lo que cambió en F1-47 es que el factor absoluto SÍ se probó, por otra vía: la
+    identidad del inyector (caudal x tiempo de apertura efectivo = volumen) y la
+    densidad de combustible que se deduce de ella, 0,741 g/mL. Así que la
+    aserción ya no es «sigue sin probarse» sino «no se prueba AQUÍ», y se apunta a
+    dónde: si esa suite desapareciera, el factor volvería a no tener respaldo.
+    """
     f = fila_de_referencia
     relacion = f["Calculated Air Mass Per Cylinder"] / f["Fuel Mass Per Cylinder"]
     lam = f["Wideband O2 1"] * a(desc, "AFR")
@@ -265,9 +275,19 @@ def test_masa_por_cilindro_da_la_relacion_de_mezcla(desc: dict, fila_de_referenc
     afr_esperado = lam * stq
     error = abs(relacion - afr_esperado) / afr_esperado
     assert error < 0.15, f"relación {relacion:.2f} vs AFR esperado {afr_esperado:.2f}"
-    assert desc["tipos"]["MassPerCyl"]["confianza"] == "inferred", (
-        "la relación cuadra pero el factor absoluto sigue sin probarse"
+
+    # El cociente es invariante a la escala: se comprueba explícitamente, porque es
+    # la razón de que esta prueba NO pueda confirmar el factor.
+    doble = (2 * f["Calculated Air Mass Per Cylinder"]) / (2 * f["Fuel Mass Per Cylinder"])
+    assert doble == pytest.approx(relacion), "un cociente no puede fijar una escala"
+
+    quien_lo_prueba = RAIZ / "dlv-core" / "tests" / "test_identidad_inyeccion.py"
+    assert quien_lo_prueba.exists(), (
+        "MassPerCyl está confirmado por la identidad del inyector (F1-47); si esa "
+        "suite desaparece, el factor absoluto se queda sin respaldo y hay que "
+        "devolverlo a `inferred`"
     )
+    assert desc["tipos"]["MassPerCyl"]["confianza"] == "confirmed"
 
 
 def test_massovertime_sigue_siendo_desconocido(desc: dict) -> None:
