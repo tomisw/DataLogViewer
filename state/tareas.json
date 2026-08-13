@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 13:00:28Z"
+    "actualizado": "2026-08-13 13:02:13Z"
   },
   "tareas": [
     {
@@ -54,7 +54,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "875f57a"
+        "9c54663"
       ],
       "notas": [
         {
@@ -143,7 +143,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "875f57a"
+        "2af6150"
       ],
       "notas": [
         {
@@ -1506,7 +1506,7 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "8e82d5c"
+        "e918085"
       ],
       "notas": [
         {
@@ -1536,9 +1536,7 @@
       "gate": "G2",
       "estado": "hecho",
       "agente": "opus",
-      "commits": [
-        "8e82d5c"
-      ],
+      "commits": [],
       "notas": [
         {
           "fecha": "2026-08-03 14:58:49Z",
@@ -1563,9 +1561,7 @@
       "gate": "G3",
       "estado": "hecho",
       "agente": "sonnet",
-      "commits": [
-        "8e82d5c"
-      ],
+      "commits": [],
       "notas": [
         {
           "fecha": "2026-08-03 14:45:11Z",
@@ -1595,7 +1591,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "298c8ff"
+        "501b77b"
       ],
       "notas": [
         {
@@ -1625,9 +1621,7 @@
       "gate": "G2",
       "estado": "hecho",
       "agente": "opus",
-      "commits": [
-        "877e8c1"
-      ],
+      "commits": [],
       "notas": [
         {
           "fecha": "2026-08-03 20:12:11Z",
@@ -1936,7 +1930,7 @@
       "estado": "revision_humana",
       "agente": "sonnet",
       "commits": [
-        "0a590f9"
+        "45a0600"
       ],
       "notas": [
         {
@@ -1975,7 +1969,7 @@
       "estado": "revision_humana",
       "agente": "subagente",
       "commits": [
-        "4311762"
+        "90a05d4"
       ],
       "notas": [
         {
@@ -2002,7 +1996,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "4311762"
+        "4ef462e"
       ],
       "notas": [
         {
@@ -2159,7 +2153,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "4311762"
+        "682de2f"
       ],
       "notas": [
         {
@@ -2188,7 +2182,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "599596b"
+        "46d8ff6"
       ],
       "notas": [
         {
@@ -2274,7 +2268,7 @@
       "estado": "hecho",
       "agente": "opus",
       "commits": [
-        "64514eb"
+        "24909a3"
       ],
       "notas": [
         {
@@ -2618,7 +2612,7 @@
       "estado": "hecho",
       "agente": "subagente",
       "commits": [
-        "4311762"
+        "4a34148"
       ],
       "notas": [
         {

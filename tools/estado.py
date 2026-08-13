@@ -290,9 +290,40 @@ def _commit_de_la_tarea(tid: str) -> str | None:
         for sha, _, asunto in [linea.partition("\t")]
         if patron.search(asunto)
     ]
-    # El más antiguo: es el commit que entregó la tarea, no una corrección
-    # posterior que la vuelva a nombrar.
-    return candidatos[-1] if candidatos else None
+    # El más antiguo PRIMERO: es el commit que entregó la tarea, no una corrección
+    # posterior que la vuelva a nombrar. Pero antes hay que descartar los que no
+    # entregan nada, y eso lo destapó FG-18: la tarea se registró en el backlog en
+    # su propio commit («plan: registrar FG-18…»), que es más antiguo que la
+    # entrega y nombra la tarea en el asunto, así que el sello apuntaba al commit
+    # donde se decidió hacer el trabajo en vez de al que lo trajo.
+    #
+    # Un commit de planificación o de contabilidad se reconoce por lo que toca:
+    # solo el backlog y `state/`. Si un commit no toca nada más, no entregó nada.
+    for sha in reversed(candidatos):
+        if _entrega_algo(sha):
+            return sha
+    return None
+
+
+#: Ficheros que por sí solos no constituyen una entrega: el backlog y el libro de
+#: estado. Un commit que solo los toca es planificación o contabilidad.
+_SOLO_CONTABILIDAD = ("docs/05-backlog-y-asignacion-modelos.md", "state/")
+
+
+def _entrega_algo(sha: str) -> bool:
+    """¿Este commit toca algo que no sea el backlog o `state/`?"""
+    try:
+        out = subprocess.run(
+            ["git", "show", "--name-only", "--format=", sha],
+            cwd=RAIZ,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except Exception:
+        return True  # sin poder decidir, se prefiere sellar a no sellar
+    tocados = [linea.strip() for linea in out.stdout.splitlines() if linea.strip()]
+    return any(not f.startswith(_SOLO_CONTABILIDAD) for f in tocados)
 
 
 def cmd_sellar(args: argparse.Namespace) -> None:
@@ -334,8 +365,15 @@ def cmd_sellar(args: argparse.Namespace) -> None:
     for linea in corregidos:
         print(f"  {linea}")
     print(f"{len(corregidos)} tareas selladas de nuevo, {len(sin_commit)} sin commit localizable")
-    if sin_commit and args.verboso:
-        print("  sin commit que las nombre: " + ", ".join(sin_commit))
+    if sin_commit:
+        # Se dice SIEMPRE, no solo con `--verboso`: son las tareas cuya entrega no
+        # se puede encontrar desde el libro de estado, y esconder eso detrás de una
+        # bandera es exactamente lo que hacía que la trazabilidad se degradase sin
+        # que nadie se enterara. La causa es siempre la misma: ningún commit que
+        # entregue código las nombra en el ASUNTO. Se arregla en el commit
+        # siguiente que las toque, no adivinando hacia atrás.
+        print("  sin ningún commit de entrega que las nombre en el asunto:")
+        print("    " + ", ".join(sin_commit))
 
 
 def cmd_aprobar(args: argparse.Namespace) -> None:
