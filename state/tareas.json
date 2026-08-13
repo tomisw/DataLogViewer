@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 14:09:42Z"
+    "actualizado": "2026-08-13 14:09:44Z"
   },
   "tareas": [
     {
@@ -3116,7 +3116,9 @@
       "gate": "G2",
       "estado": "hecho",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "468251b"
+      ],
       "notas": [
         {
           "fecha": "2026-08-13 14:09:42Z",
