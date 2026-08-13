@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-12 23:37:09Z
+Actualizado: 2026-08-13 07:05:42Z
 
-**282 / 769 pts cerrados (36.7 %)** · 128 pts esperando revisión humana → 53.3 % entregado
+**282 / 775 pts cerrados (36.4 %)** · 128 pts esperando revisión humana → 52.9 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
-| FG | 35 | 48 | 0 | 9 | 0 | 92 |
+| FG | 35 | 48 | 0 | 15 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 8 | 10 | 8 | 89 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -125,7 +125,7 @@ Actualizado: 2026-08-12 23:37:09Z
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 | ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | `db56e94` |
 
-## FG — 83/92 pts
+## FG — 83/98 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -146,6 +146,7 @@ Actualizado: 2026-08-12 23:37:09Z
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `599596b` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | `d1f559d` |
+| ·  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | — |
 
 ## F2 — 21/80 pts
 
@@ -177,7 +178,7 @@ Actualizado: 2026-08-12 23:37:09Z
 | ·  | `F3-03` | Los 10 perfiles de fábrica de `04-perfiles-motorsport.md` §4.2 | Sonnet 5 | 8 | F3-02 | G1 | — |
 | ·  | `F3-04` | Autosugerencia por cobertura de roles («7 de 9 disponibles») | Sonnet 5 | 4 | F3-02, F1-07 | G3 | — |
 | ·  | `F3-05` | Editor de perfiles, duplicado, importación y exportación | Sonnet 5 | 5 | F3-01 | G3 | — |
-| ⏳ | `F3-06` | Motor de detectores: las 9 primitivas de §4.3 con histéresis y | Opus 5 | 10 | F1-05 | G1 | — |
+| ⏳ | `F3-06` | Motor de detectores: las 9 primitivas de §4.3 con histéresis y | Opus 5 | 10 | F1-05 | G1 | `b5ab536` |
 | ·  | `F3-07` | Detectores D1–D18 por rol, como configuración | Opus 5 | 8 | F3-06, F0-07 | G1 | — |
 | ·  | `F3-08` | Desactivación de detectores críticos cuando su rol proviene de | Opus 5 | 4 | F3-07, FG-09 | G1 | — |
 | ·  | `F3-09` | Validación contra la verdad de referencia, en formato nativo y | Opus 5 | 5 | F3-07, F0-13 | G1 | — |

@@ -6,7 +6,7 @@
 > **25 semanas**. La revisión 3 añade el **explorador de logs** (E15, fase FE):
 > 52 puntos y una semana más, hasta **750 puntos y 26 semanas**. Sumadas F1-44
 > y F1-45, que salieron de abrir la aplicación con un log real, el total es de
-> **769 puntos en 157 tareas**.
+> **775 puntos en 158 tareas**.
 
 ## 5.1 Criterio de asignación
 
@@ -66,7 +66,7 @@ plausible y llega a una decisión de tuning:
 - cualquier **asignación de rol** o regla del importador genérico.
 
 Esfuerzo en **puntos**: 1 punto ≈ media jornada de trabajo asistido más su
-revisión. Total: **157 tareas, 769 puntos** ≈ 385 jornadas. Con la capacidad
+revisión. Total: **158 tareas, 775 puntos** ≈ 388 jornadas. Con la capacidad
 supuesta de **27 puntos/semana** (≈ 2,7 flujos de trabajo en paralelo), salen las
 **26 semanas** del calendario de `02-alcance-y-plan.md` §2.7. Con un solo flujo,
 v1.0 se va a ~67 semanas.
@@ -260,7 +260,17 @@ v1.0 se va a ~67 semanas.
 | FG-16 | **Prueba de independencia de fabricante**: el log de F0-13 da resultados idénticos en los dos formatos | suite + informe | **Opus 5** | 4 | FG-09, F0-13 | **G1** |
 | FG-17 | Documentación: importar un CSV cualquiera y añadir un formato nativo | guía | Sonnet 5 | 3 | FG-13 | G3 |
 
-**Subtotal FG: 92 pts** · Hito **MG**
+| FG-18 | **El sondeo genérico llega a HTTP**: endpoints de `dlv-api` para delimitador y codificación, estructura, columna de tiempo, tipos de columna y asignación de rol, más una ruta que sirva `roles.toml` como `/comandos/unidades` sirve `units.toml` | módulo + pruebas | **Opus 5** | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 |
+
+**Subtotal FG: 98 pts** · Hito **MG**
+
+> **FG-18 salió de construir FG-11**, no de auditar el plan: el asistente de
+> importación quedó terminado y sin poder funcionar, porque todo el sondeo de CSV
+> genérico —FG-01 a FG-09, ocho tareas con sus pruebas en verde— vive solo en
+> Python y no está cableado a HTTP. `dlv-api` tiene ocho rutas y las ocho son de
+> Haltech nativo. Es el mismo tipo de hueco que F1-44 (abrir la aplicación con un
+> log real) y F1-45 (que las unidades llegasen a la ventana): la fase se declaró
+> hecha por módulos sin que nadie recorriese el camino de punta a punta.
 
 ## 5.6 Fase F2 — Multi-log paralelo y concatenado (semanas 13–15)
 
@@ -399,12 +409,12 @@ decisiones equivocadas (riesgo R14).
 
 | Modelo | Puntos | % del esfuerzo | Tareas | Concentración |
 |---|---|---|---|---|
-| **Opus 5** | 454 | 59 % | 78 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
+| **Opus 5** | 460 | 59 % | 79 | parser, almacén, pirámide, **conversiones de unidad**, **sondeo y roles del importador genérico**, renderizador, motor de tiempo, detectores, tablas de corrección, rendimiento, seguridad |
 | **Sonnet 5** | 282 | 37 % | 66 | interfaz, perfiles, asistente de importación, exportadores, empaquetado, integración |
 | **Haiku 4.5** | 33 | 4 % | 13 | *fixtures*, CI, catálogos mecánicos, i18n, documentación mecánica |
-| **Total** | **769** | 100 % | **157** | |
+| **Total** | **775** | 100 % | **158** | |
 
-Reparto por fase: F0 54 · F1 234 · FG 92 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
+Reparto por fase: F0 54 · F1 234 · FG 98 · F2 80 · F3 118 · F4 63 · **FE 52** · F5 76.
 
 (Las cifras anteriores de esta sección decían 669 puntos en 136 tareas y F1 186.
 No cuadraban con la suma de las propias tablas desde la revisión 2 —el libro de
@@ -412,7 +422,7 @@ estado ya sembraba 698— y se corrigen aquí junto con el alcance nuevo.)
 
 Distribución de puertas: **52 tareas en G1** (revisión humana obligatoria), 31 en
 G2, 61 en G3, 11 en G4. El esfuerzo de revisión de G1 y G2 es **adicional** a los
-769 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
+775 puntos y se presupuesta como un 20 % de sobrecoste sobre las tareas que las
 requieren.
 
 La proporción de Opus 5 sube del 52 % al 58 % con las dos épicas nuevas, y no por

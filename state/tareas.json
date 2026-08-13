@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-12 23:37:42Z"
+    "actualizado": "2026-08-13 07:05:42Z"
   },
   "tareas": [
     {
@@ -1759,8 +1759,7 @@
           "fecha": "2026-08-12 13:47:35Z",
           "texto": "CUARTA COMPROBACION, independiente del inyector: aritmetica de motor contra el canal de caudal. 102 mg/cil x 6 cilindros x 6449/2 ciclos/min = 118,4 kg/h = 159,8 L/h a 0,741 g/mL; 'Fuel Flow Estimated' vale 2699 crudo, que con 0,06 son 161,9 L/h (1,3 % de diferencia) y con 0,006 serian 16,2 L/h (diez veces menos). No usa el caudal del inyector ni el tiempo muerto, asi que si la premisa de los 620 cc/min configurados fuese falsa, esta comprobacion seguiria en pie. Potencia implicita 441-529 hp segun BSFC (0,36 a 0,30 kg/kW.h) a 213 kPa absolutos: un numero que puedes juzgar de un vistazo, y esa es la clase de evidencia que hace revisable una G1. Anadida como quinta prueba de test_identidad_inyeccion.py; por mutacion, revertir Flow a 0,006 pone AHORA TRES pruebas en rojo (antes dos) y subir MassPerCyl a 10,0 pone dos. Los seis cilindros viven en la prueba y no en el descriptor: Haltech va montada en motores de cualquier numero de cilindros."
         }
-      ],
-      "base": "4136e44"
+      ]
     },
     {
       "id": "FG-01",
@@ -2093,8 +2092,7 @@
           "fecha": "2026-08-12 23:26:08Z",
           "texto": "dlv-ui/src/importacion/: 6 modulos puros con sus pruebas + el componente de 3 pasos. Campo<T> distingue deducido de confirmado, y RolPropuesto lleva la confianza EXACTA/INDEXADA/DIFUSA de FG-09; debeDesactivarDetectorCritico() es la mitigacion 4 de docs/07 SS7.15 y recibe una LISTA de roles porque a un detector le basta con que uno de los implicados sea dudoso. CeldaPrevia usa tipos disjuntos ({tipo:'hueco'} sin campo valor) para que un ?? descuidado no pueda convertir un hueco en 0. DEFECTO QUE ENCONTRE Y CORREGI, y es el importante: analizarNumero era un 'espejo simplificado' de decimal_csv._a_float, y la simplificacion era justo la parte que importaba. Quitaba el caracter contrario y dejaba opinar a Number, asi que '0,000' con punto decimal daba 0 y '12,34' daba 1234: error de factor 100, silencioso. Es LA MISMA trampa que el docstring del modulo Python documenta como ya pagada una vez ('la primera version quitaba el caracter contrario y probaba float'), re-introducida al portarlo. Porte el patron de verdad (agrupacion solo en grupos de tres empezando por 1-9) y cruce las dos implementaciones sobre un barrido de 86 casos: 0 divergencias. Anadida una suite permanente de 4 pruebas que nombra el caso del docstring, y comprobado que las 7 aserciones que ya habia siguen valiendo. VERIFICACION MIA: ejecute los modulos puros con node --experimental-transform-types (strip-types no vale, hay un enum en unidades/tipos.ts); hueco vs cero, los 6 centinelas de SS7.10, particion europea y la mitigacion 4 completa. grep confirma una sola lectura de globales, el 'opciones.documento ?? globalThis.document' inyectable, igual que selector-canales.ts. NO he podido ejecutar vitest ni tsc: npm da 403 en este contenedor, asi que las pruebas .test.ts quedan SIN EJECUTAR. El componente asistente-importacion.ts no tiene .test.ts, misma convencion que selector-canales.ts. LO QUE FALTA EN dlv-api PARA QUE FUNCIONE DE PUNTA A PUNTA: no hay NINGUN endpoint de sondeo de CSV generico (delimitador/codificacion FG-01/02, estructura FG-03, columna de tiempo FG-04, tipos FG-05/06, rol FG-09) ni ruta que sirva roles.toml como /comandos/unidades sirve units.toml. Todo ese Python existe y esta probado, pero no esta cableado a HTTP. PuertoImportacionApi lanza un error nombrando que falta en cada metodo en vez de inventar la respuesta."
         }
-      ],
-      "base": "6861bd3"
+      ]
     },
     {
       "id": "FG-12",
@@ -2247,6 +2245,36 @@
           "texto": "docs/10-guia-importar-csv-y-anadir-formato.md, 496 lineas, dos partes: importar un CSV cualquiera y anadir un formato nativo. Tabla completa de las claves del descriptor sacada de cargar_descriptor y sus auxiliares, tabla de errores con los mensajes literales, y un descriptor minimo de ejemplo (MiniLog ML-1). REVISION MIA, no su informe: (1) extraje TODOS los bloques toml de la guia y los cargue con cargar_descriptor -- el descriptor completo carga (minilog_ml1); (2) comprobe la tabla de claves contra el motor quitando cada clave del ejemplo una a una: 13 obligatorias y 2 opcionales, sin una sola incoherencia con lo que la guia declara; (3) verifique los tres hallazgos que reporta y los tres son ciertos. metadatos_cierre y reloj.clave_origen estan en haltech_nsp.toml y NO los lee ningun codigo (decorativos; no los quito porque es un dato de puerta G1); y la seccion [tipos] no se validaba al cargar, reproducido: KeyError('a_canonica') sin nombre de descriptor, de tipo ni de clave. Ese tercero lo he CERRADO en nativo.py (_validar_tipos, con casos propios para a_canonica = 0 y para el booleano, que colaria como 1,0 porque bool es subclase de int) y he rectificado los cuatro pasajes de la guia que lo documentaban como limite, comprobando que los mensajes que cita salen literalmente. 857 pruebas pasan. Sin ejecutar: verificar.sh completo, las 16 suites de numpy/polars, y el pipeline de sondeo de CSV completo (parte de la fase FG sigue pendiente, la guia lo dice en su 10.6 en vez de describir lo que no existe)."
         }
       ]
+    },
+    {
+      "id": "FG-18",
+      "fase": "FG",
+      "titulo": "El sondeo genérico llega a HTTP: endpoints de `dlv-api` para delimitador y codificación, estructura, columna de tiempo, tipos de columna y asignación de rol, más una ruta que sirva `roles.toml` como `/comandos/unidades` sirve `units.toml`",
+      "entregable": "módulo + pruebas",
+      "modelo": "Opus 5",
+      "pts": 6,
+      "deps": [
+        "FG-01",
+        "FG-03",
+        "FG-04",
+        "FG-05",
+        "FG-09",
+        "FG-11"
+      ],
+      "deps_backlog": [
+        "FG-01",
+        "FG-03",
+        "FG-04",
+        "FG-05",
+        "FG-09",
+        "FG-11"
+      ],
+      "dep_todo": false,
+      "gate": "G2",
+      "estado": "pendiente",
+      "agente": null,
+      "commits": [],
+      "notas": []
     },
     {
       "id": "F2-01",
@@ -2760,8 +2788,7 @@
           "fecha": "2026-08-12 23:37:09Z",
           "texto": "Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 lineas) con 84 pruebas. detectores.py se queda con el vocabulario compartido (Incidencia, contrato Detector). SIN NUMBA: la histeresis se vectoriza como retencion del ultimo cruce decisivo y las ventanas con searchsorted; el docstring de detectores.py que anunciaba Numba queda rectificado. ADR-009 a 0 ocurrencias. EL AGENTE MURIO POR LIMITE DE SESION con 5 pruebas en rojo; el diagnostico y el cierre son mios, y de las 5 solo UNA era defecto del modulo: (1) DEFECTO DEL DOBLE, el mas grave por lo que implica: Vec.__and__ del doble stdlib hacia el AND LOGICO en vez del bit a bit. Sobre booleanos coinciden y por eso tardo en verse; sobre enteros no, y fuera_de_mascara pide bits & mascara sobre una mascara de verdad, asi que convertia '¿esta puesto el bit 1?' en '¿hay algun bit puesto?' -- un detector disparando por la causa equivocada. El modulo estaba bien. Es la clase de divergencia que invalida el patron Vectorial entero, porque el doble existe para ejercitar el MISMO codigo que produccion. (2) DEFECTO DEL MODULO: una meseta en el maximo se partia en dos picos, porque en su interior el minimo de la ventana es el propio maximo y la prominencia sale 0. No es raro (saturacion, limitador, canal cuantizado en su tope) y los detectores que cuentan eventos contarian el doble. Corregido con una dilatacion del nucleo del pico sobre la misma ventana ya configurada: sin parametro nuevo, sin bucle, y sin ensanchar un pico de verdad hacia sus laderas porque solo se admiten muestras que ya estan en el maximo local. Limite declarado en el codigo: una meseta mas ancha que la ventana no se une entera. (3,4,5) TRES PRUEBAS MAL ESCRITAS, no defectos: la de multitasa pedia 350 en t=200 ms contradiciendo su propio comentario ('desde 200 ms, 360'); la de ventana posterior pedia a la vez ventana inclusiva (en la validez) y exclusiva (en el valor), no podia pasar; y la de D4 daba 4 muestras a 50 ms por 200 ms de permanencia cuando son 150 -- la permanencia se mide t_fin - t_inicio, como documenta el contrato de Permanencia ('3 muestras son 106 ms' = (3-1)x53). Las tres reescritas mas fuertes que antes, cada una diciendo en un comentario que pedia la version anterior. VERIFICADO POR MUTACION: las dos guardas de umbrales cazan una infraccion real (un valor por omision en el ultimo campo de Permanencia, y el 0.02 de histeresis_relativa inyectado como literal). Y comprobe la derivacion del umbral nuevo midiendo los logs: G0/G1/G2 dan dt mediano 53/102/202 ms y el AutoLog 54/221/499 ms, exactamente lo que afirma docs/01 SS1.6 y SS1.7, asi que ventana_validez_ms = 250 esta bien sostenido. ADEMAS, defecto MIO de F1-47 que esto destapo: solo habia ejecutado dlv-core/tests, y el [resumen] de haltech_nsp.toml (confirmados 16 -> 19, inferidos 11 -> 8) y una prueba de tests/test_formato_haltech.py se quedaron desincronizados. Corregidos los dos; la prueba ahora comprueba explicitamente que un cociente NO puede fijar una escala y apunta a la suite que si lo hace. 1163 pruebas pasan; los 2 fallos son los preexistentes del PEP 695 en el interprete 3.11. Sin ejecutar: verificar.sh completo y las 20 suites de numpy/polars."
         }
-      ],
-      "base": "92627b1"
+      ]
     },
     {
       "id": "F3-07",
