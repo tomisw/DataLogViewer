@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 14:09:44Z"
+    "actualizado": "2026-08-13 14:34:21Z"
   },
   "tareas": [
     {
@@ -3094,10 +3094,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-13 14:34:21Z",
+          "texto": "data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55 pruebas. El entregable es DATOS: expresiones.py (F3-18) sabe evaluar pero no sabe ninguna formula, y estas viven en data/ por lo mismo que casos_de_unidades.toml -- un tuner puede auditar una columna de formulas, nadie audita cadenas dentro de un modulo. QUE REVISAR (G1, por consecuencia): la CLASE de cada una, no la formula. La regla que decide es que una resta de dos valores de la MISMA dimension es un INTERVALO, y hay una prueba que la impone con una lista de excepciones declaradas. La unica excepcion es error_lambda: se escribe como resta (a/b - 1) pero lo que resta es un cociente adimensional menos un numero, asi que es una RAZON y es PUNTO de ratio; marcarla intervalo de mixture_ratio daria un numero con unidades de lambda y sin sentido. Es la entrada que justifica el fichero entero. DOS HALLAZGOS al comprobarlo contra el log de verdad en vez de leerlo: (1) delta() NO EXISTE en el evaluador -- solo admite abs, max y min -- asi que mi propia entrada de delta de knock violaba la frontera que el fichero declara tres parrafos mas arriba: aqui cabe lo que se calcula con la muestra de ESE instante, y un delta necesita la anterior. Lo comodo habria sido anadir delta al evaluador, y habria convertido una lista blanca de nodos AST en un lenguaje con estado cuando primitivas.delta_de_contador (F3-06) ya lo hace vectorizado y devolviendo INTERVALO. Movido a [[fuera_de_biblioteca]] con su destino, y hay una prueba que prohibe delta(, derivada(, media_movil( y acumulado( para que la comodidad no gane la proxima vez. (2) EL LOG DEL PROPIETARIO NO TRAE PRESION ATMOSFERICA: ninguno de los 475 canales del AutoLog lo es (el unico parecido por nombre es Ambient Light Level, que es un porcentaje), asi que boost_relativo y relacion_de_presiones referenciaban Barometric Pressure, inexistente, y no se podrian evaluar. No las quito -- son de SS4.5 y en otro log el canal si estara -- sino que declaran requiere_referencia = presion_atmosferica, o sea que el segundo operando sale de la referencia de docs/01 SS1.9. En el DATO y no solo en un comentario, porque quien instancie la formula tiene que saber que le falta un operando ANTES de intentarlo. Comprobado por mutacion: borrar ese campo pone la prueba en rojo. Tambien hay una prueba de que ninguna formula cablea el 14,7 (con E85 son ~9,77 y el AFR saldria un 50 % alto), y otra de que los roles que declaran existen en roles.toml. 1340 pruebas pasan en el arbol; los 2 fallos son los preexistentes del PEP 695. Sin ejecutar: verificar.sh completo y las 20 suites de numpy/polars."
+        }
+      ],
+      "base": "1adaff6"
     },
     {
       "id": "F3-20",

@@ -1,0 +1,229 @@
+#  DataLogViewer — biblioteca de fórmulas de canal derivado
+#
+#  Tarea F3-19.  Especificación: docs/04-perfiles-motorsport.md §4.5.
+#  PUERTA G1: cada entrada declara una CLASE DE MAGNITUD, y una clase equivocada
+#  produce un número plausible con la escala o el origen mal. No se cambia una
+#  entrada sin que una persona compruebe su clase contra la tabla de abajo.
+#
+#  PARA QUÉ SIRVE ESTE FICHERO
+#  ===========================
+#  `dlv_core/expresiones.py` (F3-18) sabe EVALUAR una fórmula, pero no sabe
+#  ninguna. Estas son las de §4.5, y viven en `data/` y no en el código por lo
+#  mismo que `casos_de_unidades.toml`: un tuner puede auditar una columna de
+#  fórmulas, y nadie va a auditar cadenas enterradas en un módulo. Añadir una
+#  fórmula a la biblioteca no es escribir código.
+#
+#  LO QUE DE VERDAD HAY QUE REVISAR AQUÍ: LA CLASE
+#  ==============================================
+#  El resultado de una fórmula NO hereda la clase de sus operandos. Es la decisión
+#  que este fichero existe para hacer explícita, y la que produce la trampa del
+#  delta cuando se deja implícita:
+#
+#    PUNTO      un valor absoluto en la escala del canal. Se convierte con el
+#               desplazamiento de origen completo (`a·x + b`).
+#    INTERVALO  una DIFERENCIA entre dos valores de la misma magnitud. Solo la
+#               parte lineal (`a·x`): un Δ de 10 K son 10 °C, nunca −263,15 °C.
+#    TASA       una magnitud por unidad de tiempo, o un cociente de dos
+#               magnitudes distintas. Solo la parte lineal.
+#    VARIANZA   una dispersión. Escala con el cuadrado del factor.
+#
+#  La regla que decide, y que es la única cosa que hay que tener en la cabeza al
+#  leer este fichero: **si la fórmula es una resta de dos valores de la MISMA
+#  dimensión, el resultado es un INTERVALO**. Si es una división, o una resta de
+#  dimensiones distintas, no es un punto de esa dimensión y hay que decir qué es.
+#
+#  Cuatro de las fórmulas de este fichero son restas, y tres de esas cuatro son
+#  intervalos. La cuarta —«λ error»— NO lo es, y ese caso es el que justifica todo
+#  este fichero: se escribe como una resta (`a/b − 1`), pero lo que resta es un
+#  cociente adimensional menos un número, así que el resultado es una RAZÓN, y su
+#  dimensión no es la de ningún operando.
+#
+#  SINTAXIS
+#  ========
+#  Un canal va entre llaves: `{Manifold Pressure}`. Un canal de OTRO log lleva
+#  sufijo: `{RPM}@logB`. Los valores son siempre CANÓNICOS (docs/06): kPa
+#  absolutos, K, lambda, fracción, rpm, km/h, grados, V, s. Una fórmula escrita
+#  pensando en la unidad mostrada es un defecto: `{Coolant Temperature} - 90` son
+#  90 kelvin, no 90 °C.
+#
+#  `roles` nombra los ROLES semánticos que la fórmula necesita, no los canales:
+#  es lo que permite que la misma fórmula funcione en un log de otro fabricante.
+#  Los nombres de canal de `formula` son los de Haltech y valen como valor por
+#  omisión; el asistente de importación los sustituye por los del log real.
+
+[meta]
+version = 1
+tarea = "F3-19"
+especificacion = "docs/04-perfiles-motorsport.md §4.5"
+evaluador = "dlv_core/expresiones.py (F3-18)"
+clases = ["punto", "intervalo", "tasa", "varianza"]
+
+# =========================================================================== #
+#  MEZCLA
+# =========================================================================== #
+
+[[formula]]
+id = "error_lambda"
+etiqueta = "Error de λ"
+formula = "{Wideband O2 1} / {Target Lambda} - 1"
+clase = "punto"
+dimension = "ratio"
+roles = ["lambda_measured", "lambda_target"]
+# LA ENTRADA QUE JUSTIFICA ESTE FICHERO. Se escribe con un `-`, así que la
+# tentación es marcarla INTERVALO; no lo es. `{medida}/{objetivo}` ya es
+# adimensional —lambda entre lambda—, y restarle 1 solo desplaza el cero para que
+# «sin error» sea 0 en vez de 1. El resultado es una RAZÓN y es un PUNTO de la
+# dimensión `ratio`: en tanto por ciento, +5 % significa 5 % más pobre que el
+# objetivo, y ese 5 % se convierte multiplicando por 100, no como un intervalo de
+# lambda. Marcarla INTERVALO de `mixture_ratio` daría un número con las unidades
+# de lambda y sin sentido.
+nota = "es el canal central del perfil P1 (docs/04 §4.2)"
+
+[[formula]]
+id = "afr"
+etiqueta = "AFR"
+formula = "{Wideband O2 1} * {Fuel Tuning Current Stoichiometry}"
+clase = "punto"
+dimension = "mixture_ratio"
+roles = ["lambda_measured", "stoichiometry"]
+# Un producto, no una resta: PUNTO sin discusión. Lo que importa aquí es de dónde
+# sale la estequiometría: del CANAL del log, no de un 14,7 escrito en la fórmula.
+# El log del propietario declara 14,7 en `Fuel Tuning Current Stoichiometry`, pero
+# con E85 son ~9,77 y una fórmula con el 14,7 dentro daría un AFR un 50 % alto sin
+# que nada avisase. Ver `units.toml`, unidad `afr`, `parametro_rol`.
+nota = "la estequiometría es un canal, nunca una constante de la fórmula"
+
+# =========================================================================== #
+#  PRESIÓN Y TURBO
+# =========================================================================== #
+
+[[formula]]
+id = "boost_relativo"
+etiqueta = "Presión de boost relativa"
+formula = "{Manifold Pressure} - {Barometric Pressure}"
+clase = "intervalo"
+dimension = "pressure"
+roles = ["manifold_pressure", "baro_pressure"]
+requiere_referencia = "presion_atmosferica"
+# Resta de dos presiones absolutas: INTERVALO. Es el caso de libro, y el que hace
+# visible por qué la clase importa. Como PUNTO de `pressure`, convertir a psi
+# aplicaría el desplazamiento de origen y un boost de 0 kPa (motor parado)
+# aparecería como −14,7 psi en vez de 0.
+#
+# EL BARÓMETRO NO ESTÁ EN EL LOG DEL PROPIETARIO. Medido: ninguno de los 475
+# canales del AutoLog es una presión atmosférica —el único que se le parece por
+# nombre es `Ambient Light Level`, que es un porcentaje—. Así que esta fórmula
+# NO se puede evaluar con dos canales en ese log, y de ahí
+# `requiere_referencia = "presion_atmosferica"`: el segundo operando sale de la
+# referencia de `docs/01` §1.9, que es una decisión del propietario y no de esta
+# fórmula. Ver `admite_referencia` en `units.toml`.
+#
+# Se declara en el dato y no solo en un comentario porque quien instancie la
+# fórmula tiene que saber que le falta un operando ANTES de intentarlo: sin ese
+# campo, el fallo aparece al evaluar, con un canal no encontrado y sin decir que
+# hay un camino alternativo.
+nota = "docs/06 §6.6: el cambio de origen es un parámetro de la conversión, no una unidad"
+
+[[formula]]
+id = "relacion_de_presiones"
+etiqueta = "Relación de presiones"
+formula = "{Manifold Pressure} / {Barometric Pressure}"
+clase = "tasa"
+dimension = "ratio"
+roles = ["manifold_pressure", "baro_pressure"]
+requiere_referencia = "presion_atmosferica"
+# Cociente de dos presiones: adimensional, y TASA porque no es un valor absoluto
+# de ninguna dimensión con origen. Es la carga que ve el turbo, y a 1,0 significa
+# atmosférica. No se puede marcar PUNTO de `pressure`: no está en kPa.
+nota = "1,0 es atmosférica; en el AutoLog llega a 2,1 (213 kPa sobre ~101)"
+
+[[formula]]
+id = "error_de_boost"
+etiqueta = "Error de boost"
+formula = "{Boost Control Actual Pressure} - {Boost Control Target Pressure}"
+clase = "intervalo"
+dimension = "pressure"
+roles = ["boost_pressure_actual", "boost_pressure_target"]
+# Resta de dos presiones: INTERVALO, mismo motivo que `boost_relativo`. Es la
+# entrada de las métricas de PID de F4-09, y ahí el signo importa: positivo es
+# sobrepresión.
+nota = "entrada de F4-09; el signo es actual menos objetivo, o sea positivo = pasado de boost"
+
+# =========================================================================== #
+#  TRACCIÓN
+# =========================================================================== #
+
+[[formula]]
+id = "deslizamiento"
+etiqueta = "Deslizamiento"
+formula = "{Driven Wheel Speed} - {Vehicle Speed}"
+clase = "intervalo"
+dimension = "speed"
+roles = ["driven_wheel_speed", "vehicle_speed"]
+# Resta de dos velocidades: INTERVALO. `speed` no tiene desplazamiento de origen,
+# así que aquí PUNTO e INTERVALO darían el mismo número en km/h y en mph — y por
+# eso conviene decir que la clase se declara por lo que la magnitud ES, no por si
+# se nota. En nudos también coincidirían; en cuanto alguien añada una unidad de
+# velocidad con origen desplazado, dejaría de coincidir, y entonces sería tarde.
+nota = "en un GT-R la tracción total hace que el deslizamiento útil sea entre ejes"
+
+# =========================================================================== #
+#  COMPARACIÓN ENTRE LOGS
+# =========================================================================== #
+
+[[formula]]
+id = "delta_entre_logs"
+etiqueta = "Δ entre logs"
+formula = "{Manifold Pressure} - {Manifold Pressure}@logB"
+clase = "intervalo"
+dimension = "pressure"
+roles = ["manifold_pressure"]
+# El mismo canal en dos logs. Es una resta de la misma dimensión: INTERVALO.
+# La dimensión de la plantilla es `pressure` porque el ejemplo lo es, pero esta
+# fórmula es una PLANTILLA: la dimensión y la clase salen del canal que se
+# sustituya, y quien la instancie tiene que recalcularlas. Con un canal de
+# temperatura, sigue siendo INTERVALO —y ahí sí se nota: un Δ de 10 K son 10 °C—;
+# con lambda medido contra lambda medido también.
+#
+# Requiere que los dos logs estén alineados en el tiempo (F2-xx). Sin alineación
+# no es que dé un número malo: no se puede evaluar, y `expresiones.py` lo dice.
+plantilla = true
+nota = "requiere alineación entre logs; la dimensión sale del canal sustituido"
+
+# =========================================================================== #
+#  LO QUE NO ESTÁ AQUÍ, Y POR QUÉ
+# =========================================================================== #
+#  La tabla de §4.5 tiene una fila más, «Marcha estimada», y NO es una fórmula:
+#  es una agrupación estadística sobre todo el log, no una expresión que se
+#  evalúe muestra a muestra. Vive en `dlv_core/marcha.py` (F3-20) con sus propios
+#  umbrales en `[marcha]` de `data/umbrales.toml`.
+#
+#  Ponerla aquí habría exigido que el evaluador supiera hacer histogramas, y eso
+#  convierte una lista blanca de nodos de AST en un lenguaje. La frontera es esa:
+#  en este fichero cabe lo que se calcula con la muestra de ese instante y las
+#  constantes; lo que necesita ver el log entero es un módulo.
+
+[[fuera_de_biblioteca]]
+id = "marcha_estimada"
+donde = "dlv_core/marcha.py (F3-20)"
+motivo = "es una agrupación sobre todo el log, no una expresión por muestra"
+
+[[fuera_de_biblioteca]]
+id = "delta_knock"
+donde = "dlv_core/primitivas.py:delta_de_contador (F3-06)"
+motivo = """
+un delta necesita la muestra ANTERIOR, así que no es una expresión por muestra.
+Este fichero lo tuvo escrito como `delta({Knock Sensor 1 Knock Count})` hasta que
+la prueba lo compiló con el evaluador de verdad y saltó: `delta` no está en la
+lista blanca de `expresiones.py`, que solo admite `abs`, `max` y `min`. La entrada
+violaba la frontera que este mismo fichero declara tres párrafos más arriba.
+
+Añadir `delta` al evaluador habría sido lo cómodo y lo equivocado: convertiría una
+lista blanca de nodos de AST en un lenguaje con estado, y `primitivas.delta_de_contador`
+(§4.3) ya lo hace vectorizado y devolviendo `Clase.INTERVALO`.
+
+Aviso que sigue valiendo para quien lo consuma: un contador que se reinicia
+—arranque nuevo, desbordamiento de 16 bits— produce un delta grande y negativo que
+NO es detonación. Descartar los negativos es del detector D2, no del delta. Y es
+por SENSOR: con dos sensores de knock salen dos canales derivados, no uno.
+"""
