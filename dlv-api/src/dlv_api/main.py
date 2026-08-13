@@ -42,6 +42,32 @@ ADR-002): es la capa de comandos, y "abrir un fichero que me pide el
 frontend" es exactamente su trabajo. `dlv-core` sigue recibiendo bytes ya
 leídos, nunca una ruta.
 
+SONDEO DE CSV GENÉRICO (tarea FG-18)
+====================================
+Hasta FG-18 los ocho comandos de aquí eran **todos** del formato nativo de
+Haltech, así que el camino de nivel 2 de `docs/07` §7.3 —el CSV genérico, con
+su asistente de tres pasos de §7.8— existía entero en `dlv_core` (FG-01…FG-09,
+con sus pruebas) y en `dlv-ui` (FG-11) y no se podían hablar entre ellos. Los
+cuatro comandos que lo cierran:
+
+    POST /comandos/sondear-formato   delimitador, codificación, decimal y
+                                     estructura (preámbulo/nombres/unidades/
+                                     inicio de datos), más las primeras líneas
+                                     en crudo para la previsualización
+    POST /comandos/sondear-tiempo    la columna de tiempo y su clase, con el
+                                     formato YA confirmado por el usuario
+    POST /comandos/sondear-canales   tipo, unidad declarada y ROL de cada
+                                     columna, con su confianza
+    GET  /comandos/roles             `data/roles.toml`, igual que
+                                     `/comandos/unidades` sirve `units.toml`
+
+La traducción entre `dlv_core` y el JSON que espera
+`dlv-ui/src/importacion/puerto.ts` vive en `dlv_api.importacion`, que no
+importa FastAPI: ahí está documentado el porqué de cada campo, y en particular
+por qué la confianza de un rol viaja completa y no aplanada a una cadena
+(`docs/07` §7.15). Estas cuatro rutas son solo el cableado: leer la ruta que
+pide el frontend, llamar y traducir el error a un código HTTP.
+
 El descriptor de formato (`data/formats/haltech_nsp.toml`) se localiza hoy
 relativo a este fichero fuente (`_RAIZ_REPO`), que funciona en el repositorio
 de desarrollo pero no en un paquete `dlv-app` ya empaquetado (F5-01): cuando
@@ -76,6 +102,27 @@ from dlv_api.exportacion import (
     exportar_csv,
     exportar_parquet,
 )
+from dlv_api.importacion import (
+    MAX_BYTES_FICHERO,
+    ErrorDeEntrada,
+    FicheroDemasiadoGrande,
+    FicheroNoEncontrado,
+    FormatoConfirmado,
+    Muestra,
+    catalogo_roles_json,
+    formato_confirmado,
+    leer_muestra,
+    tiempo_confirmado,
+)
+from dlv_api.importacion import (
+    sondear_canales as sondear_canales_de_muestra,
+)
+from dlv_api.importacion import (
+    sondear_formato as sondear_formato_de_muestra,
+)
+from dlv_api.importacion import (
+    sondear_tiempo as sondear_tiempo_de_muestra,
+)
 from dlv_api.sesiones import (
     MAXIMO_SESIONES,
     CanalSesion,
@@ -94,6 +141,7 @@ from dlv_core.formatos.haltech import (
     parsear_cabecera,
 )
 from dlv_core.formatos.limpieza import nulificar_centinelas
+from dlv_core.formatos.unidades_declaradas import cargar_alias
 from dlv_core.informe_importacion import InformeImportacion
 from dlv_core.piramide import NivelPiramide
 from dlv_core.roles import Rol, cargar_catalogo_roles
@@ -119,6 +167,7 @@ _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
 _UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
 _ROLES_TOML = _RAIZ_REPO / "data" / "roles.toml"
 _COMBUSTIBLES_TOML = _RAIZ_REPO / "data" / "combustibles.toml"
+_ALIAS_UNIDADES_TOML = _RAIZ_REPO / "data" / "alias_unidades.toml"
 
 CABECERAS_EXPUESTAS = (
     "X-Factor",
@@ -245,6 +294,19 @@ def _catalogo_roles() -> dict[str, Rol]:
     """
     with _ROLES_TOML.open("rb") as fh:
         return cargar_catalogo_roles(fh)
+
+
+@lru_cache(maxsize=1)
+def _alias_unidades() -> dict[str, tuple[str, str]]:
+    """`data/alias_unidades.toml` (FG-06), cacheado como los demás catálogos.
+
+    Es lo que convierte el `C`, el `degC` o el `kph` que escribe un exportador
+    de CSV en un `(dimension, unidad)` de `data/units.toml`. Sin él, el sondeo
+    genérico reconoce la unidad solo cuando el fichero la escribe exactamente
+    igual que el catálogo, y todo lo demás se queda en crudo (§7.6).
+    """
+    with _ALIAS_UNIDADES_TOML.open("rb") as fh:
+        return dict(cargar_alias(fh))
 
 
 class InfoCanal(BaseModel):
@@ -955,16 +1017,267 @@ def exportar_datos(comando: ComandoExportarDatos, request: Request) -> Response:
     )
 
 
+# --------------------------------------------------------------------------- #
+# Sondeo de CSV genérico: los cuatro comandos que el asistente de importación
+# ya esperaba (FG-18; ver la sección homónima del docstring del módulo)
+# --------------------------------------------------------------------------- #
+class _Campo(BaseModel):
+    """La mitad común de `Campo<T>` de `dlv-ui/src/importacion/tipos.ts`.
+
+    El asistente NUNCA pinta un valor sin saber si viene del sondeo o de una
+    corrección del usuario, y lo consigue porque el dato mismo lleva esa marca.
+    Las peticiones de los pasos 2 y 3 devuelven al servidor los mismos objetos
+    que el paso 1 les dio, así que el servidor tiene que aceptar esta forma tal
+    cual: sin esto, el frontend tendría que desenvolver cada campo antes de
+    mandarlo y volver a envolverlo al recibirlo, y esa asimetría es la clase de
+    detalle que se implementa mal una vez y se arrastra.
+
+    `origen` se valida pero **no se lee**: es estado de la sesión de
+    importación, no un dato del fichero, y el servidor no toma ninguna decisión
+    distinta según quién eligió el delimitador (ver
+    `dlv_api.importacion.FormatoConfirmado`).
+
+    Hay cinco subclases —una por tipo de `valor`— en vez de un modelo genérico
+    `Campo[T]`. Es más largo y es deliberado: la forma genérica exige o
+    `Generic[T]`, que `ruff` marca (UP046) en un proyecto con
+    `target-version = py312`, o los parámetros de tipo de PEP 695, que es la
+    sintaxis que hoy impide comprobar `dlv_core.piramide` con la versión de
+    `mypy` del entorno. Cinco clases de dos líneas no necesitan ninguna de las
+    dos y se pueden verificar donde se escriben.
+    """
+
+    origen: Literal["deducido", "confirmado"] = "deducido"
+
+
+class CampoTexto(_Campo):
+    valor: str
+
+
+class CampoTextoOpcional(_Campo):
+    valor: str | None
+
+
+class CampoEntero(_Campo):
+    valor: int
+
+
+class CampoEnteroOpcional(_Campo):
+    valor: int | None
+
+
+class CampoDecimalOpcional(_Campo):
+    valor: float | None
+
+
+class PropuestaFormatoRecibida(BaseModel):
+    """`PropuestaFormato` de `tipos.ts` tal como la devuelve el paso 1.
+
+    Los nombres son los de TypeScript, en `camelCase`, y no los de Python: es
+    el mismo criterio que `/comandos/unidades` («la frontera entre `snake_case`
+    de Python y `camelCase` de TypeScript tiene que estar en un sitio
+    concreto, y el que serializa es el que la conoce»), aplicado también a lo
+    que se recibe, porque lo que se recibe es literalmente lo que se sirvió.
+    """
+
+    # `camelCase` a propósito: son los nombres de `PropuestaFormato` en
+    # `tipos.ts`, y este objeto es el que el paso 1 sirvió y el paso 2 devuelve
+    # sin tocar. Renombrarlos a `snake_case` obligaría al frontend a traducir
+    # una estructura que solo transporta.
+    codificacion: CampoTexto
+    delimitador: CampoTextoOpcional
+    comilla: CampoTextoOpcional
+    decimal: CampoTexto
+    filaCabecera: CampoEnteroOpcional
+    filaUnidades: CampoEnteroOpcional
+    filaDatos: CampoEntero
+
+
+class PropuestaTiempoRecibida(BaseModel):
+    """`PropuestaTiempo` de `tipos.ts` tal como la devuelve el paso 2."""
+
+    clase: CampoTexto
+    columna: CampoEnteroOpcional
+    columnaFecha: CampoEnteroOpcional
+    frecuenciaHz: CampoDecimalOpcional
+    # `factorASegundos` es el único campo de `PropuestaTiempo` que NO es un
+    # `Campo<T>`: no lo edita el usuario, lo determina la clase de tiempo. Trae
+    # valor por omisión porque el servidor no lo lee —vuelve a salir del sondeo
+    # de FG-04— y exigirlo obligaría al frontend a devolver un dato que ya
+    # tenemos.
+    factorASegundos: float = 1.0
+
+
+class ComandoSondearFormato(BaseModel):
+    """Cuerpo de `/comandos/sondear-formato`: qué fichero sondear."""
+
+    ruta: str
+
+
+class ComandoSondearTiempo(BaseModel):
+    """Cuerpo de `/comandos/sondear-tiempo`: el fichero y el formato confirmado."""
+
+    ruta: str
+    formato: PropuestaFormatoRecibida
+
+
+class ComandoSondearCanales(BaseModel):
+    """Cuerpo de `/comandos/sondear-canales`: el fichero, el formato y el tiempo."""
+
+    ruta: str
+    formato: PropuestaFormatoRecibida
+    tiempo: PropuestaTiempoRecibida
+
+
+def _error_http(e: ErrorDeEntrada) -> HTTPException:
+    """El código HTTP de cada forma de rechazar una entrada de sondeo.
+
+    404 no existe, 413 demasiado grande, 422 el resto (no es un CSV
+    reconocible, o los índices de fila que manda el cliente no cuadran con el
+    fichero). El mensaje de `dlv-core` se conserva íntegro porque suele decir
+    qué hay que elegir en el asistente, y eso es lo que el usuario tiene que
+    leer; un `detail` genérico obligaría a mirar los registros del servidor
+    para averiguar qué falla en el fichero de uno.
+    """
+    if isinstance(e, FicheroNoEncontrado):
+        return HTTPException(status_code=404, detail=str(e))
+    if isinstance(e, FicheroDemasiadoGrande):
+        # 413 y no 422: la petición está bien formada y lo que sobra es el
+        # fichero. Es el código que el frontend puede distinguir para decir
+        # «este fichero es demasiado grande» en vez de «no se reconoce».
+        return HTTPException(status_code=413, detail=str(e))
+    return HTTPException(status_code=422, detail=str(e))
+
+
+def _muestra_de(ruta_pedida: str, request: Request) -> Muestra:
+    """Los primeros 64 kB del fichero que pide el frontend, o el error HTTP.
+
+    Es el único punto de estas cuatro rutas que toca el disco (ADR-002: a
+    `dlv-core` le llegan bytes). El tope de tamaño sale de `app.state` para que
+    una prueba pueda bajarlo sin escribir medio gigabyte en el disco.
+    """
+    try:
+        return leer_muestra(
+            Path(ruta_pedida), max_bytes_fichero=request.app.state.max_bytes_fichero
+        )
+    except ErrorDeEntrada as e:
+        raise _error_http(e) from e
+
+
+def _formato_de(propuesta: PropuestaFormatoRecibida) -> FormatoConfirmado:
+    try:
+        return formato_confirmado(
+            codificacion=propuesta.codificacion.valor,
+            delimitador=propuesta.delimitador.valor,
+            comilla=propuesta.comilla.valor,
+            decimal=propuesta.decimal.valor,
+            fila_cabecera=propuesta.filaCabecera.valor,
+            fila_unidades=propuesta.filaUnidades.valor,
+            fila_datos=propuesta.filaDatos.valor,
+        )
+    except ErrorDeEntrada as e:
+        raise _error_http(e) from e
+
+
+def sondear_formato(comando: ComandoSondearFormato, request: Request) -> dict[str, object]:
+    """Paso 1 del asistente de §7.8: delimitador, codificación, decimal y estructura.
+
+    Es `puerto.ts#sondearFormato`. Encadena FG-01, FG-02 y FG-03 sobre los
+    primeros 64 kB del fichero y devuelve la propuesta junto con las primeras
+    líneas EN CRUDO, que es lo que el paso 1 reparte de nuevo en el cliente
+    cada vez que el usuario toca un desplegable, sin volver a preguntar.
+
+    Que un CSV de una sola columna salga con `delimitador: null` y un 200 no es
+    un fallo: §7.4 lo dice explícitamente y `PropuestaFormato.delimitador` está
+    declarado nulable por eso. Lo que da 422 es un fichero en el que no se
+    reconoce ninguna fila de datos, o sea «esto no es una tabla».
+    """
+    muestra = _muestra_de(comando.ruta, request)
+    try:
+        return sondear_formato_de_muestra(muestra)
+    except ErrorDeEntrada as e:
+        raise _error_http(e) from e
+
+
+def sondear_tiempo(comando: ComandoSondearTiempo, request: Request) -> dict[str, object]:
+    """Paso 2 del asistente: la columna de tiempo y su clase (FG-04).
+
+    Es `puerto.ts#sondearTiempo`. Recibe el formato que el usuario confirmó en
+    el paso 1 y **lo obedece** en vez de volver a deducirlo (ver
+    `dlv_api.importacion._estado`).
+    """
+    muestra = _muestra_de(comando.ruta, request)
+    formato = _formato_de(comando.formato)
+    try:
+        return sondear_tiempo_de_muestra(muestra, formato)
+    except ErrorDeEntrada as e:
+        raise _error_http(e) from e
+
+
+def sondear_canales(comando: ComandoSondearCanales, request: Request) -> dict[str, object]:
+    """Paso 3 del asistente: tipo, unidad declarada y rol de cada columna.
+
+    Es `puerto.ts#sondearCanales`, y encadena FG-05, FG-06 y FG-09. El rol
+    viaja con su `confianza` (`EXACTA`/`INDEXADA`/`DIFUSA`), el sinónimo que lo
+    disparó, el índice capturado y el parecido: `docs/07` §7.15 exige
+    desactivar los detectores críticos cuando el rol viene de una difusa sin
+    confirmar, y con un `rol: "coolant_temp"` pelado esa mitigación no se puede
+    implementar (ver `dlv_api.importacion._rol_json`).
+    """
+    muestra = _muestra_de(comando.ruta, request)
+    formato = _formato_de(comando.formato)
+    try:
+        tiempo = tiempo_confirmado(
+            clase=comando.tiempo.clase.valor,
+            columna=comando.tiempo.columna.valor,
+            columna_fecha=comando.tiempo.columnaFecha.valor,
+            frecuencia_hz=comando.tiempo.frecuenciaHz.valor,
+        )
+        return sondear_canales_de_muestra(
+            muestra,
+            formato,
+            tiempo,
+            catalogo=_catalogo_unidades(),
+            alias=_alias_unidades(),
+            catalogo_roles=_catalogo_roles(),
+        )
+    except ErrorDeEntrada as e:
+        raise _error_http(e) from e
+
+
+def catalogo_roles() -> list[dict[str, object]]:
+    """`data/roles.toml` para el frontend: `puerto.ts#catalogoRoles`.
+
+    JSON y no binario por el mismo motivo que `/comandos/unidades`: ADR-007
+    prohíbe mandar **series** en JSON, y esto son 58 entradas de catálogo, o
+    sea kilobytes de metadatos, que es justo el caso para el que el ADR reserva
+    JSON.
+
+    Se devuelve un array desnudo y no un objeto con la lista dentro, a
+    diferencia de `/comandos/unidades`, porque el consumidor está ya escrito y
+    declarado: `catalogoRoles(): Promise<readonly RolDeCatalogo[]>`. Envolverlo
+    obligaría a cambiar una interfaz que ya tiene pruebas por una preferencia
+    de forma.
+    """
+    return catalogo_roles_json(_catalogo_roles())
+
+
 def crear_app(
     *,
     token_sesion: str,
     dir_cache: Path | None = None,
     maximo_sesiones: int = MAXIMO_SESIONES,
+    max_bytes_fichero: int = MAX_BYTES_FICHERO,
 ) -> FastAPI:
     """Construye la app de FastAPI.
 
     `token_sesion` se guarda en `app.state` para que los endpoints
     autenticados puedan comprobarlo; `/salud` no lo requiere.
+
+    `max_bytes_fichero` es el tope de tamaño de los ficheros que las rutas de
+    sondeo genérico aceptan mirar. Es un parámetro y no una constante cableada
+    porque no es un umbral de física —el porqué está en
+    `dlv_api.importacion.MAX_BYTES_FICHERO`— y porque así una prueba puede
+    bajarlo a unos bytes en vez de escribir medio gigabyte en el disco.
 
     `dir_cache` es dónde se escriben los `.dlvcache` (ADR-005); `None` usa
     `directorio_cache_por_omision()`. Se puede fijar aquí, y no solo por
@@ -1013,6 +1326,7 @@ def crear_app(
         expose_headers=[*CABECERAS_EXPUESTAS, "Content-Disposition"],
     )
     app.state.token_sesion = token_sesion
+    app.state.max_bytes_fichero = max_bytes_fichero
     app.state.registro_sesiones = RegistroSesiones(
         descriptor=_descriptor_haltech(),
         catalogo=_catalogo_unidades(),
@@ -1072,6 +1386,38 @@ def crear_app(
         "/comandos/exportar-datos",
         exportar_datos,
         methods=["POST"],
+        dependencies=[Depends(verificar_token)],
+    )
+    # Los cuatro del sondeo de CSV genérico (FG-18). Con token como los demás:
+    # las tres primeras leen un fichero que elige el usuario, y `/comandos/roles`
+    # sirve un catálogo de `data/`, igual que `/comandos/unidades`. No declaran
+    # `response_model` por el mismo motivo que `/comandos/unidades`: la forma la
+    # fija `dlv-ui/src/importacion/puerto.ts` en TypeScript, y duplicarla aquí en
+    # Pydantic crearía dos declaraciones del mismo contrato que habría que
+    # cambiar a la vez. Lo que la vigila son las pruebas de
+    # `test_importacion_generica.py`, que comparan campo por campo.
+    app.add_api_route(
+        "/comandos/sondear-formato",
+        sondear_formato,
+        methods=["POST"],
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/sondear-tiempo",
+        sondear_tiempo,
+        methods=["POST"],
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/sondear-canales",
+        sondear_canales,
+        methods=["POST"],
+        dependencies=[Depends(verificar_token)],
+    )
+    app.add_api_route(
+        "/comandos/roles",
+        catalogo_roles,
+        methods=["GET"],
         dependencies=[Depends(verificar_token)],
     )
     return app

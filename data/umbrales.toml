@@ -354,6 +354,183 @@ maximo_de_eventos = 10000
 ventana_pico_s = 0.5
 
 # =========================================================================== #
+#  SEGMENTACIÓN AUTOMÁTICA  (F3-16 · docs/04 §4.4)
+# =========================================================================== #
+#  Los tramos en los que el motor está haciendo UNA cosa reconocible: arranque,
+#  plena carga (WOT), deceleración, ralentí y crucero. Los consume
+#  dlv_core/segmentacion.py, que no lleva ni un valor por omisión en el código.
+#
+#  LAS CINCO CLASES SON EXCLUYENTES, Y ESO OBLIGA A QUE LOS UMBRALES ENCAJEN
+#  ------------------------------------------------------------------------
+#  Un instante está en un segmento o está fuera con un motivo, así que estos
+#  números no son independientes entre sí: el techo del ralentí es también la
+#  salida de la histéresis de la deceleración, y el umbral de WOT es también el
+#  techo de la banda de crucero. `UmbralesDeSegmentacion.__post_init__` comprueba
+#  las relaciones y falla con el nombre de la clave, no con un mensaje de la
+#  primitiva: cambiar uno de estos valores sin mirar los de al lado abre un hueco
+#  o un solape, y el módulo lo dice antes de segmentar nada.
+#
+#  DE DÓNDE SALEN LOS NÚMEROS
+#  --------------------------
+#  Tres son literales de §4.4 (500 rpm, 2 000 rpm, 80 % de mariposa y la duración
+#  mínima de 1,5 s de una tirada). Los demás están MEDIDOS sobre samples/real/ y
+#  cada uno dice sobre qué. Lo que se midió, para poder repetirlo:
+#    AutoLog_20260729_1830.csv  2 636 filas, 245,1 s, dt p50 54 ms / p99 219 ms
+#      régimen  412 … 7 007 rpm     mariposa  0,000 … 1,000 (cuantización 0,001)
+#      mariposa cerrada (<= 2 %) en 988 filas; exactamente 0 en 904
+#      meseta de ralentí de los primeros 37 s: 909 … 993 rpm, vehículo parado
+#      cuatro tramos con mariposa >= 80 %: 3,18 s, 2,06 s, 0,37 s y 1,29 s
+#    20260729_1859_Log2768/2769  mariposa máxima 0,558 y 0,569: NO tienen WOT
+
+[segmentacion]
+# Por debajo de este régimen el motor no gira: el instante no es de ninguna clase
+# y se cuenta como MOTOR_PARADO. Un motor de arranque gira un motor caliente a
+# 150-300 rpm, así que 50 rpm es un tercio del arranque más lento y sigue estando
+# 50 veces por encima de la resolución del canal (1 rpm, tipo EngineSpeed).
+#
+# Es el único de esta sección que NO se puede contrastar con los logs reales: el
+# régimen mínimo de los tres es 412 rpm, así que ninguna muestra del corpus cae
+# por debajo y lo único que dice el dato es que el umbral no parte ningún tramo
+# existente. Si algún día hay un log con el motor parado, este es el número que
+# hay que volver a mirar.
+rpm_arranque_min = 50.0
+
+# Régimen a partir del cual el motor se sostiene solo. §4.4 lo escribe como «RPM
+# de 0 a > 500» para el arranque, y es el mismo número con el que
+# [detectores.D11].condiciones.engine_speed_min decide que el motor está en
+# marcha. Que sean el mismo no es casualidad ni copia: es la misma frontera
+# física, y si un día se separan, la segmentación diría que el motor arranca
+# mientras D11 ya lo considera en marcha.
+rpm_motor_en_marcha = 500.0
+
+# Techo de la banda de ralentí, y umbral de SALIDA de la deceleración.
+#
+# Medido: la meseta de ralentí del AutoLog (los primeros 37 s, vehículo parado y
+# mariposa cerrada) está entre 909 y 993 rpm, y la mediana del régimen con
+# mariposa cerrada en todo el log es 1 032 rpm. 1 400 son ~1,45 veces esa meseta:
+# deja sitio al idle-up del ventilador y del aire acondicionado (§4.2 P6 lista
+# `Thermofan 1 Idle Up Active` y `Air Con Idle Up Active`) y a un ralentí en frío,
+# sin llegar a los 2 000 rpm con los que §4.4 define la deceleración.
+rpm_ralenti_max = 1400.0
+
+# Régimen por encima del cual la mariposa cerrada es una deceleración y no un
+# ralentí. Literal de §4.4: «TPS ≈ 0 con RPM > 2000».
+rpm_decel_min = 2000.0
+
+# Pendiente MEDIA mínima del régimen para que un tramo de mariposa abierta sea una
+# tirada, en rpm por segundo. Es el «RPM creciente durante > 1,5 s» de §4.4, y se
+# aplica al tramo entero y no muestra a muestra: un cambio de marcha a mariposa
+# abierta invierte la derivada instantánea y partiría la tirada en dos trozos que
+# la duración mínima descartaría (ocurre de verdad en la segunda tirada del
+# AutoLog, con la derivada en −1 238 rpm/s durante tres muestras).
+#
+# Medido: las cuatro tiradas del AutoLog tienen pendientes medias de 744, 305, 349
+# y 193 rpm/s, así que 100 rpm/s las acepta todas con un factor 1,9 de margen sobre
+# la más lenta. Por abajo, el ruido de la pendiente media sobre 1,5 s es menor que
+# 1 rpm/s (la resolución del canal es 1 rpm), así que el umbral está dos órdenes
+# de magnitud por encima del ruido. Lo que rechaza es lo que tiene que rechazar:
+# un mantenido a plena carga en banco, con el régimen plano, da ~0 rpm/s.
+rpm_creciente_min_por_s = 100.0
+
+# Cuánto puede moverse el régimen para que el tramo se considere estacionario
+# (crucero), en rpm por segundo y sobre `ventana_derivada_s`.
+#
+# Derivado del uso: un tramo de crucero es el que alimenta la tabla RPM×MAP de
+# §4.6, así que la muestra tiene que quedarse en su celda mientras se mide. Con
+# 300 rpm/s y una ventana de 0,25 s, el punto de operación se mueve 75 rpm, menos
+# de la quinta parte de una columna de una tabla de 16 columnas sobre el rango del
+# AutoLog (412 … 7 007 rpm son 412 rpm por columna).
+#
+# Medido, para saber cuánto log deja fuera: |d régimen/dt| <= 300 rpm/s en el
+# 64,5 % de las muestras del AutoLog (un log de carretera, con mucho transitorio),
+# el 99,3 % de Log2768 y el 72,9 % de Log2769.
+rpm_estable_max_por_s = 300.0
+
+# Mariposa CERRADA («TPS ≈ 0» de §4.4), en FRACCIÓN y no en porcentaje: la
+# canónica de `ratio` es la fracción (data/units.toml).
+#
+# Medido: la mariposa del AutoLog en reposo lee exactamente 0,000 en 904 de sus
+# 2 636 filas, y su cuantización es 0,001 (1 000 crudo = 100 %). El 2 % son 20
+# cuentas de margen para un sensor cuyo cero se desplaza con el uso, que es lo que
+# de verdad pasa: un TPS recalibrado se queda en 0,3 o 0,5 % en reposo. Con el
+# umbral en 2 % hay 988 filas cerradas, 84 más que con el cero exacto.
+tps_cerrada_entrada = 0.02
+
+# Y a cuánto hay que volver para dejar de considerarla cerrada. La histéresis va
+# en canónica y no como fracción del umbral: `umbral_con_histeresis` no acepta
+# fracciones y explica por qué (el 2 % de un umbral depende de la unidad en la que
+# se mire).
+#
+# 3 puntos porcentuales por encima de la entrada. Medido: entre el 2 % y el 5 % de
+# mariposa hay 177 filas del AutoLog, que son aperturas de verdad y no ruido; y el
+# 5 % está por debajo de la mediana de mariposa del log (7,9 %), así que una
+# mariposa realmente abierta sale de «cerrada» sin dudarlo.
+tps_cerrada_salida = 0.05
+
+# Mariposa que abre una tirada. Literal de §4.4: «TPS > 80 %». Es también el techo
+# de la banda de crucero, así que «carga parcial» es exactamente «ni cerrada ni a
+# fondo» y no un tercer criterio que se pudiera desincronizar de este.
+tps_wot_entrada = 0.80
+
+# Y a cuánto hay que bajar para cerrar la tirada. 5 puntos porcentuales, que son
+# 50 veces la cuantización del canal.
+#
+# Medido, y es la mejor evidencia de para qué sirve una histéresis: con el umbral
+# desnudo, las cuatro tiradas del AutoLog duran 3,18 / 2,06 / 0,37 / 1,29 s, y la
+# cuarta se queda por debajo de la duración mínima de 1,5 s. Con la histéresis
+# 0,80/0,75 duran 3,18 / 2,10 / 0,40 / 1,66 s y la cuarta pasa a ser una tirada.
+# La diferencia entre encontrar tres tiradas y encontrar dos es este número.
+tps_wot_salida = 0.75
+
+# Ventana de la derivada del régimen con la que se juzga si el tramo es
+# estacionario. Sale de aquí y no de [motor_de_deteccion] porque es una decisión
+# de esta segmentación: el motor de detectores no deriva nada por su cuenta.
+#
+# El dt p99 del AutoLog es 219 ms (docs/01 §1.7), así que una ventana de 250 ms
+# contiene al menos una muestra anterior en el 99 % de las muestras. Medido: 15 de
+# 2 636 muestras (0,6 %) se quedan sin ventana y salen como hueco, que es lo
+# honesto. Con una ventana más corta ese porcentaje crece deprisa, y con una mucho
+# más larga la derivada dejaría de ver el transitorio que tiene que ver.
+ventana_derivada_s = 0.25
+
+# Duración mínima de un segmento, por clase y en segundos. Se aplica con
+# `Permanencia.fusionar`, así que el mínimo de muestras de [general] se sigue
+# exigiendo además de esta duración (las dos condiciones a la vez, §4.3).
+#
+# Las cinco claves son obligatorias: una clase sin duración mínima tendría que
+# traer un valor por omisión en el código, y eso es lo que esta sección existe
+# para evitar. Un nombre de clase que no exista es un error, no una clave
+# ignorada.
+[segmentacion.duracion_minima_s]
+# Literal de §4.4: «TPS > 80 % y RPM creciente durante > 1,5 s».
+wot = 1.5
+
+# Medido: las dos caídas de régimen del AutoLog que entran en la banda de arranque
+# sin ser un arranque —tirones de embrague, de 1 186 a 412 rpm y de 1 275 a
+# 471 rpm— duran 0,17 s y 0,15 s dentro de la banda. Medio segundo las descarta
+# con un factor 3 de margen, y sigue siendo menos de lo que tarda en prender un
+# motor de verdad: un arranque en caliente son 0,5-1 s de motor de arranque.
+arranque = 0.5
+
+# Un levantamiento de pie entre dos cambios de marcha dura 0,2-0,3 s y es un
+# transitorio, no una deceleración. Medido: las retenciones de verdad del AutoLog
+# —mariposa cerrada por encima de 2 000 rpm— duran 0,58, 0,99, 1,01 y 2,66 s, así
+# que 0,5 s separa unas de otras sin quedarse al filo de ninguna.
+deceleracion = 0.5
+
+# La escala del propio lazo de ralentí (§4.2 P6 mide «tiempo de recuperación tras
+# carga»). Medido: los pasos momentáneos por la banda de ralentí durante una
+# retención que sigue bajando duran 0,85 s como mucho en el AutoLog, así que 1 s
+# los descarta; los ralentíes de verdad del log duran 37,0 s, 7,5 s, 3,9 s y 2,5 s.
+ralenti = 1.0
+
+# Derivado del uso, como `rpm_estable_max_por_s`: un crucero sirve para llenar la
+# tabla RPM×MAP, y §4.6 no rellena una celda con menos de 20 muestras. A la tasa
+# media efectiva del AutoLog (10,75 Hz, docs/01 §1.7) 2 s son 21 muestras, así que
+# un tramo más corto que este no puede completar ni una celda por sí solo.
+crucero = 2.0
+
+# =========================================================================== #
 #  INFORME DE PLAUSIBILIDAD  (FG-10 · docs/07 §7.7, docs/09 §9.9 escalón 2)
 # =========================================================================== #
 #  No es un detector: no mira el motor, mira la IMPORTACIÓN. Compara los valores

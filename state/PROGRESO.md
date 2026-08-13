@@ -4,17 +4,17 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-13 07:05:42Z
+Actualizado: 2026-08-13 13:00:27Z
 
-**282 / 775 pts cerrados (36.4 %)** · 128 pts esperando revisión humana → 52.9 % entregado
+**296 / 775 pts cerrados (38.2 %)** · 128 pts esperando revisión humana → 54.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
-| FG | 35 | 48 | 0 | 15 | 0 | 98 |
+| FG | 41 | 48 | 0 | 9 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 8 | 10 | 8 | 89 | 3 | 118 |
+| F3 | 16 | 10 | 8 | 81 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
@@ -125,7 +125,7 @@ Actualizado: 2026-08-13 07:05:42Z
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 | ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | `db56e94` |
 
-## FG — 83/98 pts
+## FG — 89/98 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -146,7 +146,7 @@ Actualizado: 2026-08-13 07:05:42Z
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `599596b` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | `d1f559d` |
-| ·  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | — |
+| ✔  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | — |
 
 ## F2 — 21/80 pts
 
@@ -169,7 +169,7 @@ Actualizado: 2026-08-13 07:05:42Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 18/118 pts
+## F3 — 26/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -188,7 +188,7 @@ Actualizado: 2026-08-13 07:05:42Z
 | ▶  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | — |
 | ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
-| ·  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | — |
+| ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | — |
 | ·  | `F3-17` | Panel de tiradas con resumen y superposición entre tiradas | Sonnet 5 | 5 | F3-16, F2-12 | G3 | — |
 | ✔  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | `372edba` |
 | ·  | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | — |

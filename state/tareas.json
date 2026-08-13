@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 07:05:42Z"
+    "actualizado": "2026-08-13 13:00:27Z"
   },
   "tareas": [
     {
@@ -2271,10 +2271,16 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-13 12:59:35Z",
+          "texto": "dlv_api/importacion.py + 4 rutas nuevas en main.py: sondear-formato, sondear-tiempo, sondear-canales y /comandos/roles (que sirve roles.toml como /comandos/unidades sirve units.toml). Desbloquea FG-11, que estaba terminado y sin poder funcionar. LO QUE MAS ME IMPORTABA VERIFICAR, y esta bien resuelto: el agente reparto las pruebas en DOS ficheros a proposito. test_importacion_generica.py prueba la logica pura sin TestClient (46 pruebas, pasan aqui) y test_sondeo_generico_http.py va detras de importorskip('fastapi.testclient') (1 skipped). Su razonamiento, escrito en la cabecera: si todo estuviera detras del importorskip, un entorno sin FastAPI daria 'todo skipped', que es indistinguible de verde. Es exactamente la trampa que docs/09 SS9.10 ya tiene registrada ('fiarse del informe de un agente: decia verde y pytest solo recogia 4 pruebas'). LIMITE HONESTO DE ESTA ENTREGA: en este contenedor NO hay fastapi (PyPI da 403), asi que LA CAPA HTTP NO ESTA EJERCITADA. Lo comprobe intentando montar un TestClient yo mismo y falla por el import. Las 46 que pasan cubren el sondeo, la validacion de entrada y la forma de las respuestas; las rutas, el token, los codigos de estado y el 401 sin token solo se ejecutaran en CI con FastAPI instalado. No digo verde de eso. Checks: ruff y ruff format limpios; mypy limpio en importacion.py; los 27 errores de main.py son de la clase que ya daba en HEAD (16 alli), 'Class cannot subclass BaseModel (has type Any)', artefacto de --follow-imports=skip con pydantic sin instalar. 1270 pruebas pasan en el arbol entero; los 2 fallos son los preexistentes del PEP 695. Sin ejecutar: verificar.sh completo, la capa HTTP y las 20 suites de numpy/polars."
+        }
+      ],
+      "base": "64514eb"
     },
     {
       "id": "F2-01",
@@ -3007,10 +3013,20 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-13 12:59:35Z",
+          "texto": "dlv_core/segmentacion.py (1265 lineas) + 61 pruebas. Cinco clases (wot, ralenti, arranque, deceleracion, crucero) definidas por ROL, no por nombre de canal, con precedencia declarada y sin solapes. El agente murio por limite de sesion justo antes de la verificacion contra logs reales, que es la mitad del valor de la tarea; la hice yo. QUE SALE EN LOS TRES LOGS: AutoLog (245,1 s): 3 wot (6,9 s, el mas largo 3,2 s), 10 ralenti (81,1 s), 13 deceleracion (26,7 s), 5 crucero (24,8 s); cobertura 54,9 %. Log2768 (14,1 s): 1 crucero + 2 deceleracion, cobertura 89,6 %. Log2769 (6,8 s): 1 crucero + 1 deceleracion, 70,5 %. El 45 % sin clasificar del AutoLog se desglosa con motivo: 604 muestras por duracion_insuficiente, 581 por ninguna_clase, 3 por sin_datos, y cero por motor_parado o pendiente_insuficiente. COMPROBACIONES DE SENTIDO, no de forma: la mariposa maxima (100 %) cae dentro de un wot, como debe. PERO el regimen maximo del log (7007 rpm) NO cae en ningun segmento: probablemente es el final de una tirada donde la mariposa ya esta cerrando, y el tramo de transicion no llega a la duracion minima. Es lo primero que revisaria el propietario, porque el instante de mas regimen del log quedando sin clasificar es raro aunque tenga explicacion. Y  no dispara nunca en estos logs, y es CORRECTO: rpm_arranque_min = 50 y el regimen minimo medido es 412 rpm, o sea que el motor ya estaba en marcha antes de grabar (coherente con Engine Running Time 283 s sobre un log de 245 s). VERIFIQUE la derivacion de los umbrales: el fichero cita 'las dos caidas de regimen del AutoLog que entran en la banda de arranque sin ser un arranque, de 1186 a 412 rpm', y yo mido minimo 412 rpm: cuadra. Checks: ruff y ruff format limpios, mypy --strict SIN --follow-imports=skip limpio (los 5 errores que salian con el atajo eran el artefacto de Evento convertido en Any), ADR-009 a 0 ocurrencias, 1270 pruebas pasan en el arbol entero. Sin ejecutar: verificar.sh completo y las 20 suites de numpy/polars."
+        },
+        {
+          "fecha": "2026-08-13 13:00:27Z",
+          "texto": "CORRECCION de la nota anterior: donde dice \"Y  no dispara nunca en estos logs\" tiene que decir \"Y la clase ARRANQUE no dispara nunca en estos logs\". La palabra se perdio al escribir la nota entre backticks dentro de comillas dobles en bash, que las ejecuta como una orden. Sin consecuencia sobre el codigo; se apunta para que la nota se pueda leer."
+        }
+      ],
+      "base": "64514eb"
     },
     {
       "id": "F3-17",
