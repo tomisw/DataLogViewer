@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 13:02:13Z"
+    "actualizado": "2026-08-13 14:09:42Z"
   },
   "tareas": [
     {
@@ -3114,10 +3114,16 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-13 14:09:42Z",
+          "texto": "dlv_core/marcha.py + 15 pruebas. Esta la he hecho yo, no un agente: el limite de sesion es compartido y ya se habian cortado cuatro. LO QUE VALIDA LA TAREA, y es lo mas fuerte que ha salido: las SEPARACIONES entre acumulaciones consecutivas son las relaciones de la caja, porque el grupo final y el desarrollo del neumatico se cancelan al dividir. Contra los tres logs reales: AutoLog da 4 marchas (cocientes 4,70 / 7,90 / 11,79 / 15,43 km/h por 1000 rpm) con separaciones 1,681 / 1,492 / 1,308, y la caja del R33 GTR de serie da 1,670 / 1,478 / 1,302 -> desvios del 0,7 %, 0,9 % y 0,5 %. Log2769 da 2 marchas con separacion 1,303 contra 1,302 de 3a-4a: 0,0 %. Log2768 da una sola marcha a 15,50, el MISMO cociente que la cuarta del AutoLog y la segunda del Log2769: coherencia entre logs, que es otra validacion independiente. Cobertura de lo util: 85,2 % en el AutoLog, 81,7 % y 100 % en los internos. DISENO: histograma con bincount sobre bordes de searchsorted, cimas por comparacion con las vecinas, y asignacion por bandas [centro*(1-tol), centro*(1+tol)] concatenadas en una sola lista de bordes -- un indice impar cae dentro de una marcha y uno par en el hueco entre dos, que es justo la distincion que hace falta. Cero bucles por muestra (ADR-009 en 0); los dos bucles que hay son sobre CELDAS y sobre MARCHAS, acotados por marchas_maximas, mismo criterio que malla.py declara explicitamente. LO QUE ESTE MODULO NO PUEDE DECIR, y esta escrito en su cabecera: QUE marcha es. El indice es ordinal entre las observadas, no absoluto: si no se uso la primera, la mas corta del log es la segunda. Numerarlas como absolutas seria inventar. HALLAZGO DE ESTRUCTURA: hay CINCO Vectorial en el paquete (expresiones, malla, plausibilidad, primitivas, reloj) y no es duplicacion por descuido, son cinco contratos minimos distintos que numpy satisface por ser estructurales. Pero un modulo que COMPONE con otro tiene que compartir su raiz: marcha.py hereda de primitivas.Vectorial y le anade bincount, en vez de tocar un modulo G1 recien cerrado o redeclarar el protocolo entero. Deje el razonamiento en el docstring del protocolo. Checks: ruff, ruff format, mypy --strict SIN atajos, 15 pruebas propias y 1285 en el arbol; los 2 fallos son los preexistentes del PEP 695. Umbrales nuevos en [marcha] de data/umbrales.toml, los siete con su derivacion medida sobre el AutoLog, y tres guardas que comprueban que no hay ninguno cableado (firma, AST, y el solape de bandas). Sin ejecutar: verificar.sh completo y las 20 suites de numpy/polars."
+        }
+      ],
+      "base": "3a49ba2"
     },
     {
       "id": "F3-21",

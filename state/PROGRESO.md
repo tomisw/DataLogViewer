@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-13 13:00:27Z
+Actualizado: 2026-08-13 14:09:42Z
 
-**296 / 775 pts cerrados (38.2 %)** · 128 pts esperando revisión humana → 54.7 % entregado
+**301 / 775 pts cerrados (38.8 %)** · 128 pts esperando revisión humana → 55.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-13 13:00:27Z
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
 | FG | 41 | 48 | 0 | 9 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 16 | 10 | 8 | 81 | 3 | 118 |
+| F3 | 21 | 10 | 8 | 76 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
@@ -59,10 +59,10 @@ Actualizado: 2026-08-13 13:00:27Z
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ⏳ | `F0-01` | Cerrar ADR-001…009 y spike de rendimiento de Polars sobre el A | Opus 5 | 6 | F0-05 | G1 | `4229523` |
-| ✔  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | `875f57a` |
+| ✔  | `F0-02` | Andamiaje: paquetes `dlv-core`, `dlv-api`, `dlv-ui`, `dlv-app` | Sonnet 5 | 4 | — | G3 | `9c54663` |
 | ✔  | `F0-03` | CI: matriz de 3 plataformas, `pytest`, `ruff`, `mypy`, `eslint | Haiku 4.5 | 2 | F0-02 | G4 | `4229523` |
 | ✔  | `F0-04` | Banco de rendimiento con publicación de métricas y puertas de  | Opus 5 | 5 | F0-02 | G2 | `4229523` |
-| ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `875f57a` |
+| ✔  | `F0-05` | Corpus: los 3 logs reales + generador de sintéticos (1 h/475 c | Sonnet 5 | 4 | — | G3 | `2af6150` |
 | ✔  | `F0-06` | Corpus de logs corruptos (11 casos de `01-formato-log.md` §1.1 | Haiku 4.5 | 2 | F0-05 | G4 | `217d88b` |
 | ⏳ | `F0-07` | Log de verdad de referencia con knock y λ pobre anotados | Opus 5 | 4 | F0-05 | G1 | `efc4f55` |
 | ✔  | `F0-08` | Catálogo `units.toml`: dimensiones, canónicas, unidades altern | Opus 5 | 6 | — | G1 | `0fbe4ea` |
@@ -115,11 +115,11 @@ Actualizado: 2026-08-13 13:00:27Z
 | ✔  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | `b01e52e` |
 | ✔  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | `2e92399` |
 | ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
-| ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `8e82d5c` |
-| ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | `8e82d5c` |
-| ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | `8e82d5c` |
-| ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `298c8ff` |
-| ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | `877e8c1` |
+| ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `e918085` |
+| ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | — |
+| ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | — |
+| ✔  | `F1-42` | Apertura en < 4 s: `detectar_grupos_de_muestreo` usa `np.uniqu | Opus 5 | 5 | F1-05, F1-06, F1-40 | G2 | `501b77b` |
+| ✔  | `F1-43` | La aplicación abre un log de verdad: cablear `FuenteApi`, búfe | Opus 5 | 5 | F1-39, F1-40, F1-35 | G2 | — |
 | ✔  | `F1-44` | Un log real abierto enseña sus datos: CORS con `expose_headers | Opus 5 | 3 | F1-43 | G2 | `3eec0d4` |
 | ✔  | `F1-45` | E13 llega a la ventana: conversiones reales por HTTP, motor de | Opus 5 | 8 | F1-13, F1-30, F1-41, F1-44 | G1 | `1fff834` |
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
@@ -134,19 +134,19 @@ Actualizado: 2026-08-13 13:00:27Z
 | ⏳ | `FG-03` | Estructura: preámbulo de metadatos, fila de nombres, fila de u | Opus 5 | 5 | FG-01 | G1 | `dadd9b6` |
 | ⏳ | `FG-04` | Columna de tiempo en las 8 variantes de §7.5, incluida la ause | Opus 5 | 8 | FG-03 | G1 | `8adc47f` |
 | ✔  | `FG-05` | Inferencia de tipo por columna: entero, decimal, enum de texto | Opus 5 | 5 | FG-03 | G2 | `88d1c71` |
-| ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `0a590f9` |
-| ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `4311762` |
-| ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4311762` |
+| ⏳ | `FG-06` | Unidad declarada en el nombre o en la fila de unidades + dicci | Sonnet 5 | 5 | FG-03, F0-08 | G1 | `45a0600` |
+| ⏳ | `FG-07` | Valores no numéricos, unidad embebida en la celda, separador d | Sonnet 5 | 4 | FG-05 | G1 | `90a05d4` |
+| ✔  | `FG-08` | Columnas de texto y booleanas → enum con diccionario autogener | Sonnet 5 | 3 | FG-05 | G3 | `4ef462e` |
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
 | ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | `1b76111` |
 | ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
-| ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `4311762` |
-| ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `599596b` |
+| ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
+| ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `46d8ff6` |
 | ·  | `FG-16` | Prueba de independencia de fabricante: el log de F0-13 da resu | Opus 5 | 4 | FG-09, F0-13 | G1 | — |
 | ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | `d1f559d` |
-| ✔  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | — |
+| ✔  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | `24909a3` |
 
 ## F2 — 21/80 pts
 
@@ -165,11 +165,11 @@ Actualizado: 2026-08-13 13:00:27Z
 | ·  | `F2-11` | Estadísticas y detectores que respetan las fronteras de segmen | Opus 5 | 5 | F2-09 | G2 | — |
 | ·  | `F2-12` | Eje X alternativo (RPM, velocidad, distancia) con monotonía po | Opus 5 | 8 | F2-01 | G2 | — |
 | ⏳ | `F2-13` | Conflictos: mismo rol con unidades de origen distintas → canón | Opus 5 | 4 | F2-02, F1-13 | G1 | `e717ffa` |
-| ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4311762` |
+| ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4a34148` |
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 26/118 pts
+## F3 — 31/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -188,11 +188,11 @@ Actualizado: 2026-08-13 13:00:27Z
 | ▶  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | — |
 | ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
-| ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | — |
+| ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | `24909a3` |
 | ·  | `F3-17` | Panel de tiradas con resumen y superposición entre tiradas | Sonnet 5 | 5 | F3-16, F2-12 | G3 | — |
 | ✔  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | `372edba` |
 | ·  | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | — |
-| ·  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | — |
+| ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | — |
 | ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
 
 ## F4 — 0/63 pts

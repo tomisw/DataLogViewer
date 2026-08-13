@@ -605,3 +605,50 @@ factores_candidatos = [-1.0, 10.0, 0.1, 100.0, 0.01, 1000.0, 0.001]
 # alertas, y entonces el detector que sí importa tampoco se lee.
 severidades_afectadas = ["critica"]
 motivo = "rol asignado por parecido de nombre y sin confirmar"
+
+# =========================================================================== #
+#  MARCHA ESTIMADA  (F3-20 · docs/04 §4.5)
+# =========================================================================== #
+#  El cociente velocidad/régimen es constante dentro de una marcha, así que las
+#  marchas salen como acumulaciones en su histograma. Estos umbrales dicen qué
+#  muestras entran en la agrupación y cuándo dos acumulaciones son la misma.
+[marcha]
+# Por debajo de este régimen el cociente no significa nada: ralentí en punto
+# muerto, embrague abierto, o el propio arranque. 1 200 rpm está por encima del
+# ralentí de un RB26 (~950 rpm en caliente, medido: el AutoLog baja a 412 rpm en
+# tirones de embrague) y por debajo de cualquier marcha en uso.
+rpm_minimo = 1200.0
+
+# Y por debajo de esta velocidad tampoco: con el coche casi quieto el cociente se
+# dispara y ensancharía todas las acumulaciones. 10 km/h es la primera marcha a
+# ralentí largo.
+velocidad_minima_kmh = 10.0
+
+# Anchura de la celda del histograma, en km/h por 1000 rpm. Medido sobre el
+# AutoLog: las cuatro acumulaciones están en 4,7 · 7,8 · 11,7 · 15,4 y la más
+# estrecha ocupa unas 8 décimas, así que 0,2 la resuelve con cuatro celdas sin
+# partirla en ruido. Bajarlo a 0,05 rompería cada marcha en varias cimas; subirlo
+# a 1,0 fundiría 11,7 con 12,3.
+ancho_de_celda = 0.2
+
+# Una acumulación con menos muestras que esto no es una marcha: es un tramo de
+# cambio que se quedó quieto. Sobre el AutoLog, las cuatro marchas de verdad
+# tienen entre 130 y 400 muestras y el ruido entre cimas no pasa de 20.
+muestras_minimas_por_marcha = 25
+
+# Cuánto puede alejarse el cociente del centro y seguir siendo esa marcha. El 4 %
+# cubre la deriva por deslizamiento del neumático y por el convertidor de par que
+# NO hay aquí (caja manual), y se queda muy por debajo del 30 % que separa dos
+# marchas consecutivas en la caja más cerrada.
+tolerancia_relativa = 0.04
+
+# Dos centros más próximos que esto son la misma marcha vista en dos celdas. El
+# paso más corto de una caja de serie es 3ª->4ª o 4ª->5ª, del orden de 1,30, o sea
+# un 30 %; el 12 % deja margen de sobra y sigue siendo el triple de la tolerancia,
+# que es lo que impide que dos bandas se solapen (lo comprueba `validar`).
+separacion_minima_relativa = 0.12
+
+# Tope de acumulaciones. Ocho cubre cualquier caja de carretera (seis marchas más
+# margen) y convierte «el ancho_de_celda es demasiado fino» en un error explicado
+# en vez de en veinte marchas inventadas.
+marchas_maximas = 8
