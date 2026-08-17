@@ -4,15 +4,15 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-17 16:36:11Z
+Actualizado: 2026-08-17 16:59:39Z
 
-**305 / 775 pts cerrados (39.4 %)** · 140 pts esperando revisión humana → 57.4 % entregado
+**310 / 775 pts cerrados (40.0 %)** · 140 pts esperando revisión humana → 58.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
-| FG | 41 | 48 | 0 | 9 | 0 | 98 |
+| FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 21 | 22 | 8 | 64 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
@@ -127,7 +127,7 @@ Actualizado: 2026-08-17 16:36:11Z
 | ✔  | `F1-46` | Los factores del catálogo, derivados de su definición: `data/d | Opus 5 | 5 | F0-08, F1-20 | G2 | `acec9a7` |
 | ⏳ | `F1-47` | La identidad del inyector fija tres factores: el caudal config | Opus 5 | 3 | F0-09, FG-10 | G1 | `db56e94` |
 
-## FG — 89/98 pts
+## FG — 94/98 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -142,7 +142,7 @@ Actualizado: 2026-08-17 16:36:11Z
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
 | ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | `1b76111` |
-| ·  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
+| ✔  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `46d8ff6` |
@@ -226,7 +226,7 @@ Actualizado: 2026-08-17 16:36:11Z
 | ·  | `FE-05` | Tabla del explorador: una fila por log, orden en canónica y pr | Sonnet 5 | 5 | FE-03, F1-19 | G3 | — |
 | ·  | `FE-06` | Filtros por métrica combinables («λ mín < 0,80» y «más de 5 ev | Sonnet 5 | 5 | FE-05 | G3 | — |
 | ·  | `FE-07` | Personalización de columnas: añadir, quitar y reordenar métric | Sonnet 5 | 4 | FE-03, FE-05 | G3 | — |
-| ✔  | `FE-08` | Escaneo incremental y cancelable, con filas apareciendo a medi | Sonnet 5 | 4 | FE-01 | G3 | — |
+| ✔  | `FE-08` | Escaneo incremental y cancelable, con filas apareciendo a medi | Sonnet 5 | 4 | FE-01 | G3 | `64293e7` |
 | ·  | `FE-09` | Abrir la selección en el espacio de trabajo, uno o varios logs | Sonnet 5 | 3 | FE-05 | G3 | — |
 | ·  | `FE-10` | Prueba de coherencia: el resumen de cada log del corpus coinci | Opus 5 | 5 | FE-02 | G1 | — |
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |

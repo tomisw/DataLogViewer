@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-17 16:36:13Z"
+    "actualizado": "2026-08-17 16:59:39Z"
   },
   "tareas": [
     {
@@ -2103,10 +2103,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-17 16:59:39Z",
+          "texto": "dlv_core/perfil_importacion.py + 27 pruebas, mas dlv-ui/src/importacion/perfil-importacion.ts con su suite. Hizo la comprobacion previa y la reporto: no existia nada, solo referencias en docs/07 SS7.9 y comentarios que decian \"eso es FG-12\". LA HUELLA identifica el FORMATO y no el fichero: nombres normalizados en orden, delimitador y codificacion. El log de la semana siguiente trae otra fecha, otro numero de sesion, otro tamano y otras muestras, y nada de eso esta en la huella, asi que coincide igual. Delimitador o codificacion distintos -> rechazo total con motivo; columnas reordenadas o anadidas -> parcial, se reaplica lo que coincide POR NOMBRE. La comparacion mira delimitador y codificacion como campos APARTE, con mensajes distintos, y el hash es solo un resumen de los nombres: eso da mejores errores que comparar un hash opaco, y lo verifique leyendo el codigo. VERIFICACION MIA, no su informe: (1) implemento SHA-256 A MANO en TypeScript porque crypto.subtle es asincrono. Lo cruce contra hashlib de Python en 12 casos incluidos los limites del relleno (0, 54, 55, 56, 63, 64, 65, 119, 120 bytes) y UTF-8 no ASCII: 0 divergencias. (2) Cruce normalizar() entre las dos implementaciones en 18 casos: 0 divergencias. (3) ruff, ruff format y mypy --strict limpios sin atajos; ADR-009 a 0. DEFECTO QUE ENCONTRE Y CORREGI: el fichero era medio ingles y medio espanol -- secciones [fingerprint], [format], [time], [[channels]] con las claves de dentro en espanol. Su informe decia que las claves estaban en espanol, y era solo la mitad. Renombradas las cuatro secciones, incluido el literal \"[[channels]]\" del escritor de TOML que no se ve renombrando diccionarios y que rompio la prueba de ida y vuelta hasta que lo encontre. Y ACTUALICE docs/07 SS7.9: su boceto usaba claves en ingles, asi que la especificacion y el codigo se contradecian; ahora la seccion lleva el fichero REAL generado con a_texto_toml(), y explica las tres cosas que la implementacion necesito y el boceto no tenia (origen deducido/confirmado por campo, nombre_columna ademas del indice, y version_esquema). LA MEJOR DECISION SUYA: el boceto guardaba la columna de tiempo como indice puro (column = 0), y si el fichero siguiente trae una columna mas al principio ese indice apunta a otro canal y la columna de tiempo se reaplica sobre un dato cualquiera sin que nada falle. Guarda el NOMBRE ademas del indice. Lo llamo el fallo silencioso mas caro de esta tarea y tiene razon. RIESGO QUE DEJO ANOTADO: el algoritmo esta implementado DOS VECES, en Python y en TypeScript. En FG-11 un \"espejo simplificado\" del modulo Python perdio justo la parte que importaba y metio un error de factor 100. Aqui los dos cruces que hice (SHA-256 y normalizar) dan 0 divergencias, pero la de reaplicarPerfil no la he cruzado y no hay nada que impida que deriven. GAP DECLARADO: no hay endpoint en dlv-api para cargar ni guardar un .dlvimport, asi que no cablearon el asistente. No pudo ejecutar vitest (npm 403), asi que perfil-importacion.test.ts queda SIN EJECUTAR; la logica que prueba si la verifique con node. 1376 pruebas pasan; los 2 fallos son los preexistentes del PEP 695."
+        }
+      ],
+      "base": "c61d64a"
     },
     {
       "id": "FG-13",

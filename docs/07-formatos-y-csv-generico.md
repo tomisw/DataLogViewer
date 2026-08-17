@@ -194,40 +194,66 @@ Al terminar se ofrece **guardar como perfil de importación**.
 
 ## 7.9 Perfil de importación `.dlvimport`
 
+Este es el fichero que produce `dlv_core/perfil_importacion.py` (FG-12), no un
+boceto: está generado ejecutando `a_texto_toml()`. El boceto anterior de esta
+sección usaba claves en inglés (`[fingerprint]`, `column_hash`, `[[channels]]`), y
+se sustituye porque las claves de datos de este proyecto están en español, como en
+`roles.toml` y `units.toml`. Que la especificación y el código se contradigan es
+peor que cualquiera de las dos convenciones: el siguiente que lo implemente
+seguiría el boceto.
+
 ```toml
-name = "MoTeC i2 export - coche 1"
+version_esquema = 1
+nombre = "MoTeC i2 export - coche 1"
 
-[fingerprint]
-column_hash = "sha256:…"        # hash de los nombres de columna normalizados
-column_count = 42
-delimiter = ","
+[huella]
+hash_columnas = "sha256:5261fc4f12e1616481782228a7f8997947db3ab83df24889f273189843dfcb36"
+n_columnas = 3
+delimitador = ","
+codificacion = "utf-8"
 
-[format]
-encoding = "utf-8"
-delimiter = ","
-decimal = "."
-header_row = 14
-units_row = 15
-data_row = 16
+[formato]
+codificacion = { origen = "deducido", valor = "utf-8" }
+delimitador = { origen = "deducido", valor = "," }
+comilla = { origen = "deducido" }
+decimal = { origen = "deducido", valor = "." }
+fila_cabecera = { origen = "deducido", valor = 14 }
+fila_unidades = { origen = "deducido", valor = 15 }
+fila_datos = { origen = "deducido", valor = 16 }
 
-[time]
-kind = "relative_seconds"
-column = 0
+[tiempo]
+clase = { origen = "confirmado", valor = "relativo" }
+columna = { origen = "deducido", valor = 0 }
+columna_fecha = { origen = "deducido" }
+frecuencia_hz = { origen = "deducido" }
+nombre_columna = "Time"
 
-[[channels]]
-column = 3
-name = "Engine RPM"
-role = "engine_speed"
-dimension = "angular_speed"
-source_unit = "rpm"
+[[canales]]
+nombre = "Engine RPM"
+dimension = { origen = "deducido", valor = "angular_speed" }
+unidad_origen = { origen = "deducido", valor = "rpm" }
+columna = 1
 
-[[channels]]
-column = 7
-name = "Coolant Temp"
-role = "coolant_temp"
-dimension = "temperature"
-source_unit = "degC"
+[[canales]]
+nombre = "Coolant Temp"
+dimension = { origen = "confirmado", valor = "temperature" }
+unidad_origen = { origen = "confirmado", valor = "degC" }
+columna = 2
 ```
+
+Tres cosas que no estaban en el boceto y que la implementación necesitó:
+
+- **`origen` en cada campo.** Un valor `deducido` se vuelve a deducir al reaplicar
+  el perfil; uno `confirmado` sobrevive aunque el sondeo nuevo opine otra cosa. Sin
+  esa distinción el perfil no guarda lo único que justifica guardarlo, que es el
+  trabajo manual del usuario.
+- **`nombre_columna` además de `columna`.** El boceto guardaba `column = 0`, un
+  índice puro. Si el fichero de la semana siguiente trae una columna más al
+  principio, ese índice apunta a otro canal y la columna de tiempo se reaplica
+  sobre un dato cualquiera sin que nada falle. El nombre sobrevive al reordenado.
+- **`version_esquema`.** Un perfil de una versión futura se rechaza con un mensaje
+  en vez de leerse a medias.
+
 
 La **huella de cabecera** es lo que convierte esto en una función usable: la
 segunda vez que se abre un CSV con las mismas columnas, el perfil se aplica solo
