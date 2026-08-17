@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-13 14:34:24Z"
+    "actualizado": "2026-08-17 11:50:03Z"
   },
   "tareas": [
     {
@@ -2809,10 +2809,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-17 11:50:03Z",
+          "texto": "YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia como pendiente y el trabajo existe desde el commit 7b995a3, \"Los umbrales de los detectores pasan a ser datos configurables\". Lo descubri escribiendo un data/detectores.toml duplicado, y lo tire entero al ver que lo que ya hay es MEJOR: los 18 detectores estan en data/umbrales.toml como [detectores.D1] .. [detectores.D18], con roles, descripcion, severidad, permanencia por detector, escaladas ([detectores.D1.escalada_critica] con engine_speed_min y manifold_pressure_min), condiciones compuestas ([detectores.D4.condiciones]) y la curva de D10 YA RESUELTA ([detectores.D10.curva_minima], lineal_por_regimen con base 201,3 kPa y pendiente 100 kPa por 1000 rpm, con la alternativa de tabla de puntos documentada). Mi version marcaba D10 como pendiente de F3-10, o sea que era peor. Y esta validada: tests/test_umbrales_catalogo.py, 14 pruebas que pasan, cubren que estan los 18, que cada uno esta bien formado, que los roles citados existen, que las condiciones citan roles existentes, que los umbrales estan en unidad CANONICA, que la curva de presion de aceite es creciente, que los criticos llevan permanencia o son binarios, que la desactivacion automatica de R10 esta declarada, y que el generador no cablea umbrales. ERROR MIO, y es el segundo de la misma clase en esta sesion (ya lance agentes de FG-07/FG-08 sobre trabajo terminado): no comprobe si el entregable existia antes de escribir 400 lineas. La comprobacion barata era un grep de [detectores] en data/. Lo unico que aporto aqui es haber encontrado que el estado estaba mal. Queda en revision_humana como cualquier G1: lo que hay que revisar son los umbrales de los 18, y en particular la curva de D10, que es el detector mas critico del programa y el unico cuyo limite depende del regimen."
+        }
+      ],
+      "base": "dd15361"
     },
     {
       "id": "F3-08",

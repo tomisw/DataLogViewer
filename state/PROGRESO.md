@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-13 14:34:21Z
+Actualizado: 2026-08-17 11:50:03Z
 
-**301 / 775 pts cerrados (38.8 %)** · 132 pts esperando revisión humana → 55.9 % entregado
+**301 / 775 pts cerrados (38.8 %)** · 140 pts esperando revisión humana → 56.9 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-13 14:34:21Z
 | F1 | 190 | 39 | 0 | 5 | 0 | 234 |
 | FG | 41 | 48 | 0 | 9 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 21 | 14 | 8 | 72 | 3 | 118 |
+| F3 | 21 | 22 | 8 | 64 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
 | FE | 5 | 0 | 0 | 47 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
@@ -47,6 +47,7 @@ Actualizado: 2026-08-13 14:34:21Z
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
 | `F3-06` Motor de detectores: las 9 primitivas de §4. | revision_humana | Opus 5 | G1 | Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 line |
+| `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
@@ -170,7 +171,7 @@ Actualizado: 2026-08-13 14:34:21Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 35/118 pts
+## F3 — 43/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -180,7 +181,7 @@ Actualizado: 2026-08-13 14:34:21Z
 | ·  | `F3-04` | Autosugerencia por cobertura de roles («7 de 9 disponibles») | Sonnet 5 | 4 | F3-02, F1-07 | G3 | — |
 | ·  | `F3-05` | Editor de perfiles, duplicado, importación y exportación | Sonnet 5 | 5 | F3-01 | G3 | — |
 | ⏳ | `F3-06` | Motor de detectores: las 9 primitivas de §4.3 con histéresis y | Opus 5 | 10 | F1-05 | G1 | `b5ab536` |
-| ·  | `F3-07` | Detectores D1–D18 por rol, como configuración | Opus 5 | 8 | F3-06, F0-07 | G1 | — |
+| ⏳ | `F3-07` | Detectores D1–D18 por rol, como configuración | Opus 5 | 8 | F3-06, F0-07 | G1 | — |
 | ·  | `F3-08` | Desactivación de detectores críticos cuando su rol proviene de | Opus 5 | 4 | F3-07, FG-09 | G1 | — |
 | ·  | `F3-09` | Validación contra la verdad de referencia, en formato nativo y | Opus 5 | 5 | F3-07, F0-13 | G1 | — |
 | ·  | `F3-10` | Topes de alerta: aviso, crítico, banda y curva en función de o | Opus 5 | 8 | F3-06, F1-19 | G1 | — |
@@ -192,7 +193,7 @@ Actualizado: 2026-08-13 14:34:21Z
 | ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | `24909a3` |
 | ·  | `F3-17` | Panel de tiradas con resumen y superposición entre tiradas | Sonnet 5 | 5 | F3-16, F2-12 | G3 | — |
 | ✔  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | `372edba` |
-| ⏳ | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | — |
+| ⏳ | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | `e31b8a5` |
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
 | ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
 
