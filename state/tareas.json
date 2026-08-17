@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-17 16:59:39Z"
+    "actualizado": "2026-08-17 16:59:40Z"
   },
   "tareas": [
     {
@@ -2105,7 +2105,9 @@
       "gate": "G3",
       "estado": "hecho",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "dbc6c77"
+      ],
       "notas": [
         {
           "fecha": "2026-08-17 16:59:39Z",
