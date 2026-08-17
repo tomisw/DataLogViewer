@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-17 11:50:27Z"
+    "actualizado": "2026-08-17 16:36:11Z"
   },
   "tareas": [
     {
@@ -3634,10 +3634,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-17 16:36:11Z",
+          "texto": "dlv_core/explorador/escaneo.py + 9 pruebas. escanear_incremental(plan, calcular_resumen, *, cancelado) es un generador que recorre el PlanDeIndexado de FE-01 y emite una fila a la vez: FilaReutilizada, FilaCalculada o FilaConError. No toco indice.py, y su informe dice que no le falto nada estructural: PlanDeIndexado ya separaba a_calcular de reutilizables y aplicar_resumenes ya aceptaba resumenes PARCIALES sin tratarlo como error, que es la mitad de incremental. HIZO LA COMPROBACION PREVIA que le pedi y la reporto: el modulo no existia, solo indice.py. VERIFICACION MIA, independiente de la suya: (1) escribi mi propio arnes y comprobe la cancelacion de verdad: cancelando tras 2 de 5, el indice queda con esos 2 exactos, y la segunda apertura reutiliza esos 2 y recalcula los 3 que faltan. Nada perdido, nada inventado. (2) Comprobe su afirmacion sobre el corpus corrupto por mi cuenta: de los 11 ficheros de samples/corrupt/, lanzan exactamente 2 al parsear la cabecera -- 01-cabecera-truncada.csv y 10-version-desconocida.csv, los dos que dijo -- y el README los menciona. Los 11 se atraviesan sin parar el escaneo y los 2 rotos salen como FilaConError sin entrar en el indice, asi que se reintentan. (3) ruff, ruff format y mypy --strict limpios SIN --follow-imports=skip sobre el directorio explorador/ entero. ADR-009 a 0. DECISION DE DISENO QUE APRUEBO: escaneo SECUENCIAL a proposito, sin paralelizar, porque con calculo concurrente un log rapido adelantaria a uno lento y una fila que el usuario ya esta mirando cambiaria de sitio. El orden es reutilizables primero y luego a_calcular, los dos por ruta. Es la regla 2 del encargo y la resolvio bien. LIMITE HONESTO, y lo declara: los 0,0186 s que mide sobre los tres logs reales NO son el presupuesto de 200 logs en 60 s de docs/02 SS2.6. Eso depende del resumen completo por columnas proyectadas (FE-02), que usa Polars, y aqui no hay Polars. Lo que midio es la sobrecarga de la orquestacion, y confirma que el generador no anade coste apreciable frente al parseo. El presupuesto de verdad sigue sin medir. 1349 pruebas pasan; los 2 fallos son los preexistentes del PEP 695. Sin ejecutar: verificar.sh completo, el presupuesto de FE-02 y las 20 suites de numpy/polars."
+        }
+      ],
+      "base": "e78e12c"
     },
     {
       "id": "FE-09",

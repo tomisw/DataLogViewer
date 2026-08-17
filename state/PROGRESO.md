@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-17 11:50:03Z
+Actualizado: 2026-08-17 16:36:11Z
 
-**301 / 775 pts cerrados (38.8 %)** · 140 pts esperando revisión humana → 56.9 % entregado
+**305 / 775 pts cerrados (39.4 %)** · 140 pts esperando revisión humana → 57.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -16,7 +16,7 @@ Actualizado: 2026-08-17 11:50:03Z
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 21 | 22 | 8 | 64 | 3 | 118 |
 | F4 | 0 | 0 | 8 | 55 | 0 | 63 |
-| FE | 5 | 0 | 0 | 47 | 0 | 52 |
+| FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
 
 ## Requieren atención
@@ -215,7 +215,7 @@ Actualizado: 2026-08-17 11:50:03Z
 | ▶  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | — |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
 
-## FE — 5/52 pts
+## FE — 9/52 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -226,7 +226,7 @@ Actualizado: 2026-08-17 11:50:03Z
 | ·  | `FE-05` | Tabla del explorador: una fila por log, orden en canónica y pr | Sonnet 5 | 5 | FE-03, F1-19 | G3 | — |
 | ·  | `FE-06` | Filtros por métrica combinables («λ mín < 0,80» y «más de 5 ev | Sonnet 5 | 5 | FE-05 | G3 | — |
 | ·  | `FE-07` | Personalización de columnas: añadir, quitar y reordenar métric | Sonnet 5 | 4 | FE-03, FE-05 | G3 | — |
-| ·  | `FE-08` | Escaneo incremental y cancelable, con filas apareciendo a medi | Sonnet 5 | 4 | FE-01 | G3 | — |
+| ✔  | `FE-08` | Escaneo incremental y cancelable, con filas apareciendo a medi | Sonnet 5 | 4 | FE-01 | G3 | — |
 | ·  | `FE-09` | Abrir la selección en el espacio de trabajo, uno o varios logs | Sonnet 5 | 3 | FE-05 | G3 | — |
 | ·  | `FE-10` | Prueba de coherencia: el resumen de cada log del corpus coinci | Opus 5 | 5 | FE-02 | G1 | — |
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
