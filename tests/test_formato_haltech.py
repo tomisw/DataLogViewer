@@ -290,10 +290,44 @@ def test_masa_por_cilindro_da_la_relacion_de_mezcla(desc: dict, fila_de_referenc
     assert desc["tipos"]["MassPerCyl"]["confianza"] == "confirmed"
 
 
-def test_massovertime_sigue_siendo_desconocido(desc: dict) -> None:
-    """Regresión deliberada: si alguien le pone una escala a MassOverTime sin
-    resolver la contradicción documentada, esta prueba lo para."""
+def test_massovertime_esta_confirmado_y_con_el_aviso_del_maf(desc: dict) -> None:
+    """Esta prueba era `test_massovertime_sigue_siendo_desconocido`.
+
+    Paraba que alguien le pusiese una escala «sin resolver la contradicción
+    documentada», y funcionó: se puso roja cuando F1-38 confirmó el tipo. La
+    contradicción sí está resuelta —el cociente de los dos canales de caudal de
+    combustible fija el factor, y los canales de aire no cuadran porque no siguen
+    al modelo, no porque la escala esté mal—, así que lo que hay que proteger
+    ahora es otra cosa.
+
+    Y es esto: el factor vale para `Fuel Mass Flow` pero los cuatro canales de
+    Mass Air Flow llevan la unidad correcta con un valor que no es fiable. Ese
+    aviso es la mitad del resultado de F1-38. Si alguien lo borra del descriptor
+    por parecer una pega menor, un canal con unidad kg/h se lee como bueno y sale
+    un AFR de 4 puntos, que es la clase de error que este proyecto existe para no
+    cometer. Quien lo pruebe con números está en
+    `dlv-core/tests/test_descriptor_haltech.py`.
+    """
     t = desc["tipos"]["MassOverTime"]
-    assert t["confianza"] == "unknown"
-    assert t["dimension"] == "unknown"
-    assert "no cuadra" in t["evidencia"].lower()
+    assert t["confianza"] == "confirmed"
+    assert t["dimension"] == "mass_flow"
+    assert t["a_canonica"] == 0.036
+
+    evidencia = t["evidencia"].lower()
+    assert "no fiable" in evidencia or "no lo son" in evidencia, (
+        "falta el aviso de que los canales de Mass Air Flow no son fiables en "
+        "valor absoluto; sin él la unidad kg/h invita a calcular un AFR con ellos"
+    )
+    assert "0,813875" in t["evidencia"], (
+        "falta el cociente medido que fija el factor: es lo que hay que volver a "
+        "medir si este número se pone en duda"
+    )
+
+    quien_lo_prueba = (
+        Path(__file__).resolve().parents[1] / "dlv-core" / "tests" / "test_descriptor_haltech.py"
+    )
+    assert quien_lo_prueba.exists(), (
+        "MassOverTime está confirmado por la identidad de los dos caudales de "
+        "combustible (F1-38); si esa suite desaparece, el factor se queda sin "
+        "respaldo y hay que devolverlo a `unknown`"
+    )

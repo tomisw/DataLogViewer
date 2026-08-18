@@ -117,13 +117,28 @@ def test_las_escalas_salen_del_descriptor_no_del_codigo(desc: Descriptor) -> Non
 
 
 def test_los_tipos_sin_escala_confirmada_se_marcan(desc: Descriptor) -> None:
-    """Mitigación de R1: sin escala confirmada, en crudo y sin unidad."""
+    """Mitigación de R1: sin escala confirmada, en crudo y sin unidad.
+
+    El ejemplo era `Mass Air Flow 1` hasta que F1-38 confirmó el factor de su
+    tipo, y esta prueba lo detectó, que es para lo que está. Ahora usa un canal
+    que sigue sin escala —`Vehicle Speed 0 Calculated Rate`, de tipo
+    `PulsesPerLongDistance`—, y de paso comprueba lo que F1-38 sí cerró: que el
+    MAF ya lleva unidad. Los dos casos en la misma prueba porque el riesgo R1 no
+    es «hay canales sin confirmar», es que un canal salga en la casilla
+    equivocada de las dos.
+    """
     cab = parsea(REALES / "AutoLog_20260729_1830.csv", desc)
+    sin_escala = cab.por_nombre("Vehicle Speed 0 Calculated Rate")
+    assert sin_escala is not None
+    assert sin_escala.confianza == "unknown"
+    assert sin_escala.se_muestra_en_crudo
+    assert "escala_sin_confirmar" in codigos(cab)
+
     maf = cab.por_nombre("Mass Air Flow 1")
     assert maf is not None
-    assert maf.confianza == "unknown"
-    assert maf.se_muestra_en_crudo
-    assert "escala_sin_confirmar" in codigos(cab)
+    assert maf.confianza == "confirmed"
+    assert maf.dimension == "mass_flow"
+    assert not maf.se_muestra_en_crudo
 
 
 def test_el_log_de_verdad_de_referencia(desc: Descriptor) -> None:

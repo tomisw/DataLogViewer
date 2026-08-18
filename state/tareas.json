@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-17 16:59:40Z"
+    "actualizado": "2026-08-18 20:16:59Z"
   },
   "tareas": [
     {
@@ -1475,10 +1475,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-18 20:16:59Z",
+          "texto": "Cierra 2 de los 7 tipos desconocidos que quedaban y corrige la evidencia de otros 2. QUE REVISAR, por orden de consecuencia si el numero esta mal: (1) MassOverTime = 0,036 kg/h por cuenta (centigramos/s). Lo fija el cociente crudo Fuel Flow Estimated / Fuel Mass Flow = 0,813875 con cv 0,18 % sobre 1364 filas, apoyado en el 0,06 de Flow que anclo F1-47 con TU inyector; la densidad implicada sale 0,737 kg/L, gasolina. Tercera pata sin densidad ni inyector: masa por cilindro x 6 cil x rpm/2 sale plana de 400 a 7000 rpm. (2) AVISO IMPORTANTE, y es la mitad del resultado: los 4 canales de Mass Air Flow llevan kg/h correcto y su VALOR no es fiable. Su cociente contra el aire modelado crece x3 con el regimen, y una escala equivocada no crece, es constante. A 6715 rpm el modelo pide 1117 kg/h y el canal publica 261. Es un sensor que se queda corto en un motor gobernado por MAP; NO calcules un AFR con ellos. (3) AngularVelocity = 50/3 rpm por cuenta (100 grados/s): es RPM otra vez, correlacion +1,00000 y coincide con la parte entera de rpm x 0,06 en 98,5 % de las filas. Resolucion 16,7 rpm por escalon, asi que para ralenti hay que usar RPM. (4) Dos notas anteriores eran FALSAS por haberse juzgado sobre UNA fila: FuelVolume no vale 0 (1552 filas no nulas, -9724..+5344) y Vehicle Speed 0 Calculated Rate no es un parametro de calibracion (varia, correlacion +0,99998 con la velocidad). Siguen sin factor: los dos estan sin fijar a proposito. (5) PREGUNTA CONCRETA para ti: cual es la calibracion del sensor de velocidad en la ECU (pulsos por km, o pulsos por revolucion y desarrollo de rueda). Con ese numero PulsesPerLongDistance pasa a confirmado; sin el, no. (6) Las 9 ganancias de PID siguen sin fijar y tienen que seguir: varian a lo largo del log, o sea que son salida de tabla, no configuracion. (7) De paso: el [resumen] no cuadraba con la suma de los tipos desde F1-47, que movio la confianza de 18 canales y no el recuento. Decia 422 y 36 donde la suma daba 440 y 18. Corregido, y ahora hay una prueba que lo comprueba."
+        }
+      ],
+      "base": "8dffe79"
     },
     {
       "id": "F1-39",

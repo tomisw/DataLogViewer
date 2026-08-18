@@ -312,6 +312,141 @@ llega a 65535 y es una MÁSCARA DE BITS: hay que decodificar bits, no valores.""
 canales = 102
 subtipos = "ver data/enums.toml (F0-11)"
 
+[tipos.MassOverTime]
+dimension = "mass_flow"
+# centigramos por segundo -> kg/h  ==  0,01 g/s * 3,6
+a_canonica = 0.036
+confianza = "confirmed"
+evidencia = """
+RESUELTO EN F1-38. La nota anterior daba dos explicaciones posibles —que los
+canales de Mass Air Flow no estuviesen conectados, o que la escala fuese otra— y
+decia que no se podia distinguir con estas muestras. Se puede: LAS DOS SON
+FALSAS, y medirlas sobre las 2 636 filas del AutoLog es lo que lo demuestra.
+
+EL FACTOR, por identidad con un tipo ya confirmado. `Fuel Flow Estimated` es de
+tipo `Flow` (0,06 L/h, confirmado en F1-47) y `Fuel Mass Flow` es de este tipo:
+son el mismo caudal de combustible, uno en volumen y otro en masa, asi que su
+cociente es la densidad del combustible y tiene que ser constante.
+
+  crudo(Fuel Flow Estimated) / crudo(Fuel Mass Flow) = 0,813875
+  sobre 1 364 filas, coeficiente de variacion 0,18 %
+
+Un cociente constante al 0,18 % entre dos canales que la ECU calcula por caminos
+distintos no es una coincidencia: son la misma magnitud. Y con el 0,06 de `Flow`
+ya anclado por el inyector del propietario, ese cociente fija ESTE factor:
+
+  factor = 0,06 L/h x 0,741 kg/L / 0,813875 = 0,036186 kg/h por cuenta
+  medido fila a fila con caudal alto (>500 crudo, 879 filas): cv 0,04 %
+
+0,036 exacto es la lectura natural del crudo —centigramos por segundo, porque
+0,01 g/s x 3 600 s/h / 1 000 g/kg = 0,036 kg/h— y deja un 0,5 % de residuo, que
+cae dentro de la incertidumbre de la propia densidad (0,741 +- 0,007 g/mL, o sea
+0,9 %, medida en F1-47). Se adopta 0,036 y no 0,036186 porque el segundo numero
+no es del formato: arrastra la densidad de ESTE deposito de gasolina.
+
+TERCERA PATA, INDEPENDIENTE DE LA DENSIDAD Y DEL INYECTOR. `Fuel Mass Per
+Cylinder` esta confirmado en mg/cilindro, y un cuatro tiempos de 6 cilindros
+inyecta una vez por cilindro cada dos vueltas, asi que el caudal masico se puede
+calcular sin usar ningun canal de caudal:
+
+  mg/cil x 6 cil x (rpm/2) ciclos/min x 60 min/h / 1e6 = kg/h
+
+Dividido por el crudo de `Fuel Mass Flow` da 0,0344 a 400 rpm y 0,0358 a
+7 000 rpm: PLANO en todo el rango, con un 4 % de deriva atribuible a que el canal
+esta filtrado y a que el enriquecimiento transitorio entra y sale. Un factor
+equivocado no da plano; da una recta con pendiente.
+
+POR QUE LA CONTRADICCION DEL AFR NO ERA UN PROBLEMA DE ESCALA — y esta es la
+parte que hay que leer antes de fiarse de un canal de MAF en este log. El mismo
+calculo aplicado al aire (`Calculated Air Mass Per Cylinder`, tambien confirmado
+en mg/cilindro) NO sale plano, y no sale plano de una forma que ninguna escala
+puede arreglar:
+
+  tramo de rpm      Mass Air Flow   Mass Air Flow 1   Mass Air Flow 2
+    400-1000            0,049            0,098             0,099
+   1000-2000            0,058            0,132             0,107
+   2000-3000            0,073            0,161             0,135
+   3000-4000            0,096            0,201             0,205
+   4000-5000            0,111            0,211             0,242
+   5000-6000            0,134            0,247             0,294
+   6000-7100            0,150            0,274             0,339
+
+El cociente crece por tres en el rango del log. Un factor de escala es una
+CONSTANTE: multiplica igual a 400 rpm que a 7 000. Que crezca monotonamente con
+el caudal significa que estos canales no miden el aire que el modelo de la ECU
+calcula, y que ningun numero puesto aqui los va a hacer coincidir. A 6 715 rpm y
+227,2 kPa el modelo pide 1 117 kg/h de aire y `Mass Air Flow` publica 261 kg/h
+con este factor: es un sensor que se queda corto, progresivamente, en un motor
+que la ECU gobierna por presion de colector (speed-density), no por MAF.
+
+Tampoco es que esten desconectados —la hipotesis (a) de la nota anterior—: los
+tres varian con el motor (`Mass Air Flow 1` recorre 60..4 760 crudo, con 1 207
+valores distintos), no arrastran un valor por defecto como Oil Temperature.
+
+CONSECUENCIA PARA QUIEN LEA EL LOG. Los cinco canales llevan la unidad correcta
+para el tipo, kg/h, y `Fuel Mass Flow` es fiable en valor absoluto. Los cuatro de
+aire NO lo son: sirven para ver una tendencia, no para calcular un AFR ni una
+potencia. Es un defecto del canal, no de la unidad, y por eso el factor se
+confirma y el aviso se queda escrito aqui.
+
+QUE MIRAR SI ESTE NUMERO ESTA MAL. Lo primero, el 0,813875 de arriba: si ese
+cociente no es constante en otro log, la identidad se cae y con ella el factor.
+Lo segundo, el aviso del MAF: si en otro coche los canales de aire salen planos
+contra el modelo, entonces lo de aqui es de este coche y no del formato."""
+canales = 5
+
+[tipos.AngularVelocity]
+dimension = "angular_speed"
+# 1 cuenta = 100 grados/s = 50/3 rpm
+a_canonica = 16.666666666666668
+confianza = "confirmed"
+evidencia = """
+RESUELTO EN F1-38. La nota anterior decia que el crudo 402 no guardaba relacion
+evidente con 6 715 rpm «en ninguna escala decimal». Si la guarda, y el error
+estaba en buscarla sobre UNA FILA: con las 2 636 del AutoLog el canal se
+identifica solo.
+
+  correlacion(Angular Velocity, RPM) = +1,00000
+
+No es «parecida a» las rpm: ES las rpm. El canal no aporta una medida nueva, es
+el regimen del cigueñal en otra unidad, y eso es lo que permite fijar la escala
+sin depender de ninguna suposicion fisica.
+
+LA ESCALA, y es exacta:
+
+  Angular Velocity == parte_entera(RPM x 0,06)   en 2 597 de 2 636 filas (98,5 %)
+
+Las 39 filas que fallan lo hacen por una cuenta y todas en el mismo sitio: donde
+RPM x 0,06 queda justo por debajo de un entero (rpm 933 -> 55,98, el canal
+publica 56). O sea que la ECU trunca su regimen interno, que no es exactamente el
+entero que publica en RPM. Es truncamiento, no otro factor.
+
+QUE DESCARTA EL TRUNCAMIENTO FRENTE A UN FACTOR DISTINTO. Ajustando por minimos
+cuadrados sale 0,059890 en vez de 0,060000, un 0,18 % por debajo, y la tentacion
+es escribir ese numero. No: el sesgo medido es de -0,478 cuentas y es EL MISMO en
+todos los tramos de rpm (-0,476 a 400-1000 rpm, -0,481 a 6000-7100). Un factor
+equivocado da un sesgo PROPORCIONAL al valor; un truncamiento da -0,5 cuentas
+constante, que es exactamente lo que hay. Con 0,06 exacto las 2 636 filas
+coinciden dentro de +-1 cuenta; con 0,059890, tambien, y ademas hay que explicar
+por que el sesgo no crece. Se adopta 0,06.
+
+LA UNIDAD. 1 cuenta = 1/0,06 rpm = 50/3 rpm = 16,667 rpm, que son 100 grados por
+segundo exactos (100 deg/s = 100/6 rpm). El factor a la canonica del proyecto
+—rpm, units.toml— es 50/3; el 16,666666666666668 de arriba es el doble mas
+cercano, con un error de 1e-16 que esta catorce ordenes de magnitud por debajo
+del 0,18 % de la medida.
+
+RESOLUCION, que es lo unico incomodo de este canal: a ralenti (412 rpm) publica
+24 cuentas, asi que un escalon de una cuenta son 16,7 rpm. Para mirar deriva de
+ralenti no sirve; hay que usar `RPM`, que es el mismo dato con resolucion de
+1 rpm. Merece la pena decirlo en la interfaz antes de que alguien diagnostique un
+ralenti inestable que solo es cuantizacion.
+
+QUE MIRAR SI ESTE NUMERO ESTA MAL. La correlacion +1,00000 y el 98,5 % de
+coincidencia exacta con la parte entera; si el canal fuese la velocidad angular
+de otra cosa (un arbol, una rueda) esas dos cifras no saldrian."""
+canales = 1
+
 # =========================================================================== #
 #  INFERIDOS — plausibles pero sin identidad que los pruebe.
 #  Se muestran con marca visual. Confirmarlos es tarea F1-38.
@@ -543,41 +678,44 @@ canales = 1
 #  Es la mitigación del riesgo R1: mejor sin unidad que con una inventada.
 # =========================================================================== #
 
-[tipos.MassOverTime]
-dimension = "unknown"
-a_canonica = 1.0
-confianza = "unknown"
-evidencia = """
-No cuadra con la lambda medida y es el caso más claro de por qué no se debe
-adivinar una escala:
-  Mass Air Flow 1 = 4001, Fuel Mass Flow = 2958, λ medida 0,648, stq 14,7
-  AFR esperado = 9,53
-  aire/10 y fuel/100 dan AFR 13,53; ninguna combinación probada da 9,53.
-Dos explicaciones posibles, y no se puede distinguir con estas muestras:
-  a) los canales Mass Air Flow no están conectados (el motor es speed-density,
-     por MAP) y arrastran un valor por defecto, como Oil Temperature;
-  b) la escala es otra.
-Hasta resolverlo, los 5 canales se muestran en crudo. Tarea F1-38."""
-canales = 5
-
 [tipos.FuelVolume]
 dimension = "unknown"
 a_canonica = 1.0
 confianza = "unknown"
 evidencia = """
-Transient Throttle Fuel Peak Synchronous Output, DisplayMaxMin 30000,-30000,
-crudo 0 en la fila de referencia. Sin ningún valor distinto de cero con el que
-deducir la escala."""
-canales = 1
+SIGUE SIN FIJAR, pero la nota anterior era FALSA y hay que corregirla: decia
+«crudo 0 en la fila de referencia, sin ningun valor distinto de cero con el que
+deducir la escala». Sobre el AutoLog completo el canal tiene 1 552 filas no nulas
+de 2 636, con 459 valores distintos, y recorre -9 724 .. +5 344. Lo que fallaba
+era el metodo, no el canal: se juzgo por una fila.
 
-[tipos.AngularVelocity]
-dimension = "unknown"
-a_canonica = 1.0
-confianza = "unknown"
-evidencia = """
-Canal `Angular Velocity`, crudo 402, SIN DisplayMaxMin. No hay rango ni
-identidad. A 6715 rpm serían 703 rad/s, que no guarda relación evidente con
-402 en ninguna escala decimal."""
+QUE ES. `Transient Throttle Fuel Peak Synchronous Output` es el aporte de
+combustible del enriquecimiento transitorio, y el signo importa: 1 356 filas
+positivas (enriquecimiento al abrir gas) y 196 negativas (empobrecimiento al
+cerrar). Es un INCREMENTO sobre el combustible base, no una cantidad absoluta,
+asi que su clase de magnitud es INTERVALO. Da igual para el numero —el volumen no
+tiene origen desplazado— pero no da igual para lo que significa.
+
+POR QUE AUN ASI NO SE PUEDE FIJAR. Ningun canal del log publica esta misma
+cantidad en unidades ya conocidas, que es lo que resolvio `MassOverTime`. Se
+probaron los candidatos y ninguno da una relacion constante:
+
+  contra Transient Throttle Fuel Enrichment Sync Amount (%):  cv 96 %
+  contra Injector 1 Volume:                        correlacion -0,23
+  contra Throttle Position Derivative:             correlacion +0,43
+  contra Transient Throttle Fuel Enrichment Rate:  correlacion +0,58
+
+Correlaciones de 0,4 a 0,6 dicen que el canal tiene que ver con el transitorio,
+que ya se sabia por el nombre; no fijan una escala.
+
+LO QUE SI SE PUEDE ACOTAR, y es la via si esto se retoma: si compartiese unidad
+con `InjFuelVolume` (decenas de nanolitros, confirmado en F1-47), el maximo de
+5 344 serian 53 uL, frente a los 119 uL que el inyector entrega por ciclo a plena
+carga —un aporte transitorio de pico del 45 %, que es del orden de lo que se
+configura—. Es PLAUSIBLE y por eso no se escribe: exactamente el paso que la
+regla de `confianza = unknown` prohibe. Haria falta una identidad, y la unica que
+la cerraria es comparar el volumen inyectado durante un transitorio con el mismo
+punto en regimen estacionario, que necesita un log grabado a proposito."""
 canales = 1
 
 [tipos.PulsesPerLongDistance]
@@ -585,12 +723,40 @@ dimension = "unknown"
 a_canonica = 1.0
 confianza = "unknown"
 evidencia = """
-Vehicle Speed 0 Calculated Rate, crudo 2123, SIN DisplayMaxMin.
-Es un parámetro de calibración del sensor de velocidad (pulsos por km o por
-milla), no una medida. Sin más muestras no se puede fijar."""
-canales = 1
+SIGUE SIN FIJAR, y aqui tambien la nota anterior era FALSA en lo esencial: decia
+que `Vehicle Speed 0 Calculated Rate` es «un parametro de calibracion del sensor
+de velocidad, no una medida». Es una medida. Sobre el AutoLog recorre 0 .. 3 793
+con 601 valores distintos, y:
 
-# --- Dimensiones compuestas: la unidad se DERIVA de las activas (units.toml) --
+  correlacion(tasa, Vehicle Speed) = +0,99998
+  tasa / crudo(Vehicle Speed) = 4,0824,  cv 0,44 %  sobre 1 338 filas
+
+Es la frecuencia de pulsos del sensor de velocidad, proporcional a la velocidad
+como tiene que ser. Un parametro de calibracion habria sido constante, como
+`Injection Stage 1 Flow Rate`, y no lo es.
+
+POR QUE NO BASTA PARA FIJAR EL FACTOR. La proporcionalidad da la relacion entre
+DOS canales, no la unidad de este. Con `Speed` a 0,1 km/h por cuenta —la fila mas
+rapida del log es crudo 929, o sea 92,9 km/h— salen 40,82 cuentas por km/h, y de
+ahi la unidad depende de un dato que el log no publica, los pulsos por kilometro
+configurados en la ECU:
+
+  si la tasa esta en Hz:          146 967 pulsos/km
+  si esta en pulsos por minuto:     2 449 pulsos/km
+
+El primero son demasiados pulsos para un sensor de velocidad; el segundo es del
+orden de lo normal. Eso es plausibilidad, no evidencia, y no se escribe.
+
+LA PREGUNTA CONCRETA QUE LO CIERRA, que es lo que esta tarea puede aportar: cual
+es la calibracion del sensor de velocidad en la ECU (pulsos por km, o pulsos por
+revolucion y el desarrollo de la rueda). Con ese numero el factor sale de una
+division y este tipo pasa a confirmado. Sin el, no.
+
+PISTA POR SI SE MIDE ALGUN DIA: contra `Driveshaft RPM` el cociente sale 7,93 con
+cv 2,31 %, y en las cinco filas mas rapidas del log ronda 8,0. Ocho pulsos por
+revolucion es un numero de sensor creible, pero el 2,31 % de dispersion no
+aguanta como identidad."""
+canales = 1
 
 [tipos.PercentPerRpm]
 dimension = "pct_per_rpm"
@@ -628,18 +794,32 @@ canales = 3
 tipos_totales = 34
 # F1-47 pasó `Flow`, `InjFuelVolume` y `MassPerCyl` de inferidos a confirmados
 # con la especificación del inyector del propietario: 16 -> 19 y 11 -> 8.
-confirmados = 19
+# F1-38 pasó `MassOverTime` (5 canales) y `AngularVelocity` (1) de desconocidos a
+# confirmados, midiendo sobre las 2 636 filas del AutoLog: 19 -> 21 y 7 -> 5.
+confirmados = 21
 inferidos = 8
-desconocidos = 7
+desconocidos = 5
 canales_totales = 475
-canales_confirmados = 422
-canales_inferidos = 36
-canales_desconocidos = 17
-# Matiz importante para no leer el 422 como mejor de lo que es: incluye los 102
+# CORRECCIÓN DE RECUENTO, encontrada al hacer F1-38. Estos tres números no
+# cuadraban con la suma de los `canales` de cada tipo, y llevaban así desde
+# F1-47: esa tarea cambió la confianza de `Flow` (2 canales), `InjFuelVolume`
+# (13) y `MassPerCyl` (3) de inferida a confirmada, pero dejó los 18 canales
+# contados como inferidos. Decía 422 y 36 donde la suma daba 440 y 18.
+# Ahora los tres son la suma real, y `test_descriptor_haltech.py` la comprueba
+# para que no vuelva a desviarse en silencio.
+canales_confirmados = 446
+canales_inferidos = 18
+canales_desconocidos = 11
+# Matiz importante para no leer el 446 como mejor de lo que es: incluye los 102
 # canales de tipo `Raw`, cuya escala es trivialmente x1 pero que NO tienen unidad
 # física (son contadores, enumerados y máscaras). Canales con una unidad física
-# confirmada: 422 - 102 = 320 de 475, el 67 %.
-canales_con_unidad_fisica_confirmada = 320
+# confirmada: 446 - 102 = 344 de 475, el 72 %.
+canales_con_unidad_fisica_confirmada = 344
+# Y un segundo matiz, que F1-38 obliga a escribir: de esos 326, cuatro —los de
+# Mass Air Flow— tienen la unidad confirmada y el VALOR no fiable en absoluto.
+# La unidad de un canal y su credibilidad son dos cosas distintas; ver la
+# evidencia de `MassOverTime`.
+canales_con_unidad_confirmada_y_valor_no_fiable = 4
 nota = """
 Frente a las 13 escalas confirmadas de docs/01 §1.8, esta revisión confirma tres
 más por identidad aritmética sobre la fila de referencia:
@@ -647,5 +827,9 @@ más por identidad aritmética sobre la fila de referencia:
   · Frequency    — x1 Hz, vía el disparo del inyector.
   · Time_us      — x1 µs, vía el periodo de ciclo del motor (y de paso revela
                    que el motor tiene 6 cilindros).
-Los 7 desconocidos y los 11 inferidos son el trabajo de la tarea F1-38. Ninguno
-se rellena a ojo: se muestran en crudo o con marca, según su confianza."""
+F1-38 cerró dos de los desconocidos y dejó los otros cinco con la evidencia
+corregida: dos de ellos —`FuelVolume` y `PulsesPerLongDistance`— se habían
+descartado juzgando UNA fila, y sobre el log completo los dos canales varían.
+Siguen sin factor, pero ahora se sabe qué son y qué dato falta para fijarlos.
+Los 5 desconocidos y los 8 inferidos que quedan no se rellenan a ojo: se muestran
+en crudo o con marca, según su confianza."""

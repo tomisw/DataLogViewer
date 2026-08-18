@@ -4,14 +4,14 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-17 16:59:39Z
+Actualizado: 2026-08-18 20:16:59Z
 
-**310 / 775 pts cerrados (40.0 %)** · 140 pts esperando revisión humana → 58.1 % entregado
+**310 / 775 pts cerrados (40.0 %)** · 145 pts esperando revisión humana → 58.7 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
-| F1 | 190 | 39 | 0 | 5 | 0 | 234 |
+| F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 21 | 22 | 8 | 64 | 3 | 118 |
@@ -34,6 +34,7 @@ Actualizado: 2026-08-17 16:59:39Z
 | `F1-15` Presión absoluta/relativa como cambio de ori | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) DISCREPANCIA ENTRE ESPECI |
 | `F1-16` Dimensiones compuestas derivadas (`%/kPa` →  | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LA ARITMETICA ES a_num/a_ |
 | `F1-20` Prueba de la trampa del delta (Δ10 K = 10 °C | revision_humana | Opus 5 | G1 | data/casos_de_unidades.toml (38 filas: 22 puntos, 5 deltas, 2 varianza |
+| `F1-38` Confirmar los 21 tipos `unknown` con análisi | revision_humana | Opus 5 | G1 | Cierra 2 de los 7 tipos desconocidos que quedaban y corrige la evidenc |
 | `F1-47` La identidad del inyector fija tres factores | revision_humana | Opus 5 | G1 | CUARTA COMPROBACION, independiente del inyector: aritmetica de motor c |
 | `FG-01` Sondeo: codificación, fin de línea, delimita | revision_humana | Opus 5 | G1 | dlv_core/formatos/sondeo.py: pasos 1,2,3 y 5 de SS7.4 (codificacion co |
 | `FG-02` Separador decimal con verificación cruzada d | revision_humana | Opus 5 | G1 | dlv_core/formatos/decimal_csv.py + 32 pruebas. Verificacion cruzada de |
@@ -75,7 +76,7 @@ Actualizado: 2026-08-17 16:59:39Z
 | ⏳ | `F0-13` | Log equivalente en dos formatos (nativo + genérico) para la pr | Sonnet 5 | 3 | F0-12 | G1 | `613f5f8` |
 | ✔  | `F0-14` | Guía de contribución, convenciones y ADR-009 documentado como  | Haiku 4.5 | 2 | F0-02 | G4 | `ed16fb5` |
 
-## F1 — 229/234 pts
+## F1 — 234/234 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -116,7 +117,7 @@ Actualizado: 2026-08-17 16:59:39Z
 | ✔  | `F1-35` | Contenedor `pywebview` + PyInstaller `onedir` para desarrollo | Sonnet 5 | 4 | F0-03, F1-21 | G3 | `ee4fb16` |
 | ✔  | `F1-36` | Fuzzing de propiedad sobre cabecera y filas (Hypothesis) | Opus 5 | 4 | F1-03, F0-06 | G2 | `b01e52e` |
 | ✔  | `F1-37` | Presupuestos de F1 como puertas de CI, incluido el de cambio d | Haiku 4.5 | 2 | F0-04, F1-23 | G4 | `2e92399` |
-| ·  | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
+| ⏳ | `F1-38` | Confirmar los 21 tipos `unknown` con análisis de datos y evide | Opus 5 | 5 | F0-09 | G1 | — |
 | ✔  | `F1-39` | Montaje de la aplicación: unir renderizador, ejes, paneles, es | Sonnet 5 | 8 | F1-26, F1-28, F1-29, F1-31, F1-33 | G3 | `e918085` |
 | ✔  | `F1-40` | Sesión de log abierto en `dlv-api` y endpoint de cubos de pirá | Opus 5 | 8 | F1-21, F1-09, F1-11 | G2 | — |
 | ✔  | `F1-41` | Selector de tipo de combustible y factores de conversión edita | Sonnet 5 | 3 | F1-14 | G3 | — |
@@ -142,7 +143,7 @@ Actualizado: 2026-08-17 16:59:39Z
 | ⏳ | `FG-09` | Asignación automática de roles por sinónimos, normalización y  | Opus 5 | 8 | F0-10 | G1 | `334a088` |
 | ⏳ | `FG-10` | Informe de plausibilidad por rango declarado de cada rol | Opus 5 | 5 | FG-09 | G1 | `30666f0` |
 | ✔  | `FG-11` | Asistente de importación de 3 pasos con previsualización viva | Sonnet 5 | 8 | FG-04, FG-09 | G3 | `1b76111` |
-| ✔  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | — |
+| ✔  | `FG-12` | Perfil `.dlvimport` con huella de cabecera y reaplicación parc | Sonnet 5 | 5 | FG-11 | G3 | `dbc6c77` |
 | ✔  | `FG-13` | Descriptores de formato nativo declarativos; migrar Haltech a  | Opus 5 | 8 | F1-01 | G2 | `71c9f21` |
 | ✔  | `FG-14` | Robustez: filas de longitud variable, columnas duplicadas, cab | Sonnet 5 | 4 | FG-05 | G3 | `682de2f` |
 | ✔  | `FG-15` | Fuzzing del importador genérico sobre el corpus de CSV | Opus 5 | 4 | FG-14, F0-12 | G2 | `46d8ff6` |

@@ -521,15 +521,23 @@ def test_la_dimension_declarada_coincidente_no_estorba(xp: XpVec) -> None:
 
 
 def test_una_dimension_desconocida_no_choca_con_nada(xp: XpVec) -> None:
-    """Los 7 tipos `confianza = "unknown"` de `data/formats/haltech_nsp.toml` se
+    """Los tipos `confianza = "unknown"` de `data/formats/haltech_nsp.toml` se
     declaran con dimensión `unknown` a propósito (mitigación de R1). Eso es la
     AUSENCIA de una dimensión, no una dimensión distinta, y tratarlo como choque
     llenaría el informe de falsos defectos en los canales que el descriptor ya
-    marca como no interpretables."""
+    marca como no interpretables.
+
+    Quedan cinco tipos así tras F1-38, que cerró dos de los siete. El canal de
+    ejemplo era `Angular Velocity` precisamente hasta esa tarea: ahora tiene
+    dimensión `angular_speed`, así que se usa uno de los que siguen abiertos.
+    """
     valores = Vec([360.0 + (i % 10) for i in range(100)])
     h = _evaluar(
         CanalJuzgable(
-            "Angular Velocity", valores, _exacta("coolant_temp"), dimension_declarada="unknown"
+            "Vehicle Speed 0 Calculated Rate",
+            valores,
+            _exacta("coolant_temp"),
+            dimension_declarada="unknown",
         ),
         xp,
     )
