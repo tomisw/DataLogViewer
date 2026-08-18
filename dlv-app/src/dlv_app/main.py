@@ -68,12 +68,20 @@ con `npm run build`. `main()` decide asi, en orden:
    de credenciales al frontend funcionan de extremo a extremo, no es el
    frontend de `dlv-ui`.
 
-Empaquetado con PyInstaller (F5-01): este modulo localiza `dlv-ui/dist/`
-relativo al propio fichero fuente (`_RAIZ_REPO`, igual que `dlv_api.main`
-localiza `data/`), lo que no sera valido bajo un `dlv_app.spec` congelado
--- ver el aviso ya anotado en ese fichero. No se toca aqui porque el
-paquete congelado esta fuera del alcance de "que la app arranque en esta
-maquina" y ya esta marcado como pendiente de F5-01.
+Empaquetado con PyInstaller (F5-01): `_raiz_datos_de_la_app` (mas abajo)
+ya distingue arbol de desarrollo (cuenta `.parents[]` desde `__file__`) de
+paquete congelado (`sys._MEIPASS`, ver su docstring), asi que este modulo
+SI localiza `dlv-ui/dist/` correctamente bajo `dlv_app.spec`.
+
+El mismo problema lo tenia `dlv_api.main` con `data/*.toml`, y era el que de
+verdad bloqueaba que un paquete congelado abriese un log: sin el, la app
+arranca y falla al abrir cualquier fichero, porque no encuentra el descriptor
+ni el catalogo de unidades. Se arreglo en la misma tarea con este mismo
+patron (`dlv_api.main._raiz_de_datos`), asi que las dos mitades --el
+frontend que sirve `dlv-app` y los datos que lee `dlv-api`-- se localizan
+ya igual en el arbol de codigo y en el paquete. `tests/
+test_rutas_en_paquete_congelado.py` comprueba que no vuelva a aparecer una
+ruta contada por `.parents[]` sin el guardia de `sys.frozen`.
 
 Cierre limpio (F1-35)
 ======================
@@ -93,6 +101,7 @@ ventana se cierra por una excepcion, no solo por el cierre normal.
 from __future__ import annotations
 
 import http.server
+import sys
 import threading
 import time
 import urllib.error
@@ -109,11 +118,34 @@ from dlv_api.main import ServidorArrancado, preparar_servidor
 
 HOST_LOCAL = "127.0.0.1"
 
-# `parents[3]` desde `dlv-app/src/dlv_app/main.py`: [0]=dlv_app, [1]=src,
-# [2]=dlv-app, [3]=raiz del repositorio. Misma cuenta que usa
-# `dlv_api.main._RAIZ_REPO` para `data/`; ver el aviso de F5-01 en el
-# docstring del modulo sobre por que esto no es valido bajo PyInstaller.
-_RAIZ_REPO = Path(__file__).resolve().parents[3]
+
+def _raiz_datos_de_la_app() -> Path:
+    """Raiz desde la que este modulo localiza sus propios ficheros embebidos
+    (hoy solo `dlv-ui/dist`, ver `_DIST_UI` mas abajo) -- arreglo de F5-01
+    para el aviso que dejo F1-35 en este mismo docstring de modulo.
+
+    En el arbol de desarrollo, `parents[3]` desde
+    `dlv-app/src/dlv_app/main.py` ([0]=dlv_app, [1]=src, [2]=dlv-app,
+    [3]=raiz del repositorio) es correcto. Pero bajo PyInstaller `onedir`
+    (`dlv_app.spec`, `noarchive=False`) el bytecode puro de este modulo vive
+    dentro del archivo `PYZ`, no como fichero suelto en disco: `__file__` ya
+    no aterriza en una ruta real del arbol de codigo, y contar `.parents[]`
+    desde ahi no tiene un equivalente valido en el paquete congelado (el
+    mismo problema que ya tiene `dlv_api.main._RAIZ_REPO`, documentado en
+    `dlv_app.spec`).
+
+    PyInstaller marca el proceso congelado con `sys.frozen = True` y expone
+    en `sys._MEIPASS` la carpeta de soporte del paquete (en `onedir`,
+    tipicamente `_internal/` junto al ejecutable) -- ahi es donde
+    `dlv_app.spec` copia `dlv-ui/dist` (`datas=[(..., "dlv-ui/dist")]`), asi
+    que es la raiz correcta para localizarlo en el paquete congelado.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+    return Path(__file__).resolve().parents[3]
+
+
+_RAIZ_REPO = _raiz_datos_de_la_app()
 _DIST_UI = _RAIZ_REPO / "dlv-ui" / "dist"
 
 # Plantilla de la pagina placeholder (ver `_pagina_placeholder`). Se sustituye

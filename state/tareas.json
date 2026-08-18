@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-18 22:27:29Z"
+    "actualizado": "2026-08-18 22:31:29Z"
   },
   "tareas": [
     {
@@ -3768,10 +3768,16 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-18 22:31:29Z",
+          "texto": "Entregado por un agente Sonnet que murio por limite de sesion, pero habia llegado practicamente al final; completado y revisado por el orquestador (puerta G2). Lo que trae: dlv_app.spec con dlv-ui/dist en datas y una comprobacion que ABORTA el build con mensaje claro si dist no existe (sin eso el paquete abriria el placeholder provisional en vez del frontend), la lista de excludes con el motivo de cada entrada, hiddenimports para lo que uvicorn resuelve por nombre en tiempo de ejecucion, tools/empaquetar.py, tools/verificar_empaquetado.py y un workflow. VERIFICADO POR MI: 'samples' no aparece en ningun sitio del .spec, asi que samples/real/ no entra en el paquete; y la lista de data/*.toml se comprobo contra lo que el codigo abre de verdad, no de memoria. LO QUE HE COMPLETADO YO, y era lo que dejaba la tarea a medias: dlv_api.main calculaba _RAIZ_REPO y las cinco rutas de data/*.toml con Path(__file__).parents[3], que bajo PyInstaller no vale porque el bytecode vive dentro del PYZ y __file__ no aterriza en ninguna ruta real. El agente lo arreglo en su mitad (dlv-app) y dejo la de dlv-api porque le prohibi tocar ese carril para que no colisionase con otro agente; esa restriccion era mia y ya no aplica. Sin ese arreglo el paquete ARRANCA y falla al abrir cualquier log: el modo de fallo mas caro, porque no aparece en ninguna prueba de aqui (donde la ruta relativa siempre acierta) y solo aparece en la maquina de quien descarga el ZIP. F1-35 ya lo habia anotado como comentario en dlv_api.main y el comentario sobrevivio intacto y sin efecto hasta ahora, asi que he añadido tests/test_rutas_en_paquete_congelado.py: prohibe contar .parents[] para una raiz de datos fuera de una funcion que mire sys.frozen, en los tres paquetes. QUE REVISAR, y es el limite grande: NADA de esto se ha construido de verdad. No hay PyInstaller ni PyPI en este entorno, asi que no hay ZIP, ni medida de tamaño contra el presupuesto de <60 MB de docs/02 2.6, ni arranque en frio, ni prueba de humo abriendo un log real. Cada exclusion es un riesgo sin confirmar: la unica forma de validarlas es un build por plataforma leyendo build/dlv-app/warn-dlv-app.txt. El verificador que si corre da 1 en rojo aqui, y por la razon correcta: falta dlv-ui/dist porque no hay npm."
+        }
+      ],
+      "base": "6c07905"
     },
     {
       "id": "F5-02",

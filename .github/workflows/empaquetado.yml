@@ -1,0 +1,94 @@
+name: Empaquetado
+
+# F5-01: build real de `dlv-app` (onedir + ZIP) en las 3 plataformas.
+#
+# Por qué es un workflow separado de `ci.yml` y no un job más: construir con
+# PyInstaller + `npm run build` cuesta varios minutos por plataforma, y
+# `ci.yml` ya deja anotado (ver su job `python`) que ese coste solo se paga
+# cuando hay algo que medir de verdad. Aquí SÍ lo hay: `tools/empaquetar.py`
+# ejecuta el build, comprueba el ZIP contra el presupuesto de
+# `docs/02-alcance-y-plan.md` §2.6 (< 60 MB comprimido, < 150 MB sin
+# comprimir) y falla la comprobación si se supera -- sin ajustar el límite,
+# como pide la regla del proyecto.
+#
+# QUÉ NO SE HA COMPROBADO TODAVÍA (informe de la tarea F5-01)
+# ==============================================================
+# Este workflow no se ha ejecutado nunca: se escribió en un entorno sin
+# acceso a PyPI ni a la registry de npm (los dos bloqueados con 403), así
+# que ni `pyinstaller` ni las dependencias de `dlv-ui` se pudieron instalar
+# ahí para probarlo de verdad. Los runners de GitHub Actions sí tienen
+# acceso normal a ambos, pero eso es una expectativa, no algo que se haya
+# visto correr. La primera vez que corra hay que leer su log con atención,
+# en particular:
+#   - si `hiddenimports`/`excludes` de `dlv_app.spec` dejan algo sin
+#     encontrar (buscar en el log de PyInstaller los avisos de módulo no
+#     encontrado y en `dlv-app/build/dlv-app/warn-dlv-app.txt`);
+#   - si el paquete arranca de verdad (este workflow NO abre la ventana:
+#     no hay pantalla en el runner sin un paso adicional de Xvfb/similar en
+#     Linux, y nada equivalente aquí para macOS/Windows; solo confirma que
+#     el build termina y el ZIP entra en el presupuesto de tamaño);
+#   - si el tiempo de arranque en frío cumple los < 2,5 s de §2.6 -- este
+#     workflow tampoco lo mide, es un presupuesto de tiempo interactivo con
+#     ventana real, no algo que un runner sin cabeza pueda medir con
+#     sentido.
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  empaquetar:
+    name: dlv-app onedir + ZIP en ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          cache: true
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      # Incluye el grupo `dev` (por omisión de `uv sync`), que es donde
+      # `pyproject.toml` declara `pyinstaller>=6.0` -- ver el comentario ahí
+      # sobre por qué es una dependencia de construcción y no entra en el
+      # ZIP que produce.
+      - name: Sync workspace (con pyinstaller)
+        run: uv sync --all-packages
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dlv-ui/package-lock.json
+      - name: Construir dlv-ui (produce dlv-ui/dist, que dlv_app.spec exige)
+        run: npm ci && npm run build
+        working-directory: dlv-ui
+
+      # Comprobación barata antes del build completo: el mismo AST/rutas
+      # que valida `tools/verificar_empaquetado.py` sin necesitar
+      # PyInstaller instalado. Si esto falla, el build real de más abajo
+      # habría fallado igual pero tras gastar minutos en ello.
+      - name: Comprobar dlv_app.spec (sin build real)
+        run: uv run python tools/verificar_empaquetado.py
+
+      # `empaquetar.py` ejecuta `pyinstaller dlv_app.spec`, comprime
+      # `dist/dlv-app/` en un ZIP determinista y compara el resultado contra
+      # el presupuesto de tamaño de docs/02-alcance-y-plan.md §2.6. Sale con
+      # código de error si se supera -- no se ajusta el límite para que pase.
+      - name: Construir el paquete onedir y comprimirlo en ZIP
+        run: uv run python tools/empaquetar.py --salida dist/dlv-app-${{ matrix.os }}.zip
+
+      - name: Publicar el ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: dlv-app-${{ matrix.os }}
+          path: dist/dlv-app-${{ matrix.os }}.zip

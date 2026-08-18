@@ -68,12 +68,12 @@ por qué la confianza de un rol viaja completa y no aplanada a una cadena
 (`docs/07` §7.15). Estas cuatro rutas son solo el cableado: leer la ruta que
 pide el frontend, llamar y traducir el error a un código HTTP.
 
-El descriptor de formato (`data/formats/haltech_nsp.toml`) se localiza hoy
-relativo a este fichero fuente (`_RAIZ_REPO`), que funciona en el repositorio
-de desarrollo pero no en un paquete `dlv-app` ya empaquetado (F5-01): cuando
-llegue el empaquetado, ese dato tendrá que venir embebido en el ZIP portable
-en vez de localizarse por ruta relativa al código fuente. Se deja anotado
-aquí a propósito para que esa tarea no lo redescubra desde cero.
+El descriptor de formato (`data/formats/haltech_nsp.toml`) y los demás
+`data/*.toml` se localizan con `_raiz_de_datos()`, que distingue el árbol de
+código del paquete congelado (`sys._MEIPASS`). F1-35 dejó anotado aquí que la
+ruta relativa al fichero fuente no valdría en un paquete `dlv-app`, y F5-01 lo
+arregló: ver el docstring de esa función para por qué el fallo que evita solo se
+manifiesta en la máquina de quien usa el ZIP y en ninguna prueba de aquí.
 """
 
 from __future__ import annotations
@@ -81,6 +81,7 @@ from __future__ import annotations
 import os
 import secrets
 import socket
+import sys
 import tomllib
 from dataclasses import dataclass
 from functools import lru_cache
@@ -162,7 +163,35 @@ from dlv_core.unidades import (
     cargar_catalogo,
 )
 
-_RAIZ_REPO = Path(__file__).resolve().parents[3]
+
+def _raiz_de_datos() -> Path:
+    """Desde dónde se localizan los `data/*.toml`, en árbol de código y en paquete.
+
+    F1-35 dejó anotado en el docstring de este módulo que la ruta relativa al
+    fichero fuente «funciona en el repositorio de desarrollo pero no en un paquete
+    `dlv-app` ya empaquetado (F5-01)». Esto es ese arreglo, con el mismo patrón que
+    `dlv_app.main._raiz_datos_de_la_app`.
+
+    En el árbol de desarrollo, `parents[3]` desde `dlv-api/src/dlv_api/main.py`
+    ([0]=dlv_api, [1]=src, [2]=dlv-api, [3]=raíz) es correcto. Bajo PyInstaller
+    `onedir` no lo es: el bytecode de este módulo vive dentro del archivo `PYZ`, así
+    que `__file__` no aterriza en ninguna ruta real del disco y contar `.parents[]`
+    desde ahí da un directorio que no existe. `sys._MEIPASS` es el directorio donde
+    el arranque de PyInstaller deja los `datas` del paquete, que es donde
+    `dlv_app.spec` copia `data/` entero.
+
+    POR QUÉ ESTO NO ES UN DETALLE DE EMPAQUETADO. Sin este arreglo el paquete
+    ARRANCA y falla al abrir cualquier log, porque no encuentra ni el descriptor de
+    formato ni el catálogo de unidades. Es el modo de fallo más caro de los dos
+    posibles: uno que no aparece en ninguna prueba del repositorio —donde la ruta
+    relativa siempre funciona— y solo aparece en la máquina de quien usa el ZIP.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+    return Path(__file__).resolve().parents[3]
+
+
+_RAIZ_REPO = _raiz_de_datos()
 _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
 _UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
 _ROLES_TOML = _RAIZ_REPO / "data" / "roles.toml"

@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-18 22:27:29Z
+Actualizado: 2026-08-18 22:31:29Z
 
-**325 / 775 pts cerrados (41.9 %)** · 145 pts esperando revisión humana → 60.6 % entregado
+**331 / 775 pts cerrados (42.7 %)** · 145 pts esperando revisión humana → 61.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-18 22:27:29Z
 | F3 | 26 | 22 | 8 | 59 | 3 | 118 |
 | F4 | 5 | 0 | 8 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 5 | 0 | 3 | 68 | 0 | 76 |
+| F5 | 11 | 0 | 3 | 62 | 0 | 76 |
 
 ## Requieren atención
 
@@ -233,11 +233,11 @@ Actualizado: 2026-08-18 22:27:29Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 5/76 pts
+## F5 — 11/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ·  | `F5-01` | Empaquetado `onedir` en ZIP para las 3 plataformas, con exclus | Opus 5 | 6 | F1-35 | G2 | — |
+| ✔  | `F5-01` | Empaquetado `onedir` en ZIP para las 3 plataformas, con exclus | Opus 5 | 6 | F1-35 | G2 | — |
 | ·  | `F5-02` | Modo portable con `portable.txt`: cero escritura fuera de la c | Opus 5 | 5 | F5-01 | G1 | — |
 | ·  | `F5-03` | Detección de WebView2 ausente con descarga guiada | Sonnet 5 | 3 | F5-01 | G3 | — |
 | ·  | `F5-04` | Firma y notarización | Sonnet 5 | 4 | F5-01 | G3 | — |
