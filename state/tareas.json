@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-18 22:23:17Z"
+    "actualizado": "2026-08-18 22:24:53Z"
   },
   "tareas": [
     {
@@ -3862,10 +3862,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-18 22:24:53Z",
+          "texto": "Entregado por un agente Sonnet, revisado por el orquestador. Lo importante no es la guia de despliegue: es un DEFECTO REAL que encontro de camino. main.ts construia la URL de la API como http://127.0.0.1:<puerto> cableado, sin mirar desde que host se habia cargado la pagina. Invisible en dlv-app y en npm run dev (loopback en los dos), y bloqueante en red: desde el navegador de otro equipo, 127.0.0.1 es ESE equipo, no el servidor. Corregido con resolverUrlBaseApi(window.location.hostname, ...) y ?api_host= como escape. Yo le he añadido el caso IPv6, que estaba mal: window.location.hostname devuelve la direccion SIN corchetes, asi que '::1' daba http://::1:8000, una URL que ningun navegador resuelve, y el sintoma habria sido otra vez 'no se pudo abrir el log' sin decir la causa. Ejecutados los 9 casos con node: los 9 correctos. VERIFICADO POR MI, no por el informe: dlv-api no monta StaticFiles en ningun sitio (samples/real/ no queda accesible por HTTP), servir()/preparar_servidor() ya aceptan host= con 127.0.0.1 por omision (no hizo falta tocar dlv-api), y la regex de CORS sigue intacta en loopback. QUE REVISAR, y es una decision tuya que el agente hizo bien en NO tomar: este despliegue NO funciona todavia, porque allow_origin_regex solo admite 127.0.0.1 y localhost, asi que un origen 192.168.x.x se rechaza en el preflight antes de mirar el token. Ampliar esa regex es tu decision, igual que acotar 'ruta' a un directorio de logs: hoy quien tenga el token puede pedir la cabecera de cualquier fichero legible por el proceso. Las garantias que se pierden estan listadas en docs/11 §11.5. No se pudo ejecutar npm install, build, preview ni vitest."
+        }
+      ],
+      "base": "e3fd287"
     },
     {
       "id": "F5-07",

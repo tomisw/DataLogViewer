@@ -23,6 +23,7 @@ import { Aplicacion } from "./app/aplicacion.ts";
 import { FuenteApi } from "./datos/fuente-api.ts";
 import type { FuenteDeDatos } from "./datos/fuente.ts";
 import { FuenteSintetica } from "./datos/fuente-sintetica.ts";
+import { resolverUrlBaseApi } from "./datos/resolver-api.ts";
 import { inicializarTema } from "./tema/tema.ts";
 
 function contenedorApp(): HTMLDivElement {
@@ -47,6 +48,13 @@ function contenedorApp(): HTMLDivElement {
  * nombre («sintética» / «dlv-api») y `Aplicacion` lo enseña: un repliegue
  * silencioso a datos falsos sería justo el tipo de cosa que hace perder una
  * tarde depurando por qué «los datos no coinciden con el log».
+ *
+ * La URL de la API se resuelve con `resolverUrlBaseApi` (F5-06) a partir del
+ * host desde el que se cargó ESTA página, no de una constante `127.0.0.1`
+ * cableada: ver el docstring de `datos/resolver-api.ts` para por qué eso
+ * importa en cuanto `dlv-ui` se sirve para otro equipo de la red y no solo
+ * para `dlv-app` o `npm run dev`. `?api_host=` es el escape para cuando
+ * `dlv-api` no comparte host con lo que sirve `dlv-ui`.
  */
 function elegirFuente(): { fuente: FuenteDeDatos; referencia: string } {
   const parametros = new URLSearchParams(window.location.search);
@@ -54,8 +62,12 @@ function elegirFuente(): { fuente: FuenteDeDatos; referencia: string } {
   const token = parametros.get("token");
   const log = parametros.get("log");
   if (puerto !== null && token !== null && log !== null) {
+    const apiHost = parametros.get("api_host");
     return {
-      fuente: new FuenteApi({ urlBase: `http://127.0.0.1:${puerto}`, tokenSesion: token }),
+      fuente: new FuenteApi({
+        urlBase: resolverUrlBaseApi(window.location.hostname, puerto, apiHost),
+        tokenSesion: token,
+      }),
       referencia: log,
     };
   }

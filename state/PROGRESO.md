@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-18 22:23:17Z
+Actualizado: 2026-08-18 22:24:53Z
 
-**315 / 775 pts cerrados (40.6 %)** · 145 pts esperando revisión humana → 59.4 % entregado
+**320 / 775 pts cerrados (41.3 %)** · 145 pts esperando revisión humana → 60.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-18 22:23:17Z
 | F3 | 21 | 22 | 8 | 64 | 3 | 118 |
 | F4 | 5 | 0 | 8 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 0 | 0 | 3 | 73 | 0 | 76 |
+| F5 | 5 | 0 | 3 | 68 | 0 | 76 |
 
 ## Requieren atención
 
@@ -233,7 +233,7 @@ Actualizado: 2026-08-18 22:23:17Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 0/76 pts
+## F5 — 5/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -242,7 +242,7 @@ Actualizado: 2026-08-18 22:23:17Z
 | ·  | `F5-03` | Detección de WebView2 ausente con descarga guiada | Sonnet 5 | 3 | F5-01 | G3 | — |
 | ·  | `F5-04` | Firma y notarización | Sonnet 5 | 4 | F5-01 | G3 | — |
 | ·  | `F5-05` | Actualizador opcional y desactivable | Sonnet 5 | 4 | F5-01 | G3 | — |
-| ·  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | — |
+| ✔  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | — |
 | ·  | `F5-07` | Espacio de trabajo `.dlvproj` persistente, con emparejamientos | Sonnet 5 | 5 | F3-01, F2-03 | G3 | — |
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
 | ▶  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |

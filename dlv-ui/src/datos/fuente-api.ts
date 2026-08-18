@@ -52,7 +52,12 @@ const COLUMNAS_CUBOS = 5;
 const BYTES_POR_FLOTANTE = 4;
 
 export interface OpcionesFuenteApi {
-  /** `http://127.0.0.1:<puerto>`, con el puerto efímero de ADR-007. */
+  /**
+   * `http://127.0.0.1:<puerto>` en escritorio (ADR-007, puerto efímero).
+   * En el despliegue de navegador de red (F5-06) puede ser el host de la LAN
+   * en el que escucha `dlv-api`: la construye `resolverUrlBaseApi`
+   * (`datos/resolver-api.ts`), no un valor cableado en este fichero.
+   */
   readonly urlBase: string;
   /** Token de sesión que `dlv-api` generó al arrancar (ADR-007). */
   readonly tokenSesion: string;
