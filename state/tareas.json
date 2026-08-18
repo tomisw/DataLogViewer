@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-18 22:24:53Z"
+    "actualizado": "2026-08-18 22:27:29Z"
   },
   "tareas": [
     {
@@ -2937,10 +2937,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-18 22:27:29Z",
+          "texto": "Entregado por un agente Sonnet, verificado por el orquestador ejecutando la logica pura con node (no fiandome del informe). Comprobado: (1) el orden es por severidad y solo dentro de ella por tiempo, asi que una informativa temprana NO gana a una critica tardia; (2) un detector desactivado sale primero, por encima de cualquier severidad concreta, y sigue teniendo fila con incidencias vacias, o sea que 'desactivado' nunca se confunde con 'todo bien'; (3) el NaN que el propio agente encontro y corrigio (dos activos sin incidencias restaban infinito menos infinito) esta arreglado: ordena por etiqueta; (4) un detector que no aparece en 'estados' se trata como activo, que es lo correcto mientras el backend no mande estados. AÑADIDO POR MI, y cubre mas que esta tarea: tests/test_espejos_typescript.py. El orden de severidades esta escrito dos veces, en dlv_core.plausibilidad.SEVERIDADES y en SEVERIDADES_CONCRETAS de tipos.ts, y no habia nada que lo comprobara; igual que el 'type Clase' de unidades/conversion.ts frente al Enum Clase de Python. Los dos se pueden desincronizar SIN QUE FALLE NADA: el panel ordenaria por un orden de consecuencia distinto del que aplica el motor, y una clase que un lado no reconozca cae en la rama por omision, que es como un delta de 10 K sale a -263,15 C. La prueba vive en Python porque es el unico lado que puede leer los dos ficheros. QUE REVISAR: el panel no esta cableado a ningun sitio todavia porque el backend no lo expone. Faltan cuatro cosas de otros carriles: un endpoint de incidencias, uno de estado de detectores (7.15), que Incidencia.detalle lleve la clase de conversion por campo (hoy es dict[str,float] sin clase, y su propio docstring ya avisa) y un irA(tS) en el controlador de navegacion. Y no hay colores de severidad en la paleta del tema: el agente uso marcas ●/○ en vez de inventar literales de color, que es lo correcto, pero la paleta necesita esos tokens algun dia."
+        }
+      ],
+      "base": "5298576"
     },
     {
       "id": "F3-13",

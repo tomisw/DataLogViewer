@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-18 22:24:53Z
+Actualizado: 2026-08-18 22:27:29Z
 
-**320 / 775 pts cerrados (41.3 %)** · 145 pts esperando revisión humana → 60.0 % entregado
+**325 / 775 pts cerrados (41.9 %)** · 145 pts esperando revisión humana → 60.6 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-18 22:24:53Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 21 | 22 | 8 | 64 | 3 | 118 |
+| F3 | 26 | 22 | 8 | 59 | 3 | 118 |
 | F4 | 5 | 0 | 8 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 5 | 0 | 3 | 68 | 0 | 76 |
@@ -172,7 +172,7 @@ Actualizado: 2026-08-18 22:24:53Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 43/118 pts
+## F3 — 48/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -187,7 +187,7 @@ Actualizado: 2026-08-18 22:24:53Z
 | ·  | `F3-09` | Validación contra la verdad de referencia, en formato nativo y | Opus 5 | 5 | F3-07, F0-13 | G1 | — |
 | ·  | `F3-10` | Topes de alerta: aviso, crítico, banda y curva en función de o | Opus 5 | 8 | F3-06, F1-19 | G1 | — |
 | ·  | `F3-11` | Dibujo de límites y bandas sobre los paneles, en la unidad act | Sonnet 5 | 4 | F3-10, F1-25 | G3 | — |
-| ·  | `F3-12` | Panel de incidencias por severidad con salto al instante | Sonnet 5 | 5 | F3-07 | G3 | — |
+| ✔  | `F3-12` | Panel de incidencias por severidad con salto al instante | Sonnet 5 | 5 | F3-07 | G3 | — |
 | ▶  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | — |
 | ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
