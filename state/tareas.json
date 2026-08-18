@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-18 20:16:59Z"
+    "actualizado": "2026-08-18 22:23:17Z"
   },
   "tareas": [
     {
@@ -3380,10 +3380,16 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-18 22:23:17Z",
+          "texto": "Entregado por un agente Sonnet que murio por limite de sesion con 2 pruebas en rojo; revisado y corregido por el orquestador (puerta G2). El modulo estaba bien: los dos fallos eran de las pruebas, no del codigo. (1) Una exigia que el promedio ingenuo del error saliera NEGATIVO, y en ese escenario sale +0,4 kPa contra los 3,0 reales; la afirmacion util es el factor 7,5 de diferencia, no el signo, asi que la asercion ahora es sobre la magnitud. (2) La otra esperaba el mensaje de 'rejilla' y saltaba la rama de 'mismo numero de muestras en instantes distintos', que es la traicionera; ahora prueba las dos ramas por separado. Verificado por mi ademas: el borde i_inicio=0 no existe porque _delta_simple invalida la primera muestra (comprobado ejecutando un escalon en el indice 1: objetivo_anterior sale 100,0 y no el ultimo valor de la serie), n_muestras del evento coincide con la longitud del tramo que promedia, y el unico bucle Python es sobre escalones y no sobre muestras (ADR-009), con tope configurable. Corregido tambien un F821 real: una anotacion 'Mapping_like' que no existia. QUE REVISAR: el objetivo de boost es CONSTANTE en las 2636 filas del AutoLog (228,8 kPa siempre), asi que este modulo no se ha podido validar contra ningun transitorio real: sobre ese log devuelve un informe vacio con n_escalones_totales=0, que es lo correcto (no un cero de sobreoscilacion), pero significa que las metricas estan probadas solo con escenarios fabricados. Para validarlas hace falta un log con un cambio de objetivo de boost. Desbloquea D7."
+        }
+      ],
+      "base": "a504996"
     },
     {
       "id": "F4-10",

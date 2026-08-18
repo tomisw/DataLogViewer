@@ -652,3 +652,84 @@ separacion_minima_relativa = 0.12
 # margen) y convierte «el ancho_de_celda es demasiado fino» en un error explicado
 # en vez de en veinte marchas inventadas.
 marchas_maximas = 8
+
+# =========================================================================== #
+#  MÉTRICAS DE PID DE BOOST  (F4-09 · docs/04 §4.2 P3, §4.3 D7)
+# =========================================================================== #
+#  Lo que necesita dlv_core.pid_boost para delimitar UN transitorio del lazo de
+#  boost (un escalón del objetivo) antes de medir su sobreoscilación, su tiempo
+#  de establecimiento y su error en régimen. Desbloquea D7 («sobreoscilación de
+#  boost: pico > objetivo + 5 % TRAS UNA SUBIDA»), declarado desde F0-07 con
+#  `sobreoscilacion_relativa_max` más abajo pero sin poder evaluarse: nada
+#  delimitaba «una subida» ni «tras». Las claves de aquí son exactamente esa
+#  delimitación.
+#
+#  MEDIDO SOBRE EL AUTOLOG REAL
+#  -----------------------------
+#  `Boost Control Target Pressure` es CONSTANTE en las 2 636 filas del AutoLog
+#  (2 288 crudo = 228,8 kPa siempre, con el motor en marcha y parado): el lazo
+#  nunca recibe una orden nueva en este log concreto, así que no hay ningún
+#  escalón que delimitar en él. Es exactamente el caso que contempla la regla 1
+#  de esta tarea («si el objetivo no cambia, no hay transitorio que medir, y hay
+#  que decirlo, no devolver un cero»): `dlv_core.pid_boost.medir_transitorios_
+#  boost` sobre este log devuelve un informe vacío con `n_escalones_totales = 0`,
+#  no una sobreoscilación de 0. Los `Boost Control Actual Pressure` de la misma
+#  zona activa (`Boost Control State` en 1, 3 o 6, presión > 100 kPa) sí dan una
+#  medida real de ruido de muestra a muestra, y es la que respalda
+#  `histeresis_banda_relativa` más abajo: 826 muestras, delta absoluto p50 =
+#  1,1 kPa, p90 = 2,5 kPa, sobre una media de 162,4 kPa en esa zona.
+[boost_pid]
+# Diferencia mínima entre dos muestras consecutivas del objetivo para que cuente
+# como un escalón. `Boost Control Target Pressure` es de tipo `Pressure`
+# (`docs/01` §1.8: crudo ÷10, resolución 0,1 kPa). 5 kPa son 50 veces esa
+# resolución -- el mismo factor de margen que `[marcha].rpm_arranque_min` usa
+# sobre la resolución de RPM--, muy por encima de cualquier ruido de
+# cuantización y muy por debajo de un cambio de tabla de boost por marcha o
+# modo real, que en la práctica son decenas de kPa (el rango de boost activo
+# del AutoLog, 100-227 kPa, es 127 kPa de fondo de escala).
+escalon_minimo_kpa = 5.0
+
+# Semiancho de la banda de establecimiento, en fracción del objetivo nuevo.
+# Literal de `docs/04` §4.2 P3: «tiempo de establecimiento al ±3 %».
+banda_establecimiento_relativa = 0.03
+
+# Histéresis de la banda de establecimiento, en fracción de su anchura (mismo
+# parámetro que acepta `primitivas.banda`). Medido: bajo boost activo (estado 1,
+# 3 o 6 y presión > 100 kPa) el AutoLog tiene un delta absoluto de muestra a
+# muestra con p90 = 2,5 kPa sobre una media de 162,4 kPa en esa zona, un 1,54 %.
+# Con 0,25 el margen adicional que `primitivas.banda` añade a cada lado de la
+# banda del 3 % es 0,25 x (2 x 3 %) = 1,5 % del objetivo -- prácticamente ese
+# mismo p90 medido--, así que absorbe el ruido de muestra a muestra sin
+# necesitar ensanchar la propia banda de establecimiento, que es la que importa
+# para el número que se informa.
+histeresis_banda_relativa = 0.25
+
+# Cuánto tiempo tiene que durar la carrera de «dentro de banda», sin interrupción
+# y hasta el final del horizonte del transitorio, para certificar el
+# establecimiento. Misma escala que `[segmentacion.duracion_minima_s].ralenti`
+# (1,0 s): es el orden de magnitud en el que un lazo de control de este motor se
+# juzga estable, y se queda por debajo de la duración mínima de una tirada WOT
+# (1,5 s, `[segmentacion.duracion_minima_s].wot`), así que un transitorio puede
+# llegar a establecerse dentro de una tirada corta y no solo en una larga.
+permanencia_establecimiento_s = 1.0
+
+# Y cuántas muestras, como mínimo, para lo mismo (las dos condiciones a la vez,
+# igual que `primitivas.Permanencia`). El AutoLog entero tiene dt mediano 54 ms
+# (`docs/01` §1.7, ~18,5 Hz efectivos); 10 muestras son ~540 ms a esa tasa, por
+# debajo del segundo de arriba, así que en este log manda el tiempo y no el
+# recuento -- pero un canal alineado a un grupo más lento (G2, 5 Hz) necesita el
+# recuento para no certificar un establecimiento con solo 5 muestras vistas.
+muestras_minimas_establecimiento = 10
+
+# Tope de eventos de las llamadas internas a `primitivas.eventos` (detección de
+# escalones, y carreras de «dentro de banda» por transitorio). Mismo valor y
+# mismo motivo que `[motor_de_deteccion].maximo_de_eventos`: no es física, es la
+# salvaguarda que mantiene acotada cada llamada.
+maximo_de_eventos_internos = 10000
+
+# Tope de escalones (subida + bajada) que se procesan de una sola vez. Acota el
+# único bucle de Python del módulo (ADR-009). Doscientos escalones en un
+# segmento son más de los que cualquier panel de tiradas puede mostrar a la vez
+# (§4.3, «la pantalla que responde en cinco segundos») y muy por encima de lo
+# que un log real produce: el AutoLog entero (245,1 s) no llega a ninguno.
+maximo_de_transitorios = 200

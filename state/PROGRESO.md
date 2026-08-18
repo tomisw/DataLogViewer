@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-18 20:16:59Z
+Actualizado: 2026-08-18 22:23:17Z
 
-**310 / 775 pts cerrados (40.0 %)** · 145 pts esperando revisión humana → 58.7 % entregado
+**315 / 775 pts cerrados (40.6 %)** · 145 pts esperando revisión humana → 59.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -15,7 +15,7 @@ Actualizado: 2026-08-18 20:16:59Z
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 21 | 22 | 8 | 64 | 3 | 118 |
-| F4 | 0 | 0 | 8 | 55 | 0 | 63 |
+| F4 | 5 | 0 | 8 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 0 | 0 | 3 | 73 | 0 | 76 |
 
@@ -198,7 +198,7 @@ Actualizado: 2026-08-18 20:16:59Z
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
 | ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
 
-## F4 — 0/63 pts
+## F4 — 5/63 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -210,7 +210,7 @@ Actualizado: 2026-08-18 20:16:59Z
 | ·  | `F4-06` | Exportación de tabla a CSV y portapapeles como malla pegable | Sonnet 5 | 3 | F4-05 | G3 | — |
 | ·  | `F4-07` | Mapas de calor de avance de encendido y de densidad de knock | Sonnet 5 | 4 | F4-02 | G3 | — |
 | ·  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | — |
-| ·  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | — |
+| ✔  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | — |
 | ·  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
 | ·  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
 | ▶  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | — |
