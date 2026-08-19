@@ -196,7 +196,14 @@ export function crearElementoFalso(etiqueta: string): ElementoFalso {
       },
     },
     get textContent(): string {
-      return texto;
+      // Semántica del DOM real: el texto de TODO el subárbol, no solo el
+      // propio. El doble de `incidencias/` tenía esto como campo plano y por
+      // eso `panel-incidencias.test.ts` llevaba dos pruebas en rojo desde que
+      // se escribió: una fila construida con `<span>` dentro no tiene texto
+      // propio, así que `fila.textContent` devolvía cadena vacía y una prueba
+      // correcta parecía equivocada. Este doble tenía el mismo defecto sin que
+      // hubiera mordido todavía, porque sus pruebas usan `textoDelArbol()`.
+      return texto + hijos.map((h) => h.textContent).join("");
     },
     set textContent(valor: string) {
       // En el DOM real, asignar `textContent` BORRA los hijos. Es la vía que

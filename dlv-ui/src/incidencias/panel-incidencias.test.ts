@@ -55,8 +55,9 @@ describe("PanelDeIncidencias: banner de detectores desactivados", () => {
   });
 
   it("aparece con el motivo cuando un detector crítico está desactivado, aunque no haya incidencias", () => {
+    const MOTIVO = "rol lambda_measured sin confirmar (asignación difusa)";
     const estados: readonly EstadoDetector[] = [
-      { detectorId: "D4", activo: false, motivo: "rol lambda_measured sin confirmar (asignación difusa)" },
+      { detectorId: "D4", activo: false, motivo: MOTIVO },
     ];
     const { contenedor, panel } = montarPanel();
     panel.actualizar({ catalogo: CATALOGO, estados, incidencias: [] });
@@ -66,7 +67,14 @@ describe("PanelDeIncidencias: banner de detectores desactivados", () => {
     const lineas = buscarPorClase(contenedor, "panel-incidencias__banner-linea");
     expect(lineas).toHaveLength(1);
     expect(lineas[0]?.textContent).toContain("Mezcla pobre en carga");
-    expect(lineas[0]?.textContent).toContain("asignación difusa sin confirmar");
+    // El motivo VERBATIM, no una paráfrasis. La aserción anterior buscaba
+    // «asignación difusa sin confirmar», que es el mismo motivo con las
+    // palabras en otro orden y que su propio `estados` de arriba nunca produce:
+    // la prueba llevaba en rojo desde que se escribió por eso. Comprobar el
+    // motivo entero es además lo que de verdad importa — el banner existe para
+    // decir POR QUÉ un detector crítico está callado (docs/07 §7.15), y
+    // reescribir ese texto por el camino lo dejaría sin su valor.
+    expect(lineas[0]?.textContent).toContain(MOTIVO);
   });
 
   it("un detector desactivado NO se pinta como la lista vacía de \"sin incidencias\"", () => {

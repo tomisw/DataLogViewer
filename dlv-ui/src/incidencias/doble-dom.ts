@@ -46,8 +46,34 @@ export class ElementoFalso implements ElementoDOM {
   readonly hijos: ElementoFalso[] = [];
   readonly classList: ClaseCSS;
   readonly style: EstiloCSS;
-  textContent = "";
+  /**
+   * Texto PROPIO del nodo. `textContent` (abajo) devuelve el del subarbol,
+   * que es lo que hace el DOM real.
+   */
+  #textoPropio = "";
   title = "";
+
+  /**
+   * Semantica del DOM real: al LEER devuelve el texto de TODOS los
+   * descendientes concatenado; al ESCRIBIR borra los hijos y deja solo ese
+   * texto.
+   *
+   * Antes era un campo plano, y por eso `panel-incidencias.test.ts` llevaba
+   * tres pruebas en rojo desde que se escribio: el panel construye cada fila
+   * con `<span>` dentro, asi que la fila no tiene texto PROPIO y
+   * `fila.textContent` devolvia `""`. Las pruebas estaban bien --usan la
+   * semantica del navegador-- y el doble mentia. Un doble que se aparta del
+   * original en algo tan basico no protege: hace que una prueba correcta
+   * parezca equivocada, y como el fallo "no es de nadie", nadie lo arregla.
+   */
+  get textContent(): string {
+    return this.#textoPropio + this.hijos.map((h) => h.textContent).join("");
+  }
+
+  set textContent(valor: string) {
+    this.hijos.length = 0;
+    this.#textoPropio = valor;
+  }
   #alClic: (() => void) | null = null;
 
   constructor(etiqueta: string) {
