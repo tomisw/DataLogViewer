@@ -38,6 +38,7 @@ import {
 } from "./resolucion.ts";
 import type { CombustibleInfo, EleccionUsuario, FactorResuelto } from "./tipos.ts";
 import { OrigenFactor } from "./tipos.ts";
+import { t } from "../locale/catalogo.ts";
 
 /** Lo que se emite tras cualquier cambio: el factor activo y de dónde vino. */
 export interface CambioFactor {
@@ -134,12 +135,12 @@ export class SelectorCombustible {
 
   #filaSelector(): NodoDom {
     const opciones = [
-      { value: VALOR_AUTOMATICO, texto: "— automático (log / supuesto) —" },
+      { value: VALOR_AUTOMATICO, texto: t("combustible.automatico") },
       ...this.#catalogo.map((c) => ({
         value: c.id,
         texto: `${c.etiqueta} (${c.estequiometria})`,
       })),
-      { value: VALOR_MANUAL, texto: "— valor manual —" },
+      { value: VALOR_MANUAL, texto: t("combustible.manual") },
     ];
     const select = this.#dom.crearSelect();
     select.classList.add("selector-combustible__select");
@@ -154,7 +155,7 @@ export class SelectorCombustible {
       const valor = (evento.target as unknown as SelectDom).value;
       this.#alCambiarSelector(valor);
     });
-    return this.#construirFila("Combustible", select);
+    return this.#construirFila(t("combustible.etiquetaCombustible"), select);
   }
 
   #alCambiarSelector(valor: string): void {
@@ -180,7 +181,7 @@ export class SelectorCombustible {
     const input = this.#dom.crearInput();
     input.classList.add("selector-combustible__input");
     input.type = "text";
-    input.placeholder = "p. ej. 9,77";
+    input.placeholder = t("combustible.placeholderManual");
     input.value = this.#textoManual;
     input.addEventListener("change", (evento: Event) => {
       const texto = (evento.target as unknown as { value: string }).value;
@@ -188,10 +189,8 @@ export class SelectorCombustible {
     });
 
     const valida = analizarEstequiometriaTecleada(this.#textoManual) !== undefined;
-    const nota = valida
-      ? undefined
-      : "no es un número válido (> 0): se mantiene el último valor manual válido";
-    return this.#construirFila("Estequiometría", input, nota);
+    const nota = valida ? undefined : t("combustible.errorManual");
+    return this.#construirFila(t("combustible.etiquetaEstequiometria"), input, nota);
   }
 
   #alCambiarValorManual(texto: string): void {
@@ -215,11 +214,13 @@ export class SelectorCombustible {
     if (factor.origen === OrigenFactor.SUPUESTO) {
       // El caso que no puede pasar desapercibido: ver la cabecera del módulo.
       nodo.classList.add("selector-combustible__aviso");
-      nodo.textContent = `SUPUESTO — ${explicacionDeOrigen(factor.origen)} (${factor.estequiometria})`;
+      nodo.textContent = `${t("combustible.supuestoPrefijo")} ${explicacionDeOrigen(factor.origen)} (${factor.estequiometria})`;
     } else {
       nodo.classList.add("selector-combustible__nota");
       const origenTexto =
-        factor.origen === OrigenFactor.USUARIO ? "elegido aquí" : "leído del log";
+        factor.origen === OrigenFactor.USUARIO
+          ? t("combustible.elegidoAqui")
+          : t("combustible.leidoDelLog");
       nodo.textContent = `${origenTexto}: ${explicacionDeOrigen(factor.origen)} (${factor.estequiometria})`;
     }
     return nodo;

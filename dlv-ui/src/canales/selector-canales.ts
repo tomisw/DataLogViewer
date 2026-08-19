@@ -28,6 +28,7 @@
 import { filtrarCanales } from "./filtro.ts";
 import type { CanalFiltrado, ResumenOcultos } from "./filtro.ts";
 import type { CanalInfo, MotivoOculto } from "./tipos.ts";
+import { t } from "../locale/catalogo.ts";
 
 export interface OpcionesSelectorCanales {
   readonly contenedor: HTMLElement;
@@ -50,10 +51,16 @@ export interface OpcionesSelectorCanales {
   readonly documento?: Pick<Document, "createElement" | "createTextNode">;
 }
 
-const ETIQUETA_MOTIVO: Record<MotivoOculto, string> = {
-  constante: "constante: no cambia en todo el log",
-  vacio: "vacío: el canal no se activó en este log",
-};
+/**
+ * ETIQUETA_MOTIVO no es un `Record` cableado: sale de `t()` (F5-10) para que
+ * ES/EN vivan en `locale/textos.*.ts` y no aquí duplicados. La CLAVE de
+ * `MotivoOculto` ("constante"/"vacio") sí sigue siendo la de `tipos.ts` --
+ * es el identificador técnico del filtro, no texto de interfaz -- solo su
+ * ETIQUETA visible pasa por el catálogo.
+ */
+function etiquetaMotivo(motivo: MotivoOculto): string {
+  return motivo === "constante" ? t("canales.motivoConstante") : t("canales.motivoVacio");
+}
 
 /**
  * El texto que explica por qué un canal está marcado como inactivo. Pura y
@@ -62,7 +69,7 @@ const ETIQUETA_MOTIVO: Record<MotivoOculto, string> = {
  * enterrada dentro de una función que no se puede invocar sin navegador.
  */
 export function textoMotivo(motivo: MotivoOculto | null): string {
-  return motivo === null ? "" : ETIQUETA_MOTIVO[motivo];
+  return motivo === null ? "" : etiquetaMotivo(motivo);
 }
 
 /** El texto del resumen de ocultos, o cadena vacía si no hay nada que decir. */
@@ -70,9 +77,9 @@ export function textoResumenOcultos(ocultos: ResumenOcultos, mostrarInactivos: b
   const total = ocultos.constante + ocultos.vacio;
   if (mostrarInactivos || total === 0) return "";
   const partes: string[] = [];
-  if (ocultos.constante > 0) partes.push(`${ocultos.constante} constante(s)`);
-  if (ocultos.vacio > 0) partes.push(`${ocultos.vacio} vacío(s)`);
-  return `${total} canal(es) oculto(s): ${partes.join(", ")}. Actívalo con «mostrar inactivos».`;
+  if (ocultos.constante > 0) partes.push(t("canales.constanteN", { n: ocultos.constante }));
+  if (ocultos.vacio > 0) partes.push(t("canales.vacioN", { n: ocultos.vacio }));
+  return `${t("canales.ocultosPrefijo", { n: total })}: ${partes.join(", ")}. ${t("canales.ocultosSufijo")}`;
 }
 
 export class SelectorCanales {
@@ -101,7 +108,7 @@ export class SelectorCanales {
 
     this.#entradaBusqueda = this.#documento.createElement("input");
     this.#entradaBusqueda.type = "text";
-    this.#entradaBusqueda.placeholder = "Buscar por nombre, rol semántico o ID…";
+    this.#entradaBusqueda.placeholder = t("canales.buscarPlaceholder");
     this.#entradaBusqueda.className = "selector-canales__busqueda";
     this.#entradaBusqueda.addEventListener("input", () => {
       this.#consulta = this.#entradaBusqueda.value;
@@ -116,7 +123,10 @@ export class SelectorCanales {
       this.#mostrarInactivos = this.#casillaInactivos.checked;
       this.#renderizarLista();
     });
-    etiquetaCasilla.append(this.#casillaInactivos, this.#documento.createTextNode(" mostrar inactivos"));
+    etiquetaCasilla.append(
+      this.#casillaInactivos,
+      this.#documento.createTextNode(` ${t("canales.mostrarInactivos")}`),
+    );
 
     this.#resumen = this.#documento.createElement("p");
     this.#resumen.className = "selector-canales__resumen";

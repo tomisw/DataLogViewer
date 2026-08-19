@@ -45,6 +45,7 @@ import type {
   UnidadResuelta,
 } from "./tipos.ts";
 import { Capa } from "./tipos.ts";
+import { t } from "../locale/catalogo.ts";
 
 /** Lo que el usuario ha elegido en los tres niveles, en un momento dado. */
 export interface EstadoUnidades {
@@ -150,12 +151,12 @@ export class SelectorUnidad {
       this.#render();
       this.#emitir();
     });
-    return this.#construirFila("Global", select);
+    return this.#construirFila(t("unidades.global"), select);
   }
 
   #filaDimension(dimension: DimensionInfo): NodoDom {
     const opciones = [
-      { value: VALOR_HEREDAR, texto: "— heredar del preset —" },
+      { value: VALOR_HEREDAR, texto: t("unidades.heredarDelPreset") },
       ...dimension.unidades.map((u) => ({ value: u.id, texto: u.etiqueta || u.id })),
     ];
     const valorActual = this.#preferenciasPerfil[dimension.id] ?? VALOR_HEREDAR;
@@ -172,7 +173,7 @@ export class SelectorUnidad {
       // A nivel de dimensión, "lo heredado" es lo que vendría del preset, sin
       // contar la propia preferencia de perfil que esta fila edita.
     });
-    const nota = `${this.#notaDecimales(resuelta.unidad.decimales)} · si no se fija aquí, ${explicacionDeCapa(resuelta.capa)}`;
+    const nota = `${this.#notaDecimales(resuelta.unidad.decimales)} · ${t("unidades.siNoSeFijaAqui")} ${explicacionDeCapa(resuelta.capa)}`;
     return this.#construirFila(dimension.etiqueta, select, nota);
   }
 
@@ -182,13 +183,13 @@ export class SelectorUnidad {
       const aviso = this.#dom.crearSpan();
       aviso.classList.add("selector-unidad__aviso");
       aviso.textContent = dimension.mostrarEnCrudo
-        ? "sin confirmar: se muestra en crudo, sin unidad"
-        : "sin conversión de unidad (escala logarítmica o adimensional)";
+        ? t("unidades.sinConfirmarCrudo")
+        : t("unidades.sinConversion");
       return this.#construirFila(canal.etiqueta, aviso);
     }
 
     const opciones = [
-      { value: VALOR_HEREDAR, texto: "— heredar —" },
+      { value: VALOR_HEREDAR, texto: t("unidades.heredar") },
       ...dimension.unidades.map((u) => ({ value: u.id, texto: u.etiqueta || u.id })),
     ];
     const valorActual = this.#anulacionesCanal[canal.id] ?? VALOR_HEREDAR;
@@ -201,13 +202,16 @@ export class SelectorUnidad {
 
     const resuelta = this.unidadResueltaDe(canal.id);
     const origen =
-      resuelta.capa === Capa.CANAL ? "fijado aquí" : `heredado: ${explicacionDeCapa(resuelta.capa)}`;
+      resuelta.capa === Capa.CANAL
+        ? t("unidades.fijadoAqui")
+        : `${t("unidades.heredadoPrefijo")} ${explicacionDeCapa(resuelta.capa)}`;
     const nota = `${this.#notaDecimales(resuelta.unidad.decimales)} · ${origen}`;
     return this.#construirFila(canal.etiqueta, select, nota);
   }
 
   #notaDecimales(decimales: number): string {
-    return `${decimales} decimal${decimales === 1 ? "" : "es"}`;
+    const palabra = decimales === 1 ? t("unidades.decimalSingular") : t("unidades.decimalPlural");
+    return `${decimales} ${palabra}`;
   }
 
   #construirSelect(

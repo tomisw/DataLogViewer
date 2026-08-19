@@ -42,6 +42,7 @@ import {
   type FormaConversion,
 } from "../cursor/doble.ts";
 import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts";
+import { t } from "../locale/catalogo.ts";
 import { ControladorDeNavegacion } from "../navegacion/controlador.ts";
 import type { DefinicionPanel } from "../paneles/paneles.ts";
 import { PanelesApilados } from "../paneles/paneles.ts";
@@ -335,7 +336,7 @@ export class Aplicacion {
     this.#barra = documento.createElement("div");
     this.#barra.className = "dlv-barra";
     const boton = documento.createElement("button");
-    boton.textContent = "Abrir log sintético";
+    boton.textContent = t("app.abrirLogSintetico");
     boton.addEventListener("click", () => void this.abrirLog("autolog-sintetico"));
     // Botón visible además del atajo de teclado (F5-09): el atajo por sí solo
     // no es descubrible ni alcanzable sin saberlo de antemano -- exactamente
@@ -347,7 +348,7 @@ export class Aplicacion {
     botonPaleta.addEventListener("click", () => this.#paleta?.abrir());
     this.#estadoTexto = documento.createElement("span");
     this.#estadoTexto.className = "dlv-barra__estado";
-    this.#estadoTexto.textContent = `fuente: ${fuente.nombre}`;
+    this.#estadoTexto.textContent = `${t("app.barraFuente")}: ${fuente.nombre}`;
     this.#barra.append(
       boton,
       botonPaleta,
@@ -359,8 +360,7 @@ export class Aplicacion {
 
     this.#barraDelta = documento.createElement("div");
     this.#barraDelta.className = "dlv-barra-delta";
-    this.#barraDelta.title =
-      "Doble cursor: haz clic sobre los paneles para fijar el ancla, y otro clic para quitarla.";
+    this.#barraDelta.title = t("app.dobleCursorTitulo");
 
     // El color de una serie se calcula en TypeScript y se sube a la GPU, así que
     // cambiar el tema no lo toca: hay que olvidar los colores cacheados y volver
@@ -392,7 +392,7 @@ export class Aplicacion {
     this.#areaPrincipal.className = "dlv-principal";
     this.#mensajeVacio = documento.createElement("p");
     this.#mensajeVacio.className = "dlv-mensaje-vacio";
-    this.#mensajeVacio.textContent = "Selecciona canales en la izquierda para verlos aquí.";
+    this.#mensajeVacio.textContent = t("app.mensajeVacio");
     this.#contenedorPaneles = documento.createElement("div");
     this.#contenedorPaneles.className = "dlv-paneles";
     this.#areaPrincipal.append(this.#mensajeVacio, this.#contenedorPaneles);
@@ -509,7 +509,8 @@ export class Aplicacion {
 
   /** Abre (o reabre) un log a través de la fuente configurada y reconstruye toda la interfaz. */
   async abrirLog(referencia: string): Promise<void> {
-    this.#estadoTexto.textContent = `fuente: ${this.#fuente.nombre} · abriendo…`;
+    this.#estadoTexto.textContent =
+      `${t("app.barraFuente")}: ${this.#fuente.nombre} · ${t("app.barraAbriendo")}`;
     const [log, catalogo] = await Promise.all([
       this.#fuente.abrirLog(referencia),
       this.#fuente.catalogoUnidades(),
@@ -521,7 +522,7 @@ export class Aplicacion {
     this.#colorPorCanal.clear();
 
     this.#estadoTexto.textContent =
-      `fuente: ${this.#fuente.nombre} · ${log.nombre} · ${log.canales.length} canales` +
+      `${t("app.barraFuente")}: ${this.#fuente.nombre} · ${log.nombre} · ${t("app.barraNCanales", { n: log.canales.length })}` +
       (log.avisos.length > 0 ? ` · ${log.avisos[0]}` : "");
 
     this.#construirSelectorCanales(log);

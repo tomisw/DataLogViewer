@@ -61,6 +61,7 @@
 
 import { CacheDeCubos, valorEn, type ClaveCubos } from "../datos/cache-cubos.ts";
 import { formatearNumero as formatearNumeroLocale } from "../locale/numerico.ts";
+import { t } from "../locale/catalogo.ts";
 import type { ContextoDOM } from "./contexto-dom.ts";
 
 /** Un canal a mostrar en la tabla del cursor. */
@@ -226,7 +227,7 @@ export class CursorDeTabla {
 
     const encabezado = documento.createElement("thead");
     const filaEncabezado = documento.createElement("tr");
-    for (const texto of ["Canal", "Valor", "Nivel"]) {
+    for (const texto of [t("cursor.columnaCanal"), t("cursor.columnaValor"), t("cursor.columnaNivel")]) {
       const celda = documento.createElement("th");
       celda.textContent = texto;
       filaEncabezado.appendChild(celda);

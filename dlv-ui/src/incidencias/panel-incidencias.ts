@@ -53,6 +53,7 @@ import {
   type ElementoDOM,
 } from "./contexto-dom.ts";
 import { SEVERIDADES_CONCRETAS, type DetectorCatalogo, type EstadoDetector, type IncidenciaPanel } from "./tipos.ts";
+import { t } from "../locale/catalogo.ts";
 
 /** Lo que necesita `actualizar` para repintar el panel entero. */
 export interface DatosPanelIncidencias {
@@ -124,8 +125,8 @@ export class PanelDeIncidencias {
     const titulo = crearNodo(this.#documento, "div", "panel-incidencias__banner-titulo");
     titulo.textContent =
       desactivados.length === 1
-        ? "1 detector desactivado — no se sabe si hay incidencias, no que no las haya"
-        : `${desactivados.length} detectores desactivados — no se sabe si hay incidencias, no que no las haya`;
+        ? t("incidencias.bannerSingular")
+        : t("incidencias.bannerPlural", { n: desactivados.length });
     titulo.style.setProperty("font-weight", "700");
     banner.appendChild(titulo);
 
@@ -151,7 +152,7 @@ export class PanelDeIncidencias {
     resumen.style.setProperty("font-size", "11px");
 
     if (incidencias.length === 0) {
-      resumen.textContent = "Sin incidencias.";
+      resumen.textContent = t("incidencias.sinIncidencias");
       return resumen;
     }
 
@@ -188,7 +189,7 @@ export class PanelDeIncidencias {
 
   #pintarFilaVacia(): ElementoDOM {
     const li = crearNodo(this.#documento, "li", "panel-incidencias__vacio");
-    li.textContent = "Sin incidencias en los detectores activos.";
+    li.textContent = t("incidencias.sinIncidenciasActivos");
     li.style.setProperty("color", "var(--texto-tenue)");
     li.style.setProperty("font-style", "italic");
     return li;
@@ -225,8 +226,10 @@ export class PanelDeIncidencias {
 
     const boton = crearNodo(this.#documento, "button", "panel-incidencias__salto");
     boton.setAttribute("type", "button");
-    boton.textContent = "Saltar";
-    boton.title = `Saltar al instante en que empezó (${formatearInstanteS(instanteDeSalto(incidencia))})`;
+    boton.textContent = t("incidencias.saltar");
+    boton.title = t("incidencias.saltarTitulo", {
+      instante: formatearInstanteS(instanteDeSalto(incidencia)),
+    });
     boton.style.setProperty("background", "var(--panel)");
     boton.style.setProperty("border", "1px solid var(--panel-borde)");
     boton.style.setProperty("color", "var(--texto)");
