@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 13:42:13Z"
+    "actualizado": "2026-08-19 17:53:42Z"
   },
   "tareas": [
     {
@@ -3824,10 +3824,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "f317f68"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 17:53:42Z",
+          "texto": "PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso y NO arranca, nunca cae a no-portable; (2) el modo portable pisa un DLV_DIR_CACHE puesto desde fuera; (3) nombre y disposicion de datos-dlv/; (4) la cache no tiene desalojo: ~13 MB por log en pendrive."
+        }
+      ]
     },
     {
       "id": "F5-03",
