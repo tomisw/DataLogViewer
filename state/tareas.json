@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 17:56:48Z"
+    "actualizado": "2026-08-19 18:22:34Z"
   },
   "tareas": [
     {
@@ -2935,10 +2935,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "1765d14"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 18:22:34Z",
+          "texto": "Componente puro + SVG. Un tope plano fuera de rango se ancla al borde con marca; una banda o curva se recorta. NO cableado: dlv-api no expone todavia los topes de un canal."
+        }
+      ]
     },
     {
       "id": "F3-12",
@@ -4021,10 +4028,17 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "32d6875"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 18:22:34Z",
+          "texto": "Mecanismo + catalogos ES/EN + 40 claves. Sin traducir a proposito: tema, carriles, paleta, topes (sesiones en curso) y el asistente de importacion (por tiempo)."
+        }
+      ]
     },
     {
       "id": "F5-11",
