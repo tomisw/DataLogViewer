@@ -1,6 +1,7 @@
 /**
  * Suite de regresión visual del renderizador — la parte que necesita GPU.
- * Se abre con `npm run dev`, en `/regresion-visual.html`.
+ * Se abre con `npm run dev`, en `/regresion-visual.html`, o sin manos con
+ * `npm run regresion-visual:edge` (ver `tools/regresion-visual-edge.mjs`).
  *
  * QUÉ HACE ESTE FICHERO Y QUÉ NO
  * ===============================
@@ -8,11 +9,76 @@
  * de posición) son lógica pura y se prueban sin navegador, en cada
  * `npm test`. Este fichero es la otra mitad: crea un `Renderizador` de
  * verdad sobre un `<canvas>` de verdad, sube las escenas, dibuja, lee los
- * píxeles con `gl.readPixels` y les aplica esos comparadores. Es la única
- * pieza de F5-12 que no se pudo EJECUTAR en el entorno donde se escribió
- * (sin navegador con WebGL2 ni `node_modules`) — queda dicho en el informe
- * de la tarea y aquí, en el propio código: quien la abra en un navegador de
- * verdad es quien la ejecuta por primera vez.
+ * píxeles con `gl.readPixels` y les aplica esos comparadores.
+ *
+ * PRIMERA EJECUCIÓN REAL — QUÉ SE MIDIÓ Y DÓNDE
+ * ==============================================
+ * Esta suite se escribió en un entorno sin navegador, sin WebGL2 y sin
+ * `node_modules`, así que durante un tiempo fue código plausible y no código
+ * ejecutado. **Ya no.** Primera ejecución real, 2026-08-19, en la máquina del
+ * propietario:
+ *
+ *   - Navegador  Microsoft Edge 151.0.4129.59, `--headless=new`, Windows 11
+ *   - Backend    ANGLE sobre Direct3D 11 con la **GPU real** de la máquina
+ *                (Intel UHD Graphics 620). No SwiftShader: el modo sin cabeza
+ *                de Edge, si NO se le pasa `--disable-gpu`, encuentra la GPU
+ *                del sistema y la usa.
+ *   - Resultado  veredicto global PASA — las cuatro comprobaciones en verde
+ *                (posición y color de dos series, y color de tema en los tres
+ *                temas).
+ *
+ * También se ejecutó forzando el rasterizador por software
+ * (`--disable-gpu --enable-unsafe-swiftshader`, backend SwiftShader/Subzero) y
+ * el veredicto es el mismo. Que coincidan es la evidencia de que los tres
+ * invariantes de `invariantes.ts` no dependen del rasterizador — que es
+ * exactamente lo que aquel fichero razona al descartar la comparación de
+ * imágenes—, pero **el resultado que vale como garantía es el de la GPU
+ * real**; el de SwiftShader solo dice que la geometría y los uniformes están
+ * bien, no cómo rasteriza el hardware del propietario.
+ *
+ * Por eso esta suite AVERIGUA Y PUBLICA su backend (`describirBackend`): un
+ * PASA sin saber quién rasterizó es media respuesta, y en una máquina de CI
+ * sin GPU sería un PASA de software presentado como si fuera de hardware.
+ *
+ * QUE PASE A LA PRIMERA NO ES PRUEBA DE QUE COMPRUEBE ALGO
+ * =========================================================
+ * Una suite recién escrita que sale verde puede estar viendo el fallo... o
+ * puede no estar mirando. Para distinguirlo se inyectaron tres regresiones
+ * REALES en el renderizador, una a una, y se comprobó que la suite las caza y
+ * que el guion devuelve 1 (mismo día, misma GPU):
+ *
+ *   1. Eje Y invertido (`escalaY` negativo en `escala.ts::transformacion`):
+ *      FALLA las cuatro comprobaciones; la de cobertura además cuenta 0
+ *      píxeles no-fondo, porque la escena entera se va fuera del lienzo.
+ *   2. Eje X desplazado 10 px (`+0,05` en `despX`): FALLA la comprobación de
+ *      posición. Ver más abajo, que este caso enseñó algo.
+ *   3. Canales R y B intercambiados al pasar el color a la GPU
+ *      (`renderizador.ts::dibujar`): FALLA las cuatro.
+ *
+ * Las tres inyecciones se revirtieron; están aquí escritas, y no dejadas como
+ * prueba automática, porque exigen editar el renderizador y no hay forma de
+ * hacerlo desde fuera sin abrirle una puerta que ADR-006 quiere cerrada.
+ *
+ * LÍMITE DE SENSIBILIDAD QUE DESTAPÓ LA INYECCIÓN 2
+ * ==================================================
+ * Con el eje X desplazado 10 px, la comprobación de posición falló pero las
+ * tres de color de tema siguieron en verde. No es un defecto: es geometría, y
+ * conviene tenerlo escrito para no confundirse al leer un fallo parcial.
+ *
+ *   - Las comprobaciones de tema dibujan un segmento HORIZONTAL a través del
+ *     centro. Un desplazamiento en X mueve ese segmento a lo largo de sí
+ *     mismo, así que el píxel central sigue estando encima. Son comprobaciones
+ *     de COLOR y no detectan desplazamientos en X por construcción; un
+ *     desplazamiento en Y sí las rompería. Quien busque posición mira la
+ *     comprobación 1, que es la que existe para eso.
+ *   - Dentro de la comprobación 1, un desplazamiento en X se nota tanto más
+ *     cuanto más inclinada sea la serie: mueve la serie `d·m/√(1+m²)` píxeles
+ *     respecto al punto esperado, con `m` la pendiente en píxeles. Para
+ *     `PUNTOS_RECTA` (m = 0,75) los 10 px dan 6 px de desvío y se salen de
+ *     `RADIO_BUSQUEDA_PX`; para `PUNTOS_PARALELA` (m = 0,375) dan 3,5 px y
+ *     cuatro de sus cinco puntos aún caían dentro de la caja de búsqueda. Que
+ *     la escena tenga las DOS series, y que la comprobación exija todos los
+ *     puntos de ambas, es lo que hace que el conjunto sí lo cace.
  *
  * QUÉ PASA SIN WEBGL2 (no puede quedarse en verde en silencio)
  * ================================================================
@@ -68,6 +134,56 @@ interface ResultadoComprobacion {
   readonly nombre: string;
   readonly veredicto: Veredicto;
   readonly detalle: string;
+}
+
+/**
+ * Quién rasterizó de verdad este fotograma.
+ *
+ * No es decoración del informe: es la diferencia entre «la serie sale donde
+ * tiene que salir en la GPU del propietario» y «sale donde tiene que salir en
+ * un rasterizador por software que nadie usa para mirar logs». Los tres
+ * invariantes de `invariantes.ts` están elegidos para ser indiferentes al
+ * rasterizador, así que un PASA con software SIGUE valiendo para lo que la
+ * suite comprueba (posición, color, cobertura); lo que no vale es publicarlo
+ * sin decir cuál fue, porque quien lea «PASA» va a suponer hardware.
+ */
+interface Backend {
+  /** Cadena cruda de `UNMASKED_RENDERER_WEBGL`, o de `RENDERER` si no hay extensión. */
+  readonly renderizador: string;
+  readonly version: string;
+  /** `true` si la cadena delata un rasterizador por software conocido. */
+  readonly esSoftware: boolean;
+}
+
+/**
+ * Marcas de los rasterizadores por software que se pueden encontrar aquí.
+ * `SwiftShader` es el que trae Chromium/Edge; `llvmpipe`/`softpipe` son los de
+ * Mesa, por si la suite acaba corriendo en una VM Linux de CI. La lista es
+ * conservadora a propósito: ante una cadena desconocida se dice «hardware»
+ * pero se imprime la cadena entera, así que un caso nuevo se ve a simple vista
+ * en vez de esconderse tras un booleano.
+ */
+const MARCAS_DE_SOFTWARE = ["swiftshader", "llvmpipe", "softpipe", "software rasterizer"];
+
+function describirBackend(lienzo: HTMLCanvasElement): Backend {
+  const gl = lienzo.getContext("webgl2");
+  if (gl === null) {
+    return { renderizador: "desconocido", version: "desconocida", esSoftware: false };
+  }
+  // `WEBGL_debug_renderer_info` es la única forma de saber la GPU real: el
+  // `RENDERER` estándar devuelve siempre "WebKit WebGL" por privacidad, que no
+  // distingue una Intel integrada de SwiftShader.
+  const ext = gl.getExtension("WEBGL_debug_renderer_info");
+  const crudo =
+    ext !== null
+      ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL))
+      : String(gl.getParameter(gl.RENDERER));
+  const enMinusculas = crudo.toLowerCase();
+  return {
+    renderizador: crudo,
+    version: String(gl.getParameter(gl.VERSION)),
+    esSoftware: MARCAS_DE_SOFTWARE.some((marca) => enMinusculas.includes(marca)),
+  };
 }
 
 /**
@@ -214,34 +330,69 @@ function coloresIguales(a: ColorRGB, b: ColorRGB): boolean {
   return Math.abs(a.r - b.r) <= 2 && Math.abs(a.g - b.g) <= 2 && Math.abs(a.b - b.b) <= 2;
 }
 
-function escribirResultados(resultados: readonly ResultadoComprobacion[]): void {
-  const destino = document.querySelector<HTMLPreElement>("#resultado");
-  if (destino === null) return;
+function escribirResultados(
+  resultados: readonly ResultadoComprobacion[],
+  backend: Backend | null,
+): void {
   const hayFallo = resultados.some((r) => r.veredicto === "FALLA");
   const hayNoMedido = resultados.some((r) => r.veredicto === "NO MEDIDO");
-  const veredictoGlobal = hayFallo ? "FALLA" : hayNoMedido ? "NO MEDIDO" : "PASA";
-  const lineas = [
-    `veredicto global: ${veredictoGlobal}`,
-    "",
-    ...resultados.map((r) => `[${r.veredicto.padEnd(9)}] ${r.nombre}\n            ${r.detalle}`),
-  ];
-  destino.textContent = lineas.join("\n");
-  // También en un global explícito: útil para que, en el futuro, un
-  // controlador de navegador (Playwright — ver la propuesta en el informe de
-  // la tarea, NO añadida como dependencia) lea el veredicto sin tener que
-  // interpretar el DOM.
-  (window as unknown as { __resultadoRegresionVisual: unknown }).__resultadoRegresionVisual = {
-    veredictoGlobal,
-    resultados,
-  };
+  const veredictoGlobal: Veredicto = hayFallo ? "FALLA" : hayNoMedido ? "NO MEDIDO" : "PASA";
+
+  const destino = document.querySelector<HTMLPreElement>("#resultado");
+  if (destino !== null) {
+    const lineas = [
+      `veredicto global: ${veredictoGlobal}`,
+      backend === null
+        ? "backend:          desconocido (no se llegó a crear el contexto)"
+        : `backend:          ${backend.esSoftware ? "SOFTWARE" : "GPU"} — ${backend.renderizador}`,
+      ...(backend !== null && backend.esSoftware
+        ? [
+            "",
+            "AVISO: ha rasterizado un backend por SOFTWARE. Lo que comprueba esta",
+            "suite (posición, color y cobertura) es indiferente al rasterizador, así",
+            "que el PASA es válido para eso — pero NO dice nada de cómo se ve en la",
+            "GPU real del propietario. Para eso, ejecútala sin `--disable-gpu`.",
+          ]
+        : []),
+      "",
+      ...resultados.map((r) => `[${r.veredicto.padEnd(9)}] ${r.nombre}\n            ${r.detalle}`),
+    ];
+    destino.textContent = lineas.join("\n");
+  }
+
+  const informe = { veredictoGlobal, backend, resultados };
+
+  // El mismo informe, en JSON y dentro del DOM.
+  //
+  // POR QUÉ EN EL DOM Y NO SOLO EN UN GLOBAL DE `window`
+  // ====================================================
+  // `tools/regresion-visual-edge.mjs` conduce Edge sin cabeza con `--dump-dom`,
+  // que vuelca el árbol del documento y NADA del estado de JavaScript. Un
+  // veredicto que solo viva en `window.__resultadoRegresionVisual` es invisible
+  // para ese modo, y leerlo exigiría un protocolo de depuración remota o una
+  // dependencia de control de navegador (Playwright/Puppeteer), que este
+  // proyecto no añade sin permiso. Un `<pre>` con JSON lo hace legible con lo
+  // que ya hay. El global se mantiene para quien abra la página a mano y quiera
+  // hurgar desde la consola.
+  const json = document.querySelector<HTMLPreElement>("#resultado-json");
+  if (json !== null) json.textContent = JSON.stringify(informe);
+  (window as unknown as { __resultadoRegresionVisual: unknown }).__resultadoRegresionVisual =
+    informe;
 }
 
 function arrancar(): void {
   const lienzo = document.querySelector<HTMLCanvasElement>("#lienzo");
   if (lienzo === null) {
-    escribirResultados([
-      { nombre: "arranque", veredicto: "NO MEDIDO", detalle: "falta el <canvas id=lienzo> en la página" },
-    ]);
+    escribirResultados(
+      [
+        {
+          nombre: "arranque",
+          veredicto: "NO MEDIDO",
+          detalle: "falta el <canvas id=lienzo> en la página",
+        },
+      ],
+      null,
+    );
     return;
   }
 
@@ -260,17 +411,24 @@ function arrancar(): void {
   try {
     renderizador = Renderizador.desdeLienzo(lienzo);
   } catch (error) {
-    escribirResultados([
-      {
-        nombre: "creación del renderizador",
-        veredicto: "NO MEDIDO",
-        detalle:
-          (error instanceof Error ? error.message : String(error)) +
-          " — ninguna de las comprobaciones de F5-12 se pudo ejecutar en este navegador.",
-      },
-    ]);
+    escribirResultados(
+      [
+        {
+          nombre: "creación del renderizador",
+          veredicto: "NO MEDIDO",
+          detalle:
+            (error instanceof Error ? error.message : String(error)) +
+            " — ninguna de las comprobaciones de F5-12 se pudo ejecutar en este navegador.",
+        },
+      ],
+      null,
+    );
     return;
   }
+
+  // Después de `desdeLienzo` y no antes: el backend se pregunta al contexto ya
+  // creado, y crearlo aquí con otros atributos podría devolver otro distinto.
+  const backend = describirBackend(lienzo);
 
   renderizador.redimensionar(VIEWPORT_PRUEBA);
 
@@ -281,7 +439,7 @@ function arrancar(): void {
   }
 
   renderizador.destruir();
-  escribirResultados(resultados);
+  escribirResultados(resultados, backend);
 }
 
 arrancar();

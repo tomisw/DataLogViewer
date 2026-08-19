@@ -41,6 +41,16 @@
         white-space: pre-wrap;
         margin: 0;
       }
+      /*
+        El informe en JSON es para `tools/regresion-visual-edge.mjs`, que lee el
+        volcado del DOM; a una persona no le aporta nada sobre el texto de
+        arriba, así que se oculta. `display: none` y no `visibility: hidden`
+        porque no debe ocupar sitio, y ninguna de las dos afecta a `--dump-dom`:
+        vuelca el árbol, no lo que se ve.
+      */
+      #resultado-json {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -53,13 +63,22 @@
         <code>src/render/regresion-visual/invariantes.ts</code>.
       </p>
       <p>
-        Ábrelo con <code>npm run dev</code>. Si el veredicto global dice
-        <strong>NO MEDIDO</strong>, esta máquina o navegador no tiene WebGL2 utilizable: no es un
-        aprobado, es que no se pudo mirar (§8.10).
+        Ábrelo con <code>npm run dev</code>, o sin manos con
+        <code>npm run regresion-visual:edge</code> (levanta Vite, lo abre en Edge sin cabeza y
+        devuelve un código de salida). Si el veredicto global dice <strong>NO MEDIDO</strong>, esta
+        máquina o navegador no tiene WebGL2 utilizable: no es un aprobado, es que no se pudo mirar
+        (§8.10).
+      </p>
+      <p>
+        La línea <code>backend</code> del resultado dice QUIÉN rasterizó. Si pone
+        <strong>SOFTWARE</strong>, lo que se ha comprobado sigue siendo válido —posición, color y
+        cobertura no dependen del rasterizador— pero no dice nada de la GPU real de esta máquina.
       </p>
     </header>
     <canvas id="lienzo" width="400" height="300"></canvas>
     <pre id="resultado">Preparando…</pre>
+    <!-- Informe legible por máquina; el porqué, en `escribirResultados`. -->
+    <pre id="resultado-json"></pre>
     <script type="module" src="/src/render/regresion-visual/suite-navegador.ts"></script>
   </body>
 </html>

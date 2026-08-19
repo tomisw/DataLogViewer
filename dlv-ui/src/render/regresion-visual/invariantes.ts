@@ -79,6 +79,30 @@
  * ejecute la suite en una GPU más ruidosa (una máquina virtual con
  * renderizado por software, por ejemplo) sube el número en la llamada, no
  * reescribe la función.
+ *
+ * LO QUE SE HA MEDIDO DE ESAS TOLERANCIAS (2026-08-19)
+ * =====================================================
+ * Las dos constantes se escribieron razonadas pero sin ejecutar nada. Primera
+ * medida real, en Edge 151 sin cabeza sobre Windows 11:
+ *
+ *   - Con la GPU real de la máquina (ANGLE/D3D11, Intel UHD Graphics 620) las
+ *     cuatro comprobaciones pasan con estos valores por omisión, sin tocarlos.
+ *   - Con el rasterizador por SOFTWARE (SwiftShader), el resultado es el
+ *     MISMO, también sin tocar los valores.
+ *
+ * Ese segundo punto es el que importaba y es el que justifica a posteriori
+ * todo lo razonado arriba: si esta suite comparase imágenes, el umbral
+ * calibrado contra software casi seguro no valdría para la GPU —es la
+ * advertencia habitual de la regresión visual por captura— y habría hecho
+ * falta un umbral por backend. Comparando INVARIANTES GEOMÉTRICOS no hizo
+ * falta: los dos backends dan el mismo veredicto con la misma tolerancia,
+ * porque lo que se compara (¿está el punto donde toca? ¿de qué color?) es
+ * justo lo que no cambia entre rasterizadores.
+ *
+ * Sigue sin estar medido, y no se puede medir en esta máquina: cómo se
+ * comportan estas tolerancias en una GPU de otro fabricante (AMD, NVIDIA) o
+ * con otro backend de ANGLE (OpenGL, Metal, Vulkan de escritorio). Lo
+ * esperable, por lo anterior, es que no cambie nada; esperable no es medido.
  */
 
 /** Un color RGB de 8 bits por canal, como lo devuelve `gl.readPixels`. */
@@ -131,6 +155,15 @@ export const TOLERANCIA_CANAL_COLOR = 10;
  * control por decenas de píxeles a propósito, así que un fallo real —un
  * rango de vista invertido, un `viewport` equivocado— mueve el punto muchas
  * veces este radio y sigue fallando.
+ *
+ * MEDIDO: con un desplazamiento inyectado de 10 px en el eje X, la
+ * comprobación de posición falla. Pero el margen no es holgado para una serie
+ * poco inclinada —un desplazamiento en X mueve la serie `d·m/√(1+m²)` px
+ * respecto al punto esperado, con `m` su pendiente en píxeles—, y con esos
+ * 10 px la serie "paralela" (m = 0,375) quedaba a 3,5 px, al borde de esta
+ * caja. El detalle y por qué el conjunto sí lo caza están en la cabecera de
+ * `suite-navegador.ts`. Subir este radio "por si acaso" es exactamente lo que
+ * volvería ciega la comprobación de posición.
  */
 export const RADIO_BUSQUEDA_PX = 3;
 
