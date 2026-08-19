@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regresión visual del renderizador — DataLogViewer</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        background: #111;
+        color: #eee;
+      }
+      header {
+        padding: 0.75rem 1rem;
+      }
+      h1 {
+        font-size: 1rem;
+        margin: 0 0 0.25rem;
+      }
+      p {
+        margin: 0.25rem 0;
+        font-size: 0.85rem;
+        color: #aaa;
+        max-width: 70ch;
+      }
+      #lienzo {
+        display: block;
+        width: 400px;
+        height: 300px;
+        background: #000;
+        border-bottom: 1px solid #333;
+      }
+      #resultado {
+        padding: 0.75rem 1rem;
+        font-family: ui-monospace, monospace;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Regresión visual del renderizador (F5-12, obligatoria por ADR-006)</h1>
+      <p>
+        Comprueba posición, color y fondo del renderizador WebGL2 con datos sintéticos y
+        deterministas, comparando contra un oráculo geométrico calculado a mano —no contra una
+        imagen de referencia guardada—. El porqué de esa elección está en la cabecera de
+        <code>src/render/regresion-visual/invariantes.ts</code>.
+      </p>
+      <p>
+        Ábrelo con <code>npm run dev</code>. Si el veredicto global dice
+        <strong>NO MEDIDO</strong>, esta máquina o navegador no tiene WebGL2 utilizable: no es un
+        aprobado, es que no se pudo mirar (§8.10).
+      </p>
+    </header>
+    <canvas id="lienzo" width="400" height="300"></canvas>
+    <pre id="resultado">Preparando…</pre>
+    <script type="module" src="/src/render/regresion-visual/suite-navegador.ts"></script>
+  </body>
+</html>

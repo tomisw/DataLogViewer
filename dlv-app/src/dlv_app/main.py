@@ -96,6 +96,16 @@ parada que uvicorn expone para pararse desde fuera de su propio bucle de
 eventos) y espera (`Thread.join`) a que el hilo termine, y `main()` la llama
 en un `finally` alrededor de `webview.start()` para que corra tambien si la
 ventana se cierra por una excepcion, no solo por el cierre normal.
+
+Runtime de WebView2 ausente (F5-03)
+====================================
+En Windows, `pywebview` usa el backend `edgechromium`, que depende de que el
+runtime de WebView2 este instalado. Sin ese aviso previo, la maquina sin el
+runtime ve una ventana en blanco o una excepcion de `pywebview`/`clr_loader`
+sin contexto -- y sin consola donde leerla (`console=False` en `dlv_app.
+spec`). `main()` llama a `dlv_app.webview2.verificar_webview2_y_avisar()`
+antes de arrancar nada; ver el docstring de ese modulo para el metodo de
+deteccion y su nivel de confianza.
 """
 
 from __future__ import annotations
@@ -115,6 +125,7 @@ import uvicorn
 import webview
 
 from dlv_api.main import ServidorArrancado, preparar_servidor
+from dlv_app.webview2 import verificar_webview2_y_avisar
 
 HOST_LOCAL = "127.0.0.1"
 
@@ -411,7 +422,20 @@ def main(*, url_frontend: str | None = None, log: str | None = None, depurar: bo
     se cierra la ultima ventana) estan en un `try`/`finally` para que los dos
     se paren tambien si `webview.start()` termina por una excepcion, no solo
     por el cierre normal de la ventana.
+
+    Antes de arrancar nada, `verificar_webview2_y_avisar` (F5-03) comprueba
+    en Windows si falta el runtime de WebView2 que necesita el backend
+    `edgechromium` de `pywebview`. Si falta, ya avisa con un cuadro de
+    dialogo nativo (no una ventana `pywebview`: esa es justo la via que no
+    funcionaria sin el runtime) y aqui solo queda salir sin arrancar
+    `dlv-api` ni intentar crear ninguna ventana -- de lo contrario el fallo
+    real llegaria mas tarde como una excepcion de `pywebview`/`clr_loader`
+    sin este contexto. Fuera de Windows, o si no se pudo confirmar la
+    ausencia, esta comprobacion no hace nada (ver el docstring del modulo
+    `dlv_app.webview2`).
     """
+    if not verificar_webview2_y_avisar():
+        return
     estado = iniciar_api_en_hilo(host=HOST_LOCAL)
     estado_ui: ServidorUiDeFondo | None = None
     try:

@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 06:55:11Z"
+    "actualizado": "2026-08-19 06:58:26Z"
   },
   "tareas": [
     {
@@ -3834,10 +3834,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-19 06:58:26Z",
+          "texto": "Entregado por un agente Sonnet, verificado por el orquestador ejecutando el modulo, no leyendo el informe. Comprobado por mi: (1) en Linux detectar_webview2() devuelve DESCONOCIDO sin tocar el registro y verificar_webview2_y_avisar() devuelve True, o sea NO bloquea; (2) el GUID {F3017226-FE2A-4295-8BDF-00C3A9A7E4C5} es el del cliente EdgeUpdate del WebView2 Runtime y la URL developer.microsoft.com/en-us/microsoft-edge/webview2 es la oficial: las dos correctas; (3) winreg se importa de forma perezosa DENTRO de la funcion, que es lo que hace que el modulo se pueda importar en Linux; (4) pv='0.0.0.0' se trata como no instalado, que es el caso real de una clave presente sin producto; (5) el mensaje lleva el nombre exacto del runtime y la URL. LO MEJOR DE LA ENTREGA es un fallo que el propio agente encontro y corrigio: su primera version trataba 'clave no encontrada' (FileNotFoundError, el caso NORMAL cuando el runtime nunca se instalo) igual que 'clave presente pero ilegible', asi que habria devuelto DESCONOCIDO en el caso mas comun de todos en vez de AUSENTE, y la deteccion no habria detectado nada. Ahora los distingue con una excepcion interna y hay una prueba para cada rama. El aviso se muestra con MessageBoxW por ctypes y no por pywebview, que es lo correcto: abrir una ventana pywebview es precisamente lo que no funciona sin el runtime, y el .spec va con console=False, asi que un mensaje por stderr no lo veria nadie. QUE REVISAR: la clave del registro se confirmo por busqueda contra varias fuentes independientes, incluidos hilos del repositorio oficial MicrosoftEdge/WebView2Feedback, pero NO contra learn.microsoft.com en vivo (el proxy lo bloquea) ni contra una maquina Windows real. Confianza alta, no total, y el propio modulo lo dice en su docstring en vez de presentarlo como confirmado. 12 pruebas, todas ejecutadas."
+        }
+      ],
+      "base": "f0f7b50"
     },
     {
       "id": "F5-04",
@@ -4029,10 +4035,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "hecho",
+      "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-19 06:58:26Z",
+          "texto": "Entregado por un agente Sonnet, verificado por el orquestador ejecutando la logica pura con node. LA DECISION CENTRAL, y esta bien tomada: NO compara imagenes ni guarda PNG de referencia. Compara tres invariantes geometricos leidos con readPixels: posicion (un punto conocido tiene que aparecer a menos de 3 px de su pixel calculado analiticamente), color (tolerancia 10/255 por canal) y cobertura (recuento de pixeles no-fondo contra un rango ancho, 0,3x-3x). El razonamiento esta escrito: un diff de pixeles exactos entre GPUs distintas falla por antialiasing y redondeo de shaders sin que nada este roto, y una prueba que falla sin motivo acaba desactivada, que es peor que no tenerla. VERIFICADO POR MI ejecutando los modulos reales: el oraculo de posicion da que el punto 'centro' (t=10, v=100) cae en (200,150), el centro exacto de un viewport de 400x300, comprobable a mano sin usar ninguna formula del proyecto; los cinco puntos de control caen dentro con el margen del 10 % que documenta; la tolerancia de color acepta una desviacion de 10 y rechaza 11; contarPixelesNoFondo y hayColorCerca dan lo esperado con radio 0 y 1. El oraculo de posicion esta REIMPLEMENTADO a proposito sin importar escala.ts::transformacion, que es lo correcto: importar la funcion que estas probando no prueba nada. Sin WebGL2 el veredicto es NO MEDIDO con la lista de lo que no se comprobo, nunca verde en silencio, que era la condicion que puse. Y NO metio las tolerancias en data/umbrales.toml, con un argumento con el que estoy de acuerdo: ese fichero describe la fisica de un motor y tiene precedencia canal>perfil>usuario>fichero, mientras que 'cuanto ruido de rasterizacion introduce una GPU' no es un umbral de dominio y no tendria sentido con esa precedencia. Son constantes con nombre, exportadas, con su motivo al lado y parametrizables en la llamada. QUE REVISAR: la suite de navegador no se ha ejecutado nunca (no hay WebGL2 ni node_modules aqui), asi que lo unico probado es la logica pura. Hoy exige abrir regresion-visual.html a mano; el agente propone un runner tipo Playwright para CI y NO lo añadio como dependencia, que es lo correcto: es tu decision. Sin dependencias nuevas, solo un script en package.json."
+        }
+      ],
+      "base": "f0f7b50"
     },
     {
       "id": "F5-13",

@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-19 06:55:11Z
+Actualizado: 2026-08-19 06:58:26Z
 
-**331 / 775 pts cerrados (42.7 %)** · 157 pts esperando revisión humana → 63.0 % entregado
+**338 / 775 pts cerrados (43.6 %)** · 157 pts esperando revisión humana → 63.9 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-19 06:55:11Z
 | F3 | 26 | 34 | 8 | 47 | 3 | 118 |
 | F4 | 5 | 0 | 8 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 11 | 0 | 3 | 62 | 0 | 76 |
+| F5 | 18 | 0 | 3 | 55 | 0 | 76 |
 
 ## Requieren atención
 
@@ -235,13 +235,13 @@ Actualizado: 2026-08-19 06:55:11Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 11/76 pts
+## F5 — 18/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ✔  | `F5-01` | Empaquetado `onedir` en ZIP para las 3 plataformas, con exclus | Opus 5 | 6 | F1-35 | G2 | `3d8d81d` |
 | ·  | `F5-02` | Modo portable con `portable.txt`: cero escritura fuera de la c | Opus 5 | 5 | F5-01 | G1 | — |
-| ·  | `F5-03` | Detección de WebView2 ausente con descarga guiada | Sonnet 5 | 3 | F5-01 | G3 | — |
+| ✔  | `F5-03` | Detección de WebView2 ausente con descarga guiada | Sonnet 5 | 3 | F5-01 | G3 | — |
 | ·  | `F5-04` | Firma y notarización | Sonnet 5 | 4 | F5-01 | G3 | — |
 | ·  | `F5-05` | Actualizador opcional y desactivable | Sonnet 5 | 4 | F5-01 | G3 | — |
 | ✔  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | `5298576` |
@@ -250,7 +250,7 @@ Actualizado: 2026-08-19 06:55:11Z
 | ▶  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |
 | ·  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | — |
 | ·  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
-| ·  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | — |
+| ✔  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | — |
 | ·  | `F5-13` | Revisión de seguridad: rutas, deserialización, evaluador de ex | Opus 5 | 6 | F3-18, F5-07 | G1 | — |
 | ·  | `F5-14` | Auditoría final contra los presupuestos de §2.6, incluidos tam | Opus 5 | 5 | todo | G1 | — |
 | ·  | `F5-15` | Corrección de defectos y pulido | Sonnet 5 | 8 | todo | G3 | — |
