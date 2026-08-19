@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-18 22:31:36Z"
+    "actualizado": "2026-08-19 06:45:52Z"
   },
   "tareas": [
     {
@@ -2853,10 +2853,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-19 06:45:52Z",
+          "texto": "REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUATRO DETECTORES, NO A TRES. docs/07 7.15 enumeraba '(D4, D10, D12)', que son los que tienen severidad='critica' fija. Con la politica que F3-07 ya habia declarado en data/umbrales.toml (severidades_afectadas=['critica']) tambien entra D13, que no tiene severidad fija sino severidad_por_nivel con 3='critica'. Lo he incluido a proposito y he corregido la enumeracion de docs/07: si el rol protection_level se emparejo por parecido, una critica de nivel 3 afirma que la ECU esta protegiendo el motor sobre un canal que puede medir otra cosa, y ese es el aviso falso de mayor consecuencia de los 18. Si decides que D13 debe seguir avisando, se cambia en el DATO (dandole severidad fija o partiendo la politica), no en el codigo. (2) El criterio no esta cableado: hay una prueba que cambia la politica a ['media'] y comprueba que entonces se desactiva el detector medio y NO el critico. Si el dato fuera decorativo, esa prueba pasaria igual. (3) Una errata en severidades_afectadas ('critico' por 'critica') FALLA al cargar. Es el fallo mas caro de este modulo y el unico sin sintoma: no coincidiria con nada, no desactivaria ningun detector y no daria ningun error, dejando apagada la mitigacion de R10 hasta que apareciese una alerta falsa meses despues. Lo mismo con una lista vacia y con un detector sin severidad declarada (suponer 'informativa' seria suponer el lado que no desactiva nada). (4) TRES ESTADOS Y NO DOS: activo, desactivado por precaucion (el rol esta y no esta confirmado: se arregla con un clic) y no ejecutable (el log no trae el canal: no hay nada que confirmar). Colapsarlos dejaria al usuario sin saber si le falta un canal o una confirmacion. Un rol ausente NO se cuenta ademas como sin confirmar, para que el motivo no pida confirmar algo que no existe. (5) El motivo nombra el rol, que es la otra mitad del valor: 'confirma el rol oil_pressure' es una accion, 'detector desactivado' es un callejon sin salida. (6) Esto es lo que le faltaba al panel de F3-12: produce el EstadoDetector que su union discriminada ya esperaba. Falta el endpoint que lo sirva, que es de otro carril. 20 pruebas, todas ejecutadas."
+        }
+      ],
+      "base": "3de5dfb"
     },
     {
       "id": "F3-09",

@@ -359,7 +359,24 @@ Mitigaciones, todas obligatorias:
 2. El informe de plausibilidad compara cada rol contra su rango declarado.
 3. Los canales sin dimensión resuelta se muestran en crudo, sin unidad y sin
    selector.
-4. Los detectores de severidad crítica (D4, D10, D12) **se desactivan** en un log
-   cuyos roles implicados provengan de asignación difusa no confirmada por el
-   usuario. Preferimos no avisar a avisar en falso, porque una alerta falsa
-   repetida enseña al usuario a ignorar las alertas.
+4. Los detectores de severidad crítica **se desactivan** en un log cuyos roles
+   implicados provengan de asignación difusa no confirmada por el usuario.
+   Preferimos no avisar a avisar en falso, porque una alerta falsa repetida
+   enseña al usuario a ignorar las alertas.
+
+   El criterio vive en `[desactivacion_automatica]` de `data/umbrales.toml`
+   (`severidades_afectadas = ["critica"]`) y lo aplica
+   `dlv_core.activacion_detectores` (F3-08). **Son cuatro detectores, no tres.**
+   Este párrafo enumeraba «(D4, D10, D12)», que son los que tienen
+   `severidad = "critica"` fija; F3-08 añade **D13**, que no tiene `severidad`
+   sino `severidad_por_nivel` con `3 = "critica"`. Se incluye a propósito: si el
+   rol `protection_level` se emparejó por parecido, una crítica de nivel 3
+   afirma que la ECU está protegiendo el motor sobre un canal que puede estar
+   midiendo otra cosa, y ese es el aviso falso de mayor consecuencia de los 18.
+   La enumeración anterior era incompleta, no incorrecta.
+
+   Y el estado que se publica distingue **tres** casos, no dos: activo,
+   desactivado por precaución (el rol está y no está confirmado — el usuario lo
+   arregla con un clic) y no ejecutable (el log no trae el canal — no hay nada
+   que confirmar). Colapsar los dos últimos dejaría al usuario sin saber si le
+   falta un canal o le falta una confirmación, que son dos acciones distintas.
