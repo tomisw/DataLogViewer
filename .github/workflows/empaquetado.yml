@@ -90,7 +90,7 @@ name: Empaquetado
 #
 # 2. QUÉ PASA SIN CERTIFICADO (el caso de HOY, y el de cualquiera que clone
 #    este repositorio sin comprar uno). Cada paso de firma/notarización va
-#    condicionado por `if: ... secrets.X != ''`: con el secreto vacío (lo
+#    condicionado por `if: ... env.HAY_CERT_* == 'true'`: con el secreto vacío (lo
 #    normal fuera de la cuenta del propietario), el paso se SALTA sin
 #    fallar, el ZIP se construye igual a partir de `dlv-app/dist/dlv-app`
 #    sin firmar, y el paso "Aviso de estado de firma" de más abajo lo dice
@@ -147,6 +147,21 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    # El contexto `secrets` NO esta disponible en un `if:` de paso: la tabla de
+    # disponibilidad de contextos de GitHub Actions lista para
+    # `jobs.<job_id>.steps[*].if` unicamente github, needs, strategy, matrix,
+    # job, runner, env, vars, steps e inputs. Un `if: secrets.X != ''` no da
+    # error de sintaxis --el YAML es valido y `yaml.safe_load` lo acepta-- pero
+    # la condicion no evalua lo que aparenta, y el paso quedaria saltado SIEMPRE,
+    # incluso con el certificado configurado. Es decir: el dia que el propietario
+    # anadiese el certificado, la firma seguiria sin ocurrir y el ZIP saldria sin
+    # firmar sin que nada lo dijera.
+    #
+    # `env` a nivel de job SI admite `secrets`, asi que la presencia del
+    # certificado se resuelve aqui una vez y los pasos preguntan por `env`.
+    env:
+      HAY_CERT_WINDOWS: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 != '' }}
+      HAY_CERT_MACOS: ${{ secrets.MACOS_CODESIGN_P12_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -202,7 +217,7 @@ jobs:
       # en esta máquina (sin SDK de Windows, ver la cabecera) ni en un runner
       # real (sin push todavía).
       - name: "Windows: firmar dlv-app.exe con Authenticode (signtool)"
-        if: matrix.os == 'windows-latest' && secrets.WINDOWS_CODESIGN_PFX_BASE64 != ''
+        if: matrix.os == 'windows-latest' && env.HAY_CERT_WINDOWS == 'true'
         shell: pwsh
         env:
           PFX_B64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
@@ -247,7 +262,7 @@ jobs:
       # Mach-O suelto. NO EJECUTADO NUNCA (sin cuenta de Apple en ningún
       # sitio de este proyecto).
       - name: "macOS: firmar los binarios con codesign (Developer ID)"
-        if: matrix.os == 'macos-latest' && secrets.MACOS_CODESIGN_P12_BASE64 != ''
+        if: matrix.os == 'macos-latest' && env.HAY_CERT_MACOS == 'true'
         shell: bash
         env:
           P12_B64: ${{ secrets.MACOS_CODESIGN_P12_BASE64 }}
@@ -288,7 +303,7 @@ jobs:
       # NUNCA. NO incluye "stapling" -- ver la decisión 4 de la cabecera: sin
       # bundle .app/.pkg/.dmg no hay a qué grapar la notarización.
       - name: "macOS: notarizar el ZIP (notarytool)"
-        if: matrix.os == 'macos-latest' && secrets.MACOS_CODESIGN_P12_BASE64 != ''
+        if: matrix.os == 'macos-latest' && env.HAY_CERT_MACOS == 'true'
         shell: bash
         env:
           APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
