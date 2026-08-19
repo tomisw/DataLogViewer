@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 12:54:30Z"
+    "actualizado": "2026-08-19 13:24:12Z"
   },
   "tareas": [
     {
@@ -3824,8 +3824,8 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
@@ -3892,8 +3892,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente",
       "commits": [],
       "notas": []
     },
