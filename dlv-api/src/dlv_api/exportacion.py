@@ -198,6 +198,44 @@ def _etiqueta_y_metadatos_en_crudo(
     return f"{columna.nombre} [{etiqueta_unidad}]", metadatos
 
 
+def _valores_aritmeticos(valores: Any) -> Any:
+    """Convierte una secuencia de Python en `ndarray` antes de la aritmética.
+
+    POR QUÉ HACE FALTA, SI EL DOCSTRING DECÍA QUE YA FUNCIONABA
+    ==========================================================
+    `ColumnaAExportar.valores` promete admitir «un `float`, una `list[float]` o
+    un `numpy.ndarray`», y razona que da igual «porque la aritmética de
+    `Afin`/`desde_canonica` tampoco distingue». Eso último es FALSO y sus
+    propias pruebas lo demostraban: `Afin.desde_canonica` hace `self.a * x`, y
+    en Python `float * list` no escala la lista — lanza `TypeError: can't
+    multiply sequence by non-int of type 'float'`. Con `a` entero sería aún
+    peor: `2 * [1.0, 2.0]` REPITE la lista en vez de duplicar sus valores, y
+    eso no da error, da una columna con el doble de filas y los mismos
+    números. Un fallo silencioso en la exportación es exactamente el que
+    nadie encuentra, porque el fichero se abre y tiene datos.
+
+    Se arregla aquí, en la frontera, y no en `dlv_core.unidades`: ese módulo es
+    el que usa el camino caliente con `ndarray` de millones de muestras, y
+    meterle una comprobación de tipo por llamada sería pagar en el sitio
+    equivocado. `np.asarray` sobre un `ndarray` no copia nada, así que el
+    camino de producción (`ChannelSeries.v`, que ya es `ndarray`) no paga.
+
+    Los ESCALARES se dejan intactos a propósito: `valores=10.0` tiene que
+    seguir saliendo como un número y no como un array de cero dimensiones, que
+    se formatearía distinto en el CSV.
+
+    Y se llama SOLO en el camino aritmético, no al entrar en
+    `preparar_columna`: los tres casos que exportan en crudo devuelven
+    `columna.valores` tal cual, y cambiarles el tipo ahí sería convertir lo
+    que el módulo promete no tocar.
+    """
+    if isinstance(valores, (list, tuple)):
+        import numpy as np
+
+        return np.asarray(valores, dtype=float)
+    return valores
+
+
 def preparar_columna(columna: ColumnaAExportar, *, catalogo: Catalogo) -> ColumnaPreparada:
     """Decide la unidad de una columna y convierte sus valores (o los deja en
     crudo), sin escribir nada: es la mitad de este módulo que no necesita
@@ -246,7 +284,8 @@ def preparar_columna(columna: ColumnaAExportar, *, catalogo: Catalogo) -> Column
     # Caso general: bruto -> canónica -> unidad de destino, con la MISMA clase
     # en los dos pasos. Ver la cabecera del módulo sobre por qué el primer paso
     # también necesita la clase y no solo el segundo.
-    canonico = columna.to_canon.desde_canonica(columna.valores, columna.clase, columna.parametro)
+    valores = _valores_aritmeticos(columna.valores)
+    canonico = columna.to_canon.desde_canonica(valores, columna.clase, columna.parametro)
     unidad_id = (
         columna.unidad_destino if columna.unidad_destino is not None else dimension.unidad_canonica
     )

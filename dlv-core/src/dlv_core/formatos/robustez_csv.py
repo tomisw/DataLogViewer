@@ -312,17 +312,42 @@ def leer_bloque_de_datos(
     # sea cual sea el origen, porque un `str` de Python no recuerda de qué
     # bytes vino.
     cuerpo = ("\n".join(lineas_datos) + "\n").encode("utf-8")
-    esquema = {_columna_polars(i): pl.Utf8 for i in range(n)}
+    # `schema=` y no `schema_overrides=` + `new_columns=`.
+    #
+    # POR QUÉ, Y QUÉ ROMPÍA LA VERSIÓN ANTERIOR
+    # =========================================
+    # `new_columns` RENOMBRA columnas que ya existen, así que exige que Polars
+    # haya inferido exactamente `n`. Y Polars infiere el ancho de los DATOS, no
+    # de la cabecera: si la fila más ancha del bloque tiene menos campos que
+    # nombres hay en la cabecera, infiere menos columnas y `new_columns`
+    # revienta con `ShapeError: 3 column names provided for a DataFrame of
+    # width 1`. `truncate_ragged_lines` no lo evita: recorta las filas LARGAS,
+    # no rellena las cortas.
+    #
+    # No es un caso rebuscado: es «cabecera de 3 columnas y una única fila de
+    # datos a la que le faltan campos», que es la primera fila de la tabla de
+    # §7.10 («filas de longitud variable: se rellena con vacío y se registra;
+    # no se aborta») combinada con un fichero corto. Lo encontró el fuzzing de
+    # FG-15 con la entrada `b's,rpm,kPa\n9'`, y ESE es el fallo que ese fuzzing
+    # existe para cazar: una excepción de Polars escapando en vez de un error
+    # declarado del importador rompe E1.7 —solo se admite un resultado válido o
+    # un rechazo explicado— y aquí ni siquiera era un rechazo: era un dato
+    # perfectamente cargable.
+    #
+    # `schema=` declara nombres Y número de columnas de una vez, así que el
+    # ancho lo manda la cabecera (que es quien sabe cuántos canales hay) y
+    # Polars rellena con nulo lo que falte en cada fila corta. El hueco llega
+    # como ausente, no como cero, que es lo que exige la misma tabla de §7.10.
+    esquema = dict.fromkeys(nombres, pl.Utf8)
     tabla = pl.read_csv(
         cuerpo,
         has_header=False,
         separator=sondeo.delimitador,
         quote_char=sondeo.comilla,
         infer_schema_length=0,
-        schema_overrides=esquema,
+        schema=esquema,
         null_values=[""],
         truncate_ragged_lines=True,
-        new_columns=list(nombres),
     )
 
     return LecturaRobusta(

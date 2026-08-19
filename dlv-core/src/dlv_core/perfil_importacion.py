@@ -217,7 +217,9 @@ def _origen_desde_bruto(bruto: Mapping[str, object], *, contexto: str) -> Origen
         raise ErrorDePerfilImportacion(
             f"{contexto}: 'origen' debe ser 'deducido' o 'confirmado' y aquí es {origen!r}"
         )
-    return cast(Origen, origen)
+    # Sin `cast`: el `raise` de arriba ya estrecha `origen` a `Origen` para
+    # mypy, y con `--strict` un `cast` redundante es un error, no un adorno.
+    return origen
 
 
 def _campo_str(bruto: Mapping[str, object], *, contexto: str) -> Campo[str]:
