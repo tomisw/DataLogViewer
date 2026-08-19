@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 19:49:55Z"
+    "actualizado": "2026-08-19 20:03:18Z"
   },
   "tareas": [
     {
@@ -3287,10 +3287,17 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet (plan dice Opus; ver nota)",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "7912ef1"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 20:03:18Z",
+          "texto": "Alcance real: F4-01 ya agregaba; lo que faltaba era declarar la clase de magnitud (CLASE_DE_ESTADISTICA). Revision G2 del orquestador: la formula inestable de la varianza se midio y aguanta hasta ~1e12; limite documentado."
+        }
+      ]
     },
     {
       "id": "F4-03",
