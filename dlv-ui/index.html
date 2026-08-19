@@ -262,6 +262,60 @@
       }
 
       /* -------------------------------------------------------------- */
+      /* Topes: límites y bandas de alerta (F3-11)                       */
+      /* -------------------------------------------------------------- */
+      /* Colores semánticos fijos, no ligados al tema (mismo criterio que
+         `.cursor-valor--rango` más abajo: un aviso ámbar y un crítico rojo se
+         reconocen igual en los tres temas de F3-21, y esa tarea decide el
+         resto de la paleta — esto no le pisa nada, solo añade dos colores que
+         no varían). `dlv-topes-*` lo pinta `src/topes/topes.ts`, con la
+         geometría que decide `src/topes/geometria.ts` sin saber de SVG. */
+      .dlv-topes-linea--aviso {
+        stroke: #ffcf6b;
+        stroke-width: 1.5;
+        stroke-dasharray: 5 3;
+      }
+
+      .dlv-topes-linea--critico {
+        stroke: #ff6b6b;
+        stroke-width: 1.5;
+        stroke-dasharray: 5 3;
+      }
+
+      .dlv-topes-linea--curva {
+        stroke-dasharray: none;
+        fill: none;
+      }
+
+      .dlv-topes-marca--aviso {
+        fill: #ffcf6b;
+      }
+
+      .dlv-topes-marca--critico {
+        fill: #ff6b6b;
+      }
+
+      .dlv-topes-banda--aviso {
+        fill: rgba(255, 207, 107, 0.12);
+      }
+
+      .dlv-topes-banda--critico {
+        fill: rgba(255, 107, 107, 0.12);
+      }
+
+      .dlv-topes-etiqueta {
+        font-size: 10px;
+      }
+
+      .dlv-topes-etiqueta--aviso {
+        fill: #ffcf6b;
+      }
+
+      .dlv-topes-etiqueta--critico {
+        fill: #ff6b6b;
+      }
+
+      /* -------------------------------------------------------------- */
       /* Cursor (F1-29)                                                  */
       /* -------------------------------------------------------------- */
       .cursor-linea {
