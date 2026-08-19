@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 06:58:56Z"
+    "actualizado": "2026-08-19 12:54:30Z"
   },
   "tareas": [
     {
@@ -3478,13 +3478,19 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "orquestador",
-      "commits": [],
+      "commits": [
+        "ec9e0d8"
+      ],
       "notas": [
         {
           "fecha": "2026-08-10 16:00:19Z",
           "texto": "CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE G3 EN UNA MAQUINA CON POLARS Y NODE_MODULES. Commit ec9e0d8.\n\nEntregada por un agente Sonnet (el subagente local se habia cortado sin escribir nada) y revisada e integrada por Opus. Sigue en_curso porque la puerta es G3, verificacion completa, y aqui no se puede ejecutar vitest (npm da 403, no hay node_modules) ni la escritura real de Parquet (sin Polars).\n\nDEFECTO ENCONTRADO EN LA REVISION Y ARREGLADO: write_parquet(metadata=...) es un parametro reciente de Polars y pyproject.toml declara polars>=1.9, donde NO existe. uv.lock fija 1.43.1, asi que hoy no falla, pero cualquier resolucion a una version anterior reventaba con TypeError por argumento inesperado y esa traza llegaba al usuario por la respuesta HTTP. Traducido a ErrorDeExportacion con mensaje que dice que actualizar, y el endpoint lo devuelve como 501 (lo pedido es valido, es esta instalacion la que no puede). Con prueba.\n\nDECISION QUE ES TUYA: subir el minimo de polars en pyproject.toml de >=1.9 a la version en que aparece metadata= (>=1.28 segun el PR pola-rs/polars#21806). No lo toco yo porque cambia la especificacion de dependencias, que docs/09 SS9.11 reserva al propietario. Mientras no se suba, el arreglo de arriba es lo que evita la traza.\n\nVERIFICADO POR MI, no solo por el informe del agente: ruff y ruff format en verde en todo el repo; mypy --strict limpio sobre exportacion.py; tsc --noEmit sin ningun error de tipos real en dlv-ui; 12 pruebas de exportacion pasan; 27 de dlv-api pasan; ADR-009 en verde. Comprobado con git stash que los 4 modulos de prueba que no coleccionan ya fallaban ANTES de esta tarea (numpy y polars ausentes), asi que no los rompio ella. Leidas y comprobadas las dos pruebas de la trampa del delta: son asertos reales, PUNTO 10 K -> -263,15 C e INTERVALO 10 K -> 10 C. Comprobado que capturarTrazoPNG es sincrona de verdad (dibujar + toDataURL sin await), que es lo unico que garantiza que el buffer de WebGL no se ha vaciado.\n\nQUE FALTA PARA CERRAR G3: npm ci y npm run test en dlv-ui, y las dos pruebas marcadas con importorskip('polars') de test_exportacion.py. Y como es exportacion de imagen, MIRAR un PNG y un SVG exportados de verdad: que el PNG lleve los ejes y no solo la curva, y que el SVG se abra en un visor con los ejes como vector. Eso no lo puede comprobar ninguna prueba de las que hay hoy.\n\nTRES DEFECTOS AJENOS QUE ANOTO SIN ARREGLAR, vistos por el agente y que confirmo utiles: los docstrings de factor_a/factor_b en main.py (InfoCanalSesion) dicen 'v_canonica = a*v + b' sin decir que eso vale solo para Clase.PUNTO, y quien lea solo eso puede reimplementar la conversion sin la trampa del delta en mente; el docstring de sesiones.py menciona un reintento con el fichero entero en _leer_cabecera que el agente no encontro en el cuerpo; y mypy/pytest del contenedor corren sobre un interprete 3.11 que no puede parsear la sintaxis PEP 695 de piramide.py, lo que tumba dos comprobaciones de verificar.sh en CUALQUIER tarea de este repo hasta que se resuelva."
+        },
+        {
+          "fecha": "2026-08-19 12:08:48Z",
+          "texto": "Cerrada por otra sesion; el libro se habia quedado desincronizado."
         }
       ]
     },
@@ -4044,12 +4050,17 @@
       "estado": "hecho",
       "agente": "sonnet",
       "commits": [
-        "0a990f9"
+        "0a990f9",
+        "712d3a3"
       ],
       "notas": [
         {
           "fecha": "2026-08-19 06:58:26Z",
           "texto": "Entregado por un agente Sonnet, verificado por el orquestador ejecutando la logica pura con node. LA DECISION CENTRAL, y esta bien tomada: NO compara imagenes ni guarda PNG de referencia. Compara tres invariantes geometricos leidos con readPixels: posicion (un punto conocido tiene que aparecer a menos de 3 px de su pixel calculado analiticamente), color (tolerancia 10/255 por canal) y cobertura (recuento de pixeles no-fondo contra un rango ancho, 0,3x-3x). El razonamiento esta escrito: un diff de pixeles exactos entre GPUs distintas falla por antialiasing y redondeo de shaders sin que nada este roto, y una prueba que falla sin motivo acaba desactivada, que es peor que no tenerla. VERIFICADO POR MI ejecutando los modulos reales: el oraculo de posicion da que el punto 'centro' (t=10, v=100) cae en (200,150), el centro exacto de un viewport de 400x300, comprobable a mano sin usar ninguna formula del proyecto; los cinco puntos de control caen dentro con el margen del 10 % que documenta; la tolerancia de color acepta una desviacion de 10 y rechaza 11; contarPixelesNoFondo y hayColorCerca dan lo esperado con radio 0 y 1. El oraculo de posicion esta REIMPLEMENTADO a proposito sin importar escala.ts::transformacion, que es lo correcto: importar la funcion que estas probando no prueba nada. Sin WebGL2 el veredicto es NO MEDIDO con la lista de lo que no se comprobo, nunca verde en silencio, que era la condicion que puse. Y NO metio las tolerancias en data/umbrales.toml, con un argumento con el que estoy de acuerdo: ese fichero describe la fisica de un motor y tiene precedencia canal>perfil>usuario>fichero, mientras que 'cuanto ruido de rasterizacion introduce una GPU' no es un umbral de dominio y no tendria sentido con esa precedencia. Son constantes con nombre, exportadas, con su motivo al lado y parametrizables en la llamada. QUE REVISAR: la suite de navegador no se ha ejecutado nunca (no hay WebGL2 ni node_modules aqui), asi que lo unico probado es la logica pura. Hoy exige abrir regresion-visual.html a mano; el agente propone un runner tipo Playwright para CI y NO lo añadio como dependencia, que es lo correcto: es tu decision. Sin dependencias nuevas, solo un script en package.json."
+        },
+        {
+          "fecha": "2026-08-19 12:54:30Z",
+          "texto": "Suite ejecutada de verdad en Edge 151 con GPU real; verificada inyectando tres regresiones."
         }
       ],
       "base": "f0f7b50"
