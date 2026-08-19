@@ -12,6 +12,14 @@ entregar un `.spec` sin comprobar nada: "no digas verde de nada que no hayas
 ejecutado tú" es la regla del proyecto (`docs/09` §9.4), así que este guion
 SÍ ejecuta algo, aunque no sea PyInstaller.
 
+Ese entorno ya no es el único. En la máquina del propietario (Windows 11
+26100, PyInstaller 6.21, Python 3.14.6) el build SÍ se ejecuta -- ver
+`tools/empaquetar.py` y el docstring de `dlv_app.spec` para lo que se midió
+allí. Este guion sigue siendo útil como comprobación rápida y sin build (100
+veces más rápida que `pyinstaller`), pero YA NO es el único respaldo del
+`.spec`, y cuando puede mirar el entorno en vez de suponerlo, lo mira (ver
+`_informe_collect_data_files`).
+
 QUÉ HACE
 ========
 1. `python -m py_compile` sobre el `.spec`: que sea Python sintácticamente
@@ -28,9 +36,10 @@ QUÉ HACE
 3. Para cada entrada de `datas` que sea una ruta literal del repositorio
    (tupla `(origen, destino)`), comprueba que `origen` existe en disco.
 4. Para las entradas que NO son rutas literales -- aquí solo
-   `collect_data_files("webview")`, que necesita el paquete `webview`
-   instalado para poder ejecutarse -- se marca explícitamente como NO
-   VERIFICABLE en este entorno, en vez de darla por buena o por mala.
+   `collect_data_files("webview")` -- se llama al hook DE VERDAD si
+   PyInstaller y `webview` están instalados (15 ficheros medidos en la
+   máquina del propietario) y, si no lo están, se marca explícitamente como
+   NO VERIFICABLE en vez de darla por buena o por mala.
 5. Comprueba que `samples/real/` (los tres logs del propietario, que
    `CLAUDE.md` prohíbe tocar y que no son material de distribución) NO
    aparece en ninguna ruta de `datas`.
@@ -45,7 +54,10 @@ QUÉ NO HACE (y por qué no puede)
 No construye el paquete, no mide su tamaño ni el arranque en frío contra los
 presupuestos de `docs/02-alcance-y-plan.md` §2.6, y no puede confirmar que
 `hiddenimports`/`excludes` sean correctos: eso exige un build real por
-plataforma con `pyinstaller` instalado, que no está disponible aquí.
+plataforma. Para eso está `tools/empaquetar.py`, que en Windows ya se ha
+ejecutado de verdad; los presupuestos medidos allí (242 MB sin comprimir,
+83,4 MB en ZIP, ambos por encima del límite) están en el docstring de
+`dlv_app.spec`. En macOS y Linux sigue sin medirse nada.
 """
 
 from __future__ import annotations
@@ -53,6 +65,7 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -134,17 +147,71 @@ def _collect_falsa(*_a: object, **_k: object) -> object:
 def _collect_data_files_falsa(paquete: str, *_a: object, **_k: object) -> list[object]:
     """Sustituye a `PyInstaller.utils.hooks.collect_data_files`.
 
-    Necesitaría el paquete (`webview`) instalado de verdad para devolver algo
-    con sentido, y no lo está aquí. Se registra la llamada (ver
-    `PAQUETES_COLLECT_DATA_FILES`) para que el resumen la marque como NO
-    VERIFICABLE en vez de fingir que devolvió una lista vacía y por tanto
-    "sin problema".
+    Este guion ejecuta el `.spec` con PyInstaller sustituido por comprobantes,
+    así que aquí no hay hook real que llamar. Se registra la llamada (ver
+    `PAQUETES_COLLECT_DATA_FILES`) en vez de fingir que devolvió una lista
+    vacía y por tanto "sin problema"; el resumen intenta después la función
+    de verdad (`_informe_collect_data_files`) si PyInstaller y el paquete
+    están instalados, que es el caso en la máquina del propietario aunque no
+    lo fuera en el contenedor sin PyPI donde se escribió esto.
     """
     PAQUETES_COLLECT_DATA_FILES.append(paquete)
     return []
 
 
 PAQUETES_COLLECT_DATA_FILES: list[str] = []
+
+
+def _hook_real_collect_data_files() -> Callable[[str], list[object]] | None:
+    """La `collect_data_files` DE VERDAD, capturada antes de que
+    `ejecutar_spec_con_comprobantes` meta su comprobante en `sys.modules`.
+
+    Sin capturarla aquí, un `from PyInstaller.utils.hooks import ...` posterior
+    encuentra el módulo falso que inyecta esa función y devuelve una lista
+    vacía -- que es justo la mentira ("0 ficheros, todo bien") que este
+    comprobante existe para no contar. Medido: capturada así devuelve 15
+    ficheros para `webview` en esta máquina; buscada después de la inyección,
+    devolvía 0.
+    """
+    try:
+        from PyInstaller.utils.hooks import collect_data_files
+    except ImportError:
+        return None
+    return collect_data_files
+
+
+_COLLECT_DATA_FILES_REAL = _hook_real_collect_data_files()
+
+
+def _informe_collect_data_files(paquete: str) -> str:
+    """Qué se puede decir de `collect_data_files(paquete)` en ESTE entorno.
+
+    La versión anterior imprimía siempre «no está instalado (PyPI bloqueado)»,
+    que era cierto en el contenedor sin red donde se escribió F5-01 y es FALSO
+    en la máquina del propietario: ahí PyInstaller y `pywebview` sí están, y el
+    build real de `dlv_app.spec` copia esos ficheros (medido: 15 ficheros bajo
+    `webview/`, presentes en `dist/dlv-app/_internal/webview/`). Un mensaje que
+    afirma sobre el entorno en vez de mirarlo es exactamente el defecto que
+    esta sesión vino a corregir, así que ahora se mira.
+    """
+    if _COLLECT_DATA_FILES_REAL is None:
+        return (
+            f"{AMARILLO}NO VERIFICABLE{FIN}: collect_data_files({paquete!r}) necesita "
+            "PyInstaller instalado, y aquí no lo está. No se puede confirmar ni negar "
+            "qué ficheros añadiría."
+        )
+    try:
+        ficheros = _COLLECT_DATA_FILES_REAL(paquete)
+    # `except Exception` a proposito y no una lista de tipos: el hook de
+    # PyInstaller puede fallar de muchas formas segun el paquete que le pidas
+    # (ImportError, AttributeError, errores propios de PyInstaller), y aqui
+    # cualquiera de ellas significa lo mismo -- «no se pudo, dilo».
+    except Exception as error:
+        return (
+            f"{AMARILLO}NO VERIFICABLE{FIN}: collect_data_files({paquete!r}) falló: "
+            f"{error!r}. Suele significar que {paquete!r} no está instalado."
+        )
+    return f"OK: collect_data_files({paquete!r}) añadiría {len(ficheros)} ficheros de datos"
 
 
 def ejecutar_spec_con_comprobantes() -> _LlamadaCapturada | None:
@@ -222,13 +289,12 @@ def comprobar_datas(capturada: _LlamadaCapturada) -> bool:
             print(f"{ROJO}FALLA{FIN}: {ruta} está bajo samples/ -- no debe empaquetarse")
             ok = False
 
-    if PAQUETES_COLLECT_DATA_FILES:
-        for paquete in PAQUETES_COLLECT_DATA_FILES:
-            print(
-                f"{AMARILLO}NO VERIFICABLE{FIN}: collect_data_files({paquete!r}) necesita "
-                f"el paquete {paquete!r} instalado; no lo está en este entorno (PyPI "
-                "bloqueado). No se puede confirmar ni negar qué ficheros añadiría."
-            )
+    # `dict.fromkeys` y no `set`: `PAQUETES_COLLECT_DATA_FILES` acumula una
+    # entrada por CADA ejecución del `.spec` (este guion lo ejecuta varias
+    # veces), así que sin deduplicar se imprimiría la misma línea una docena
+    # de veces. Conserva el orden de primera aparición, que es el del `.spec`.
+    for paquete in dict.fromkeys(PAQUETES_COLLECT_DATA_FILES):
+        print(_informe_collect_data_files(paquete))
     return ok
 
 

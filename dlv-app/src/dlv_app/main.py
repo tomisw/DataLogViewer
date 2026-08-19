@@ -142,8 +142,13 @@ def _raiz_datos_de_la_app() -> Path:
     dentro del archivo `PYZ`, no como fichero suelto en disco: `__file__` ya
     no aterriza en una ruta real del arbol de codigo, y contar `.parents[]`
     desde ahi no tiene un equivalente valido en el paquete congelado (el
-    mismo problema que ya tiene `dlv_api.main._RAIZ_REPO`, documentado en
-    `dlv_app.spec`).
+    mismo problema que tenia `dlv_api.main`, resuelto ahi con este mismo
+    patron en `_raiz_de_datos`).
+
+    MEDIDO con el paquete real (Windows 11, PyInstaller 6.21): el ejecutable
+    de `dist/dlv-app/` sirve `dlv-ui/dist` desde `_internal/` y abre un log
+    Haltech real de extremo a extremo. Ver el docstring de `dlv_app.spec`
+    para el detalle de la prueba de humo.
 
     PyInstaller marca el proceso congelado con `sys.frozen = True` y expone
     en `sys._MEIPASS` la carpeta de soporte del paquete (en `onedir`,

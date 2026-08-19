@@ -12,6 +12,14 @@ Los argumentos se leen con `argparse` y no con `sys.argv` a mano para que
 `--help` diga que hace falta un log: la diferencia entre abrir la aplicacion
 con un log real y abrirla con datos sinteticos es exactamente ese argumento, y
 no tenerlo documentado hace que parezca que la aplicacion "no lee logs".
+
+Este fichero es TAMBIEN el script de entrada del paquete congelado
+(`ENTRADA` en `dlv-app/dlv_app.spec`), y no por comodidad. Cuando la entrada
+era `main.py`, el ejecutable ejecutaba el `if __name__ == "__main__":
+main()` de ahi --sin argumentos-- y `dlv-app.exe <ruta_del_log>` ignoraba el
+log en silencio: el ZIP arrancaba y no podia abrir nada. Medido y corregido
+en el build real de Windows; ver el docstring del `.spec`. Si algun dia se
+anade un argumento aqui, lo tiene el ejecutable el mismo dia.
 """
 
 from __future__ import annotations

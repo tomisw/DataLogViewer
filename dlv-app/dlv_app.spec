@@ -8,15 +8,54 @@ portable que exige SS3.10 ("con un portable.txt junto al ejecutable, la app
 no escribe nada fuera de su carpeta"). `onedir` no descomprime nada al
 arrancar y es igual de portable distribuido en ZIP.
 
-Estado de este fichero (tarea F5-01, sobre la base de F1-35)
-================================================================
-Esta tarea sigue sin poder producir el binario: PyInstaller no esta
-instalado en el entorno donde se escribio este fichero (PyPI da 403 aqui) y
-no se puede instalar, asi que **nada de lo de abajo se ha ejecutado con un
-build real** -- ver el informe de la tarea para el detalle de que se
-comprobo en su lugar (AST del propio fichero, existencia de cada ruta de
-`datas`, `python -m py_compile`) y que se dio explicitamente por NO MEDIDO
-(arranque en frio, tamano del ZIP contra `docs/02-alcance-y-plan.md` SS2.6).
+Estado de este fichero: MEDIDO con un build real en Windows
+==============================================================
+Este fichero lo escribio un agente sin PyInstaller (PyPI daba 403 en su
+entorno), asi que decia que **nada de lo de abajo se habia ejecutado con un
+build real**. Ya no es asi: se ha construido de verdad en la maquina del
+propietario -- Windows 11 Pro 10.0.26100 x64, Python 3.14.6, PyInstaller
+6.21.0, `pyinstaller --noconfirm --clean dlv_app.spec` -- y lo que salio
+esta anotado aqui abajo. Lo que se midio:
+
+- El build termina sin errores (~100 s en frio, ~70 s con cache).
+- `dist/dlv-app/dlv-app.exe` arranca, `dlv-api` levanta dentro del paquete
+  ("Application startup complete") y responde `GET /salud` 200.
+- Encuentra sus ficheros de `data/` dentro del paquete. Esto es lo que de
+  verdad habia que comprobar y lo que ninguna prueba del repositorio puede
+  comprobar (ver `dlv_api.main._raiz_de_datos`): con un log real Haltech
+  (copia de `samples/real/AutoLog_20260729_1830.csv`, que no se toca) el log
+  de uvicorn del proceso congelado muestra `GET /comandos/unidades` 200 ->
+  `data/units.toml` localizado, `POST /comandos/abrir-log` 200 ->
+  `data/formats/haltech_nsp.toml` y los catalogos de roles/alias/
+  combustibles localizados, y ocho `POST /comandos/cubos` 200 -> la piramide
+  sirviendo datos reales al renderizador. La ventana se cierra y el proceso
+  sale con codigo 0.
+- El backend `edgechromium` de `pywebview` funciona en el paquete: la
+  ventana "DataLogViewer" aparece (WebView2 151 instalado en esa maquina).
+- `collect_data_files("webview")` aporta 15 ficheros, presentes en
+  `dist/dlv-app/_internal/webview/`.
+
+PRESUPUESTO SUPERADO, y no se ajusta el limite (`docs/02` SS2.6)
+------------------------------------------------------------------
+`python tools/empaquetar.py` sobre ese build, medido:
+
+    onedir sin comprimir: 242,0 MB  (limite 150 MB)
+    ZIP:                   83,4 MB  (limite  60 MB)
+
+Un solo directorio explica casi todo: `_internal/_polars_runtime_32` son
+176 MB de los 242. Es el binario de Polars (la variante de indices de 32
+bits) y entra entero. Lo siguiente ya es pequeno en comparacion:
+`numpy.libs` 21 MB, `python314.dll` 7 MB, `numpy` 7 MB, `pydantic_core`
+6 MB. Es decir, ni los `excludes` de mas abajo ni `dlv-ui/dist` mueven la
+aguja: el presupuesto lo decide Polars. Queda como dato para el propietario,
+que es quien decide si el limite era optimista o si hay que empaquetar
+Polars de otra forma; aqui no se toca ninguno de los dos numeros.
+
+Lo que sigue SIN medir despues de esta sesion: el build en macOS y en Linux
+(los `excludes` y los `hiddenimports` de esas plataformas siguen sin
+confirmar), el arranque en frio cronometrado, y si los `excludes` recortan
+algo que haga falta en un camino de ejecucion que la prueba de humo no
+recorrio.
 
 Lo que SI cambia respecto a F1-35 en este fichero:
 - `datas` ahora incluye `dlv-ui/dist` (antes solo `data/`), con una
@@ -37,35 +76,23 @@ Lo que SI cambia respecto a F1-35 en este fichero:
   la clave `"auto"`), no por un `import` estatico: el mismo patron por el
   que F1-35 ya declaraba a mano los backends de `pywebview`.
 
-Problema conocido, SIGUE sin resolverse aqui (fuera del carril de F5-01)
-==========================================================================
-`dlv_api.main` localiza el descriptor de formato Haltech y el catalogo de
-unidades por ruta relativa al propio fichero fuente:
+Problema conocido de F5-01: RESUELTO y COMPROBADO en el paquete
+=================================================================
+La version anterior de este docstring avisaba de que `dlv_api.main`
+localizaba el descriptor Haltech y el catalogo de unidades contando
+`.parents[3]` desde `__file__`, lo que bajo PyInstaller `onedir` con
+`noarchive=False` no tiene equivalente valido (el bytecode vive dentro del
+`PYZ`, `__file__` no aterriza en ninguna ruta real), y concluia: **el
+paquete arranca pero falla al abrir cualquier log real**. Estaba fuera del
+carril de F5-01 y quedo pendiente.
 
-    _RAIZ_REPO = Path(__file__).resolve().parents[3]
-    _DESCRIPTOR_HALTECH = _RAIZ_REPO / "data" / "formats" / "haltech_nsp.toml"
-    _UNITS_TOML = _RAIZ_REPO / "data" / "units.toml"
-
-Bajo PyInstaller `onedir` con `noarchive=False` (ver `PYZ` mas abajo), el
-bytecode puro de `dlv_api.main` vive dentro del archivo `PYZ`, no como
-fichero suelto en disco: `__file__` ya no aterriza en una ruta real del
-arbol de codigo, y `.parents[3]` no tiene un equivalente valido en el
-paquete congelado. `dlv_app/src/dlv_app/main.py` tenia el MISMO problema
-para localizar `dlv-ui/dist` y esta tarea SI lo arregla ahi
-(`_raiz_datos_de_la_app`, que distingue `sys.frozen` de arbol de
-desarrollo) porque `dlv-app/*` esta en el carril de F5-01.
-
-`dlv-api/*` NO esta en el carril de F5-01 (restriccion explicita de la
-tarea: "NO toques ... dlv-api/"), asi que el cambio equivalente en
-`dlv_api.main` --el mismo patron `sys.frozen`/`sys._MEIPASS` que ya usa
-`dlv_app.main._raiz_datos_de_la_app`-- queda pendiente de otra tarea/agente
-con `dlv-api/*` en su carril. Este `.spec` SI copia `data/` dentro del
-bundle (mas abajo, en `datas`) para que los ficheros EXISTAN fisicamente en
-el paquete, pero eso no arregla la ruta que calcula `dlv_api.main`: **sin
-ese cambio en `dlv-api`, un `dlv-app` empaquetado con este `.spec` arranca
-pero falla al abrir cualquier log real**, porque no encuentra el descriptor
-Haltech ni el catalogo de unidades. Ver el informe de la tarea F5-01 para
-el detalle completo.
+Ya no lo esta: `dlv_api.main._raiz_de_datos` usa el mismo patron
+`sys.frozen`/`sys._MEIPASS` que `dlv_app.main._raiz_datos_de_la_app`, y este
+`.spec` copia `data/` entero dentro del bundle (ver `datas`). Comprobado con
+el build real descrito arriba: el paquete abre un log Haltech real y sirve
+sus cubos. Era la afirmacion mas cara de este fichero --describia un fallo
+que solo se manifiesta en la maquina de quien usa el ZIP-- y ahora esta
+medida en esa clase de maquina.
 """
 
 from pathlib import Path
@@ -93,7 +120,19 @@ from PyInstaller.utils.hooks import collect_data_files
 # detalle completo de como se detecto sin tener PyInstaller instalado.
 RAIZ_REPO = Path(SPECPATH).resolve().parent  # type: ignore[name-defined]  # noqa: F821
 
-ENTRADA = RAIZ_REPO / "dlv-app" / "src" / "dlv_app" / "main.py"
+# El script de entrada es `__main__.py`, NO `main.py`. Medido en el build real
+# de esta maquina (ver "Estado de este fichero" arriba): con `main.py` como
+# entrada, el ejecutable congelado ejecuta su bloque `if __name__ ==
+# "__main__": main()`, que llama a `main()` SIN argumentos -- el `argparse` que
+# convierte `dlv-app.exe <ruta_del_log>` en `main(log=...)` vive en
+# `dlv_app/__main__.py` y no se ejecutaba nunca. Sintoma medido: el paquete
+# arrancaba, abria la ventana y `dlv-api` respondia a `/salud`, pero pasarle un
+# log real por la linea de ordenes no producia NINGUNA llamada a `/comandos/*`
+# en el log de uvicorn -- el frontend caia a su fuente sintetica. Es decir, el
+# ZIP arrancaba y no podia abrir un log, que es justo lo que el ZIP existe para
+# hacer. `__main__.py` importa `dlv_app.main`, asi que el arbol de modulos que
+# analiza PyInstaller es el mismo mas `argparse`.
+ENTRADA = RAIZ_REPO / "dlv-app" / "src" / "dlv_app" / "__main__.py"
 
 # `dlv-ui/dist` lo genera `npm run build` (workflow "frontend" de
 # `.github/workflows/ci.yml`) y NO se versiona. Un `.spec` que lo omitiera en
@@ -155,9 +194,13 @@ a = Analysis(  # type: ignore[name-defined]  # noqa: F821
         # `pywebview` elige el backend grafico en tiempo de ejecucion segun
         # la plataforma (`webview/guilib.py`, funcion `initialize()`), no por
         # un `import` estatico que PyInstaller pueda seguir. Hay que declarar
-        # a mano los backends candidatos. Lista NO verificada con un build
-        # real de PyInstaller (no instalado en este entorno): revisarla en
-        # F5-01 con un build real por plataforma, y recortar los que sobren.
+        # a mano los backends candidatos. MEDIDO en el build de Windows: las
+        # once entradas de esta lista se resolvieron, PyInstaller no emitio
+        # ni un "Hidden import ... not found" para ninguna (los tres que si
+        # emitio son `pycparser.lextab`/`yacctab` y `tzdata`, de hooks de
+        # terceros, no de aqui), y la ventana abrio con `edgechromium`.
+        # Sigue sin medirse en macOS y Linux, donde `cocoa`/`gtk` son los que
+        # importan.
         "webview.platforms.winforms",  # Windows sin WebView2 (.NET/WinForms)
         "webview.platforms.edgechromium",  # Windows con WebView2 (el caso
         # comprometido por ADR-002/docs SS3.10: "presente por omision en
@@ -177,7 +220,10 @@ a = Analysis(  # type: ignore[name-defined]  # noqa: F821
         # en Windows, donde `uvicorn[standard]` no lo instala) deberian
         # quedar como advertencia inocua en el analisis, igual que ya pasa
         # con `webview.platforms.winforms` en Linux/macOS -- a confirmar con
-        # el log de advertencias de un build real.
+        # el log de advertencias de un build real. Medido en Windows: el
+        # unico ausente es `uvloop`, y aparece solo como modulo transitivo
+        # que falta ("imported by uvicorn.loops.uvloop"), inocuo tal como se
+        # esperaba; el resto se resolvio.
         "uvicorn.lifespan.on",
         "uvicorn.lifespan.off",
         "uvicorn.loops.auto",
@@ -198,12 +244,19 @@ a = Analysis(  # type: ignore[name-defined]  # noqa: F821
     # defensa es poder releer, para cada entrada, POR QUE se cree que nada
     # del arbol de importacion real (`dlv-core` -> polars/numpy, `dlv-api` ->
     # fastapi/uvicorn[standard], `dlv-app` -> pywebview/bottle) la necesita.
-    # Ninguna se ha confirmado contra un build real (PyInstaller no esta
-    # instalado aqui, ver el docstring del modulo): son exclusiones por
-    # ausencia de dependencia declarada, no por haber visto un build que las
-    # arrastraba y sobraban. Repasarlas contra el log de advertencias
-    # (`build/dlv-app/warn-dlv-app.txt`) de un build real es trabajo
-    # pendiente de quien tenga acceso a PyPI.
+    # Medido en el build real de Windows (ver el docstring del modulo): el
+    # paquete construye, arranca y abre un log con esta lista puesta, asi que
+    # ninguna de estas exclusiones corta nada que el camino de ejecucion
+    # probado necesite. Lo que ese build NO demuestra es que hicieran falta:
+    # de los quince nombres, los unicos presentes en el entorno son `pytest`,
+    # `hypothesis`, `mypy` y `ruff` (dependencias de desarrollo) y `tkinter`
+    # (stdlib); `pyarrow`, `pandas`, `scipy`, `matplotlib`, Qt y la pila de
+    # notebooks no estan instalados, asi que sus exclusiones son cinturon y
+    # tirantes por si algun dia entraran, no ahorro observado. El log de
+    # advertencias del build vive en `build/dlv_app/warn-dlv_app.txt` (con
+    # guion BAJO: el nombre lo pone el `.spec`, no el `name=` del `EXE`; la
+    # version anterior de este comentario decia `warn-dlv-app.txt`, que no
+    # existe). Sin medir en macOS y Linux.
     excludes=[
         # ADR-001/docs SS3.1: Polars ya evita PyArrow como dependencia
         # directa (lee/escribe Parquet y Arrow IPC por si mismo). Excluirlo
@@ -276,7 +329,14 @@ exe = EXE(  # type: ignore[name-defined]  # noqa: F821
     upx=False,  # UPX complica firma/notarizacion (macOS/Windows) para el
     # ahorro de tamano que da aqui; no vale la pena para este paquete
     console=False,  # ventana de escritorio, sin consola (docs SS3.10).
-    # Cambiar a True temporalmente al depurar un build real en F5-01.
+    # NO hace falta cambiarlo a True para depurar, contra lo que decia este
+    # comentario. Medido con el bootloader `runw.exe` de PyInstaller 6.21 en
+    # Windows: si quien lanza el ejecutable le pasa tuberias para stdout/
+    # stderr (`subprocess.Popen(..., stderr=subprocess.STDOUT)`), el proceso
+    # congelado SI escribe ahi, y se lee el log de uvicorn entero -- que es
+    # como se comprobo que el paquete abre un log real (las lineas
+    # `POST /comandos/abrir-log 200` del docstring del modulo). Lo que no hay
+    # es consola si nadie la proporciona, que es lo que se queria.
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

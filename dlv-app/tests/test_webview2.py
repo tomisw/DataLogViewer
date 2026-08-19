@@ -5,14 +5,21 @@ de esa dependencia, ver su docstring), asi que estas pruebas no necesitan
 `pytest.importorskip("webview")` como `test_main.py`: corren siempre, incluso
 en este sandbox sin `pywebview` instalado.
 
-La rama "no es Windows" se prueba de verdad (no simulada): este sandbox ES
-Linux, asi que `test_detectar_webview2_fuera_de_windows_no_toca_nada` corre
-contra el interprete real, tal como pide el informe de la tarea. La rama
-Windows (lectura de registro) no se puede probar contra un Windows real
-aqui, asi que se simula inyectando un modulo `winreg` falso en
-`sys.modules` y fijando `sys.platform = "win32"` con `monkeypatch` --
-`detectar_webview2`/`_version_desde_registro` importan `winreg` de forma
-perezosa justo para permitir esto.
+Este fichero lo escribio un agente que solo tenia Linux, y lo daba por
+supuesto: `test_detectar_webview2_fuera_de_windows_no_toca_nada` empezaba con
+`assert sys.platform != "win32"`, asi que en Windows la prueba FALLABA -- no
+se saltaba, fallaba. Como la matriz de `.github/workflows/ci.yml` incluye
+`windows-latest`, ese trabajo estaba en rojo. Ahora la plataforma decide que
+se ejecuta de verdad y que se simula, en las dos direcciones:
+
+- La rama "no es Windows" corre contra el interprete real en Linux/macOS y se
+  simula con `monkeypatch` en Windows.
+- La rama Windows (lectura de registro) se simula con un modulo `winreg`
+  falso en Linux/macOS -- `detectar_webview2`/`_version_desde_registro`
+  importan `winreg` de forma perezosa justo para permitir esto -- y en
+  Windows hay ademas dos pruebas que NO simulan nada: leen el registro de
+  verdad, tanto para el caso instalado como para el ausente (este ultimo
+  apuntando a un GUID inexistente, sin desinstalar nada del sistema).
 """
 
 from __future__ import annotations
@@ -23,6 +30,7 @@ from typing import Any
 
 import pytest
 
+from dlv_app import webview2
 from dlv_app.webview2 import (
     NOMBRE_RUNTIME,
     URL_DESCARGA_WEBVIEW2,
@@ -32,24 +40,61 @@ from dlv_app.webview2 import (
     verificar_webview2_y_avisar,
 )
 
+ES_WINDOWS = sys.platform == "win32"
 
-def test_detectar_webview2_fuera_de_windows_no_toca_nada() -> None:
-    """Prueba real, no simulada: este entorno es Linux (ver el informe de la
-    tarea), asi que esto corre contra `sys.platform` de verdad, sin
-    `monkeypatch`. Regla F5-03 #2: en una plataforma que no es Windows la
-    comprobacion no debe hacer nada ni fallar -- aqui "no hacer nada" se
-    traduce en no intentar `import winreg` (que ni siquiera existe en esta
-    maquina) y devolver `DESCONOCIDO`.
+# Cualquier cadena que no sea "win32" sirve para la rama "no es Windows"; se
+# usa "linux" por ser la plataforma donde esa rama corre de verdad.
+_PLATAFORMA_NO_WINDOWS = "linux"
+
+
+class _WinregProhibido:
+    """Modulo `winreg` que estalla al primer acceso a cualquier atributo.
+
+    En la rama "no es Windows" la afirmacion no es solo "devuelve
+    DESCONOCIDO", es "no toca el registro". En Linux eso se cumple por
+    construccion (no hay `winreg` que importar). En Windows si lo hay, asi que
+    la unica forma de comprobar lo mismo es poner en su sitio algo que falle
+    ruidosamente si alguien lo usa.
     """
+
+    def __getattr__(self, nombre: str) -> object:
+        raise AssertionError(f"no se debe tocar el registro fuera de Windows (winreg.{nombre})")
+
+
+def _simular_no_windows(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys, "platform", _PLATAFORMA_NO_WINDOWS)
+    monkeypatch.setitem(sys.modules, "winreg", _WinregProhibido())
+
+
+def test_detectar_webview2_fuera_de_windows_no_toca_nada(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Regla F5-03 #2: en una plataforma que no es Windows la comprobacion no
+    debe hacer nada ni fallar -- "no hacer nada" significa no intentar
+    `import winreg` y devolver `DESCONOCIDO`.
+
+    En Linux/macOS corre contra `sys.platform` de verdad. En Windows se
+    simula la plataforma (y se sabotea `winreg`, ver `_WinregProhibido`)
+    porque no hay otra forma de ejercitar esa rama ahi -- lo que NO se hace es
+    lo que hacia la version anterior de esta prueba: dar por sentado que el
+    entorno es Linux y fallar en Windows.
+    """
+    if ES_WINDOWS:
+        _simular_no_windows(monkeypatch)
     assert sys.platform != "win32"
 
     assert detectar_webview2() is EstadoWebView2.DESCONOCIDO
 
 
-def test_verificar_webview2_y_avisar_fuera_de_windows_devuelve_true() -> None:
+def test_verificar_webview2_y_avisar_fuera_de_windows_devuelve_true(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """El llamante (`dlv_app.main.main`) debe poder seguir arrancando: un
     resultado no concluyente nunca bloquea (regla F5-03 #4).
     """
+    if ES_WINDOWS:
+        _simular_no_windows(monkeypatch)
+
     assert verificar_webview2_y_avisar() is True
 
 
@@ -269,6 +314,55 @@ def test_verificar_webview2_y_avisar_no_llama_al_aviso_si_esta_presente(
     )
 
     assert verificar_webview2_y_avisar() is True
+
+
+_GUID_QUE_NO_EXISTE = "{00000000-0000-0000-0000-0000DEADBEEF}"
+
+
+@pytest.mark.skipif(not ES_WINDOWS, reason="lee el registro real de Windows")
+def test_deteccion_real_en_windows_es_concluyente() -> None:
+    """Sin simular NADA: `winreg` de verdad, registro de verdad.
+
+    No afirma `PRESENTE`, que dependeria de que la maquina tenga WebView2
+    instalado (lo tiene la del propietario, no necesariamente un runner de
+    CI). Afirma lo que si debe cumplirse en cualquier Windows sano: que la
+    lectura llega a una CONCLUSION. `DESCONOCIDO` aqui significaria que
+    alguna clave existe pero no se pudo leer, y eso es lo que dejaria a un
+    usuario con WebView2 ausente arrancando hacia la ventana en blanco que
+    este modulo existe para evitar.
+
+    Medido al escribir esta prueba (Windows 11 Pro 10.0.26100, Python 3.14.6
+    x64): `PRESENTE`, con `pv = "151.0.4129.86"` en
+    `HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\
+    {F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}`.
+    """
+    assert detectar_webview2() in (EstadoWebView2.PRESENTE, EstadoWebView2.AUSENTE)
+
+
+@pytest.mark.skipif(not ES_WINDOWS, reason="lee el registro real de Windows")
+def test_ausente_contra_el_registro_real_de_windows(monkeypatch: pytest.MonkeyPatch) -> None:
+    """La rama que de verdad importa, ejercitada sin desinstalar nada.
+
+    Es la unica que devuelve `False` y por tanto la unica que BLOQUEA el
+    arranque, y hasta esta prueba nunca se habia ejecutado con WebView2
+    realmente ausente -- solo con un `winreg` simulado, que es tambien probar
+    la simulacion. Aqui el modulo `winreg`, el registro y el
+    `FileNotFoundError` son los de verdad; lo unico sustituido es a que GUID
+    se apunta, por uno que no existe en ninguna maquina.
+
+    `_mostrar_aviso_nativo` si se sustituye, y no por comodidad: `MessageBoxW`
+    es modal y bloquearia `pytest` hasta el timeout. Que el dialogo real se
+    pinta y con que texto se comprobo aparte, fuera de la suite (ver el
+    docstring de `dlv_app.webview2._mostrar_aviso_nativo`).
+    """
+    monkeypatch.setattr(webview2, "_GUIDS_WEBVIEW2", (_GUID_QUE_NO_EXISTE,))
+    avisos: list[str] = []
+    monkeypatch.setattr(webview2, "_mostrar_aviso_nativo", avisos.append)
+
+    assert detectar_webview2() is EstadoWebView2.AUSENTE
+    assert verificar_webview2_y_avisar() is False
+    assert len(avisos) == 1
+    assert URL_DESCARGA_WEBVIEW2 in avisos[0]
 
 
 def test_mensaje_runtime_ausente_incluye_nombre_y_url() -> None:
