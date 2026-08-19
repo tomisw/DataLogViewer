@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 19:16:07Z"
+    "actualizado": "2026-08-19 19:33:34Z"
   },
   "tareas": [
     {
@@ -3886,10 +3886,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "f689ebc"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 19:33:34Z",
+          "texto": "Flujo de firma PREPARADO pero NO PROBADO: no hay certificado ni signtool en esta maquina. Medido: exe real sale NotSigned. Ocho secretos declarados; sin ellos el ZIP se publica sin firmar y lo dice."
+        }
+      ]
     },
     {
       "id": "F5-05",

@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-19 19:16:07Z
+Actualizado: 2026-08-19 19:33:34Z
 
-**354 / 775 pts cerrados (45.7 %)** · 162 pts esperando revisión humana → 66.6 % entregado
+**358 / 775 pts cerrados (46.2 %)** · 162 pts esperando revisión humana → 67.1 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-19 19:16:07Z
 | F3 | 30 | 34 | 8 | 43 | 3 | 118 |
 | F4 | 9 | 0 | 4 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 26 | 5 | 10 | 35 | 0 | 76 |
+| F5 | 30 | 5 | 6 | 35 | 0 | 76 |
 
 ## Requieren atención
 
@@ -57,7 +57,6 @@ Actualizado: 2026-08-19 19:16:07Z
 | `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
-| `F5-04` Firma y notarización | en_curso | Sonnet 5 | G3 | — |
 | `F5-09` Paleta de comandos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c61 |
 | `F5-17` Asociación de extensiones opcional y reversi | en_curso | Sonnet 5 | G3 | — |
 
@@ -237,14 +236,14 @@ Actualizado: 2026-08-19 19:16:07Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 31/76 pts
+## F5 — 35/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ✔  | `F5-01` | Empaquetado `onedir` en ZIP para las 3 plataformas, con exclus | Opus 5 | 6 | F1-35 | G2 | `3d8d81d` |
 | ⏳ | `F5-02` | Modo portable con `portable.txt`: cero escritura fuera de la c | Opus 5 | 5 | F5-01 | G1 | `f317f68` |
 | ✔  | `F5-03` | Detección de WebView2 ausente con descarga guiada | Sonnet 5 | 3 | F5-01 | G3 | `0a990f9` |
-| ▶  | `F5-04` | Firma y notarización | Sonnet 5 | 4 | F5-01 | G3 | — |
+| ✔  | `F5-04` | Firma y notarización | Sonnet 5 | 4 | F5-01 | G3 | `f689ebc` |
 | ✔  | `F5-05` | Actualizador opcional y desactivable | Sonnet 5 | 4 | F5-01 | G3 | `5e2bbb8` |
 | ✔  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | `5298576` |
 | ·  | `F5-07` | Espacio de trabajo `.dlvproj` persistente, con emparejamientos | Sonnet 5 | 5 | F3-01, F2-03 | G3 | — |
