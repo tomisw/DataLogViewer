@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 17:53:42Z"
+    "actualizado": "2026-08-19 17:56:48Z"
   },
   "tareas": [
     {
@@ -2935,8 +2935,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente Sonnet",
       "commits": [],
       "notas": []
     },
@@ -4021,8 +4021,8 @@
       ],
       "dep_todo": false,
       "gate": "G4",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente Sonnet",
       "commits": [],
       "notas": []
     },

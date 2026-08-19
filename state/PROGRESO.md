@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-19 17:53:42Z
+Actualizado: 2026-08-19 17:56:48Z
 
 **346 / 775 pts cerrados (44.6 %)** · 162 pts esperando revisión humana → 65.5 % entregado
 
@@ -14,10 +14,10 @@ Actualizado: 2026-08-19 17:53:42Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 26 | 34 | 8 | 47 | 3 | 118 |
+| F3 | 26 | 34 | 12 | 43 | 3 | 118 |
 | F4 | 9 | 0 | 4 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 22 | 5 | 3 | 46 | 0 | 76 |
+| F5 | 22 | 5 | 7 | 42 | 0 | 76 |
 
 ## Requieren atención
 
@@ -51,6 +51,7 @@ Actualizado: 2026-08-19 17:53:42Z
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
+| `F3-11` Dibujo de límites y bandas sobre los paneles | en_curso | Sonnet 5 | G3 | — |
 | `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
@@ -58,6 +59,7 @@ Actualizado: 2026-08-19 17:53:42Z
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 | `F5-09` Paleta de comandos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c61 |
+| `F5-10` i18n ES/EN: extracción de cadenas y catálogo | en_curso | Haiku 4.5 | G4 | — |
 
 ## F0 — 54/54 pts
 
@@ -188,7 +190,7 @@ Actualizado: 2026-08-19 17:53:42Z
 | ⏳ | `F3-08` | Desactivación de detectores críticos cuando su rol proviene de | Opus 5 | 4 | F3-07, FG-09 | G1 | `3505bae` |
 | ·  | `F3-09` | Validación contra la verdad de referencia, en formato nativo y | Opus 5 | 5 | F3-07, F0-13 | G1 | — |
 | ⏳ | `F3-10` | Topes de alerta: aviso, crítico, banda y curva en función de o | Opus 5 | 8 | F3-06, F1-19 | G1 | `f0f7b50` |
-| ·  | `F3-11` | Dibujo de límites y bandas sobre los paneles, en la unidad act | Sonnet 5 | 4 | F3-10, F1-25 | G3 | — |
+| ▶  | `F3-11` | Dibujo de límites y bandas sobre los paneles, en la unidad act | Sonnet 5 | 4 | F3-10, F1-25 | G3 | — |
 | ✔  | `F3-12` | Panel de incidencias por severidad con salto al instante | Sonnet 5 | 5 | F3-07 | G3 | `6c07905` |
 | ▶  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | — |
 | ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
@@ -248,7 +250,7 @@ Actualizado: 2026-08-19 17:53:42Z
 | ·  | `F5-07` | Espacio de trabajo `.dlvproj` persistente, con emparejamientos | Sonnet 5 | 5 | F3-01, F2-03 | G3 | — |
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
 | ▶  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |
-| ·  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | — |
+| ▶  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | — |
 | ·  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
 | ✔  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | `0a990f9`, `712d3a3` |
 | ·  | `F5-13` | Revisión de seguridad: rutas, deserialización, evaluador de ex | Opus 5 | 6 | F3-18, F5-07 | G1 | — |
