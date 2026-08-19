@@ -155,8 +155,28 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
         ">=",
         "FG",
     ),
+    # 1000 ms y no 700: SUBIDO POR EL PROPIETARIO (2026-08-19) tras medirlo.
+    #
+    # Las diez mediciones del historico van de 328 a 937 ms con mediana 644:
+    # un factor de TRES entre la mejor y la peor, sobre la misma maquina y el
+    # mismo codigo. No es que la lectura de cache se haya vuelto lenta -- es
+    # que la medida es sensible a lo que esa maquina este haciendo a la vez,
+    # y el techo de 700 caia dentro de la nube de ruido. Dos agentes lo vieron
+    # fallar de forma independiente (708 y 757 ms) mientras compilaban otra
+    # cosa en paralelo.
+    #
+    # Un presupuesto que falla al azar es peor que uno holgado: se aprende a
+    # reejecutar el CI hasta que pase, y el dia que la regresion sea de verdad
+    # nadie la mira. 1000 ms cubre el maximo observado (937) y sigue siendo
+    # "casi instantanea" para E1.5 frente a los 4 s de la primera apertura.
+    #
+    # LO QUE CUESTA, dicho claro: una regresion real ahora tiene que ser mayor
+    # para saltar. Con mediana 644, hace falta un +55 % en vez de un +9 %. La
+    # alternativa que habria preferido es medir el MEJOR de tres pasadas en
+    # vez de una sola, que quita el ruido sin mover el techo; queda anotado
+    # por si algun dia se retoma.
     Presupuesto(
-        "segunda_apertura", "Segunda apertura desde la caché Parquet", "ms", 700.0, "<=", "F1"
+        "segunda_apertura", "Segunda apertura desde la caché Parquet", "ms", 1000.0, "<=", "F1"
     ),
     Presupuesto(
         "fps_pan_zoom",

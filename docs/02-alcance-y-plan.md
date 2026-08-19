@@ -236,7 +236,7 @@ justificación están en `03-arquitectura.md` §3.8.
 | Apertura de log de 66 MB / 475 canales hasta el primer gráfico | **< 4,0 s** p95 | banco automatizado en CI |
 | Parseo del camino nativo (enteros) | **≥ 100 MB/s** agregado | banco de microtest |
 | Parseo genérico numérico / con texto | **≥ 60 / ≥ 25 MB/s** agregado | banco de microtest |
-| Segunda apertura (caché Parquet) | **< 700 ms** | banco automatizado |
+| Segunda apertura (caché Parquet) | **< 1000 ms** | banco automatizado |
 | Pan/zoom con 16 canales × 5 M puntos | **≥ 60 fps**, sin fotograma > 20 ms | traza de fotogramas |
 | Latencia del cursor a tabla actualizada | **< 16 ms** | traza de fotogramas |
 | Pan/zoom que requiere cubos nuevos del backend | **< 120 ms** p95 | traza de red |

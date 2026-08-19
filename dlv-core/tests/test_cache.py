@@ -9,6 +9,8 @@ versión de esquema, y que la comprobación barata (`leer_metadatos`/
 
 from __future__ import annotations
 
+import importlib.util
+import sys
 from dataclasses import replace
 from pathlib import Path
 
@@ -271,6 +273,28 @@ def test_escribir_con_longitudes_distintas_lanza_valueerror(tmp_path: Path) -> N
         )
 
 
+def _techo_segunda_apertura() -> float:
+    """El techo de `segunda_apertura` leido de `tools/banco.py`, no copiado.
+
+    `tools/banco.py` es la definicion CANONICA de los presupuestos de docs/02
+    SS2.6. Repetir aqui el numero es lo que ya paso: se subio el presupuesto y
+    esta prueba se quedo con el valor viejo, asi que el banco decia una cosa y
+    la suite otra.
+
+    Se carga por ruta y no con un `import tools.banco` porque `dlv-core` es una
+    biblioteca pura y no debe conocer `tools/` (ADR-002 en espiritu); una PRUEBA
+    si puede, y es el mismo patron que ya usa `tests/test_banco.py`.
+    """
+    ruta = Path(__file__).resolve().parents[2] / "tools" / "banco.py"
+    spec = importlib.util.spec_from_file_location("banco_presupuestos", ruta)
+    assert spec is not None and spec.loader is not None
+    modulo = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = modulo
+    spec.loader.exec_module(modulo)
+    techo: float = modulo.POR_ID["segunda_apertura"].limite
+    return techo
+
+
 # --------------------------------------------------------------------------- #
 # Banco: datos sintéticos + medición (funciones públicas de librería, F1-11)
 # --------------------------------------------------------------------------- #
@@ -337,4 +361,8 @@ def test_lectura_cumple_presupuesto_segunda_apertura_a_escala_realista(tmp_path:
     tiempos = medir_ciclo_escritura_lectura(destino, clave, series, piramides)
 
     print(f"\nescritura: {tiempos['escritura_ms']:.1f} ms  lectura: {tiempos['lectura_ms']:.1f} ms")
-    assert tiempos["lectura_ms"] <= 700.0
+    # El techo lo manda `tools/banco.py` (`segunda_apertura`), que es donde
+    # esta el porque de que sean 1000 ms y no 700. Se importa en vez de
+    # repetir el numero: cuando se subio, esta linea se quedo atras y el
+    # presupuesto decia una cosa y la prueba otra.
+    assert tiempos["lectura_ms"] <= _techo_segunda_apertura()
