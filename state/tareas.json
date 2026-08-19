@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 19:47:50Z"
+    "actualizado": "2026-08-19 19:49:55Z"
   },
   "tareas": [
     {
@@ -3287,8 +3287,8 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente Sonnet (plan dice Opus; ver nota)",
       "commits": [],
       "notas": []
     },
