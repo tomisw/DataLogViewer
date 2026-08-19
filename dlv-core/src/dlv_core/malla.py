@@ -1,12 +1,13 @@
-"""Malla RPM x MAP para análisis tabular (tarea F4-01, `docs/04` §4.6).
+"""Malla RPM x MAP y agregación por celda (tareas F4-01 y F4-02, `docs/04` §4.6).
 
 «La entrega de mayor valor para tuning»: una tabla 2D (bins de RPM x bins de
 MAP/carga) con la agregación por celda de un canal tercero (λ, densidad de
-knock, avance de encendido...). Este módulo construye la malla y agrega; el
-mapa de calor, la tabla de corrección de combustible, el filtrado por calidad
-(transitorio, corte, protección de motor, retardo de transporte del sensor de
-λ) y la comparación de dos logs celda a celda son F4-02 y siguientes -- NO
-están aquí.
+knock, avance de encendido...). Este módulo construye la malla y agrega
+--`cuenta`, `media`, `desviacion_tipica`, `minimo`, `maximo`, la lista exacta
+de F4-02--; el componente de mapa de calor, la tabla de corrección de
+combustible, el filtrado por calidad (transitorio, corte, protección de
+motor, retardo de transporte del sensor de λ) y la comparación de dos logs
+celda a celda son F4-03, F4-04, F4-05, F4-07 y F4-08 -- NO están aquí.
 
 ADR-009 -- CÓMO SE EVITA RECORRER 73 M DE MUESTRAS EN PYTHON
 =============================================================
@@ -75,8 +76,8 @@ CELDAS SIN DATOS: NaN, NUNCA 0,0 -- Y `cuenta` ES LA EXCEPCIÓN
 ================================================================
 §4.6 es explícito: «un valor calculado con 2 muestras es peor que ninguno».
 Aquí la barra es más baja (0 muestras, no un umbral de N mínimas -- ese umbral,
-por omisión 20, es de la tabla de corrección de F4-02, no de esta malla), pero
-el principio es el mismo y más grave todavía: si una celda sin ninguna muestra
+por omisión 20, es de la tabla de corrección de combustible de F4-05, no de
+esta malla), pero el principio es el mismo y más grave todavía: si una celda sin ninguna muestra
 saliera con `media = 0.0`, sería indistinguible de una celda con datos reales
 cuyo canal (p. ej. λ de error, avance de 0°) vale legítimamente cero. Por eso
 `media`, `desviacion_tipica`, `minimo` y `maximo` llevan NaN en las celdas
@@ -102,25 +103,52 @@ sería `Clase.INTERVALO`, y confundir las dos es la trampa del delta de
 QUÉ NO HACE ESTE MÓDULO (deliberado, no un olvido)
 ====================================================
 * No excluye muestras por calidad (transitorio, corte, protección de motor,
-  retardo del sensor de λ) -- eso es la regla 2 de §4.6, y es F4-02.
+  retardo del sensor de λ) -- eso es la regla 2 de §4.6, y es F4-03.
 * No aplica el umbral de "menos de N muestras no se rellena" de la tabla de
-  corrección de combustible (por omisión 20) -- también F4-02: aquí una celda
+  corrección de combustible (por omisión 20) -- eso es F4-05: aquí una celda
   con 1 muestra sí lleva su media, solo que con `cuenta == 1` para que quien
   consuma la malla decida si es suficiente para SU propósito.
 * No calcula el mapa de knock, el avance de encendido como caso especial, ni
-  compara dos logs -- F4-02, F4-03 y siguientes.
+  compara dos logs -- F4-07 y F4-08.
 * No exporta a CSV ni al portapapeles -- eso es de la capa de presentación
   (`dlv-ui`/`dlv-api`), que este paquete no toca (ADR-002).
+
+CLASE DE MAGNITUD DE CADA ESTADÍSTICA (F4-02, regla 4 de `CLAUDE.md`)
+=======================================================================
+`construir_malla` no convierte nada -- todo lo que devuelve está en canónica
+(ADR-004) -- pero las cinco estadísticas NO son todas de la misma clase
+(`docs/06` §6.5), y quien algún día las convierta (F4-10, todavía sin hacer)
+no debería tener que adivinarlo ni volver a leer este docstring:
+
+* `media`, `minimo`, `maximo` son `Clase.PUNTO` -- valores absolutos del
+  canal, se les aplican `a` y `b` al convertir.
+* `desviacion_tipica` es `Clase.INTERVALO` -- es una dispersión, no una
+  lectura. Convertirla como PUNTO le sumaría el desplazamiento de origen: la
+  desviación de una temperatura en K no se convierte a °C restándole 273,15.
+* `cuenta` no tiene clase -- es un recuento sin unidad, no se convierte
+  nunca.
+
+`CLASE_DE_ESTADISTICA` deja esto declarado y consultable por nombre de campo
+en vez de dejarlo solo en prosa. Si alguna vez se añade `varianza` como campo
+propio de `Malla` (hoy es un paso intermedio que no se expone), le
+correspondería `Clase.VARIANZA` (`a²`), no `Clase.INTERVALO`: son cosas
+distintas (`docs/06` §6.5) y confundirlas es la misma trampa del delta,
+elevada al cuadrado.
+
+Este módulo declara la clase; no la aplica -- eso es exactamente el alcance
+que deja pendiente para F4-10 y no antes de tiempo.
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol, cast
 
 from dlv_core.unidades import Clase, Dimension, desde_canonica
 
 __all__ = [
+    "CLASE_DE_ESTADISTICA",
     "ErrorDeMalla",
     "Malla",
     "Vectorial",
@@ -323,6 +351,25 @@ def _indices_de_bin(valores: Any, bordes: Any, *, xp: Vectorial) -> tuple[Any, A
 
 
 # --------------------------------------------------------------------------- #
+# Clase de magnitud de cada estadística (F4-02, regla 4 de `CLAUDE.md`)
+# --------------------------------------------------------------------------- #
+# Nombre de campo de `Malla` -> `Clase` de conversión (`docs/06` §6.5), o
+# `None` para el campo que no tiene ninguna porque no lleva unidad. `None`
+# se guarda EXPLÍCITAMENTE en vez de omitir la clave: así un consumidor que
+# recorra `CLASE_DE_ESTADISTICA` no tiene que distinguir "no está en el mapa"
+# de "está, y no tiene clase" -- las cinco estadísticas de F4-02 están todas
+# aquí, sin excepción, y ese es justo el punto: nadie tiene que adivinar la
+# de ninguna. Ver la cabecera del módulo para el porqué de cada asignación.
+CLASE_DE_ESTADISTICA: Mapping[str, Clase | None] = {
+    "cuenta": None,
+    "media": Clase.PUNTO,
+    "desviacion_tipica": Clase.INTERVALO,
+    "minimo": Clase.PUNTO,
+    "maximo": Clase.PUNTO,
+}
+
+
+# --------------------------------------------------------------------------- #
 # Malla
 # --------------------------------------------------------------------------- #
 @dataclass(slots=True, frozen=True)
@@ -332,7 +379,9 @@ class Malla:
     Todo en unidad CANÓNICA (ADR-004): `bordes_rpm` en rpm, `bordes_map` en
     kPa absolutos. La conversión a la unidad activa es solo de presentación y
     la hace `bordes_en_unidad_activa`; este módulo nunca convierte al
-    construir.
+    construir. `CLASE_DE_ESTADISTICA` declara, por nombre de campo, la clase
+    de conversión de cada estadística (`Clase.PUNTO`/`INTERVALO`, o sin clase
+    para `cuenta`) para quien sí convierta -- ver la cabecera del módulo.
 
     Las cinco estadísticas son arrays PLANOS de longitud `n_rpm * n_map`
     (`n_rpm = len(bordes_rpm) - 1`, `n_map = len(bordes_map) - 1`), en orden

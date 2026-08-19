@@ -30,13 +30,14 @@ from typing import Any
 import pytest
 
 from dlv_core.malla import (
+    CLASE_DE_ESTADISTICA,
     ErrorDeMalla,
     Malla,
     bordes_en_unidad_activa,
     bordes_por_omision,
     construir_malla,
 )
-from dlv_core.unidades import Afin, Dimension, Unidad
+from dlv_core.unidades import Afin, Clase, Dimension, Unidad
 
 
 # --------------------------------------------------------------------------- #
@@ -580,6 +581,69 @@ def test_el_bucle_de_min_max_no_crece_con_las_muestras(xp: XpVec) -> None:
         assert list(malla.cuenta) == [n // 3, n // 3, n // 3], "n es múltiplo de 3 a propósito"
         assert contador.llamadas_min == 3, f"n={n}: {contador.llamadas_min} llamadas a min"
         assert contador.llamadas_max == 3, f"n={n}: {contador.llamadas_max} llamadas a max"
+
+
+# --------------------------------------------------------------------------- #
+# Clase de magnitud de cada estadística (F4-02, regla 4 de `CLAUDE.md`)
+# --------------------------------------------------------------------------- #
+def test_clase_de_estadistica_cubre_las_cinco_estadisticas_de_f4_02() -> None:
+    """Ni de más ni de menos: exactamente los cinco campos agregados de
+    `Malla` (`bordes_rpm`/`bordes_map` no son estadísticas, son los ejes) y
+    ninguno ausente -- un campo que faltara obligaría a un consumidor a
+    adivinar su clase, que es justo lo que este mapa existe para evitar."""
+    assert set(CLASE_DE_ESTADISTICA) == {
+        "cuenta",
+        "media",
+        "desviacion_tipica",
+        "minimo",
+        "maximo",
+    }
+
+
+def test_clase_de_estadistica_punto_para_media_minimo_maximo() -> None:
+    """Valores absolutos del canal (`docs/06` §6.5): se les aplican `a` y `b`
+    al convertir, igual que al valor bajo el cursor."""
+    assert CLASE_DE_ESTADISTICA["media"] is Clase.PUNTO
+    assert CLASE_DE_ESTADISTICA["minimo"] is Clase.PUNTO
+    assert CLASE_DE_ESTADISTICA["maximo"] is Clase.PUNTO
+
+
+def test_clase_de_estadistica_intervalo_para_desviacion_tipica() -> None:
+    """La trampa central de F4-02: una desviación típica es una dispersión,
+    no una lectura. Si se convirtiera como PUNTO, una desviación de 2 K
+    saldría como −271 °C en vez de 2 °C (`docs/06` §6.5)."""
+    assert CLASE_DE_ESTADISTICA["desviacion_tipica"] is Clase.INTERVALO
+    assert CLASE_DE_ESTADISTICA["desviacion_tipica"] is not Clase.PUNTO
+
+
+def test_clase_de_estadistica_ninguna_para_cuenta() -> None:
+    """`cuenta` es un recuento sin unidad: `None` explícito, no una clave
+    ausente -- así un consumidor que recorra el mapa no confunde "no
+    declarado" con "declarado, y sin clase"."""
+    assert "cuenta" in CLASE_DE_ESTADISTICA
+    assert CLASE_DE_ESTADISTICA["cuenta"] is None
+
+
+def test_clase_de_estadistica_no_tiene_varianza(xp: XpVec) -> None:
+    """`Malla` no expone la varianza como campo propio (solo como paso
+    intermedio hacia la desviación típica), así que `CLASE_DE_ESTADISTICA`
+    tampoco declara `Clase.VARIANZA` para nada: no hay ningún campo al que
+    aplicársela todavía. Se comprueba junto a una malla de verdad para dejar
+    constancia de que los nombres de `CLASE_DE_ESTADISTICA` son exactamente
+    los campos que `construir_malla` rellena, ni uno más."""
+    malla = construir_malla(
+        Vec([1000.0]),
+        Vec([50.0]),
+        Vec([1.0]),
+        bordes_rpm=[0.0, 2000.0],
+        bordes_map=[0.0, 100.0],
+        xp=xp,
+    )
+    campos_estadisticos = {"cuenta", "media", "desviacion_tipica", "minimo", "maximo"}
+    assert campos_estadisticos == set(CLASE_DE_ESTADISTICA)
+    assert campos_estadisticos <= set(Malla.__dataclass_fields__)
+    assert not any(v is Clase.VARIANZA for v in CLASE_DE_ESTADISTICA.values())
+    assert malla.cuenta[0] == 1  # la malla se construye igual; esta prueba no toca su cómputo
 
 
 # --------------------------------------------------------------------------- #
