@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 06:45:52Z"
+    "actualizado": "2026-08-19 06:55:11Z"
   },
   "tareas": [
     {
@@ -2903,10 +2903,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "revision_humana",
+      "agente": "opus",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-19 06:55:11Z",
+          "texto": "REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA SE RECORTA, NO SE EXTRAPOLA. Es la decision con mas consecuencia del modulo. Con la tabla de ejemplo de D10 (0->201,3 / 3000->501,3 / 7000->901,3), extrapolando el ultimo tramo saldrian 1101,3 kPa de minimo a 9000 rpm: un valor que nadie ha declarado y que en un motor que pasa de vueltas convierte una presion sana en alerta critica. Por debajo del primer punto, extrapolar hacia abajo SILENCIA una alerta de verdad. Recortando, el minimo se queda en el punto extremo declarado. El razonamiento: un tope es una afirmacion del usuario sobre su motor, y fuera del rango que declaro no hay afirmacion. Si prefieres extrapolar, dilo y lo cambio. (2) LA CURVA POR OMISION DE D10 PIDE 281,3 kPa ABSOLUTOS A 800 rpm, o sea 1,8 bar relativos a ralenti. NO lo he cambiado (cambiar un umbral por omision necesita tu permiso) pero lo saco aqui porque lo descubri equivocandome: escribi una prueba dando por normales 250 kPa a ralenti y el detector salto con razon. 1,8 bar a 800 rpm es exigente para un RB26 en caliente; si es demasiado, el falso positivo a ralenti es continuo y el usuario aprende a ignorar D10. Merece que lo mires con el motor delante. (3) El modulo NO compara nada con un umbral: primitivas.umbral_con_histeresis y primitivas.banda ya aceptan float|Serie, asi que una curva no es un tipo nuevo de umbral, es un umbral evaluado muestra a muestra. Este modulo construye esa Serie y delega. Escribir aqui una segunda comparacion con histeresis habria sido tener dos sitios donde equivocarse con ella. (4) Dos puntos con la misma referencia se rechazan al construir: dividirian por cero y dejarian un umbral infinito, con lo que el detector no dispararia nunca o dispararia siempre, sin ningun error que mirar. (5) Un aviso colocado por detras del critico se rechaza: el critico saltaria primero y el aviso nunca seria un aviso, sin que nada falle. Con curvas NO se comprueba y se dice, porque dos curvas pueden cruzarse y eso ya no es comparar dos numeros. (6) La histeresis de una curva sigue a la serie muestra a muestra; calcularla sobre un solo valor del umbral seria correcta a un regimen y equivocada en el resto. (7) ADR-009: la interpolacion se vectoriza con searchsorted y los unicos bucles Python recorren los TRAMOS de la curva (dos o tres), no las muestras; hay una prueba que compara el numero de operaciones de array con 10 y con 10000 muestras. (8) De paso: el recorte usa xp.maximum/minimum con arrays constantes y no un escalar, porque el protocolo Vectorial las declara elemento a elemento entre DOS ARRAYS; numpy difundiria un escalar sin queja y el codigo habria funcionado solo con numpy. 24 pruebas, todas ejecutadas. Queda el componente de dibujo, que es F3-11."
+        }
+      ],
+      "base": "3505bae"
     },
     {
       "id": "F3-11",
