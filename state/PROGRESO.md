@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-19 19:40:07Z
+Actualizado: 2026-08-19 19:47:50Z
 
-**361 / 775 pts cerrados (46.6 %)** · 162 pts esperando revisión humana → 67.5 % entregado
+**376 / 775 pts cerrados (48.5 %)** · 162 pts esperando revisión humana → 69.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,10 +14,10 @@ Actualizado: 2026-08-19 19:40:07Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 30 | 34 | 8 | 43 | 3 | 118 |
-| F4 | 9 | 0 | 4 | 50 | 0 | 63 |
+| F3 | 38 | 34 | 0 | 43 | 3 | 118 |
+| F4 | 13 | 0 | 0 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 33 | 5 | 3 | 35 | 0 | 76 |
+| F5 | 36 | 5 | 0 | 35 | 0 | 76 |
 
 ## Requieren atención
 
@@ -51,13 +51,9 @@ Actualizado: 2026-08-19 19:40:07Z
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
-| `F3-13` Carriles de estado para canales enumerados | en_curso | Sonnet 5 | G3 | DIVERGENCIA DETECTADA EN AUDITORIA: el trabajo esta commiteado (c9bd9a |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
-| `F3-21` Modo oscuro y modo alto contraste | en_curso | Haiku 4.5 | G4 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G4 (que CI pas |
-| `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
-| `F5-09` Paleta de comandos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c61 |
 
 ## F0 — 54/54 pts
 
@@ -174,7 +170,7 @@ Actualizado: 2026-08-19 19:40:07Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 64/118 pts
+## F3 — 72/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -190,7 +186,7 @@ Actualizado: 2026-08-19 19:40:07Z
 | ⏳ | `F3-10` | Topes de alerta: aviso, crítico, banda y curva en función de o | Opus 5 | 8 | F3-06, F1-19 | G1 | `f0f7b50` |
 | ✔  | `F3-11` | Dibujo de límites y bandas sobre los paneles, en la unidad act | Sonnet 5 | 4 | F3-10, F1-25 | G3 | `1765d14` |
 | ✔  | `F3-12` | Panel de incidencias por severidad con salto al instante | Sonnet 5 | 5 | F3-07 | G3 | `6c07905` |
-| ▶  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | — |
+| ✔  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | `c9bd9ac` |
 | ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
 | ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | `24909a3` |
@@ -198,13 +194,13 @@ Actualizado: 2026-08-19 19:40:07Z
 | ✔  | `F3-18` | Evaluador de expresiones en canónica, multi-tasa por retención | Opus 5 | 8 | F1-13 | G2 | `372edba` |
 | ⏳ | `F3-19` | Biblioteca de fórmulas de §4.5, cada una con su clase de magni | Sonnet 5 | 4 | F3-18 | G1 | `e31b8a5` |
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
-| ▶  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | — |
+| ✔  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | `13f6d99` |
 
-## F4 — 9/63 pts
+## F4 — 13/63 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ▶  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | — |
+| ✔  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | `eea3de7` |
 | ·  | `F4-02` | Agregación por celda: media, desviación, mín, máx, número de m | Opus 5 | 5 | F4-01 | G2 | — |
 | ·  | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
 | ·  | `F4-04` | Mapa de calor de λ error con detalle por celda | Sonnet 5 | 5 | F4-02 | G3 | — |
@@ -235,7 +231,7 @@ Actualizado: 2026-08-19 19:40:07Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 38/76 pts
+## F5 — 41/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -247,7 +243,7 @@ Actualizado: 2026-08-19 19:40:07Z
 | ✔  | `F5-06` | Despliegue de la versión navegador contra un backend Python (l | Sonnet 5 | 5 | F1-21 | G3 | `5298576` |
 | ·  | `F5-07` | Espacio de trabajo `.dlvproj` persistente, con emparejamientos | Sonnet 5 | 5 | F3-01, F2-03 | G3 | — |
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
-| ▶  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | — |
+| ✔  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | `c6104cf` |
 | ✔  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | `32d6875` |
 | ·  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
 | ✔  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | `0a990f9`, `712d3a3` |
