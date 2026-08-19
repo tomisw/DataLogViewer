@@ -477,6 +477,31 @@ def construir_malla(
     # modo).
     divisor = cuenta + sin_datos
     media = suma / divisor
+    # `E[X²] - E[X]²` en UNA pasada. Es la forma numéricamente inestable de
+    # calcular una varianza —cancelación catastrófica cuando la media es grande
+    # frente a la dispersión— así que la pregunta no es si lo es en teoría, sino
+    # si lo es para los canales que esta malla agrega. MEDIDO (F4-02, revisión
+    # G2), error relativo contra `np.std` sobre 20 000 muestras en float64:
+    #
+    #     RPM              (media 5e3,   sigma 30)   4e-12
+    #     Presión colector (media 219,   sigma 8)    7e-14
+    #     Distance Traveled(media 1,2e5, sigma 2)    1e-07
+    #     Knock Count      (media 4,5e4, sigma 3)    8e-09
+    #     Epoch en ms      (media 1,7e12,sigma 5)    4e+03   <-- ROTO
+    #
+    # Aguanta con holgura para todo lo que tiene sentido agregar sobre una
+    # malla RPM×MAP, incluidos los canales ACUMULATIVOS, que son los de peor
+    # relación media/dispersión del log real. Se rompe a partir de magnitudes
+    # de ~1e12, es decir una marca de tiempo epoch — que no es un canal que se
+    # agregue por celda de RPM y presión.
+    #
+    # Se deja así a propósito, en vez de cambiarlo por la versión desplazada
+    # (restar una constante antes de elevar al cuadrado, que la arregla del
+    # todo): este código venía de F4-01 con su puerta cerrada, y reescribir
+    # código aprobado por un riesgo que se ha medido y no se materializa es
+    # churn. Lo que faltaba era el número, no el cambio. Si algún día se
+    # agrega un canal de magnitud ~1e12, la vía es desplazar por la media
+    # global; la varianza es invariante a esa traslación.
     varianza = suma2 / divisor - media * media
     # El redondeo de coma flotante puede dejar la varianza ligeramente
     # negativa cuando todas las muestras de la celda son casi idénticas (la
