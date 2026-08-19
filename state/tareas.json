@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 19:33:34Z"
+    "actualizado": "2026-08-19 19:40:07Z"
   },
   "tareas": [
     {
@@ -4185,10 +4185,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "3a8f2a3"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 19:40:07Z",
+          "texto": "Solo HKCU. Guarda y restaura el dueno anterior de la extension. Se niega en modo portable en las DOS direcciones. Registro verificado limpio por el orquestador tras las pruebas."
+        }
+      ]
     }
   ]
 }

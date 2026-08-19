@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-19 19:33:34Z
+Actualizado: 2026-08-19 19:40:07Z
 
-**358 / 775 pts cerrados (46.2 %)** · 162 pts esperando revisión humana → 67.1 % entregado
+**361 / 775 pts cerrados (46.6 %)** · 162 pts esperando revisión humana → 67.5 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-19 19:33:34Z
 | F3 | 30 | 34 | 8 | 43 | 3 | 118 |
 | F4 | 9 | 0 | 4 | 50 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 30 | 5 | 6 | 35 | 0 | 76 |
+| F5 | 33 | 5 | 3 | 35 | 0 | 76 |
 
 ## Requieren atención
 
@@ -58,7 +58,6 @@ Actualizado: 2026-08-19 19:33:34Z
 | `F4-01` Malla RPM×MAP configurable, con los ejes mos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE SOLO DE LA PUERTA G3 EN UNA MAQU |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 | `F5-09` Paleta de comandos | en_curso | Sonnet 5 | G3 | CODIGO COMPLETO Y REVISADO, PENDIENTE DE G3 (vitest en CI). Commit c61 |
-| `F5-17` Asociación de extensiones opcional y reversi | en_curso | Sonnet 5 | G3 | — |
 
 ## F0 — 54/54 pts
 
@@ -236,7 +235,7 @@ Actualizado: 2026-08-19 19:33:34Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 35/76 pts
+## F5 — 38/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -256,6 +255,6 @@ Actualizado: 2026-08-19 19:33:34Z
 | ·  | `F5-14` | Auditoría final contra los presupuestos de §2.6, incluidos tam | Opus 5 | 5 | todo | G1 | — |
 | ·  | `F5-15` | Corrección de defectos y pulido | Sonnet 5 | 8 | todo | G3 | — |
 | ·  | `F5-16` | Manual de usuario y notas de la versión | Haiku 4.5 | 4 | todo | G4 | — |
-| ▶  | `F5-17` | Asociación de extensiones opcional y reversible | Sonnet 5 | 3 | F5-01 | G3 | — |
+| ✔  | `F5-17` | Asociación de extensiones opcional y reversible | Sonnet 5 | 3 | F5-01 | G3 | `3a8f2a3` |
 
 Leyenda: ✔ hecho · ⏳ esperando revisión humana (G1) · ▶ en curso · · pendiente · ✖ bloqueado
