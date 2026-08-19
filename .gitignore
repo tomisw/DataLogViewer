@@ -24,6 +24,14 @@ dlv-ui/dist/
 # Caché de parseo de la aplicación
 *.dlvcache
 
+# Modo portable (F5-02). En el árbol de desarrollo «la carpeta de la app» es la
+# raíz del repositorio (`dlv_app.portable.carpeta_de_la_app`), así que probar el
+# modo portable aquí deja estos dos: la marca, y la carpeta con la caché y el
+# perfil de WebView2 dentro. Ninguno se versiona; un `portable.txt` commiteado
+# cambiaría en silencio dónde escribe la app de todo el que clone el repo.
+/portable.txt
+/datos-dlv/
+
 # Corpus generado (se regenera con el guion de F0-05)
 samples/synth/
 

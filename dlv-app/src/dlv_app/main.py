@@ -125,6 +125,11 @@ import uvicorn
 import webview
 
 from dlv_api.main import ServidorArrancado, preparar_servidor
+from dlv_app.portable import (
+    CarpetaPortableNoEscribible,
+    activar_modo_portable,
+    avisar_de_carpeta_no_escribible,
+)
 from dlv_app.webview2 import verificar_webview2_y_avisar
 
 HOST_LOCAL = "127.0.0.1"
@@ -441,6 +446,14 @@ def main(*, url_frontend: str | None = None, log: str | None = None, depurar: bo
     """
     if not verificar_webview2_y_avisar():
         return
+    # F5-02, ANTES de `iniciar_api_en_hilo`: `crear_app` fija el directorio de
+    # cache al construirse, asi que una `DLV_DIR_CACHE` puesta despues no la
+    # veria nadie. Sin `portable.txt` esto devuelve `None` y no toca nada.
+    try:
+        rutas_portables = activar_modo_portable()
+    except CarpetaPortableNoEscribible as error:
+        avisar_de_carpeta_no_escribible(error)
+        return
     estado = iniciar_api_en_hilo(host=HOST_LOCAL)
     estado_ui: ServidorUiDeFondo | None = None
     try:
@@ -466,7 +479,17 @@ def main(*, url_frontend: str | None = None, log: str | None = None, depurar: bo
         # contexto WebGL2-- no se ejecuta nunca en la suite. Una excepcion en
         # ese camino deja la ventana en blanco o a medias, sin que ni `pytest`
         # ni `npm test` ni `tsc` digan nada.
-        webview.start(debug=depurar)
+        #
+        # `storage_path` (F5-02) es lo que decide donde WebView2 pone su
+        # perfil de usuario. Sin el, `webview/platforms/winforms.py::
+        # init_storage` lo manda a `%APPDATA%\\pywebview` o --con el
+        # `private_mode=True` por omision, que es el caso de hoy-- a un
+        # `tmpXXXX` bajo `%TEMP%`: fuera de la carpeta de la app en los dos
+        # casos. Ver el docstring de `dlv_app.portable`.
+        if rutas_portables is None:
+            webview.start(debug=depurar)
+        else:
+            webview.start(debug=depurar, storage_path=str(rutas_portables.webview))
     finally:
         if estado_ui is not None:
             detener_servidor_ui_de_fondo(estado_ui)
