@@ -200,6 +200,33 @@ def carpeta_de_la_app() -> Path:
       que no tiene nada que ver con la aplicacion. Consecuencia deliberada:
       un `portable.txt` en la raiz del repositorio activa el modo portable
       tambien en desarrollo, que es lo que permite medirlo sin empaquetar.
+
+    MEDIDO CONTRA UN PAQUETE CONGELADO DE VERDAD
+    =============================================
+    La rama `frozen` de esta funcion es la que decide si el modo portable
+    funciona para quien usa el ZIP, y las pruebas de `test_portable.py` solo la
+    cubren con `monkeypatch`: fijan `sys.frozen`/`sys.executable` a mano, asi
+    que comprueban la aritmetica de la ruta pero no que PyInstaller ponga el
+    ejecutable donde aqui se supone. Si esa suposicion fuese falsa, un
+    `portable.txt` junto al `.exe` no activaria nada y la aplicacion escribiria
+    en `~/.dlv` creyendose portable -- un fallo que no se ve, porque la
+    aplicacion funciona igual.
+
+    Se cerro ese hueco ejecutando el binario real (Windows 11, PyInstaller
+    6.21, WebView2 151, `dist/dlv-app/dlv-app.exe`, abriendo
+    `samples/real/AutoLog_20260729_1830.csv`):
+
+    - CON `portable.txt` junto al `.exe`: aparece `datos-dlv/` al lado con 153
+      ficheros, y `~/.dlv/cache` no gana NI UNO.
+    - SIN `portable.txt` y con `~/.dlv/cache` vaciada antes: no aparece
+      `datos-dlv/`, y la cache del usuario recibe los 19 ficheros esperados.
+
+    El segundo control hubo que repetirlo: la primera vez se hizo sin vaciar la
+    cache, y como ya tenia la entrada de ese log de una ejecucion anterior, la
+    reutilizo sin escribir nada. Un delta de cero ficheros parecia demostrar lo
+    contrario de lo que en realidad demostraba. Vale la pena dejarlo escrito:
+    en este proyecto la cache hace que «no se escribio nada» y «no hizo falta
+    escribir nada» se parezcan mucho.
     """
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
