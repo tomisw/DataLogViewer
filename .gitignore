@@ -33,3 +33,11 @@ Thumbs.db
 20260729_1859_Log2768.csv
 20260729_1859_Log2769.csv
 AutoLog_20260729_1830.csv
+
+# Worktrees de subagentes. Se crean aquí y se borran al integrar, pero si uno
+# se queda abandonado, `ruff` y `mypy` lo escanean como si fuera código del
+# proyecto: el árbol de un agente trae una copia entera de `dlv-core`, así que
+# `verificar.py` se pone en rojo por ficheros que ni siquiera están en la rama.
+# Pasó, y el rojo se atribuyó primero a la tarea en curso.
+# `ruff` respeta `.gitignore`, así que esta línea corta las dos cosas.
+.claude/
