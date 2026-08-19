@@ -31,6 +31,106 @@ name: Empaquetado
 #     workflow tampoco lo mide, es un presupuesto de tiempo interactivo con
 #     ventana real, no algo que un runner sin cabeza pueda medir con
 #     sentido.
+#
+# F5-04: firma y notarización, y por qué NO se ha podido probar nada de esto
+# ==============================================================================
+# En la máquina donde se escribió esto NO hay ningún certificado de firma de
+# código, ni de Windows ni de Apple, y el propietario no ha comprado ninguno
+# todavía. Medido en esa máquina (no supuesto):
+#   - `signtool.exe` no existe en ningún sitio de `C:\` (se buscó bajo
+#     `Windows Kits`, que es donde vive si el SDK de Windows está instalado,
+#     y en todo `C:\` hasta profundidad 6): no hay SDK de Windows instalado.
+#   - Los almacenes `Cert:\CurrentUser\My` y `Cert:\LocalMachine\My` no
+#     contienen ningún certificado de firma de código (`-CodeSigningCert`
+#     vacío en los dos).
+#   - `Get-AuthenticodeSignature` ejecutada sobre `dlv-app.exe` real
+#     (extraído de `dist/dlv-app-onedir.zip`, el ZIP sin firmar que produjo
+#     un build real de F5-01 en esta misma máquina) devuelve
+#     `Status = NotSigned` -- así es exactamente como se ve HOY el artefacto
+#     que este workflow publica, y así lo seguirá viendo cualquiera que
+#     clone el repositorio sin comprar un certificado.
+#   - `codesign`/`notarytool` no aplican aquí: esta es una máquina Windows,
+#     así que sencillamente no existen en este sistema operativo.
+# Con eso claro, los pasos de firma de más abajo son CÓDIGO ESCRITO Y NO
+# EJECUTADO NI UNA SOLA VEZ -- ni en esta máquina (no hay con qué) ni en un
+# runner de GitHub (no se ha hecho push de esto todavía). Cada paso lo dice
+# en su propio comentario: NO es "confianza alta sin verificar" travestida
+# de verde, es firma preparada para cuando haya certificado, marcada como tal.
+#
+# Las cuatro decisiones que pedía la tarea, razonadas:
+#
+# 1. DÓNDE VIVEN LOS SECRETOS. Nunca en el repositorio: en los "Secrets" del
+#    repositorio de GitHub (Settings > Secrets and variables > Actions), con
+#    estos nombres exactos (los usa este fichero más abajo):
+#      Windows (Authenticode):
+#        WINDOWS_CODESIGN_PFX_BASE64  -- el .pfx, codificado en base64 (un
+#          secreto de Actions es texto; el .pfx es binario -- se decodifica
+#          en el propio paso, en un fichero temporal de `RUNNER_TEMP` que se
+#          borra al terminar, nunca en el árbol de trabajo).
+#        WINDOWS_CODESIGN_PASSWORD    -- contraseña del .pfx.
+#      macOS (codesign + notarización):
+#        MACOS_CODESIGN_P12_BASE64    -- el certificado "Developer ID
+#          Application" con su clave privada, en formato .p12, en base64.
+#        MACOS_CODESIGN_PASSWORD      -- contraseña del .p12.
+#        MACOS_CODESIGN_IDENTITY      -- el nombre exacto de la identidad tal
+#          como lo exige `codesign -s`, p. ej. "Developer ID Application:
+#          Nombre Apellido (TEAMID)"; `security find-identity` lo imprime una
+#          vez importado el certificado.
+#        APPLE_NOTARIZATION_APPLE_ID    -- Apple ID (correo) de la cuenta de
+#          desarrollador.
+#        APPLE_NOTARIZATION_PASSWORD    -- contraseña de aplicación
+#          específica para ese Apple ID (NUNCA la contraseña normal de la
+#          cuenta; se genera en appleid.apple.com, "Contraseñas específicas
+#          de apps").
+#        APPLE_NOTARIZATION_TEAM_ID     -- Team ID de la cuenta de
+#          desarrollador (10 caracteres alfanuméricos).
+#    La contraseña del llavero temporal de macOS NO es un secreto: se genera
+#    al vuelo (`uuidgen`) dentro del propio job, vive solo mientras dura ese
+#    job y no protege nada fuera de él.
+#
+# 2. QUÉ PASA SIN CERTIFICADO (el caso de HOY, y el de cualquiera que clone
+#    este repositorio sin comprar uno). Cada paso de firma/notarización va
+#    condicionado por `if: ... secrets.X != ''`: con el secreto vacío (lo
+#    normal fuera de la cuenta del propietario), el paso se SALTA sin
+#    fallar, el ZIP se construye igual a partir de `dlv-app/dist/dlv-app`
+#    sin firmar, y el paso "Aviso de estado de firma" de más abajo lo dice
+#    explícitamente en el log y en el resumen del job
+#    (`GITHUB_STEP_SUMMARY`). Un CI que fallara entero por un secreto
+#    opcional ausente bloquearía a todo el que no sea el propietario, que es
+#    justo lo que esto evita.
+#
+# 3. WINDOWS Y MACOS SON DOS MUNDOS DISTINTOS. Authenticode (`signtool`) y
+#    codesign+notarización (`codesign`/`notarytool`) son herramientas,
+#    formatos de certificado (.pfx frente a .p12) y flujos completamente
+#    distintos -- no hay "firma genérica". Por eso van en pasos separados,
+#    cada uno con `if: matrix.os == '...'` explícito, y ninguno pretende
+#    servir a la otra plataforma. Linux no lleva ningún paso de firma: no
+#    hay Gatekeeper ni SmartScreen que sortear ahí y el proyecto no ha
+#    pedido firma GPG.
+#
+# 4. QUÉ NO CUBRE ESTA TAREA.
+#    - El "stapling" de la notarización (`xcrun stapler staple`, para que
+#      Gatekeeper la compruebe sin conexión) exige un bundle
+#      `.app`/`.pkg`/`.dmg`. Este proyecto TODAVÍA empaqueta macOS igual que
+#      Windows/Linux -- `onedir` en ZIP plano, sin `BUNDLE()` en
+#      `dlv_app.spec` -- aunque `docs/03-arquitectura.md` §3.10 pide `.app`
+#      en `.dmg` para macOS. Ese empaquetado específico de macOS es trabajo
+#      pendiente y NO es esta tarea (F5-04 es firma/notarización, no
+#      empaquetado): sin él, `notarytool submit --wait` puede notarizar el
+#      ZIP pero no hay nada que grapar, y Gatekeeper haría la comprobación
+#      en línea la primera vez que alguien ejecute el binario.
+#    - Si "hay cuenta de desarrollador de Apple de pago con Team ID" ya está
+#      decidido o no, esta tarea NO lo sabe ni lo decide: en esta máquina
+#      Windows no hay forma de comprobarlo, y no se inventa un Team ID de
+#      relleno en ningún sitio de este fichero. Los tres secretos de
+#      notarización quedan declarados con nombre y sin valor, a la espera.
+#    - `signtool.exe` en el runner `windows-latest` de GitHub: el paso de
+#      abajo lo busca bajo el SDK de Windows en tiempo de ejecución (la
+#      misma técnica con la que se comprobó, medido, que ESTA máquina de
+#      desarrollo no lo tiene) en vez de suponerlo en el `PATH`. Que el
+#      runner de GitHub sí lo tenga instalado es una expectativa de la
+#      documentación de `runner-images`, no algo medido desde este
+#      repositorio.
 
 on:
   workflow_dispatch: {}
@@ -80,12 +180,152 @@ jobs:
       - name: Comprobar dlv_app.spec (sin build real)
         run: uv run python tools/verificar_empaquetado.py
 
-      # `empaquetar.py` ejecuta `pyinstaller dlv_app.spec`, comprime
-      # `dist/dlv-app/` en un ZIP determinista y compara el resultado contra
-      # el presupuesto de tamaño de docs/02-alcance-y-plan.md §2.6. Sale con
-      # código de error si se supera -- no se ajusta el límite para que pase.
+      # El build de PyInstaller se separa aquí del paso de ZIP (que antes
+      # los hacía los dos `tools/empaquetar.py` en una sola llamada) para
+      # poder firmar el binario/los Mach-O ANTES de comprimir -- firmar
+      # DESPUÉS del ZIP no firma nada, firma un fichero .zip, que no es lo
+      # que Windows/macOS comprueban. `tools/empaquetar.py --saltar-pyinstaller`
+      # ya existía para "solo comprime lo que ya haya en dlv-app/dist/dlv-app/"
+      # (ver su docstring); aquí se usa para eso exactamente, con el paso de
+      # firma en medio. El presupuesto de tamaño (docs/02-alcance-y-plan.md
+      # §2.6) lo sigue comprobando el mismo `empaquetar.py` de siempre, sin
+      # tocar el límite -- ver la cabecera de este fichero: hoy ese
+      # presupuesto está incumplido (242 MB / 83,4 MB medidos en Windows) y
+      # firmar no lo cambia; es una decisión pendiente del propietario.
+      - name: Construir dlv-app con PyInstaller
+        run: uv run pyinstaller --noconfirm dlv_app.spec
+        working-directory: dlv-app
+
+      # --- Windows: Authenticode (signtool) -------------------------------- #
+      # Firma el .exe ANTES de comprimir. Condicionado al secreto: sin él, se
+      # salta sin fallar (decisión 2 de la cabecera). NO EJECUTADO NUNCA -- ni
+      # en esta máquina (sin SDK de Windows, ver la cabecera) ni en un runner
+      # real (sin push todavía).
+      - name: "Windows: firmar dlv-app.exe con Authenticode (signtool)"
+        if: matrix.os == 'windows-latest' && secrets.WINDOWS_CODESIGN_PFX_BASE64 != ''
+        shell: pwsh
+        env:
+          PFX_B64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
+          PFX_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PASSWORD }}
+        run: |
+          # `signtool.exe` se busca bajo el SDK de Windows en vez de suponerlo
+          # en el PATH: es la misma búsqueda con la que se comprobó, medido en
+          # la máquina donde se escribió este workflow, que ahí NO existe
+          # (ver la cabecera del fichero). Se coge la copia x64 más reciente.
+          $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" `
+              -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+              Where-Object { $_.FullName -match "\\x64\\" } |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1 -ExpandProperty FullName
+          if (-not $signtool) {
+            Write-Error "signtool.exe no encontrado bajo el SDK de Windows de este runner."
+            exit 1
+          }
+
+          $pfxPath = Join-Path $env:RUNNER_TEMP "codesign.pfx"
+          [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:PFX_B64))
+          try {
+            & $signtool sign /f $pfxPath /p $env:PFX_PASSWORD `
+                /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
+                "dlv-app\dist\dlv-app\dlv-app.exe"
+            if ($LASTEXITCODE -ne 0) { throw "signtool sign devolvió $LASTEXITCODE" }
+            & $signtool verify /pa "dlv-app\dist\dlv-app\dlv-app.exe"
+            if ($LASTEXITCODE -ne 0) { throw "signtool verify devolvió $LASTEXITCODE" }
+          } finally {
+            # El .pfx decodificado no debe sobrevivir al paso: contiene la
+            # clave privada del certificado.
+            Remove-Item -Force $pfxPath -ErrorAction SilentlyContinue
+          }
+
+      # --- macOS: codesign (Developer ID Application) ---------------------- #
+      # PyInstaller onedir en macOS NO produce un `.app` (este `.spec` no
+      # llama a `BUNDLE()`, ver la decisión 4 de la cabecera): produce una
+      # carpeta con el ejecutable Mach-O principal y varias extensiones
+      # `.so`/`.dylib` (Polars, NumPy) que necesitan firma individual para
+      # pasar Gatekeeper -- `--deep` está desaconsejado por Apple para
+      # bundles `.app`, pero aquí no hay bundle, así que se firma cada
+      # Mach-O suelto. NO EJECUTADO NUNCA (sin cuenta de Apple en ningún
+      # sitio de este proyecto).
+      - name: "macOS: firmar los binarios con codesign (Developer ID)"
+        if: matrix.os == 'macos-latest' && secrets.MACOS_CODESIGN_P12_BASE64 != ''
+        shell: bash
+        env:
+          P12_B64: ${{ secrets.MACOS_CODESIGN_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.MACOS_CODESIGN_PASSWORD }}
+          CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
+        run: |
+          set -euo pipefail
+          KEYCHAIN="$RUNNER_TEMP/firma.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"  # efímera: solo protege este llavero, solo dentro de este job
+          P12_PATH="$RUNNER_TEMP/codesign.p12"
+          echo -n "$P12_B64" | base64 --decode -o "$P12_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$P12_PATH" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" \
+              $(security list-keychains -d user | tr -d '"')
+
+          find "dlv-app/dist/dlv-app" -type f \( -name "*.so" -o -name "*.dylib" -o -name "dlv-app" \) -print0 |
+            xargs -0 -I{} codesign --force --timestamp --options runtime \
+                --sign "$CODESIGN_IDENTITY" --keychain "$KEYCHAIN" "{}"
+
+          rm -f "$P12_PATH"  # la clave privada no debe sobrevivir al paso
+
+      # `empaquetar.py --saltar-pyinstaller` comprime lo que ya construyó el
+      # paso de PyInstaller de arriba (firmado o no, según los pasos
+      # anteriores) y compara contra el presupuesto de tamaño de
+      # docs/02-alcance-y-plan.md §2.6. Sale con código de error si se
+      # supera -- no se ajusta el límite para que pase.
       - name: Construir el paquete onedir y comprimirlo en ZIP
-        run: uv run python tools/empaquetar.py --salida dist/dlv-app-${{ matrix.os }}.zip
+        run: uv run python tools/empaquetar.py --saltar-pyinstaller --salida dist/dlv-app-${{ matrix.os }}.zip
+
+      # --- macOS: notarización (notarytool) --------------------------------- #
+      # Sobre el ZIP ya comprimido (Apple acepta un .zip de binarios firmados
+      # como una de las formas válidas de envío para notarizar). NO EJECUTADO
+      # NUNCA. NO incluye "stapling" -- ver la decisión 4 de la cabecera: sin
+      # bundle .app/.pkg/.dmg no hay a qué grapar la notarización.
+      - name: "macOS: notarizar el ZIP (notarytool)"
+        if: matrix.os == 'macos-latest' && secrets.MACOS_CODESIGN_P12_BASE64 != ''
+        shell: bash
+        env:
+          APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          xcrun notarytool submit "dist/dlv-app-${{ matrix.os }}.zip" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID" \
+              --wait
+
+      # Siempre corre, con o sin secretos: dice explícitamente si el paquete
+      # de esta plataforma quedó firmado o no (decisión 2 de la cabecera).
+      # Que el ZIP se publique sin firmar nunca debe ser un silencio.
+      - name: Aviso de estado de firma
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            if [ -n "${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}" ]; then
+              MSG="Windows: firmado con Authenticode (WINDOWS_CODESIGN_PFX_BASE64 configurado)."
+            else
+              MSG="Windows: SIN FIRMAR -- no hay WINDOWS_CODESIGN_PFX_BASE64 configurado. El ZIP es utilizable pero SmartScreen avisará al abrirlo."
+            fi
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            if [ -n "${{ secrets.MACOS_CODESIGN_P12_BASE64 }}" ]; then
+              MSG="macOS: firmado y notarizado (MACOS_CODESIGN_P12_BASE64 configurado). Sin grapar (ver decisión 4 de la cabecera)."
+            else
+              MSG="macOS: SIN FIRMAR NI NOTARIZAR -- no hay MACOS_CODESIGN_P12_BASE64 configurado. Gatekeeper bloqueará el binario salvo excepción manual del usuario."
+            fi
+          else
+            MSG="Linux: esta tarea no firma nada en Linux (no hay Gatekeeper ni SmartScreen que sortear aquí)."
+          fi
+          echo "$MSG"
+          echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publicar el ZIP
         uses: actions/upload-artifact@v4
