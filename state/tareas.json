@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 13:24:12Z"
+    "actualizado": "2026-08-19 13:42:13Z"
   },
   "tareas": [
     {
@@ -3892,10 +3892,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "5e2bbb8"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-19 13:42:13Z",
+          "texto": "Comprobador de version, red inyectable, sin peticion real en ninguna prueba. NO descarga ni reemplaza binarios, y no esta cableado en main.py todavia. URL de publicacion PENDIENTE de decision del propietario."
+        }
+      ]
     },
     {
       "id": "F5-06",
