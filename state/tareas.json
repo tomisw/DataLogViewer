@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-19 06:58:26Z"
+    "actualizado": "2026-08-19 06:58:56Z"
   },
   "tareas": [
     {
@@ -2855,7 +2855,9 @@
       "gate": "G1",
       "estado": "revision_humana",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "3505bae"
+      ],
       "notas": [
         {
           "fecha": "2026-08-19 06:45:52Z",
@@ -2905,7 +2907,9 @@
       "gate": "G1",
       "estado": "revision_humana",
       "agente": "opus",
-      "commits": [],
+      "commits": [
+        "f0f7b50"
+      ],
       "notas": [
         {
           "fecha": "2026-08-19 06:55:11Z",
@@ -3836,7 +3840,9 @@
       "gate": "G3",
       "estado": "hecho",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "0a990f9"
+      ],
       "notas": [
         {
           "fecha": "2026-08-19 06:58:26Z",
@@ -4037,7 +4043,9 @@
       "gate": "G3",
       "estado": "hecho",
       "agente": "sonnet",
-      "commits": [],
+      "commits": [
+        "0a990f9"
+      ],
       "notas": [
         {
           "fecha": "2026-08-19 06:58:26Z",
