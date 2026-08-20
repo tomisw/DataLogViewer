@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-20 07:58:47Z
+Actualizado: 2026-08-20 13:49:55Z
 
 **395 / 775 pts cerrados (51.0 %)** · 162 pts esperando revisión humana → 71.9 % entregado
 
@@ -15,7 +15,7 @@ Actualizado: 2026-08-20 07:58:47Z
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 38 | 34 | 0 | 43 | 3 | 118 |
-| F4 | 32 | 0 | 0 | 31 | 0 | 63 |
+| F4 | 32 | 0 | 5 | 26 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 36 | 5 | 0 | 35 | 0 | 76 |
 
@@ -53,6 +53,7 @@ Actualizado: 2026-08-20 07:58:47Z
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
+| `F4-11` Informe de sesión HTML autocontenido, con la | en_curso | Sonnet 5 | G3 | — |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
 ## F0 — 54/54 pts
@@ -210,7 +211,7 @@ Actualizado: 2026-08-20 07:58:47Z
 | ✔  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | `53dea03` |
 | ✔  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | `e3fd287` |
 | ·  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
-| ·  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
+| ▶  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
 | ✔  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | `ec9e0d8` |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
 
