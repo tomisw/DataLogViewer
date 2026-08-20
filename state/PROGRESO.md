@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-20 14:23:41Z
+Actualizado: 2026-08-20 14:32:49Z
 
 **400 / 775 pts cerrados (51.6 %)** · 162 pts esperando revisión humana → 72.5 % entregado
 
@@ -14,8 +14,8 @@ Actualizado: 2026-08-20 14:23:41Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 38 | 34 | 0 | 43 | 3 | 118 |
-| F4 | 37 | 0 | 0 | 26 | 0 | 63 |
+| F3 | 38 | 34 | 6 | 37 | 3 | 118 |
+| F4 | 37 | 0 | 4 | 22 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 36 | 5 | 0 | 35 | 0 | 76 |
 
@@ -47,12 +47,14 @@ Actualizado: 2026-08-20 14:23:41Z
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
+| `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | en_curso | Opus 5 | G1 | — |
 | `F3-06` Motor de detectores: las 9 primitivas de §4. | revision_humana | Opus 5 | G1 | Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 line |
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
+| `F4-10` Estadísticas con la clase de magnitud correc | en_curso | Opus 5 | G1 | — |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
 ## F0 — 54/54 pts
@@ -174,7 +176,7 @@ Actualizado: 2026-08-20 14:23:41Z
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ·  | `F3-01` | Modelo de perfil `.dlvprofile` por rol, con unidades por dimen | Opus 5 | 6 | F1-21, F0-10 | G1 | — |
+| ▶  | `F3-01` | Modelo de perfil `.dlvprofile` por rol, con unidades por dimen | Opus 5 | 6 | F1-21, F0-10 | G1 | — |
 | ·  | `F3-02` | Aplicación de perfil por rol con degradación elegante y reserv | Sonnet 5 | 5 | F3-01 | G3 | — |
 | ·  | `F3-03` | Los 10 perfiles de fábrica de `04-perfiles-motorsport.md` §4.2 | Sonnet 5 | 8 | F3-02 | G1 | — |
 | ·  | `F3-04` | Autosugerencia por cobertura de roles («7 de 9 disponibles») | Sonnet 5 | 4 | F3-02, F1-07 | G3 | — |
@@ -209,7 +211,7 @@ Actualizado: 2026-08-20 14:23:41Z
 | ✔  | `F4-07` | Mapas de calor de avance de encendido y de densidad de knock | Sonnet 5 | 4 | F4-02 | G3 | `bb7b4ee` |
 | ✔  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | `53dea03` |
 | ✔  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | `e3fd287` |
-| ·  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
+| ▶  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
 | ✔  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | `52ca588` |
 | ✔  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | `ec9e0d8` |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
