@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 06:51:44Z"
+    "actualizado": "2026-08-20 07:27:19Z"
   },
   "tareas": [
     {
@@ -3336,10 +3336,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "e7afb45"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 07:27:18Z",
+          "texto": "Motor generico en dlv-ui/src/malla/ (sin lambda en ningun nombre) + pieza especifica en lambda/mapa-error.ts. claseValor obligatoria sin omision; con unidad reciproca (phi) DESACTIVA el mapa con explicacion en vez de restar extremos, que es matematicamente falso. Celda vacia y celda de poca confianza se distinguen. NO cableado: dlv-api no expone la malla."
+        }
+      ]
     },
     {
       "id": "F4-05",
@@ -3396,8 +3403,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente Sonnet",
       "commits": [],
       "notas": []
     },
@@ -3418,8 +3425,8 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "pendiente",
-      "agente": null,
+      "estado": "en_curso",
+      "agente": "subagente Sonnet",
       "commits": [],
       "notas": []
     },
