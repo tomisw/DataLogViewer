@@ -26,6 +26,55 @@ origen a una diferencia: un Δ de 10 K son 10 °C y 18 °F, nunca −263,15 °C.
 ahí que toda conversión exija una `Clase`, y que no haya valor por omisión: quien
 convierte tiene que declarar si lo que tiene entre manos es un punto o un
 intervalo (`docs/06-sistema-de-unidades.md` §6.5).
+
+POR QUÉ EL RMS ES `INTERVALO` Y NO `PUNTO` (F4-10)
+====================================================
+`docs/06` §6.5 ya lo declara en su tabla («RMS» en la fila de `INTERVALO`,
+junto a la desviación típica), pero merece la razón por escrito porque un RMS
+no es evidentemente una diferencia -- `sqrt(mean(x²))` de una temperatura en
+Kelvin PARECE una lectura absoluta, no un Δ. No lo es, y la prueba es
+algebraica, no de estilo.
+
+Sea `X` la serie canónica y `mostrado = a·X + b` la conversión afín de su
+unidad de destino (el único caso con `b ≠ 0` en el catálogo es la
+temperatura). El cuadrado medio de la serie CONVERTIDA es:
+
+    E[(aX + b)²] = a²·E[X²] + 2ab·E[X] + b²
+                 = a²·(σ² + μ²) + 2ab·μ + b²          (con μ = E[X], σ² = Var(X))
+                 = a²·RMS(X)² + 2ab·μ + b²
+
+Es decir, `RMS(a·X + b) = sqrt(a²·RMS(X)² + 2ab·μ + b²)`, que depende de `μ`
+-- la MEDIA de `X` -- y no es una función de `RMS(X)` por sí solo salvo que
+`b = 0`. Con `b = 0` el término cruzado desaparece y queda exactamente
+`RMS(a·X) = a·RMS(X)`: la misma regla de solo-la-parte-lineal que ya aplica
+`INTERVALO` a la desviación típica y al rango.
+
+Dos consecuencias, no una sola:
+
+1. **`RMS` nunca puede ser `Clase.PUNTO`.** Sumarle `b` (como si fuera una
+   lectura absoluta) no solo está mal por la misma razón de siempre --
+   desplazar un ancho de banda no tiene sentido físico --, sino que además
+   NO reconstruye el RMS que se obtendría convirtiendo cada muestra cruda a
+   la unidad de destino y volviendo a calcular el RMS ahí: esa reconstrucción
+   exacta necesitaría conocer también `μ`, que un RMS no lleva consigo. La
+   única conversión que este motor puede ofrecer con la información que
+   tiene -- el propio valor de RMS, sin la media que lo acompañaba -- es la
+   lineal, `a·RMS(X)`, que es justo lo que hace `Clase.INTERVALO`.
+2. **Por eso un RMS solo tiene sentido, en este sistema, sobre una magnitud
+   que YA es una diferencia** (una desviación respecto a un objetivo, no una
+   lectura cruda del canal) -- exactamente el caso de §4.2 P6, «desviación
+   RMS respecto al objetivo» en el lazo de ralentí: se calcula sobre
+   `medida − objetivo`, que ya no tiene el desplazamiento de origen del
+   canal, así que la homogeneidad `RMS(k·d) = |k|·RMS(d)` (válida para
+   cualquier `k`, sin excepción, porque el valor absoluto sale de la raíz)
+   es exacta y `Clase.INTERVALO` es la conversión correcta y no una
+   aproximación. Un RMS calculado sobre la lectura absoluta del canal --sin
+   restarle nada-- no es una magnitud que este sistema sepa convertir de
+   forma exacta, y no se debe fingir que sí con `Clase.PUNTO`.
+
+Ver `dlv-core/tests/test_trampa_del_delta.py`,
+`test_el_rms_es_homogeneo_bajo_escala_pero_no_bajo_desplazamiento`, para la
+comprobación numérica de las dos propiedades.
 """
 
 from __future__ import annotations
@@ -66,7 +115,12 @@ class Clase(Enum):
     """Valor absoluto: se aplican `a` y `b`. Cursor, media, mínimo, umbral."""
 
     INTERVALO = "intervalo"
-    """Diferencia: solo `a`. Δ del doble cursor, rango, desviación típica, RMS."""
+    """Diferencia: solo `a`. Δ del doble cursor, rango, desviación típica, RMS.
+
+    El RMS entra en esta clase y NUNCA en `PUNTO`: ver «POR QUÉ EL RMS ES
+    INTERVALO Y NO PUNTO (F4-10)» en la cabecera del módulo para la
+    justificación algebraica -- no es una convención arbitraria, es lo único
+    que se puede calcular sin conocer la media de la serie original."""
 
     TASA = "tasa"
     """Cociente por unidad de otra magnitud: solo la parte lineal. Derivadas."""

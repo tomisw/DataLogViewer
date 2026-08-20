@@ -347,6 +347,97 @@ def test_la_varianza_es_el_cuadrado_del_intervalo(cat: Catalogo) -> None:
     assert sigma_mostrada == pytest.approx(3.6, abs=1e-9)
 
 
+def test_el_rms_es_homogeneo_bajo_escala_pero_no_bajo_desplazamiento(cat: Catalogo) -> None:
+    """La justificación algebraica de por qué un RMS es SIEMPRE `Clase.INTERVALO`
+    (F4-10), nunca `Clase.PUNTO` -- ver «POR QUÉ EL RMS ES INTERVALO Y NO PUNTO»
+    en la cabecera de `unidades.py` para la derivación completa.
+
+    Serie sintética con media != 0 (7 muestras, RMS y media a mano, sin NumPy:
+    es código de prueba sobre un puñado de números, no el camino caliente que
+    prohíbe ADR-009). Se comprueban las dos propiedades que sostienen la
+    decisión:
+
+    1. **Homogeneidad bajo escala pura**: `RMS(k·X) = |k|·RMS(X)` para
+       cualquier `k` (incluido uno negativo), exacta -- es un hecho del
+       operador RMS en sí, no de este catálogo.
+    2. **Para toda unidad REAL del catálogo, `Clase.INTERVALO` reproduce esa
+       homogeneidad exactamente.** Ninguna unidad de `data/units.toml` tiene
+       `a` negativo (comprobado sobre las mismas unidades que recorre
+       `test_la_diferencia_entre_punto_y_delta_es_exactamente_b`), así que
+       `a·RMS(X)` y `|a|·RMS(X)` coinciden siempre en la práctica -- si algún
+       día se diera de alta una unidad con `a < 0`, esta prueba seguiría
+       demostrando la propiedad 1 sobre el operador matemático, aunque
+       `Afin.desde_canonica(rms, INTERVALO)` perdería el signo del valor
+       absoluto en ESE caso hipotético, algo que no le corresponde arreglar a
+       esta tarea porque hoy no existe ninguna unidad así.
+    3. **No homogeneidad bajo desplazamiento**: `RMS(a·X + b) != a·RMS(X) + b`
+       en general. Es la prueba de que `Clase.PUNTO` -- que sumaría `b` -- no
+       reconstruye el RMS que se obtendría convirtiendo la serie entera y
+       volviendo a calcular el RMS ahí: esa reconstrucción exacta necesitaría
+       la media de la serie, que un RMS no lleva consigo.
+    """
+    xs = [10.0, 12.0, 9.0, 15.0, 11.0, 8.0, 13.0]  # media 11.14..., no cero
+    rms = math.sqrt(sum(x * x for x in xs) / len(xs))
+
+    # Propiedad 1: el operador RMS en sí es homogéneo bajo escala, con signo
+    # incluido -- esto no depende del catálogo, es aritmética pura.
+    for k in (2.0, 0.5, -3.0):
+        escalados = [k * x for x in xs]
+        rms_escalado = math.sqrt(sum(x * x for x in escalados) / len(escalados))
+        assert rms_escalado == pytest.approx(abs(k) * rms, rel=1e-12), (
+            f"RMS({k}·X) debería ser |k|·RMS(X)={abs(k) * rms}, salió {rms_escalado}"
+        )
+
+    # Propiedad 2: sobre toda unidad REAL y afín del catálogo (todas con
+    # `a > 0`: `docs/06` no modela unidades de escala negativa), la conversión
+    # de un RMS con `Clase.INTERVALO` coincide exactamente con el RMS que daría
+    # convertir la serie entera y volver a calcularlo -- sin recorrer ninguna
+    # muestra, un solo número basta.
+    comprobadas = 0
+    for dim in cat.dimensiones.values():
+        if not dim.convertible:
+            continue
+        for uni in dim.unidades.values():
+            if not isinstance(uni.conversion, Afin):
+                continue
+            a = uni.conversion.a
+            assert a > 0, f"{dim.id}.{uni.id}: unidad con a<=0, la propiedad 2 no cubre este caso"
+            rms_de_la_serie_escalada = math.sqrt(sum((a * x) ** 2 for x in xs) / len(xs))
+            convertido = uni.conversion.desde_canonica(rms, Clase.INTERVALO)
+            assert convertido == pytest.approx(rms_de_la_serie_escalada, rel=1e-9), (
+                f"{dim.id}.{uni.id}: RMS convertido no coincide con el de la serie escalada"
+            )
+            comprobadas += 1
+    assert comprobadas > 40, (
+        f"solo se han comprobado {comprobadas} unidades; ¿se cargó el catálogo?"
+    )
+
+    # Propiedad 3: con un desplazamiento de origen real (K -> °F, a=1.8,
+    # b=-459.67), el RMS de la serie CONVERTIDA no es `a·rms` ni `a·rms + b`:
+    # ninguna de las dos clases lo reconstruye, y `Clase.PUNTO` en particular
+    # es la trampa que este test existe para que nadie vuelva a cometer.
+    temp = cat.dimension("temperature")
+    conv_f = temp.unidad("degF").conversion
+    assert isinstance(conv_f, Afin)
+    convertidos = [conv_f.a * x + conv_f.b for x in xs]
+    rms_de_la_serie_convertida = math.sqrt(sum(x * x for x in convertidos) / len(convertidos))
+
+    rms_como_punto = conv_f.desde_canonica(rms, Clase.PUNTO)  # LA TRAMPA: suma b
+    rms_como_intervalo = conv_f.desde_canonica(rms, Clase.INTERVALO)  # LO CORRECTO
+
+    assert rms_como_punto != pytest.approx(rms_de_la_serie_convertida, rel=1e-6), (
+        "si `Clase.PUNTO` reconstruyera el RMS real aquí sería casualidad: la "
+        "derivación algebraica dice que solo coincide cuando la media de la "
+        "serie es cero, y aquí no lo es"
+    )
+    # `Clase.INTERVALO` tampoco pretende reconstruir el RMS de la serie
+    # convertida -- eso exigiría la media, que el RMS no lleva consigo -- pero
+    # es la única conversión LINEAL que este motor puede dar con la
+    # información que tiene, y es la que declara `docs/06` §6.5.
+    assert rms_como_intervalo == pytest.approx(conv_f.a * rms, rel=1e-12)
+    assert rms_como_intervalo != pytest.approx(rms_de_la_serie_convertida, rel=1e-6)
+
+
 def test_la_tasa_no_desplaza_el_origen(cat: Catalogo) -> None:
     """Una derivada de temperatura se mide en °C/s, y 10 K/s son 10 °C/s.
 
