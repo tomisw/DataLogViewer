@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 07:27:19Z"
+    "actualizado": "2026-08-20 07:51:31Z"
   },
   "tareas": [
     {
@@ -3425,10 +3425,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "53dea03"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 07:51:31Z",
+          "texto": "Reutiliza el motor de F4-04 con CERO cambios en dlv-ui/src/malla/. Bordes distintos: RECHAZA con explicacion (igualdad exacta, sin tolerancia). Confianza combinada = min de las dos cuentas, que ademas resuelve gratis la celda vacia en uno solo de los logs."
+        }
+      ]
     },
     {
       "id": "F4-09",

@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-20 07:27:19Z
+Actualizado: 2026-08-20 07:51:31Z
 
-**386 / 775 pts cerrados (49.8 %)** · 162 pts esperando revisión humana → 70.7 % entregado
+**391 / 775 pts cerrados (50.5 %)** · 162 pts esperando revisión humana → 71.4 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -15,7 +15,7 @@ Actualizado: 2026-08-20 07:27:19Z
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 38 | 34 | 0 | 43 | 3 | 118 |
-| F4 | 23 | 0 | 9 | 31 | 0 | 63 |
+| F4 | 28 | 0 | 4 | 31 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 36 | 5 | 0 | 35 | 0 | 76 |
 
@@ -54,7 +54,6 @@ Actualizado: 2026-08-20 07:27:19Z
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
 | `F4-07` Mapas de calor de avance de encendido y de d | en_curso | Sonnet 5 | G3 | — |
-| `F4-08` Comparación de dos logs celda a celda | en_curso | Sonnet 5 | G3 | — |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
 ## F0 — 54/54 pts
@@ -198,7 +197,7 @@ Actualizado: 2026-08-20 07:27:19Z
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
 | ✔  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | `13f6d99` |
 
-## F4 — 23/63 pts
+## F4 — 28/63 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -209,7 +208,7 @@ Actualizado: 2026-08-20 07:27:19Z
 | ·  | `F4-05` | Tabla de corrección de combustible, con celdas de confianza in | Opus 5 | 8 | F4-03 | G1 | — |
 | ·  | `F4-06` | Exportación de tabla a CSV y portapapeles como malla pegable | Sonnet 5 | 3 | F4-05 | G3 | — |
 | ▶  | `F4-07` | Mapas de calor de avance de encendido y de densidad de knock | Sonnet 5 | 4 | F4-02 | G3 | — |
-| ▶  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | — |
+| ✔  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | `53dea03` |
 | ✔  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | `e3fd287` |
 | ·  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
 | ·  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | — |
