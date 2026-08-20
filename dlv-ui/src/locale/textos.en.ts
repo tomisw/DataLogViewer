@@ -78,6 +78,13 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "lambda.mapaError.sinDatosParaEscala":
     "No cell has any data yet: there is no error to color.",
 
+  "comparacion.mapa.bordesIncompatibles":
+    "The two logs were not aggregated on the same grid: the {eje} bounds do not match. Re-aggregate both with the same explicit bounds before comparing them.",
+  "comparacion.mapa.unidadReciprocaDesactivado":
+    "The comparison cannot be shown in {unidad}: a difference between two logs does not admit a reciprocal conversion. Switch to a linear unit to see it.",
+  "comparacion.mapa.sinDatosParaEscala":
+    "No cell has data in both logs at once: there is no difference to color yet.",
+
   "app.abrirLogSintetico": "Open synthetic log",
   "app.barraFuente": "source",
   "app.barraAbriendo": "opening…",

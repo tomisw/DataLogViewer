@@ -84,6 +84,13 @@ export const TEXTOS_ES = {
   "lambda.mapaError.sinDatosParaEscala":
     "No hay ninguna celda con datos: no hay error que colorear todavía.",
 
+  "comparacion.mapa.bordesIncompatibles":
+    "Los dos logs no se agregaron con la misma malla: los bordes de {eje} no coinciden. Vuelve a agregar los dos con los mismos bordes explícitos antes de compararlos.",
+  "comparacion.mapa.unidadReciprocaDesactivado":
+    "La comparación no se puede mostrar en {unidad}: una diferencia entre dos logs no admite una conversión recíproca. Cambia a una unidad lineal para verla.",
+  "comparacion.mapa.sinDatosParaEscala":
+    "Ninguna celda tiene datos en los dos logs a la vez: no hay diferencia que colorear todavía.",
+
   "app.abrirLogSintetico": "Abrir log sintético",
   "app.barraFuente": "fuente",
   "app.barraAbriendo": "abriendo…",
