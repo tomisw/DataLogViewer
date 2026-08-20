@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 07:51:31Z"
+    "actualizado": "2026-08-20 07:58:47Z"
   },
   "tareas": [
     {
@@ -3403,10 +3403,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "bb7b4ee"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 07:58:47Z",
+          "texto": "Escala SECUENCIAL (no divergente): un avance de 22 grados no es mejor ni peor que uno de 8 sin contexto, no hay cero neutro. Clase PUNTO en ambos mapas. LIMITACION DOCUMENTADA: el canal de densidad de knock tiene que llegar YA como incremento; la media del contador acumulativo por celda seria un artefacto del orden temporal."
+        }
+      ]
     },
     {
       "id": "F4-08",
