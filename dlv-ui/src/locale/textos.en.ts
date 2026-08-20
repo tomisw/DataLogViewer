@@ -85,6 +85,12 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "comparacion.mapa.sinDatosParaEscala":
     "No cell has data in both logs at once: there is no difference to color yet.",
 
+  "encendido.mapaAvance.sinDatosParaEscala":
+    "No cell has any data yet: there is no ignition advance to color.",
+
+  "knock.mapaDensidad.sinDatosParaEscala":
+    "No cell has any data yet: there is no knock density to color.",
+
   "app.abrirLogSintetico": "Open synthetic log",
   "app.barraFuente": "source",
   "app.barraAbriendo": "opening…",

@@ -91,6 +91,12 @@ export const TEXTOS_ES = {
   "comparacion.mapa.sinDatosParaEscala":
     "Ninguna celda tiene datos en los dos logs a la vez: no hay diferencia que colorear todavía.",
 
+  "encendido.mapaAvance.sinDatosParaEscala":
+    "No hay ninguna celda con datos: no hay avance que colorear todavía.",
+
+  "knock.mapaDensidad.sinDatosParaEscala":
+    "No hay ninguna celda con datos: no hay densidad de knock que colorear todavía.",
+
   "app.abrirLogSintetico": "Abrir log sintético",
   "app.barraFuente": "fuente",
   "app.barraAbriendo": "abriendo…",
