@@ -65,6 +65,19 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "cursor.columnaValor": "Value",
   "cursor.columnaNivel": "Level",
 
+  "malla.cuenta": "samples",
+  "malla.media": "mean",
+  "malla.desviacionTipica": "standard deviation",
+  "malla.minimo": "minimum",
+  "malla.maximo": "maximum",
+  "malla.sinDatos": "no data in this cell",
+  "malla.pocaConfianza": "low confidence: few samples",
+
+  "lambda.mapaError.unidadReciprocaDesactivado":
+    "The λ error map cannot be shown in {unidad}: a difference does not admit a reciprocal conversion. Switch to λ or AFR to see it.",
+  "lambda.mapaError.sinDatosParaEscala":
+    "No cell has any data yet: there is no error to color.",
+
   "app.abrirLogSintetico": "Open synthetic log",
   "app.barraFuente": "source",
   "app.barraAbriendo": "opening…",

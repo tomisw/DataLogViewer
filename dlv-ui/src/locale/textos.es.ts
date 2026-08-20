@@ -71,6 +71,19 @@ export const TEXTOS_ES = {
   "cursor.columnaValor": "Valor",
   "cursor.columnaNivel": "Nivel",
 
+  "malla.cuenta": "muestras",
+  "malla.media": "media",
+  "malla.desviacionTipica": "desviación típica",
+  "malla.minimo": "mínimo",
+  "malla.maximo": "máximo",
+  "malla.sinDatos": "sin datos en esta celda",
+  "malla.pocaConfianza": "confianza baja: pocas muestras",
+
+  "lambda.mapaError.unidadReciprocaDesactivado":
+    "El mapa de error de λ no se puede mostrar en {unidad}: una diferencia no admite una conversión recíproca. Cambia a λ o AFR para verlo.",
+  "lambda.mapaError.sinDatosParaEscala":
+    "No hay ninguna celda con datos: no hay error que colorear todavía.",
+
   "app.abrirLogSintetico": "Abrir log sintético",
   "app.barraFuente": "fuente",
   "app.barraAbriendo": "abriendo…",
