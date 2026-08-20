@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-20 14:51:48Z
+Actualizado: 2026-08-20 14:57:33Z
 
-**400 / 775 pts cerrados (51.6 %)** · 166 pts esperando revisión humana → 73.0 % entregado
+**400 / 775 pts cerrados (51.6 %)** · 172 pts esperando revisión humana → 73.8 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Actualizado: 2026-08-20 14:51:48Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 38 | 34 | 6 | 37 | 3 | 118 |
+| F3 | 38 | 40 | 0 | 37 | 3 | 118 |
 | F4 | 37 | 4 | 0 | 22 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 36 | 5 | 0 | 35 | 0 | 76 |
@@ -47,7 +47,7 @@ Actualizado: 2026-08-20 14:51:48Z
 | `F2-01` Modelo de segmento y eje X virtual | en_curso | Opus 5 | G2 | CORRECCION DE MI PROPIO REGISTRO: la habia marcado 'hecho', y no lo es |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
-| `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | en_curso | Opus 5 | G1 | — |
+| `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | revision_humana | Opus 5 | G1 | PUERTA G1. Revisar por consecuencia: (1) el corte requerido/opcional e |
 | `F3-06` Motor de detectores: las 9 primitivas de §4. | revision_humana | Opus 5 | G1 | Las 9 primitivas de docs/04 SS4.3 en dlv_core/primitivas.py (1537 line |
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
@@ -172,11 +172,11 @@ Actualizado: 2026-08-20 14:51:48Z
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-16` | Documentación de usuario de multi-log | Haiku 4.5 | 2 | F2-09 | G4 | — |
 
-## F3 — 72/118 pts
+## F3 — 78/118 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
-| ▶  | `F3-01` | Modelo de perfil `.dlvprofile` por rol, con unidades por dimen | Opus 5 | 6 | F1-21, F0-10 | G1 | — |
+| ⏳ | `F3-01` | Modelo de perfil `.dlvprofile` por rol, con unidades por dimen | Opus 5 | 6 | F1-21, F0-10 | G1 | `6965b59` |
 | ·  | `F3-02` | Aplicación de perfil por rol con degradación elegante y reserv | Sonnet 5 | 5 | F3-01 | G3 | — |
 | ·  | `F3-03` | Los 10 perfiles de fábrica de `04-perfiles-motorsport.md` §4.2 | Sonnet 5 | 8 | F3-02 | G1 | — |
 | ·  | `F3-04` | Autosugerencia por cobertura de roles («7 de 9 disponibles») | Sonnet 5 | 4 | F3-02, F1-07 | G3 | — |

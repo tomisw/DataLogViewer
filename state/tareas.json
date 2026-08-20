@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 14:51:48Z"
+    "actualizado": "2026-08-20 14:57:33Z"
   },
   "tareas": [
     {
@@ -2694,10 +2694,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente Sonnet (plan dice Opus)",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "6965b59"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 14:57:33Z",
+          "texto": "PUERTA G1. Revisar por consecuencia: (1) el corte requerido/opcional esta POR PANEL, no por perfil -- cambia como se calculara la cobertura de E4.5, y si esta mal hay que tocar el esquema ANTES de que F3-03 escriba los diez perfiles; (2) un elemento con id_nativo no puede ser 'requerido', verificado; (3) HALLAZGO: P7 (trigger) depende casi entero de id_nativo porque solo trigger_errors tiene rol en data/roles.toml. Conecta con la ampliacion de roles que el propietario ya aprobo y sigue sin hacerse."
+        }
+      ]
     },
     {
       "id": "F3-02",
