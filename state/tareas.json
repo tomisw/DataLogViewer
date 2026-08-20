@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 14:32:49Z"
+    "actualizado": "2026-08-20 14:51:48Z"
   },
   "tareas": [
     {
@@ -3489,10 +3489,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente Sonnet (plan dice Opus)",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "78405ec"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 14:51:48Z",
+          "texto": "PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encontro ningun sitio que convirtiera una estadistica con la clase equivocada. Lo que aporta es la derivacion escrita de por que el RMS es INTERVALO y no PUNTO, con prueba ejecutable sobre las 40+ unidades del catalogo. Revisar: (1) que la lista de sitios auditados este completa, (2) la derivacion algebraica, (3) la nota sobre a<0, que es un aviso y no una correccion."
+        }
+      ]
     },
     {
       "id": "F4-11",

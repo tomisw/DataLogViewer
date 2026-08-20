@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-20 14:32:49Z
+Actualizado: 2026-08-20 14:51:48Z
 
-**400 / 775 pts cerrados (51.6 %)** · 162 pts esperando revisión humana → 72.5 % entregado
+**400 / 775 pts cerrados (51.6 %)** · 166 pts esperando revisión humana → 73.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -15,7 +15,7 @@ Actualizado: 2026-08-20 14:32:49Z
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
 | F3 | 38 | 34 | 6 | 37 | 3 | 118 |
-| F4 | 37 | 0 | 4 | 22 | 0 | 63 |
+| F4 | 37 | 4 | 0 | 22 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 36 | 5 | 0 | 35 | 0 | 76 |
 
@@ -54,7 +54,7 @@ Actualizado: 2026-08-20 14:32:49Z
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
-| `F4-10` Estadísticas con la clase de magnitud correc | en_curso | Opus 5 | G1 | — |
+| `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
 ## F0 — 54/54 pts
@@ -198,7 +198,7 @@ Actualizado: 2026-08-20 14:32:49Z
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
 | ✔  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | `13f6d99` |
 
-## F4 — 37/63 pts
+## F4 — 41/63 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -211,7 +211,7 @@ Actualizado: 2026-08-20 14:32:49Z
 | ✔  | `F4-07` | Mapas de calor de avance de encendido y de densidad de knock | Sonnet 5 | 4 | F4-02 | G3 | `bb7b4ee` |
 | ✔  | `F4-08` | Comparación de dos logs celda a celda | Sonnet 5 | 5 | F4-02, F2-02 | G3 | `53dea03` |
 | ✔  | `F4-09` | Métricas de PID de boost: sobreoscilación, establecimiento, er | Opus 5 | 5 | F3-16 | G2 | `e3fd287` |
-| ▶  | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | — |
+| ⏳ | `F4-10` | Estadísticas con la clase de magnitud correcta (varianza con ` | Opus 5 | 4 | F1-13, F4-02 | G1 | `78405ec` |
 | ✔  | `F4-11` | Informe de sesión HTML autocontenido, con las unidades usadas  | Sonnet 5 | 5 | F3-12, F4-04 | G3 | `52ca588` |
 | ✔  | `F4-12` | Exportación de vista a PNG/SVG y de datos a CSV/Parquet con un | Sonnet 5 | 4 | F1-23 | G3 | `ec9e0d8` |
 | ·  | `F4-13` | Documentación de análisis tabular con las advertencias de fiab | Opus 5 | 3 | F4-05 | G1 | — |
