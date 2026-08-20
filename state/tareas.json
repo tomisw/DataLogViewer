@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-20 13:49:55Z"
+    "actualizado": "2026-08-20 14:23:41Z"
   },
   "tareas": [
     {
@@ -3511,10 +3511,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "52ca588"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-20 14:23:41Z",
+          "texto": "En dlv-ui/src/informe/. Autocontenido comprobado con prueba (busca script/link/src http/@import, evitando el falso positivo del xmlns de SVG) y escape probado con un nombre de detector hostil. No convierte magnitudes: recibe cada numero ya formateado con su unidad, asi la trampa del delta no tiene por donde entrar. Seccion de tiradas con tres respuestas honestas (no_disponible/vacia/con_datos)."
+        }
+      ]
     },
     {
       "id": "F4-12",
