@@ -50,7 +50,10 @@ def catalogo() -> dict[str, Rol]:
 # Carga del catálogo real
 # --------------------------------------------------------------------------- #
 def test_se_cargan_los_roles_del_catalogo_real(catalogo: dict[str, Rol]) -> None:
-    assert len(catalogo) == 58  # los 58 roles de F0-10
+    # 112 desde la ampliacion de 2026-08-26 (eran 58 en F0-10). El numero se
+    # comprueba contra `[resumen]` del propio fichero en `tests/test_roles_catalogo.py`;
+    # aqui solo se afirma que el catalogo real se carga entero.
+    assert len(catalogo) == 112
     assert "meta" not in catalogo  # la sección [meta] no es un rol
 
 

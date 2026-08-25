@@ -183,7 +183,14 @@ sinonimos = ["Fuel Mass Flow", "Fuel Flow", "Fuel Flow Estimated", "Caudal combu
 dimension = "angle"
 plausible = { min = -30.0, max = 60.0 }           # grados de cigüeñal
 sinonimos = ["Ignition Angle", "Ignition Timing", "Spark Advance", "Timing",
-             "Avance", "Avance encendido", "Ign Angle", "Total Timing"]
+             "Avance", "Avance encendido", "Ign Angle", "Total Timing",
+             # Por cilindro: «Ignition 3 Angle». Va como sinonimo INDEXADO del
+             # mismo rol (-> `ignition_advance[3]`) y no como un rol aparte,
+             # porque al quitar el `{n}` seria la misma cadena que «Ignition
+             # Angle» y el emparejador no podria distinguirlos. Antes caian en
+             # difuso con parecido 0,963: alto, pero una conjetura.
+             "Ignition {n} Angle", "Cylinder {n} Ignition Angle"]
+indexado = true
 critico = false
 
 [roles.ignition_advance_base]
@@ -458,10 +465,10 @@ sinonimos = ["Lap Distance", "Distance in Lap", "Distancia en vuelta"]
 #  RESUMEN
 # =========================================================================== #
 [resumen]
-roles_totales = 58
-indexados = 13
+roles_totales = 112
+indexados = 14
 criticos = 13
-con_contador_acumulado = 3
+con_contador_acumulado = 4
 nota = """
 Los 13 roles marcados `critico` son los que alimentan detectores de severidad
 crítica (D1, D4, D6, D8, D9, D10, D11, D12, D13 de docs/04 §4.3). Si alguno de
@@ -471,4 +478,377 @@ repetida enseña al usuario a ignorar las alertas (docs/07 §7.15).
 
 Los rangos plausibles están en unidad CANÓNICA y son anchos a propósito. Su
 trabajo es cazar un error de escala de un orden de magnitud, no opinar sobre la
-puesta a punto del motor."""
+puesta a punto del motor.
+
+AMPLIACION 2026-08-26: de 58 a 112 roles. Los 54 nuevos NO cambian ninguno de
+los 13 criticos --se anadieron sin marcar `critico`, y eso es lo que hay que
+revisar-- y salen de medir que 36 de los 37 canales que nombran los perfiles
+P3, P4, P6, P7, P9 y P10 de docs/04 no tenian rol, asi que esos perfiles solo
+funcionaban sobre Haltech."""
+
+# =========================================================================== #
+#  AMPLIACIÓN 2026-08-26 — roles para que P3, P4, P6, P7, P9 y P10 dejen de
+#  depender del ID nativo de Haltech.
+#
+#  POR QUÉ SE AÑADEN ESTOS Y NO OTROS
+#  ===================================
+#  F3-01 (modelo de perfil) encontró, al construir los diez perfiles de
+#  `docs/04` §4.2 contra su esquema, que cinco de ellos caían casi enteros a la
+#  reserva por `id_nativo`. Medido después canal a canal sobre el AutoLog real:
+#  de los 37 canales que esos seis perfiles nombran, 36 no tenían rol. Un perfil
+#  escrito sobre IDs de Haltech NO funciona sobre MoTeC ni sobre un CSV
+#  genérico — que es justo lo que `docs/07` §7.12 promete y la razón de ser de
+#  este fichero.
+#
+#  Los `plausible` salen de MEDIR `samples/real/AutoLog_20260729_1830.csv` (el
+#  rango observado va anotado en cada entrada) y luego ENSANCHARLOS: el criterio
+#  de `[meta]` es detectar un error de escala de uno o más órdenes de magnitud,
+#  no juzgar la puesta a punto de un motor. Un rango estrecho generaría avisos
+#  falsos y el usuario los ignoraría, que es peor que no avisar.
+#
+#  `critico` se deja SIN MARCAR en todos los roles nuevos, y esa es la decisión
+#  que hay que revisar. Marcar `critico` DESACTIVA el detector cuando el rol
+#  viene de una asignación difusa: de menos, deja pasar una conjetura a una
+#  alerta; de más, apaga detectores que sí se querían. No he encontrado en
+#  `docs/04` §4.3 un detector de severidad crítica que dependa de ninguno de
+#  estos, pero es un juicio de dominio y se señala como tal.
+# =========================================================================== #
+
+# --------------------------------------------------------------------------- #
+#  P3 — Boost control (docs/04 §4.2 P3; alimenta las métricas de PID de F4-09)
+# --------------------------------------------------------------------------- #
+[roles.boost_pressure_error]
+dimension = "pressure"
+plausible = { min = -500.0, max = 500.0 }         # kPa (medido -28..0)
+sinonimos = ["Boost Pressure Error", "Boost Error", "Error de presion de soplado"]
+
+[roles.boost_output_proporcional]
+dimension = "ratio"
+plausible = { min = -2.0, max = 2.0 }             # fraccion (medido 0..0,219)
+sinonimos = ["Boost Control Proportional Output", "Boost Proportional Output"]
+
+[roles.boost_output_integral]
+dimension = "ratio"
+plausible = { min = -2.0, max = 2.0 }             # fraccion (medido 0..0,048)
+sinonimos = ["Boost Control Integral Output", "Boost Integral Output"]
+
+[roles.boost_output_derivativo]
+dimension = "ratio"
+plausible = { min = -2.0, max = 2.0 }             # fraccion (medido -0,028..0,025)
+sinonimos = ["Boost Control Derivative Output", "Boost Derivative Output"]
+
+[roles.boost_output_base]
+dimension = "ratio"
+plausible = { min = -1.0, max = 2.0 }             # fraccion (medido 0..1)
+sinonimos = ["Boost Control Closed Loop Base Output", "Boost Control Base Output"]
+
+[roles.boost_trim_corto]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }             # fraccion (medido 0..0,222)
+sinonimos = ["Boost Control Short Term Trim", "Boost Short Term Trim"]
+
+[roles.boost_trim_largo]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }             # fraccion (medido 0..0,008)
+sinonimos = ["Boost Control Long Term Trim", "Boost Long Term Trim"]
+
+[roles.overboost_cut_pressure]
+dimension = "pressure"
+plausible = { min = 0.0, max = 1000.0 }           # kPa (medido 238,6 constante)
+sinonimos = ["Overboost Cut Max Pressure", "Overboost Cut Pressure"]
+
+# --------------------------------------------------------------------------- #
+#  P4 — Ignition: las CORRECCIONES por separado.
+#  `ignition_correction_total` ya existia; estas son las que lo componen, y son
+#  las que permiten la alerta de §4.2 P4: «avance total distinto de base + suma
+#  de correcciones» indica una correccion no contemplada o un limite actuando.
+#  Sin ellas por rol, esa alerta solo funciona sobre un log de Haltech.
+# --------------------------------------------------------------------------- #
+[roles.ignition_correction_coolant]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido -0,6..0)
+sinonimos = ["Coolant Temperature Ignition Correction", "CLT Ignition Correction"]
+
+[roles.ignition_correction_air_temp]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido -2..0)
+sinonimos = ["Air Temperature Ignition Correction", "IAT Ignition Correction"]
+
+[roles.ignition_correction_post_start]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido 0 constante)
+sinonimos = ["Post Start Ignition Correction"]
+
+[roles.ignition_correction_transient]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido 0..3)
+sinonimos = ["Transient Throttle Ignition Correction",
+             "Transient Throttle Current Ignition Correction"]
+
+[roles.ignition_correction_decel]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido -10..0)
+sinonimos = ["Decel Cut Ignition Correction", "Deceleration Ignition Correction"]
+
+[roles.ignition_correction_limiter]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido -9,6..0)
+sinonimos = ["RPM Limiter Ignition Correction", "Limiter Ignition Correction"]
+
+[roles.ignition_coil_supply]
+dimension = "voltage"
+plausible = { min = 0.0, max = 30.0 }             # V (medido 11,76..12,88)
+sinonimos = ["Ignition Coil Power Supply", "Coil Supply Voltage"]
+
+# --------------------------------------------------------------------------- #
+#  P6 — Idle control. `idle_state` ya existia (es el carril); estos son los
+#  numeros. `idle_target_rpm` e `idle_rpm_error` son los que necesita la metrica
+#  de §4.2 P6, «desviacion RMS respecto al objetivo» — y esa RMS es de clase
+#  INTERVALO (ver `unidades.py`, F4-10) precisamente porque el error ya es una
+#  diferencia.
+# --------------------------------------------------------------------------- #
+[roles.idle_target_rpm]
+dimension = "angular_speed"
+plausible = { min = 0.0, max = 5000.0 }           # rpm (medido 950..1100)
+sinonimos = ["Idle Control target RPM", "Idle Target RPM", "Target Idle RPM"]
+
+[roles.idle_rpm_error]
+dimension = "angular_speed"
+plausible = { min = -5000.0, max = 5000.0 }       # rpm (medido -361..178)
+sinonimos = ["Idle Control RPM error", "Idle RPM Error"]
+
+[roles.idle_output]
+dimension = "ratio"
+plausible = { min = -1.0, max = 2.0 }             # fraccion (medido 0,724..1)
+sinonimos = ["Idle Control Output", "Idle Output"]
+
+[roles.idle_trim_corto]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }             # fraccion (medido -0,005..0,287)
+sinonimos = ["Idle Control Short Term Trim", "Idle Short Term Trim"]
+
+[roles.idle_trim_largo]
+dimension = "ratio"
+plausible = { min = -1.0, max = 1.0 }             # fraccion (medido 0,096..0,11)
+sinonimos = ["Idle Control Long Term Trim", "Idle Long Term Trim"]
+
+[roles.idle_min_output]
+dimension = "ratio"
+plausible = { min = -1.0, max = 2.0 }             # fraccion (medido 0 constante)
+sinonimos = ["Idle Control Min Output", "Idle Min Output"]
+
+[roles.ignition_correction_idle]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido -2,8..15)
+sinonimos = ["Idle Control Ignition Correction", "Idle Ignition Correction"]
+
+# --------------------------------------------------------------------------- #
+#  P7 — Trigger. El perfil de diagnostico, el que resuelve los intermitentes.
+#  `trigger_errors` (la mascara) ya existia y era el UNICO con rol: por eso este
+#  perfil dependia casi entero del ID nativo.
+# --------------------------------------------------------------------------- #
+[roles.trigger_error_count]
+dimension = "count"
+plausible = { min = 0.0, max = 1000000.0 }        # cuenta
+monotono = "no_decreciente"   # contador acumulado: habilita el canal delta
+sinonimos = ["Trigger System Error Count", "Trigger Error Count"]
+
+[roles.trigger_sync_level]
+dimension = "unknown"
+plausible = { min = -1.0, max = 100.0 }           # enum (medido 3 constante)
+sinonimos = ["Trigger Synchronisation Level", "Trigger Sync Level"]
+
+[roles.trigger_sync_state]
+dimension = "unknown"
+plausible = { min = -1.0, max = 100.0 }           # enum (medido 5 constante)
+sinonimos = ["Trigger Synchronisation State", "Trigger Sync State",
+             "Trigger Sync Level Status"]
+
+[roles.trigger_sync_offset]
+dimension = "angle"
+plausible = { min = -720.0, max = 720.0 }         # grados (medido 109 constante)
+sinonimos = ["Trigger Sync Offset", "Sync Offset"]
+
+[roles.trigger_tooth_count]
+dimension = "unknown"
+plausible = { min = 0.0, max = 1000.0 }           # dientes (medido 0..5)
+sinonimos = ["Trigger Tooth Count", "Tooth Count"]
+
+[roles.trigger_voltage]
+dimension = "voltage"
+plausible = { min = -50.0, max = 50.0 }           # V (medido 0..5,012)
+sinonimos = ["Trigger Voltage"]
+
+[roles.home_voltage]
+dimension = "voltage"
+plausible = { min = -50.0, max = 50.0 }           # V (medido 0..4,952)
+sinonimos = ["Home Voltage"]
+
+[roles.home_travel_pct]
+dimension = "ratio"
+plausible = { min = -2.0, max = 2.0 }             # fraccion (medido -0,006)
+sinonimos = ["Home percentage of valid travel",
+             "Worst Home percentage of valid travel"]
+
+# --------------------------------------------------------------------------- #
+#  P9 — Diagnostico de sensores. Los tres «Diagnostic ... error» llegan con
+#  dimension `unknown` del descriptor (su escala no esta confirmada, docs/06
+#  §6.8): se muestran en crudo y marcados, y tener rol NO cambia eso.
+# --------------------------------------------------------------------------- #
+[roles.ref_voltage_5v]
+dimension = "voltage"
+plausible = { min = 0.0, max = 10.0 }             # V (medido 5,113..5,123)
+sinonimos = ["Diagnostic Analogue 5V rail", "Analogue 5V Rail", "5V Reference"]
+
+[roles.diag_ref_ratiometrico]
+dimension = "unknown"
+plausible = { min = -100.0, max = 100.0 }         # crudo (medido -1..2)
+sinonimos = ["Diagnostic ratiometric voltage reference error"]
+
+[roles.diag_ref_absoluto]
+dimension = "unknown"
+plausible = { min = -100.0, max = 100.0 }         # crudo (medido -2..2)
+sinonimos = ["Diagnostic absolute voltage reference error"]
+
+[roles.diag_ref_discrepancia]
+dimension = "unknown"
+plausible = { min = -1000.0, max = 1000.0 }       # crudo (medido 36..40)
+sinonimos = ["Diagnostic absolute-ratiometric discrepancy"]
+
+# --------------------------------------------------------------------------- #
+#  P10 — Launch control. `launch_state` ya existia (es el carril).
+# --------------------------------------------------------------------------- #
+[roles.launch_end_rpm]
+dimension = "angular_speed"
+plausible = { min = 0.0, max = 20000.0 }          # rpm (medido 0..4500)
+sinonimos = ["Launch Control End RPM", "Launch End RPM"]
+
+[roles.launch_rpm_error]
+dimension = "angular_speed"
+plausible = { min = -20000.0, max = 20000.0 }     # rpm (medido 0..2708)
+sinonimos = ["Launch Control RPM Error", "Launch RPM Error"]
+
+[roles.ignition_correction_launch]
+dimension = "angle"
+plausible = { min = -60.0, max = 60.0 }           # grados (medido 0..11,1)
+sinonimos = ["Launch Control Ignition", "Launch Ignition Correction"]
+
+[roles.trigger_tooth_period_error]
+dimension = "time"
+plausible = { min = 0.0, max = 10.0 }             # s (medido 0 constante)
+sinonimos = ["Tooth Period At Error", "Previous Tooth Period At Error"]
+
+# --------------------------------------------------------------------------- #
+#  GANANCIAS DE LOS LAZOS PID, y por que estan aqui
+#  ==================================================
+#  Estos roles NO se anadieron por completar un perfil, sino para APAGAR dos
+#  falsos positivos que creo la ampliacion de arriba. Con `idle_trim_largo` y
+#  `boost_trim_largo` recien dados de alta, el emparejamiento difuso empezo a
+#  asignar:
+#
+#      «Idle Control Long Term Trim Gain»  -> idle_trim_largo   (parecido 0,920)
+#      «Boost Control Long Term Trim Gain» -> boost_trim_largo  (parecido 0,923)
+#
+#  Y son cosas distintas: el TRIM es cuanto esta corrigiendo el lazo ahora
+#  mismo; la GANANCIA es el coeficiente con el que reacciona. Confundirlos pone
+#  un coeficiente de sintonia en el panel donde se lee una correccion, con el
+#  mismo aspecto de correcto. Es exactamente el fallo que `docs/07` §7.15
+#  describe para el emparejamiento difuso, y la razon de que una coincidencia
+#  DIFUSA no pueda activar un detector critico sin confirmar.
+#
+#  Con rol propio, esos canales pasan a EXACTA y dejan de robarle el rol al
+#  trim. La leccion, anotada: cada rol nuevo cambia el vecindario del difuso, y
+#  hay que volver a mirar las DIFUSAS despues de ampliar el catalogo.
+#
+#  Las dimensiones (`pct_per_kPa`, `pct_per_rpm`, `pct_per_lambda`) son
+#  compuestas y ya existen en `data/units.toml`.
+# --------------------------------------------------------------------------- #
+[roles.boost_gain_proporcional]
+dimension = "pct_per_kPa"
+plausible = { min = -10000.0, max = 10000.0 }     # %/kPa (medido 0..784)
+sinonimos = ["Boost Control Proportional Gain", "Boost Proportional Gain"]
+
+[roles.boost_gain_integral]
+dimension = "pct_per_kPa"
+plausible = { min = -10000.0, max = 10000.0 }     # %/kPa (medido 0..1310)
+sinonimos = ["Boost Control Integral Gain", "Boost Integral Gain"]
+
+[roles.boost_gain_derivativo]
+dimension = "pct_per_kPa"
+plausible = { min = -10000.0, max = 10000.0 }     # %/kPa (medido 0..98)
+sinonimos = ["Boost Control Derivative Gain", "Boost Derivative Gain"]
+
+[roles.boost_gain_trim_largo]
+dimension = "unknown"
+plausible = { min = -10000.0, max = 10000.0 }     # crudo
+sinonimos = ["Boost Control Long Term Trim Gain"]
+
+[roles.boost_gain_trim_corto]
+dimension = "unknown"
+plausible = { min = -10000.0, max = 10000.0 }     # crudo
+sinonimos = ["Boost Control Short Term Trim Gain"]
+
+[roles.idle_gain_proporcional]
+dimension = "pct_per_rpm"
+plausible = { min = -10000.0, max = 10000.0 }     # %/rpm
+sinonimos = ["Idle Control Proportional Gain", "Idle Proportional Gain"]
+
+[roles.idle_gain_integral]
+dimension = "pct_per_rpm"
+plausible = { min = -10000.0, max = 10000.0 }     # %/rpm (medido 0..500)
+sinonimos = ["Idle Control Integral Gain", "Idle Integral Gain"]
+
+[roles.idle_gain_derivativo]
+dimension = "pct_per_rpm"
+plausible = { min = -10000.0, max = 10000.0 }     # %/rpm
+sinonimos = ["Idle Control Derivative Gain", "Idle Derivative Gain"]
+
+[roles.idle_gain_trim_largo]
+dimension = "unknown"
+plausible = { min = -10000.0, max = 10000.0 }     # crudo
+sinonimos = ["Idle Control Long Term Trim Gain"]
+
+[roles.idle_gain_trim_corto]
+dimension = "unknown"
+plausible = { min = -10000.0, max = 10000.0 }     # crudo
+sinonimos = ["Idle Control Short Term Trim Gain"]
+
+[roles.o2_gain_proporcional]
+dimension = "pct_per_lambda"
+plausible = { min = -10000.0, max = 10000.0 }     # %/lambda (medido 73..304)
+sinonimos = ["O2 Control Proportional Gain"]
+
+[roles.o2_gain_integral]
+dimension = "pct_per_lambda"
+plausible = { min = -10000.0, max = 10000.0 }     # %/lambda (medido 91..383)
+sinonimos = ["O2 Control Integral Gain"]
+
+# --------------------------------------------------------------------------- #
+#  Los dos ultimos falsos positivos que quedaban, con la misma cura.
+#  «Base Output» no es «Output» (uno es el punto de partida del lazo, el otro
+#  su salida efectiva), y «Target Offset Pressure» no es «Target Pressure»
+#  (uno es un desplazamiento, el otro el objetivo).
+# --------------------------------------------------------------------------- #
+[roles.idle_output_base]
+dimension = "ratio"
+plausible = { min = -1.0, max = 2.0 }             # fraccion
+sinonimos = ["Idle Control Base Output", "Idle Base Output"]
+
+[roles.boost_pressure_target_offset]
+dimension = "pressure"
+plausible = { min = -1000.0, max = 1000.0 }       # kPa
+sinonimos = ["Boost Control Target Offset Pressure"]
+
+[roles.air_mass_flow_max]
+dimension = "unknown"
+plausible = { min = -1.0e9, max = 1.0e9 }         # escala sin confirmar
+sinonimos = ["Max Mass Air Flow"]
+
+[roles.o2_gain_derivativo]
+dimension = "pct_per_lambda"
+plausible = { min = -10000.0, max = 10000.0 }     # %/lambda
+# Sin este rol, «O2 Control Derivative Gain» caia en difuso contra
+# `boost_gain_derivativo` con parecido 0,898: la ganancia del lazo de mezcla
+# atribuida al de soplado. Tercera vez que ampliar el catalogo desplaza una
+# coincidencia difusa a un vecino equivocado; hay que remirarlas SIEMPRE.
+sinonimos = ["O2 Control Derivative Gain"]
