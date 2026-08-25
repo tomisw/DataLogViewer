@@ -46,7 +46,12 @@ criterio_de_rango = "ancho: detecta errores de escala, no de puesta a punto"
 dimension = "angular_speed"
 plausible = { min = 0.0, max = 20000.0 }          # rpm
 sinonimos = ["RPM", "Engine Speed", "EngineRPM", "Engine RPM", "Filtered RPM",
-             "Régimen", "Regimen", "Revoluciones", "N", "Speed_Engine", "rpm"]
+             "Régimen", "Regimen", "Revoluciones", "N", "Speed_Engine", "rpm",
+             # MoTeC M1 / ADU y MegaSquirt (buscado 2026-08-26; ver el
+             # commit para las fuentes). NO verificado contra un log real
+             # de esos fabricantes: son convenciones documentadas, no
+             # medidas -- este proyecto solo tiene logs Haltech.
+             "ECU_RPM", "ecu.rpm"]
 critico = true   # casi todos los detectores lo usan como contexto
 
 [roles.engine_load]
@@ -58,7 +63,12 @@ sinonimos = ["Engine Load", "Load", "Fuel - Load", "Ignition - Load", "Carga"]
 dimension = "ratio"
 plausible = { min = 0.0, max = 1.0 }              # fracción
 sinonimos = ["Throttle Position", "TPS", "Throttle", "TP", "Mariposa",
-             "Posición mariposa", "Posicion mariposa", "Throttle Position - Cable"]
+             "Posición mariposa", "Posicion mariposa", "Throttle Position - Cable",
+             # MoTeC M1 / ADU y MegaSquirt (buscado 2026-08-26; ver el
+             # commit para las fuentes). NO verificado contra un log real
+             # de esos fabricantes: son convenciones documentadas, no
+             # medidas -- este proyecto solo tiene logs Haltech.
+             "ECU_THROTTLE", "ecu.tps"]
 critico = true   # D4 (mezcla pobre en carga) condiciona por TPS
 
 [roles.throttle_pedal]
@@ -73,7 +83,10 @@ dimension = "pressure"
 # conectar como fuera de rango: eso lo detecta el clasificador de canal muerto.
 plausible = { min = 0.0, max = 600.0 }
 sinonimos = ["Manifold Pressure", "MAP", "Manifold Absolute Pressure", "MAP kPa",
-             "Presión colector", "Presion colector", "Boost", "Manifold Pres"]
+             "Presión colector", "Presion colector", "Boost", "Manifold Pres",
+             # MoTeC M1 / ADU (buscado 2026-08-26). NO verificado contra un
+             # log real de MoTeC: convencion documentada, no medida.
+             "ECU_MAP", "ecu.map", "Manifold Air Pressure"]
 critico = true   # D4, D6, D7 y la malla RPM×MAP dependen de él
 
 [roles.manifold_temp]
@@ -294,7 +307,14 @@ sinonimos = ["Oil Temperature", "Oil Temp", "Temp. aceite", "Temperatura aceite"
 dimension = "temperature"
 plausible = { min = 233.15, max = 423.15 }
 sinonimos = ["Intake Air Temperature", "IAT", "Air Temp", "Inlet Air Temp",
-             "Temp. aire", "Temperatura aire admisión", "AirT"]
+             "Temp. aire", "Temperatura aire admisión", "AirT",
+             # «MAT» de MegaSquirt NO va aqui: es Manifold Air Temperature,
+             # medida EN el colector, y ya esta en `manifold_temp`, que es su
+             # rol correcto. Lo intente anadir aqui el 2026-08-26 y la prueba
+             # de colisiones lo rechazo -- con razon: los dos roles existen por
+             # separado a proposito, y confundirlos pondria la temperatura del
+             # colector donde se lee la del aire de admision.
+             ]
 
 [roles.exhaust_temp]
 dimension = "temperature"
@@ -376,7 +396,12 @@ monotono = "no_decreciente"
 dimension = "voltage"
 plausible = { min = 0.0, max = 32.0 }             # V; 32 cubre sistemas de 24 V
 sinonimos = ["Battery Voltage", "Batt Volt", "VBatt", "Tensión batería",
-             "Tension bateria", "System Voltage", "Voltage"]
+             "Tension bateria", "System Voltage", "Voltage",
+             # MoTeC M1 / ADU y MegaSquirt (buscado 2026-08-26; ver el
+             # commit para las fuentes). NO verificado contra un log real
+             # de esos fabricantes: son convenciones documentadas, no
+             # medidas -- este proyecto solo tiene logs Haltech.
+             "Batt V"]
 critico = true   # D11: baja tensión con el motor en marcha
 
 [roles.sensor_voltage]
