@@ -769,7 +769,23 @@ angle = "deg"
 #  promedian, contaminan cualquier estadística.  Se tratan como valor ausente.
 # =========================================================================== #
 [centinelas]
-i32 = [2147483647, -2147483648, -2147483645, -2147483628, -2147483639, 8388607, 8388608]
+# 8388608 (2^23) SE QUITO de esta lista el 2026-08-26, por decision del
+# propietario y tras medirlo sobre el AutoLog real:
+#
+#   - 8388607 (2^23-1) aparece 22 874 veces en 12 canales, TODOS de tipo
+#     `Period` / `Active Time` de salidas de pulso. Es la saturacion de un
+#     contador de 24 bits: centinela de verdad, se queda.
+#   - 8388608 (2^23) aparecia 2 636 veces en UN solo canal, «Data Log Total
+#     Memory», constante en las 2 636 filas del log. 8388608 bytes son 8 MiB:
+#     no es «sin dato», es la CAPACIDAD del registrador, que por definicion no
+#     cambia. Estaba en la lista por parecerse a su vecino.
+#
+# Nulificarlo borraba el unico canal que dice cuanta memoria de log tiene la
+# ECU, y lo borraba en silencio: un centinela no deja rastro, deja un hueco.
+# Si algun dia 8388608 resulta ser un centinela en OTRO canal, el sintoma sera
+# un 8 388 608 visible y raro en pantalla -- molesto, pero detectable, que es
+# la direccion correcta del error.
+i32 = [2147483647, -2147483648, -2147483645, -2147483628, -2147483639, 8388607]
 # Cadenas que un CSV genérico puede traer como «sin dato» (docs/07 §7.10).
 texto = ["", "NaN", "nan", "inf", "-inf", "#N/A", "N/A", "n/a", "NULL", "null", "---", "-"]
 
