@@ -18,7 +18,8 @@ detectadas automáticamente y una lista de incidencias enlazada al instante exac
   Polars y NumPy; interfaz web con renderizador WebGL2; contenedor `pywebview`.
   Justificación y costes en `03-arquitectura.md` §3.1 y §3.11.
 - **Entregable v1.0**: paquete portable Windows/Linux/macOS, sin instalación
-  (< 60 MB en ZIP), más una versión de navegador sobre el mismo núcleo.
+  (< 95 MB en ZIP; 176 de los ~240 MB sin comprimir son el runtime de
+  Polars, ver §2.6), más una versión de navegador sobre el mismo núcleo.
 - **Riesgo principal**: escalas y unidades mal interpretadas —21 de 34 tipos del
   formato nativo sin confirmar, más el riesgo equivalente en el importador
   genérico— mitigado con dimensión canónica, `confidence` explícito e informe de
@@ -246,7 +247,7 @@ justificación están en `03-arquitectura.md` §3.8.
 | **Resumen de un log de 66 MB** (6 métricas proyectadas) | **< 900 ms** | banco de microtest |
 | Memoria residente con el log de 66 MB abierto | **≤ 3,5×** el tamaño del CSV | medida de RSS |
 | Arranque en frío hasta ventana interactiva | **< 2,5 s** | banco automatizado |
-| Tamaño del paquete portable | **< 150 MB sin comprimir / < 60 MB en ZIP** | comprobación de artefacto |
+| Tamaño del paquete portable | **< 260 MB sin comprimir / < 95 MB en ZIP** | comprobación de artefacto |
 | 8 logs × 30 min en paralelo | abre y navega sin degradación perceptible | prueba manual guionizada |
 | **Bucles por muestra en Python** | **cero** en `dlv-core` | banco + revisión (ADR-009) |
 

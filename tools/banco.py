@@ -225,12 +225,29 @@ PRESUPUESTOS: tuple[Presupuesto, ...] = (
     Presupuesto(
         "arranque_frio", "Arranque en frío hasta ventana interactiva", "s", 2.5, "<=", "F5"
     ),
-    Presupuesto("paquete_zip", "Tamaño del paquete portable comprimido", "MB", 60.0, "<=", "F5"),
+    # SUBIDOS POR EL PROPIETARIO (2026-08-26), con la medicion delante.
+    #
+    # El build real de F5-01 en Windows 11 dio 242 MB sin comprimir y 83,4 MB en
+    # ZIP, frente a los 150/60 originales. De los 242, **176 son
+    # `_internal/_polars_runtime_32`**: el resto del paquete cabe de sobra en el
+    # presupuesto viejo. No es que la aplicacion haya engordado -- es el coste de
+    # la decision de ADR-001 de delegar el trabajo por muestra en Polars, tomada
+    # a sabiendas y que es lo que hace posible el presupuesto de 4 s de apertura.
+    #
+    # 260 y 95 MB dejan un margen del 7 % y del 14 % sobre lo medido: suficiente
+    # para que una version de Polars algo mayor no rompa el CI, y lo bastante
+    # ajustado para que meter otra dependencia pesada SI salte.
+    #
+    # LO QUE CUESTA, DICHO CLARO: el resumen ejecutivo de docs/02 SS2.1 prometia
+    # "< 60 MB en ZIP" y ahora promete 95. El requisito de verdad era «sin
+    # instalacion», que se sigue cumpliendo (R13 de SS2.8 ya lo anticipaba), pero
+    # el numero que se enseña cambia y conviene no descubrirlo en una demo.
+    Presupuesto("paquete_zip", "Tamaño del paquete portable comprimido", "MB", 95.0, "<=", "F5"),
     Presupuesto(
         "paquete_sin_comprimir",
         "Tamaño del paquete portable sin comprimir",
         "MB",
-        150.0,
+        260.0,
         "<=",
         "F5",
     ),

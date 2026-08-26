@@ -1,5 +1,24 @@
 """Modo portable (F5-02, `docs/02` E10.1, `docs/03-arquitectura.md` SS3.10).
 
+DOS DECISIONES DEL PROPIETARIO, CONFIRMADAS EL 2026-08-26
+==========================================================
+Las dos venian de la revision G1 de esta tarea:
+
+1. **Carpeta de solo lectura**: la aplicacion FALLA CON AVISO Y NO ARRANCA.
+   Confirmado. Nunca cae al modo no portable. Caer seria escribir en
+   `~/.dlv` con un `portable.txt` delante, es decir incumplir la promesa de
+   SS3.10 justo cuando el usuario la ha pedido explicitamente -- y hacerlo en
+   silencio, que es lo peor: el USB protegido es el caso en el que alguien SE
+   FIA de que no se escribe fuera.
+
+2. **La cache NO lleva tope de tamaño.** Confirmado tambien. Son ~13 MB por
+   log abierto y no hay desalojo: una carpeta portable en un pendrive crece
+   sin limite hasta que el usuario borra `datos-dlv/`. Es una decision
+   deliberada, no un olvido: un desalojo automatico tirando entradas de cache
+   convierte una segunda apertura instantanea en una de cuatro segundos sin
+   que nadie entienda por que, y el tope correcto depende del pendrive, no del
+   programa. Borrar `datos-dlv/` sigue siendo el reinicio de fabrica.
+
 La promesa de SS3.10, literal: «con un `portable.txt` junto al ejecutable, la
 app no escribe nada fuera de su carpeta (ni configuracion, ni cache, ni
 registro)». Es el requisito de uso en pista desde un pendrive, y es la razon

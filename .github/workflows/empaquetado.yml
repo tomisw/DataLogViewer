@@ -33,6 +33,19 @@ name: Empaquetado
 #     sentido.
 #
 # F5-04: firma y notarización, y por qué NO se ha podido probar nada de esto
+#
+# macOS QUEDA FUERA POR DECISIÓN DEL PROPIETARIO (2026-08-26): «no
+# necesitamos publicar esto en macOS». Se han retirado los pasos de
+# `codesign` y de notarización con `notarytool`, y sus cuatro secretos
+# (MACOS_CODESIGN_*, APPLE_NOTARIZATION_*) ya no se declaran ni se usan.
+#
+# El paquete de macOS SE SIGUE CONSTRUYENDO --la matriz mantiene
+# `macos-latest`-- pero sale sin firmar, igual que el de Linux. Retirar la
+# firma no es lo mismo que retirar la plataforma, y quitarla de la matriz
+# habría dejado de comprobar que el empaquetado compila ahí. Si algún día
+# se decide publicar en macOS, lo que falta está descrito abajo: hace falta
+# cuenta de desarrollador de pago con Team ID, y `BUNDLE()` en el `.spec`
+# para poder hacer el «stapling».
 # ==============================================================================
 # En la máquina donde se escribió esto NO hay ningún certificado de firma de
 # código, ni de Windows ni de Apple, y el propietario no ha comprado ninguno
@@ -68,25 +81,9 @@ name: Empaquetado
 #          en el propio paso, en un fichero temporal de `RUNNER_TEMP` que se
 #          borra al terminar, nunca en el árbol de trabajo).
 #        WINDOWS_CODESIGN_PASSWORD    -- contraseña del .pfx.
-#      macOS (codesign + notarización):
-#        MACOS_CODESIGN_P12_BASE64    -- el certificado "Developer ID
-#          Application" con su clave privada, en formato .p12, en base64.
-#        MACOS_CODESIGN_PASSWORD      -- contraseña del .p12.
-#        MACOS_CODESIGN_IDENTITY      -- el nombre exacto de la identidad tal
-#          como lo exige `codesign -s`, p. ej. "Developer ID Application:
-#          Nombre Apellido (TEAMID)"; `security find-identity` lo imprime una
-#          vez importado el certificado.
-#        APPLE_NOTARIZATION_APPLE_ID    -- Apple ID (correo) de la cuenta de
-#          desarrollador.
-#        APPLE_NOTARIZATION_PASSWORD    -- contraseña de aplicación
-#          específica para ese Apple ID (NUNCA la contraseña normal de la
-#          cuenta; se genera en appleid.apple.com, "Contraseñas específicas
-#          de apps").
-#        APPLE_NOTARIZATION_TEAM_ID     -- Team ID de la cuenta de
-#          desarrollador (10 caracteres alfanuméricos).
-#    La contraseña del llavero temporal de macOS NO es un secreto: se genera
-#    al vuelo (`uuidgen`) dentro del propio job, vive solo mientras dura ese
-#    job y no protege nada fuera de él.
+#      macOS: NINGUNO. Se retiraron los cuatro secretos (MACOS_CODESIGN_*,
+#      APPLE_NOTARIZATION_*) al decidir el propietario que no se publica
+#      en macOS. Si algun dia se retoma, estan en la historia de git.
 #
 # 2. QUÉ PASA SIN CERTIFICADO (el caso de HOY, y el de cualquiera que clone
 #    este repositorio sin comprar uno). Cada paso de firma/notarización va
@@ -161,7 +158,6 @@ jobs:
     # certificado se resuelve aqui una vez y los pasos preguntan por `env`.
     env:
       HAY_CERT_WINDOWS: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 != '' }}
-      HAY_CERT_MACOS: ${{ secrets.MACOS_CODESIGN_P12_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -261,39 +257,6 @@ jobs:
       # bundles `.app`, pero aquí no hay bundle, así que se firma cada
       # Mach-O suelto. NO EJECUTADO NUNCA (sin cuenta de Apple en ningún
       # sitio de este proyecto).
-      - name: "macOS: firmar los binarios con codesign (Developer ID)"
-        if: matrix.os == 'macos-latest' && env.HAY_CERT_MACOS == 'true'
-        shell: bash
-        env:
-          P12_B64: ${{ secrets.MACOS_CODESIGN_P12_BASE64 }}
-          P12_PASSWORD: ${{ secrets.MACOS_CODESIGN_PASSWORD }}
-          CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
-        run: |
-          set -euo pipefail
-          KEYCHAIN="$RUNNER_TEMP/firma.keychain-db"
-          KEYCHAIN_PASSWORD="$(uuidgen)"  # efímera: solo protege este llavero, solo dentro de este job
-          P12_PATH="$RUNNER_TEMP/codesign.p12"
-          echo -n "$P12_B64" | base64 --decode -o "$P12_PATH"
-
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security import "$P12_PATH" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security list-keychains -d user -s "$KEYCHAIN" \
-              $(security list-keychains -d user | tr -d '"')
-
-          find "dlv-app/dist/dlv-app" -type f \( -name "*.so" -o -name "*.dylib" -o -name "dlv-app" \) -print0 |
-            xargs -0 -I{} codesign --force --timestamp --options runtime \
-                --sign "$CODESIGN_IDENTITY" --keychain "$KEYCHAIN" "{}"
-
-          rm -f "$P12_PATH"  # la clave privada no debe sobrevivir al paso
-
-      # `empaquetar.py --saltar-pyinstaller` comprime lo que ya construyó el
-      # paso de PyInstaller de arriba (firmado o no, según los pasos
-      # anteriores) y compara contra el presupuesto de tamaño de
-      # docs/02-alcance-y-plan.md §2.6. Sale con código de error si se
-      # supera -- no se ajusta el límite para que pase.
       - name: Construir el paquete onedir y comprimirlo en ZIP
         run: uv run python tools/empaquetar.py --saltar-pyinstaller --salida dist/dlv-app-${{ matrix.os }}.zip
 
@@ -302,24 +265,6 @@ jobs:
       # como una de las formas válidas de envío para notarizar). NO EJECUTADO
       # NUNCA. NO incluye "stapling" -- ver la decisión 4 de la cabecera: sin
       # bundle .app/.pkg/.dmg no hay a qué grapar la notarización.
-      - name: "macOS: notarizar el ZIP (notarytool)"
-        if: matrix.os == 'macos-latest' && env.HAY_CERT_MACOS == 'true'
-        shell: bash
-        env:
-          APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
-        run: |
-          set -euo pipefail
-          xcrun notarytool submit "dist/dlv-app-${{ matrix.os }}.zip" \
-              --apple-id "$APPLE_ID" \
-              --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-              --team-id "$APPLE_TEAM_ID" \
-              --wait
-
-      # Siempre corre, con o sin secretos: dice explícitamente si el paquete
-      # de esta plataforma quedó firmado o no (decisión 2 de la cabecera).
-      # Que el ZIP se publique sin firmar nunca debe ser un silencio.
       - name: Aviso de estado de firma
         if: always()
         shell: bash
@@ -331,11 +276,11 @@ jobs:
               MSG="Windows: SIN FIRMAR -- no hay WINDOWS_CODESIGN_PFX_BASE64 configurado. El ZIP es utilizable pero SmartScreen avisará al abrirlo."
             fi
           elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            if [ -n "${{ secrets.MACOS_CODESIGN_P12_BASE64 }}" ]; then
-              MSG="macOS: firmado y notarizado (MACOS_CODESIGN_P12_BASE64 configurado). Sin grapar (ver decisión 4 de la cabecera)."
-            else
-              MSG="macOS: SIN FIRMAR NI NOTARIZAR -- no hay MACOS_CODESIGN_P12_BASE64 configurado. Gatekeeper bloqueará el binario salvo excepción manual del usuario."
-            fi
+            # Sin firma por decision del propietario (2026-08-26): no se
+            # publica en macOS. El paquete se sigue construyendo para no
+            # dejar de comprobar que compila, pero sale sin firmar y
+            # Gatekeeper lo bloqueara salvo excepcion manual.
+            MSG="macOS: SIN FIRMAR, a proposito -- no se publica en macOS (F5-04). El ZIP se construye para comprobar el empaquetado; Gatekeeper lo bloqueara salvo excepcion manual del usuario."
           else
             MSG="Linux: esta tarea no firma nada en Linux (no hay Gatekeeper ni SmartScreen que sortear aquí)."
           fi
