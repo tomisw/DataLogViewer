@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 23:25:34Z"
+    "actualizado": "2026-08-26 23:37:48Z"
   },
   "tareas": [
     {
@@ -2462,10 +2462,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-26 23:37:48Z",
+          "texto": "paralela/arrastre.ts: aritmetica pura (segundosPorPixel, offsetTrasArrastre) separada del cableado de eventos (ArrastreDeSegmento), calcando navegacion/aritmetica.ts + controlador.ts. El signo es el CONTRARIO al de desplazarPx a proposito: alli se mueve la ventana sobre contenido fijo, aqui se mueve el contenido. 18 pruebas nuevas, 1033 en total. DEUDA DECLARADA: este commit no permite todavia arrastrar en la aplicacion. Falta decidir que elemento del DOM es el asa de cada segmento (la curva en el lienzo necesitaria hit-testing por proximidad, que no existe; o una fila de la leyenda) y como se persiste el offset resultante en el SegmentoParalelo que consume vista-paralela.ts. Ese cableado es de quien monte la vista paralela en app/, ahora que existe el ConmutadorDeVistas."
+        }
+      ],
+      "base": "bac1a3a"
     },
     {
       "id": "F2-07",
