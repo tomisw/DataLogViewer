@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 17:15:32Z"
+    "actualizado": "2026-08-26 17:37:34Z"
   },
   "tareas": [
     {
@@ -2413,10 +2413,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": null,
-      "commits": [],
-      "notas": []
+      "commits": [
+        "5b22798"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-26 17:37:34Z",
+          "texto": "Es el COMPONENTE, no el cableado: aplicacion.ts sigue ensamblando un solo log, y el agente lo declara. Rechaza superponer dimensiones distintas (C contra kPa) nombrando los dos logs, en vez de convertir en silencio o elegir una al azar. El color sale de un hash FNV-1a del id del segmento, no del indice de aparicion, para que quitar y volver a anadir un log no le cambie el color. NO reimplementa nada de tiempo.py: SegmentoParalelo.offset es un dato de ENTRADA obligatorio porque hoy ningun endpoint de dlv-api calcula el desfase (F2-05 sin hacer) -- no se invento el endpoint. Cero cambios en cursor.ts y renderizador.ts: ya generalizaban a N series."
+        }
+      ]
     },
     {
       "id": "F2-05",

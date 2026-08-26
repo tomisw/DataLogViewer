@@ -4,16 +4,16 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 17:15:32Z
+Actualizado: 2026-08-26 17:37:34Z
 
-**422 / 775 pts cerrados (54.5 %)** · 185 pts esperando revisión humana → 78.3 % entregado
+**427 / 775 pts cerrados (55.1 %)** · 185 pts esperando revisión humana → 79.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
-| F2 | 14 | 12 | 5 | 49 | 0 | 80 |
+| F2 | 19 | 12 | 0 | 49 | 0 | 80 |
 | F3 | 52 | 53 | 0 | 10 | 3 | 118 |
 | F4 | 37 | 4 | 8 | 14 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
@@ -45,7 +45,6 @@ Actualizado: 2026-08-26 17:15:32Z
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `FG-10` Informe de plausibilidad por rango declarado | revision_humana | Opus 5 | G1 | dlv_core/plausibilidad.py + 46 pruebas. Contrasta los valores REALES d |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
-| `F2-04` Vista paralela: N segmentos superpuestos, co | en_curso | Sonnet 5 | G3 | — |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
 | `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | revision_humana | Opus 5 | G1 | PUERTA G1. Revisar por consecuencia: (1) el corte requerido/opcional e |
 | `F3-03` Los 10 perfiles de fábrica de `04-perfiles-m | revision_humana | Sonnet 5 | G1 | PUERTA G1: son DATOS, cada numero es una afirmacion sobre un motor. Re |
@@ -154,14 +153,14 @@ Actualizado: 2026-08-26 17:15:32Z
 | ✔  | `FG-17` | Documentación: importar un CSV cualquiera y añadir un formato  | Sonnet 5 | 3 | FG-13 | G3 | `d1f559d` |
 | ✔  | `FG-18` | El sondeo genérico llega a HTTP: endpoints de `dlv-api` para d | Opus 5 | 6 | FG-01, FG-03, FG-04, FG-05, FG-09, FG-11 | G2 | `24909a3` |
 
-## F2 — 26/80 pts
+## F2 — 31/80 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ✔  | `F2-01` | Modelo de segmento y eje X virtual | Opus 5 | 5 | F1-05 | G2 | `9408b4f`, `1cf421d` |
 | ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `e6504cf` |
 | ✔  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | `dadd9b6` |
-| ▶  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
+| ✔  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | `5b22798` |
 | ·  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
 | ·  | `F2-06` | Desfase manual arrastrando el segmento | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-07` | Anclaje por evento (primer WOT, primer corte, launch) | Opus 5 | 5 | F2-01 | G2 | — |
