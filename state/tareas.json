@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 07:38:04Z"
+    "actualizado": "2026-08-26 07:56:14Z"
   },
   "tareas": [
     {
@@ -2721,10 +2721,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "cb765c9"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-26 07:56:14Z",
+          "texto": "id_nativo por coincidencia EXACTA, nunca difusa: un log de otro formato simplemente no trae ese literal. La Asignacion completa (con Confianza) viaja aguas abajo para que F3-08 pueda callar detectores criticos. Cobertura E4.5 como (disponibles, total) por panel, no booleano."
+        }
+      ]
     },
     {
       "id": "F3-03",
