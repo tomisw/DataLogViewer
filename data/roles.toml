@@ -14,6 +14,27 @@
 #  Es el cambio que convierte la escalabilidad del proyecto en algo real y no
 #  nominal (docs/07 §7.2 y §7.12).
 #
+#  CUÁNTO ESFUERZO MERECE LA COBERTURA POR ROL (decisión del propietario, 2026-08-26)
+#  ==================================================================================
+#  Equalizar los canales ESTÁNDAR entre fabricantes está bien y es la razón de ser
+#  de este catálogo. Pero que queden canales sin rol **no es un drama ni un
+#  problema a resolver**: el usuario de esta aplicación es un tuner, sabe qué es
+#  cada canal de su ECU, y si le hace falta un panel con un canal exótico se hace
+#  un perfil y ya está.
+#
+#  Consecuencia práctica, para no gastar recursos de más:
+#
+#  - **No se persigue el 100 % de cobertura.** Un log de 475 canales con 155
+#    asignados y 320 sin rol es un resultado BUENO, no uno a medias.
+#  - **No se inventa un rol para un canal que solo existe en un fabricante.**
+#    P5 (transient tip-in) va al 30 % por rol porque sus canales son internos de
+#    Haltech y no tienen equivalente en ningún otro sitio: eso no se arregla
+#    añadiendo roles, se arregla con la reserva a `id_nativo`, que existe
+#    exactamente para esto.
+#  - **La prioridad es el canal que un detector CRÍTICO necesita**, no el catálogo
+#    completo. Un rol que no alimenta ningún detector ni ningún perfil de fábrica
+#    es trabajo sin destinatario.
+#
 #  CAMPOS
 #      dimension   debe existir en data/units.toml
 #      plausible   rango en UNIDAD CANÓNICA de esa dimensión, no en la mostrada.
