@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 11:55:47Z"
+    "actualizado": "2026-08-26 12:19:16Z"
   },
   "tareas": [
     {
@@ -2770,10 +2770,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "2387e8d"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-26 12:19:16Z",
+          "texto": "Un canal VACIO no cuenta como disponible: cumpliria el rol sobre el papel y el perfil se abriria en blanco. DIFUSA tampoco basta para RECOMENDAR, aunque si para dibujar. Reutiliza aplicar_perfil filtrando el log antes, sin reimplementar la logica de paneles. Sin sugerencia si nadie llega al 50 %."
+        }
+      ]
     },
     {
       "id": "F3-05",
