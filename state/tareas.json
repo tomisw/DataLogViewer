@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 16:48:07Z"
+    "actualizado": "2026-08-26 17:08:03Z"
   },
   "tareas": [
     {
@@ -4168,10 +4168,17 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "4b0f40f"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-26 17:08:03Z",
+          "texto": "Propone y no impone: la decision (aceptada/descartada) se guarda por (log, perfil) y no se vuelve a preguntar. Sin sugerencia sigue el repliegue a protagonistas, aplicado ANTES de pedirla, asi que la ventana nunca esta en blanco. Ensena la cobertura Y que roles faltan, por nombre. FuenteDeDatos.sugerirPerfil es OPCIONAL: dlv-api no lo expone todavia y no se invento el endpoint."
+        }
+      ]
     },
     {
       "id": "F5-12",

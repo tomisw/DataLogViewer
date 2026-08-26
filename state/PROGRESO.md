@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 16:48:07Z
+Actualizado: 2026-08-26 17:08:03Z
 
-**414 / 775 pts cerrados (53.4 %)** · 180 pts esperando revisión humana → 76.6 % entregado
+**417 / 775 pts cerrados (53.8 %)** · 180 pts esperando revisión humana → 77.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -17,7 +17,7 @@ Actualizado: 2026-08-26 16:48:07Z
 | F3 | 52 | 48 | 5 | 10 | 3 | 118 |
 | F4 | 37 | 4 | 0 | 22 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 36 | 5 | 3 | 32 | 0 | 76 |
+| F5 | 39 | 5 | 0 | 32 | 0 | 76 |
 
 ## Requieren atención
 
@@ -58,7 +58,6 @@ Actualizado: 2026-08-26 16:48:07Z
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
 | `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
-| `F5-11` Onboarding: propuesta de perfil en lugar de  | en_curso | Sonnet 5 | G3 | — |
 
 ## F0 — 54/54 pts
 
@@ -236,7 +235,7 @@ Actualizado: 2026-08-26 16:48:07Z
 | ·  | `FE-11` | Presupuestos de §2.6 del explorador: carpeta de 200 logs en fr | Opus 5 | 4 | FE-02 | G2 | — |
 | ·  | `FE-12` | Documentación: cómo se triagea una carpeta y qué significa exa | Haiku 4.5 | 2 | FE-07 | G4 | — |
 
-## F5 — 41/76 pts
+## F5 — 44/76 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
@@ -250,7 +249,7 @@ Actualizado: 2026-08-26 16:48:07Z
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
 | ✔  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | `c6104cf` |
 | ✔  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | `32d6875` |
-| ▶  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
+| ✔  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | `4b0f40f` |
 | ✔  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | `0a990f9`, `712d3a3` |
 | ·  | `F5-13` | Revisión de seguridad: rutas, deserialización, evaluador de ex | Opus 5 | 6 | F3-18, F5-07 | G1 | — |
 | ·  | `F5-14` | Auditoría final contra los presupuestos de §2.6, incluidos tam | Opus 5 | 5 | todo | G1 | — |
