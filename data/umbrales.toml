@@ -733,3 +733,48 @@ maximo_de_eventos_internos = 10000
 # (§4.3, «la pantalla que responde en cinco segundos») y muy por encima de lo
 # que un log real produce: el AutoLog entero (245,1 s) no llega a ninguno.
 maximo_de_transitorios = 200
+
+# =========================================================================== #
+#  FILTROS DE EXCLUSIÓN PARA AGREGADOS  (F4-03 · docs/04 §4.6)
+# =========================================================================== #
+#  «Se excluyen las muestras en transitorio, en corte, en protección de motor y
+#  durante el retardo de transporte del sensor de λ... Sin este filtro, la tabla
+#  generada es basura» (docs/04 §4.6, segundo punto de la tabla de corrección de
+#  combustible). Son CUATRO motivos y esta sección declara UNO solo: los otros
+#  tres NO tienen un umbral propio aquí a propósito, para que el mismo número no
+#  tenga dos copias que se puedan desincronizar (regla 3 de CLAUDE.md, mismo
+#  criterio que `[segmentacion]` reutilizando `ventana_validez_ms` de
+#  `[motor_de_deteccion]` en vez de declararla otra vez). `dlv_core.exclusion`
+#  los lee de donde ya viven:
+#
+#    corte                -> [detectores.D14].umbral_min             (0,01)
+#    protección de motor  -> [detectores.D13].umbral_min             (1,0)
+#    transitorio (disparo) -> [detectores.D15].derivada_tps_min_por_s (2,0 frac/s)
+#    transitorio (ventana) -> [detectores.D15].ventana_s              (0,5 s)
+#    ventana de la derivada de mariposa -> [segmentacion].ventana_derivada_s
+#                                           (0,25 s -- es un número de MUESTREO,
+#                                           medido sobre el dt p99 del AutoLog, no
+#                                           de RPM; el mismo razonamiento vale
+#                                           para derivar cualquier canal de este log)
+#    ventana de validez multi-tasa -> [motor_de_deteccion].ventana_validez_ms
+#
+#  CORTE, por diseño, NO hereda el matiz de D14 «fuera del limitador esperado»:
+#  D14 lo usa para no ALERTAR sobre un corte esperado (un limitador de
+#  revoluciones no es una anomalía), pero para excluir de un promedio da igual
+#  POR QUÉ hay corte -- la lectura de λ durante cualquier corte no representa la
+#  mezcla de la tabla.
+[exclusion]
+# El ÚNICO valor genuinamente nuevo de esta tarea. Es una cita literal de
+# `docs/04-perfiles-motorsport.md` §4.6: «durante el retardo de transporte del
+# sensor de λ (configurable, por omisión 150 ms tras un cambio brusco de
+# carga)». No es una medición ni una suposición: la procedencia es el propio
+# documento de especificación del propietario, así que no lleva
+# `confianza = "unknown"`.
+#
+# §4.6 no dice qué cuenta como «cambio brusco de carga». Este módulo usa el
+# MISMO disparo que TRANSITORIO (la derivada de `throttle_position` sobre
+# `[detectores.D15].derivada_tps_min_por_s`) porque es la única definición de
+# «cambio brusco» que el proyecto ya tiene declarada; inventar un segundo
+# criterio (p. ej. la derivada de `manifold_pressure`) sin que ningún documento
+# lo pida habría sido una opinión nueva y no una que ya estuviera escrita.
+retardo_transporte_lambda_ms = 150.0
