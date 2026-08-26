@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 17:14:47Z
+Actualizado: 2026-08-26 17:15:32Z
 
 **422 / 775 pts cerrados (54.5 %)** · 185 pts esperando revisión humana → 78.3 % entregado
 
@@ -13,9 +13,9 @@ Actualizado: 2026-08-26 17:14:47Z
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
-| F2 | 14 | 12 | 0 | 54 | 0 | 80 |
+| F2 | 14 | 12 | 5 | 49 | 0 | 80 |
 | F3 | 52 | 53 | 0 | 10 | 3 | 118 |
-| F4 | 37 | 4 | 0 | 22 | 0 | 63 |
+| F4 | 37 | 4 | 8 | 14 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 39 | 5 | 0 | 32 | 0 | 76 |
 
@@ -45,6 +45,7 @@ Actualizado: 2026-08-26 17:14:47Z
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `FG-10` Informe de plausibilidad por rango declarado | revision_humana | Opus 5 | G1 | dlv_core/plausibilidad.py + 46 pruebas. Contrasta los valores REALES d |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
+| `F2-04` Vista paralela: N segmentos superpuestos, co | en_curso | Sonnet 5 | G3 | — |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
 | `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | revision_humana | Opus 5 | G1 | PUERTA G1. Revisar por consecuencia: (1) el corte requerido/opcional e |
 | `F3-03` Los 10 perfiles de fábrica de `04-perfiles-m | revision_humana | Sonnet 5 | G1 | PUERTA G1: son DATOS, cada numero es una afirmacion sobre un motor. Re |
@@ -55,6 +56,7 @@ Actualizado: 2026-08-26 17:14:47Z
 | `F3-14` Decodificación de máscaras de bits en carril | revision_humana | Opus 5 | G1 | Decodifica y pinta, pero NO nombra: el carril dice «bit 3», nunca «fal |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
+| `F4-03` Filtros de exclusión: transitorio, corte, pr | en_curso | Opus 5 | G1 | — |
 | `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
@@ -159,7 +161,7 @@ Actualizado: 2026-08-26 17:14:47Z
 | ✔  | `F2-01` | Modelo de segmento y eje X virtual | Opus 5 | 5 | F1-05 | G2 | `9408b4f`, `1cf421d` |
 | ⏳ | `F2-02` | Identidad de canal en capas (rol → `(formato, ID)` → nombre no | Opus 5 | 8 | FG-09 | G1 | `e6504cf` |
 | ✔  | `F2-03` | Emparejamiento manual con prioridad máxima, persistido en el p | Sonnet 5 | 4 | F2-02 | G3 | `dadd9b6` |
-| ·  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
+| ▶  | `F2-04` | Vista paralela: N segmentos superpuestos, color por log | Sonnet 5 | 5 | F2-01, F1-26 | G3 | — |
 | ·  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
 | ·  | `F2-06` | Desfase manual arrastrando el segmento | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ·  | `F2-07` | Anclaje por evento (primer WOT, primer corte, launch) | Opus 5 | 5 | F2-01 | G2 | — |
@@ -205,7 +207,7 @@ Actualizado: 2026-08-26 17:14:47Z
 |---|---|---|---|---|---|---|---|
 | ✔  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | `eea3de7` |
 | ✔  | `F4-02` | Agregación por celda: media, desviación, mín, máx, número de m | Opus 5 | 5 | F4-01 | G2 | `7912ef1` |
-| ·  | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
+| ▶  | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
 | ✔  | `F4-04` | Mapa de calor de λ error con detalle por celda | Sonnet 5 | 5 | F4-02 | G3 | `e7afb45` |
 | ·  | `F4-05` | Tabla de corrección de combustible, con celdas de confianza in | Opus 5 | 8 | F4-03 | G1 | — |
 | ·  | `F4-06` | Exportación de tabla a CSV y portapapeles como malla pegable | Sonnet 5 | 3 | F4-05 | G3 | — |
