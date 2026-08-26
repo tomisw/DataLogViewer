@@ -1,0 +1,62 @@
+{
+  "descripcion": "Avance de encendido y sus correcciones (docs/04 §4.2 P4).",
+  "detectores_activos": [],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P4 — Ignition",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "ignition_advance"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_advance_base"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_total"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_coolant"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_air_temp"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_post_start"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_transient"
+        },
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "knock_retard"
+        },
+        {
+          "id_nativo": "Ignition 1 Duty Cycle",
+          "requerido": false
+        },
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "dwell_time"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_coil_supply"
+        }
+      ],
+      "titulo": "Encendido"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

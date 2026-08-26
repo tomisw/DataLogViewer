@@ -1,0 +1,124 @@
+{
+  "descripcion": "Cierre del lazo de mezcla: ¿sigue la mezcla al objetivo? El perfil más usado (docs/04 §4.2 P1).",
+  "detectores_activos": [
+    "D4",
+    "D5",
+    "D8"
+  ],
+  "eje_x_preferido": null,
+  "limites": [
+    {
+      "rol": "injector_duty",
+      "topes": [
+        {
+          "direccion": "arriba",
+          "nivel": "aviso",
+          "valor": 0.85
+        }
+      ]
+    }
+  ],
+  "nombre": "P1 — Fuel / Lambda",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "engine_speed"
+        },
+        {
+          "requerido": true,
+          "rol": "throttle_position"
+        },
+        {
+          "requerido": false,
+          "rol": "manifold_pressure"
+        }
+      ],
+      "titulo": "Carga"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": true,
+          "rol": "lambda_measured"
+        },
+        {
+          "requerido": true,
+          "rol": "lambda_target"
+        },
+        {
+          "requerido": false,
+          "rol": "lambda_measured"
+        },
+        {
+          "id_nativo": "lambda_error",
+          "requerido": false
+        }
+      ],
+      "titulo": "Mezcla"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "fuel_trim_short"
+        },
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "fuel_trim_long"
+        },
+        {
+          "id_nativo": "Fuel MAP Correction",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Fuel Coolant Temperature Correction",
+          "requerido": false
+        }
+      ],
+      "titulo": "Correcciones"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": true,
+          "rol": "injector_duty"
+        },
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "injector_pulsewidth"
+        },
+        {
+          "requerido": false,
+          "rol": "fuel_pressure_differential"
+        },
+        {
+          "requerido": false,
+          "rol": "fuel_pressure"
+        }
+      ],
+      "titulo": "Inyección"
+    },
+    {
+      "elementos": [
+        {
+          "id_nativo": "Decel Cut State",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "protection_cause"
+        }
+      ],
+      "titulo": "Estado"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

@@ -1,0 +1,66 @@
+{
+  "descripcion": "Diagnóstico de sincronización: el perfil que resuelve los intermitentes (docs/04 §4.2 P7).",
+  "detectores_activos": [
+    "D12"
+  ],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P7 — Trigger / salud de sincronización",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "trigger_errors"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_error_count"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_sync_level"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_sync_state"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_sync_offset"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_tooth_count"
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_tooth_period_error"
+        },
+        {
+          "id_nativo": "Sync Offset Difference At Error",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Home Tooth Count At Error",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "trigger_voltage"
+        },
+        {
+          "requerido": false,
+          "rol": "home_voltage"
+        },
+        {
+          "requerido": false,
+          "rol": "home_travel_pct"
+        }
+      ],
+      "titulo": "Trigger"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

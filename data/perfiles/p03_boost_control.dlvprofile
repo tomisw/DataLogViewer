@@ -1,0 +1,87 @@
+{
+  "descripcion": "Presión de sobrealimentación y el lazo que la controla (docs/04 §4.2 P3).",
+  "detectores_activos": [
+    "D6",
+    "D7"
+  ],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P3 — Boost control",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "boost_pressure_actual"
+        },
+        {
+          "requerido": true,
+          "rol": "boost_pressure_target"
+        },
+        {
+          "requerido": false,
+          "rol": "boost_pressure_error"
+        }
+      ],
+      "titulo": "Presión"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "boost_output"
+        }
+      ],
+      "titulo": "Salida"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "boost_output_proporcional"
+        },
+        {
+          "requerido": false,
+          "rol": "boost_output_integral"
+        },
+        {
+          "requerido": false,
+          "rol": "boost_output_derivativo"
+        },
+        {
+          "requerido": false,
+          "rol": "boost_output_base"
+        }
+      ],
+      "titulo": "Términos PID"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "boost_trim_corto"
+        },
+        {
+          "requerido": false,
+          "rol": "boost_trim_largo"
+        }
+      ],
+      "titulo": "Trims"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "boost_state"
+        },
+        {
+          "requerido": false,
+          "rol": "overboost_cut_pressure"
+        }
+      ],
+      "titulo": "Estado"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

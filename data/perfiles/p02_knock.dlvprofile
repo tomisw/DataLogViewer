@@ -1,0 +1,124 @@
+{
+  "descripcion": "No perder ni un evento de detonación (docs/04 §4.2 P2).",
+  "detectores_activos": [
+    "D1",
+    "D2",
+    "D3"
+  ],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P2 — Knock / detonación",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "engine_speed"
+        },
+        {
+          "requerido": true,
+          "rol": "manifold_pressure"
+        },
+        {
+          "requerido": false,
+          "rol": "throttle_position"
+        }
+      ],
+      "titulo": "Carga"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": true,
+          "rol": "knock_level"
+        },
+        {
+          "indice": 2,
+          "requerido": false,
+          "rol": "knock_level"
+        },
+        {
+          "requerido": false,
+          "rol": "knock_threshold"
+        }
+      ],
+      "titulo": "Knock"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": true,
+          "rol": "knock_count"
+        },
+        {
+          "indice": 2,
+          "requerido": false,
+          "rol": "knock_count"
+        }
+      ],
+      "titulo": "Conteos"
+    },
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "knock_retard"
+        },
+        {
+          "indice": 2,
+          "requerido": false,
+          "rol": "knock_retard"
+        },
+        {
+          "id_nativo": "Knock Control Bank 1 Long Term Trim",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Knock Control Bank 2 Long Term Trim",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_advance"
+        }
+      ],
+      "titulo": "Respuesta"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "intake_air_temp"
+        },
+        {
+          "requerido": false,
+          "rol": "coolant_temp"
+        },
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "lambda_measured"
+        }
+      ],
+      "titulo": "Contexto"
+    },
+    {
+      "elementos": [
+        {
+          "id_nativo": "Knock State",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Knock Detection Active State",
+          "requerido": false
+        }
+      ],
+      "titulo": "Estado"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

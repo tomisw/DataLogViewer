@@ -1,0 +1,77 @@
+{
+  "descripcion": "Control de ralentí: error, salida del lazo y su recuperación (docs/04 §4.2 P6).",
+  "detectores_activos": [],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P6 — Idle control",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "engine_speed"
+        },
+        {
+          "requerido": false,
+          "rol": "idle_target_rpm"
+        },
+        {
+          "requerido": false,
+          "rol": "idle_rpm_error"
+        },
+        {
+          "requerido": false,
+          "rol": "idle_output"
+        },
+        {
+          "id_nativo": "Idle Control Proportional Output",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Idle Control Integral Output",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Idle Control Derivative Output",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "idle_trim_corto"
+        },
+        {
+          "requerido": false,
+          "rol": "idle_trim_largo"
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_idle"
+        },
+        {
+          "requerido": false,
+          "rol": "idle_min_output"
+        }
+      ],
+      "titulo": "Ralentí"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "idle_state"
+        },
+        {
+          "id_nativo": "Thermofan 1 Idle Up Active",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Air Con Idle Up Active",
+          "requerido": false
+        }
+      ],
+      "titulo": "Estado"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

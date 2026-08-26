@@ -1,0 +1,105 @@
+{
+  "descripcion": "Canales pegados, saturación y ruido de las entradas analógicas (docs/04 §4.2 P9).",
+  "detectores_activos": [
+    "D16",
+    "D17"
+  ],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P9 — Diagnóstico de sensores",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "indice": 1,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 2,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 3,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 4,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 5,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 6,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 7,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 8,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 9,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "indice": 10,
+          "requerido": false,
+          "rol": "sensor_voltage"
+        },
+        {
+          "id_nativo": "Synced Pulse Input 1 Voltage",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Synced Pulse Input 2 Voltage",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Synced Pulse Input 3 Voltage",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Synced Pulse Input 4 Voltage",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "ref_voltage_5v"
+        },
+        {
+          "requerido": false,
+          "rol": "diag_ref_ratiometrico"
+        },
+        {
+          "requerido": false,
+          "rol": "diag_ref_absoluto"
+        },
+        {
+          "requerido": false,
+          "rol": "diag_ref_discrepancia"
+        },
+        {
+          "requerido": true,
+          "rol": "battery_voltage"
+        }
+      ],
+      "titulo": "Sensores"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

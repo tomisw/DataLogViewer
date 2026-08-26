@@ -1,0 +1,52 @@
+{
+  "descripcion": "Control de salida en línea de largada (docs/04 §4.2 P10).",
+  "detectores_activos": [],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P10 — Launch control",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "launch_state"
+        },
+        {
+          "requerido": false,
+          "rol": "launch_rpm_error"
+        },
+        {
+          "requerido": false,
+          "rol": "launch_end_rpm"
+        },
+        {
+          "id_nativo": "Launch Control Fuel Correction",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_launch"
+        },
+        {
+          "requerido": false,
+          "rol": "cut_percentage"
+        },
+        {
+          "requerido": true,
+          "rol": "engine_speed"
+        },
+        {
+          "requerido": false,
+          "rol": "vehicle_speed"
+        },
+        {
+          "requerido": false,
+          "rol": "driven_wheel_speed"
+        }
+      ],
+      "titulo": "Launch"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

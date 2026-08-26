@@ -1,0 +1,59 @@
+{
+  "descripcion": "Excursión de lambda tras una apertura brusca de mariposa (docs/04 §4.2 P5).",
+  "detectores_activos": [
+    "D15"
+  ],
+  "eje_x_preferido": null,
+  "limites": [],
+  "nombre": "P5 — Transient / tip-in",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "id_nativo": "Throttle Position Derivative",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Load Derivative",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Fuel Enrichment Rate",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Fuel Disenrichment Rate",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Enrichment Load Derivative",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Disenrichment Load Derivative",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Transient Throttle Enrichment Start Load",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "ignition_correction_transient"
+        },
+        {
+          "indice": 1,
+          "requerido": true,
+          "rol": "lambda_measured"
+        },
+        {
+          "requerido": true,
+          "rol": "lambda_target"
+        }
+      ],
+      "titulo": "Transitorio"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}

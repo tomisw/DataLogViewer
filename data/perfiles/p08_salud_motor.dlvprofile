@@ -1,0 +1,100 @@
+{
+  "descripcion": "Térmico, presiones y protecciones activas del motor (docs/04 §4.2 P8).",
+  "detectores_activos": [
+    "D9",
+    "D10",
+    "D11",
+    "D13",
+    "D14"
+  ],
+  "eje_x_preferido": null,
+  "limites": [
+    {
+      "rol": "oil_pressure",
+      "topes": [
+        {
+          "direccion": "abajo",
+          "nivel": "critico",
+          "valor": {
+            "base": 201.3,
+            "divisor_referencia": 1000.0,
+            "forma": "lineal",
+            "pendiente": 100.0,
+            "rol_referencia": "engine_speed"
+          }
+        }
+      ]
+    }
+  ],
+  "nombre": "P8 — Salud del motor y protecciones",
+  "paneles": [
+    {
+      "elementos": [
+        {
+          "requerido": true,
+          "rol": "coolant_temp"
+        },
+        {
+          "requerido": false,
+          "rol": "oil_temp"
+        },
+        {
+          "requerido": true,
+          "rol": "oil_pressure"
+        },
+        {
+          "requerido": false,
+          "rol": "intake_air_temp"
+        },
+        {
+          "requerido": false,
+          "rol": "ecu_temp"
+        },
+        {
+          "requerido": true,
+          "rol": "battery_voltage"
+        },
+        {
+          "requerido": false,
+          "rol": "fuel_pressure"
+        }
+      ],
+      "titulo": "Térmico y presiones"
+    },
+    {
+      "elementos": [
+        {
+          "requerido": false,
+          "rol": "protection_level"
+        },
+        {
+          "requerido": false,
+          "rol": "protection_cause"
+        },
+        {
+          "id_nativo": "Engine Protection Ignition Retard",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Engine Protection Boost Correction",
+          "requerido": false
+        },
+        {
+          "id_nativo": "Engine Protection Lambda Fuel Enrichment",
+          "requerido": false
+        },
+        {
+          "requerido": false,
+          "rol": "cut_percentage"
+        },
+        {
+          "requerido": false,
+          "rol": "limiter_active"
+        }
+      ],
+      "titulo": "Estado"
+    }
+  ],
+  "unidades": {},
+  "version_esquema": 1
+}
