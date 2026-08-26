@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 14:05:37Z
+Actualizado: 2026-08-26 16:48:07Z
 
 **414 / 775 pts cerrados (53.4 %)** · 180 pts esperando revisión humana → 76.6 % entregado
 
@@ -53,7 +53,7 @@ Actualizado: 2026-08-26 14:05:37Z
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
-| `F3-14` Decodificación de máscaras de bits en carril | en_curso | Opus 5 | G1 | — |
+| `F3-14` Decodificación de máscaras de bits en carril | en_curso | Opus 5 | G1 | Sin empezar: el agente murio por limite de sesion en su fase de lectur |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
 | `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |

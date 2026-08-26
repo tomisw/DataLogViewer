@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 14:05:37Z"
+    "actualizado": "2026-08-26 16:48:07Z"
   },
   "tareas": [
     {
@@ -3059,9 +3059,14 @@
       "dep_todo": false,
       "gate": "G1",
       "estado": "en_curso",
-      "agente": "subagente Sonnet",
+      "agente": "subagente Sonnet (2o intento)",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-26 16:47:37Z",
+          "texto": "Sin empezar: el agente murio por limite de sesion en su fase de lectura, sin escribir ni un fichero. Se desmarca para que no aparezca como trabajo en curso que no existe."
+        }
+      ]
     },
     {
       "id": "F3-15",
