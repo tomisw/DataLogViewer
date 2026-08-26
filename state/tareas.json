@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 12:19:16Z"
+    "actualizado": "2026-08-26 12:32:10Z"
   },
   "tareas": [
     {
@@ -2748,10 +2748,17 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente Sonnet",
-      "commits": [],
-      "notas": []
+      "commits": [
+        "4d03eec"
+      ],
+      "notas": [
+        {
+          "fecha": "2026-08-26 12:32:10Z",
+          "texto": "PUERTA G1: son DATOS, cada numero es una afirmacion sobre un motor. Revisar: (1) los dos unicos limites declarados (P1 injector_duty 0.85 y la curva de oil_pressure de P8) son literales de docs/04 SS4.2 y DUPLICAN el valor por omision de D8/D10 en data/umbrales.toml -- el mismo numero en dos ficheros, a proposito, para que el panel dibuje la linea; (2) que no falte ningun umbral que SI estuviera en SS4.2. Portabilidad medida: P3 100 %, P4 91 %, P10 89 %, P7 83 %, P9 79 %, P8 79 %, P2 78 %, P1 76 %, P6 64 %, P5 30 %."
+        }
+      ]
     },
     {
       "id": "F3-04",
