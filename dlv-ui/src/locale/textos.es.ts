@@ -169,4 +169,7 @@ export const TEXTOS_ES = {
   "onboarding.propuestaDescartar": "No, gracias",
   "onboarding.sinPerfilAviso":
     "Ningún perfil de fábrica encaja con este log: se muestran los canales habituales.",
+
+  "paralela.dimensionesIncompatibles":
+    "«{etiquetaA}» y «{etiquetaB}» no se pueden superponer: son dimensiones físicas distintas ({dimensionA} y {dimensionB}). Elige el mismo canal (o uno de la misma dimensión) en los dos logs antes de compararlos.",
 } as const;

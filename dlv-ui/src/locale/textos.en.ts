@@ -163,4 +163,7 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "onboarding.propuestaDescartar": "No, thanks",
   "onboarding.sinPerfilAviso":
     "No factory profile matches this log: showing the usual channels instead.",
+
+  "paralela.dimensionesIncompatibles":
+    "“{etiquetaA}” and “{etiquetaB}” cannot be overlaid: they are different physical dimensions ({dimensionA} and {dimensionB}). Pick the same channel (or one in the same dimension) in both logs before comparing them.",
 };
