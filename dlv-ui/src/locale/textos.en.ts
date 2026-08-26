@@ -151,4 +151,11 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "perfiles.importarError": "Can't import: {mensaje}",
   "perfiles.exportar": "Export",
   "perfiles.exportarEtiqueta": "The .dlvprofile text (copy it or save it as a standalone file)",
+
+  "onboarding.propuestaAviso": "Suggested profile: “{perfil}” — {disponibles} of {total} roles available.",
+  "onboarding.propuestaFaltan": "Missing: {roles}.",
+  "onboarding.propuestaAceptar": "Use this profile",
+  "onboarding.propuestaDescartar": "No, thanks",
+  "onboarding.sinPerfilAviso":
+    "No factory profile matches this log: showing the usual channels instead.",
 };

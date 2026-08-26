@@ -38,6 +38,19 @@ export interface DobleGL extends ContextoGL {
    */
   fallarCompilacion: boolean;
   fallarEnlace: boolean;
+  /**
+   * Solo `"WEBGL_lose_context"` (F5-11): `app/aplicacion.ts#reconstruir`
+   * la pide sobre CADA canvas que destruye, para liberar el contexto antes de
+   * agotar el puñado que un navegador garantiza vivos a la vez (16 en
+   * Chrome/Edge). Ninguna prueba había reconstruido paneles dos veces sobre
+   * el mismo `Aplicacion` hasta la propuesta de perfil de F5-11 -- aceptarla o
+   * descartarla cambia la selección de canales después del montaje inicial,
+   * que es justo el camino que llama a esto -- así que el hueco (`ContextoGL`
+   * no la declaraba: `Renderizador` nunca la necesita) estaba sin avisar.
+   * Cualquier otro nombre de extensión devuelve `null`, como el navegador real
+   * cuando no la reconoce.
+   */
+  getExtension(nombre: string): { loseContext(): void } | null;
 }
 
 /**
@@ -79,6 +92,11 @@ export function crearDobleGL(): DobleGL {
     cuenta: (nombre) => llamadas.filter((l) => l.nombre === nombre).length,
     olvidar: () => {
       llamadas.length = 0;
+    },
+    getExtension: (nombre) => {
+      registrar("getExtension", nombre);
+      if (nombre !== "WEBGL_lose_context") return null;
+      return { loseContext: () => registrar("loseContext") };
     },
 
     createShader: (tipo) => {

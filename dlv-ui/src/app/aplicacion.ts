@@ -89,6 +89,13 @@ import {
 import { montarSelectorDeTema } from "../tema/selector-tema.ts";
 import { RegistroComandos, type Comando } from "../paleta/comandos.ts";
 import { PaletaComandos } from "../paleta/paleta-comandos.ts";
+import {
+  decisionGuardada,
+  guardarDecision,
+  type EntornoDecisionPerfil,
+} from "../onboarding/decision-guardada.ts";
+import { PropuestaPerfil } from "../onboarding/propuesta-perfil.ts";
+import type { SugerenciaDePerfil } from "../onboarding/tipos.ts";
 
 const EJE_PRINCIPAL = "principal";
 
@@ -126,6 +133,18 @@ export interface EntornoApp {
     cancelAnimationFrame(id: number): void;
   };
   readonly crearRenderizador: (lienzo: HTMLCanvasElement) => Renderizador;
+  /**
+   * Almacenamiento persistente (F5-11): `localStorage` lo cumple tal cual.
+   * `onboarding/decision-guardada.ts` lo usa para no volver a proponer el
+   * mismo perfil dos veces sobre el mismo log -- mismo criterio que
+   * `EntornoDecisionPerfil` (ver su cabecera): es un recurso del navegador,
+   * no un cálculo de negocio, así que vive aquí y no en `FuenteDeDatos`
+   * (comparar con `sugerirPerfil` en `datos/fuente.ts`, que sí es negocio y
+   * por eso vive en la fuente). Ausente en una prueba que no lo necesite: sin
+   * él, `decisionGuardada` siempre devuelve `null` y se pregunta cada vez --
+   * degradación explícita, no un error.
+   */
+  readonly almacen?: EntornoDecisionPerfil["almacen"];
 }
 
 /** El navegador de verdad. Es el valor por omisión: nadie tiene que pasarlo. */
@@ -145,6 +164,9 @@ export const ENTORNO_REAL: EntornoApp = {
     };
   },
   crearRenderizador: (lienzo) => Renderizador.desdeLienzo(lienzo),
+  get almacen() {
+    return typeof localStorage === "undefined" ? undefined : localStorage;
+  },
 };
 
 const MAXIMO_PROTAGONISTAS = 8;
@@ -273,6 +295,8 @@ export class Aplicacion {
   readonly #areaPrincipal: HTMLElement;
   readonly #contenedorPaneles: HTMLElement;
   readonly #mensajeVacio: HTMLElement;
+  /** Dónde se monta `PropuestaPerfil` (F5-11). Vacío mientras no hay nada que proponer. */
+  readonly #contenedorPropuestaPerfil: HTMLElement;
 
   #log: LogAbierto | null = null;
   #catalogo: CatalogoUnidades | null = null;
@@ -283,6 +307,15 @@ export class Aplicacion {
   #selectorUnidad: SelectorUnidad | null = null;
   #selectorCombustible: SelectorCombustible | null = null;
   #resueltasUnidad = new Map<string, UnidadResuelta>();
+  #propuestaPerfil: PropuestaPerfil | null = null;
+  /**
+   * Se incrementa en cada `abrirLog`. `#mostrarPropuestaPerfil` la comprueba
+   * tras el `await` de `sugerirPerfil`: si el usuario abrió OTRO log mientras
+   * la sugerencia del anterior seguía en vuelo, esta generación ya no
+   * coincide y la respuesta tardía se descarta -- mismo mecanismo que
+   * `#generacion` para el redibujado, documentado más abajo.
+   */
+  #generacionLog = 0;
 
   /**
    * Registro de acciones de la paleta de comandos (F5-09) y el diálogo que las
@@ -390,12 +423,20 @@ export class Aplicacion {
 
     this.#areaPrincipal = documento.createElement("div");
     this.#areaPrincipal.className = "dlv-principal";
+    // Antes del mensaje vacío y de los paneles: es lo primero que se ve al
+    // abrir un log, sea cual sea el estado de la selección (F5-11).
+    this.#contenedorPropuestaPerfil = documento.createElement("div");
+    this.#contenedorPropuestaPerfil.className = "dlv-propuesta-perfil-contenedor";
     this.#mensajeVacio = documento.createElement("p");
     this.#mensajeVacio.className = "dlv-mensaje-vacio";
     this.#mensajeVacio.textContent = t("app.mensajeVacio");
     this.#contenedorPaneles = documento.createElement("div");
     this.#contenedorPaneles.className = "dlv-paneles";
-    this.#areaPrincipal.append(this.#mensajeVacio, this.#contenedorPaneles);
+    this.#areaPrincipal.append(
+      this.#contenedorPropuestaPerfil,
+      this.#mensajeVacio,
+      this.#contenedorPaneles,
+    );
 
     cuerpo.append(this.#barraLateral, this.#areaPrincipal);
     this.#raiz.append(this.#barra, this.#barraDelta, cuerpo);
@@ -509,6 +550,8 @@ export class Aplicacion {
 
   /** Abre (o reabre) un log a través de la fuente configurada y reconstruye toda la interfaz. */
   async abrirLog(referencia: string): Promise<void> {
+    this.#generacionLog += 1;
+    this.#ocultarPropuestaPerfil();
     this.#estadoTexto.textContent =
       `${t("app.barraFuente")}: ${this.#fuente.nombre} · ${t("app.barraAbriendo")}`;
     const [log, catalogo] = await Promise.all([
@@ -529,7 +572,13 @@ export class Aplicacion {
     this.#registrarComandosDeCanales(log);
     this.#reconstruirSelectorUnidad([]);
     this.#reconstruir(null);
+    // El repliegue a los protagonistas de siempre PRIMERO, para que la
+    // ventana nunca esté en blanco mientras `sugerirPerfil` sigue en vuelo
+    // (decisión 1 del informe): la propuesta de perfil, si llega, sustituye
+    // esta selección; si no llega nunca (fuente sin esta capacidad, F5-11),
+    // esto es lo único que el usuario ve, exactamente como hoy.
     this.#preseleccionarProtagonistas();
+    this.#proponerPerfilSugerido(referencia, log);
   }
 
   // ------------------------------------------------------------------ //
@@ -596,6 +645,117 @@ export class Aplicacion {
     this.#selectorCanales.preseleccionar(
       elegirProtagonistas(this.#log.canales, ORDEN_PROTAGONISTAS, MAXIMO_PROTAGONISTAS),
     );
+  }
+
+  // ------------------------------------------------------------------ //
+  // Propuesta de perfil al abrir un log (F5-11, E9.6)
+  // ------------------------------------------------------------------ //
+
+  /**
+   * Pide la sugerencia de perfil a la fuente, si sabe darla.
+   *
+   * `sugerirPerfil` es OPCIONAL en `FuenteDeDatos` (ver su cabecera): hoy
+   * ninguna de las dos fuentes reales lo implementa, así que esta función no
+   * cambia nada de lo que se ve en pantalla hasta que alguna lo haga. Cuando
+   * lo haga, es una llamada asíncrona más -- como `nivelesDe`/`pedirCubos` --
+   * y se trata igual: fuego y olvido con `.catch`, nunca bloquea `abrirLog`.
+   */
+  #proponerPerfilSugerido(referencia: string, log: LogAbierto): void {
+    const tarea = this.#fuente.sugerirPerfil?.(log);
+    if (tarea === undefined) return; // esta fuente no sabe sugerir nada: sin aviso, comportamiento de hoy.
+    const generacion = this.#generacionLog;
+    tarea
+      .then((sugerencia) => this.#mostrarPropuestaPerfil(generacion, referencia, log, sugerencia))
+      .catch((error: unknown) => {
+        console.error("dlv-ui: fallo al pedir la sugerencia de perfil", error);
+      });
+  }
+
+  /**
+   * Decide qué hacer con la sugerencia ya resuelta: aplicarla en silencio,
+   * dejarla como estaba, o preguntar.
+   *
+   * TRES CASOS, LOS TRES DEL INFORME
+   * ===================================
+   * 1. `sugerencia === null`: ningún perfil encajó. Se avisa igualmente
+   *    (decisión 1) -- `PropuestaPerfil` con `sugerencia: null` pinta ese
+   *    aviso corto sin botones -- y la selección de protagonistas que
+   *    `abrirLog` ya aplicó se queda tal cual.
+   * 2. `decisionGuardada(...) === null`: nunca se preguntó para ESTE log y
+   *    ESTE perfil. Se propone de verdad, con los dos botones.
+   * 3. `decisionGuardada(...) !== null`: ya se preguntó (decisión 2, "no se
+   *    le puede volver a preguntar lo mismo"). Si la respuesta de entonces
+   *    fue aceptar, se vuelve a aplicar la misma selección sin mostrar nada
+   *    -- aceptar significa "así quiero verlo", no "pregúntame una vez más
+   *    para confirmarlo". Si fue descartar, no se hace nada: la selección de
+   *    protagonistas de siempre queda como estaba.
+   */
+  #mostrarPropuestaPerfil(
+    generacion: number,
+    referencia: string,
+    log: LogAbierto,
+    sugerencia: SugerenciaDePerfil | null,
+  ): void {
+    // Se pudo abrir OTRO log mientras esta respuesta seguía en vuelo.
+    if (generacion !== this.#generacionLog) return;
+
+    if (sugerencia === null) {
+      this.#propuestaPerfil = new PropuestaPerfil({
+        contenedor: this.#contenedorPropuestaPerfil,
+        sugerencia: null,
+        documento: this.#entorno.documento,
+      });
+      return;
+    }
+
+    const decision = decisionGuardada(this.#entorno, referencia, sugerencia.nombrePerfil);
+    if (decision === "aceptada") {
+      this.#aplicarSugerenciaDePerfil(log, sugerencia);
+      return;
+    }
+    if (decision === "descartada") {
+      return;
+    }
+
+    this.#propuestaPerfil = new PropuestaPerfil({
+      contenedor: this.#contenedorPropuestaPerfil,
+      sugerencia,
+      documento: this.#entorno.documento,
+      onAceptar: () => {
+        guardarDecision(this.#entorno, referencia, sugerencia.nombrePerfil, "aceptada");
+        this.#aplicarSugerenciaDePerfil(log, sugerencia);
+        this.#ocultarPropuestaPerfil();
+      },
+      onDescartar: () => {
+        guardarDecision(this.#entorno, referencia, sugerencia.nombrePerfil, "descartada");
+        this.#ocultarPropuestaPerfil();
+      },
+    });
+  }
+
+  /**
+   * Sustituye la selección actual por los canales de los roles disponibles
+   * del perfil aceptado.
+   *
+   * Reutiliza `elegirProtagonistas` (`canales/protagonistas.ts`) en vez de
+   * reimplementar "un canal por rol": esa función ya filtra `DIFUSA` y
+   * `vacío`/`constante` -- exactamente el mismo criterio que F3-04 usó para
+   * decidir que esos roles cuentan como "disponibles" en la sugerencia (ver
+   * la cabecera de `dlv_core.sugerencia_perfil`) -- así que no hay dos
+   * criterios de "qué canal sirve" que puedan desincronizarse. El `máximo` es
+   * el número de roles disponibles y no `MAXIMO_PROTAGONISTAS`: aceptar un
+   * perfil de 12 roles tiene que enseñar los 12, no recortar a 8.
+   */
+  #aplicarSugerenciaDePerfil(log: LogAbierto, sugerencia: SugerenciaDePerfil): void {
+    if (this.#selectorCanales === null || sugerencia.rolesDisponibles.length === 0) return;
+    this.#selectorCanales.preseleccionar(
+      elegirProtagonistas(log.canales, sugerencia.rolesDisponibles, sugerencia.rolesDisponibles.length),
+    );
+  }
+
+  #ocultarPropuestaPerfil(): void {
+    this.#propuestaPerfil?.destruir();
+    this.#propuestaPerfil = null;
   }
 
   // ------------------------------------------------------------------ //
@@ -1418,6 +1578,7 @@ export class Aplicacion {
   destruir(): void {
     if (this.#idFrameCursor !== null) this.#entorno.ventana.cancelAnimationFrame(this.#idFrameCursor);
     this.#paleta?.destruir();
+    this.#ocultarPropuestaPerfil();
     this.#reconstruir(null);
   }
 }

@@ -157,4 +157,11 @@ export const TEXTOS_ES = {
   "perfiles.importarError": "No se puede importar: {mensaje}",
   "perfiles.exportar": "Exportar",
   "perfiles.exportarEtiqueta": "Texto del .dlvprofile (cópialo o guárdalo como fichero suelto)",
+
+  "onboarding.propuestaAviso": "Perfil sugerido: «{perfil}» — {disponibles} de {total} roles disponibles.",
+  "onboarding.propuestaFaltan": "Faltan: {roles}.",
+  "onboarding.propuestaAceptar": "Usar este perfil",
+  "onboarding.propuestaDescartar": "No, gracias",
+  "onboarding.sinPerfilAviso":
+    "Ningún perfil de fábrica encaja con este log: se muestran los canales habituales.",
 } as const;

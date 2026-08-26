@@ -34,10 +34,13 @@
  * pedir (eso es `render/escala.ts#elegirNivel`, que ya existe y que
  * `app/aplicacion.ts` reutiliza con `nivelesDe`). Esta interfaz solo abre,
  * lista canales, entrega niveles disponibles y sirve cubos para un rango y un
- * nivel — las cuatro operaciones que dice el encargo de la tarea.
+ * nivel — las cuatro operaciones que dice el encargo de la tarea, más
+ * `sugerirPerfil` (F5-11, ver su propia cabecera más abajo), que se añadió
+ * después y por eso es la única OPCIONAL de las cinco.
  */
 
 import type { CubosContinuos } from "../render/tipos.ts";
+import type { SugerenciaDePerfil } from "../onboarding/tipos.ts";
 import type { CatalogoUnidades } from "../unidades/tipos.ts";
 import type { Rango } from "./cache-cubos.ts";
 
@@ -146,4 +149,37 @@ export interface FuenteDeDatos {
     rango: Rango,
     factor: number,
   ): Promise<CubosContinuos>;
+
+  /**
+   * La sugerencia de perfil para `log`, según `dlv_core.sugerencia_perfil`
+   * (F3-04): el perfil que mejor encaja, con su cobertura de roles, o `null`
+   * si ninguno llega al mínimo (`mejor_sugerencia` puede devolver `None`).
+   *
+   * OPCIONAL A PROPÓSITO -- Y NO ES LO MISMO QUE DEVOLVER `null`
+   * ================================================================
+   * `dlv-api` no expone hoy ningún endpoint que combine el catálogo de
+   * `data/perfiles/*.toml` con los roles resueltos de un log concreto
+   * (comprobado sobre `dlv_api/main.py` para F5-11, el mismo criterio que ya
+   * usa la cabecera de este fichero para `FuenteApi`: "si hace falta un
+   * endpoint que no existe, dilo en vez de inventarlo"). Si este método
+   * fuera obligatorio, `FuenteSintetica` -- que no tiene ningún perfil que
+   * ofrecer, solo canales sintéticos -- y `FuenteApi` -- que no tiene con
+   * quién hablar todavía -- tendrían que fingir un cálculo que no existe
+   * detrás. Al ser opcional, `app/aplicacion.ts` distingue TRES situaciones,
+   * no dos:
+   *
+   *   - método ausente (`undefined`): esta fuente no sabe sugerir nada -- no
+   *     se muestra ningún aviso nuevo. Es el caso de HOY, con las dos
+   *     fuentes existentes: F5-11 no cambia nada de lo que se ve en pantalla
+   *     hasta que alguna fuente implemente esto de verdad.
+   *   - método presente que resuelve a `null`: SÍ se calculó, y ningún
+   *     perfil encajó -- se avisa de eso explícitamente en vez de callarlo
+   *     (E9.6, decisión 1 del informe de F5-11).
+   *   - método presente que resuelve a una `SugerenciaDePerfil`: se propone.
+   *
+   * Quien conecte `dlv-api` con F3-04 solo tiene que implementar esto en
+   * `FuenteApi`; `app/aplicacion.ts` ya sabe qué hacer con cualquiera de los
+   * tres casos (`#proponerPerfilSugerido`, `#mostrarPropuestaPerfil`).
+   */
+  sugerirPerfil?(log: LogAbierto): Promise<SugerenciaDePerfil | null>;
 }

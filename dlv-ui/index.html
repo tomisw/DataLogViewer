@@ -162,6 +162,60 @@
         color: var(--texto-tenue);
       }
 
+      /* -------------------------------------------------------------- */
+      /* Propuesta de perfil al abrir un log (F5-11, E9.6)                */
+      /* -------------------------------------------------------------- */
+      /* Vacío y sin caja mientras no hay nada que proponer, mismo criterio
+         que `.dlv-nota-silueta`/`.dlv-barra-delta`: un contenedor siempre
+         presente pero normalmente vacío no roba altura al área de trazado. */
+      .dlv-propuesta-perfil-contenedor:not(:empty) {
+        flex: 0 0 auto;
+      }
+
+      .dlv-propuesta-perfil {
+        margin: 8px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid var(--panel-borde);
+        background: var(--panel);
+        font-size: 0.9em;
+      }
+
+      .dlv-propuesta-perfil--sin-perfil {
+        color: var(--texto-tenue);
+        font-style: italic;
+      }
+
+      .dlv-propuesta-perfil__texto {
+        margin: 0 0 4px;
+      }
+
+      .dlv-propuesta-perfil__faltan {
+        margin: 0 0 8px;
+        color: var(--texto-tenue);
+      }
+
+      .dlv-propuesta-perfil__acciones {
+        display: flex;
+        gap: 8px;
+      }
+
+      .dlv-propuesta-perfil__acciones button {
+        border: 1px solid var(--panel-borde);
+        border-radius: 4px;
+        padding: 4px 10px;
+        cursor: pointer;
+        background: var(--fondo);
+        color: var(--texto);
+      }
+
+      .dlv-propuesta-perfil__aceptar {
+        background: var(--acento) !important;
+        color: #06141f !important;
+        border: none !important;
+        font-weight: 600;
+      }
+
       .dlv-paneles {
         flex: 1 1 auto;
         min-height: 0;

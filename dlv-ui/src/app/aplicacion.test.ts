@@ -29,6 +29,7 @@ import type {
   ResumenNivelFuente,
 } from "../datos/fuente.ts";
 import type { CatalogoUnidades } from "../unidades/tipos.ts";
+import type { SugerenciaDePerfil } from "../onboarding/tipos.ts";
 
 // --------------------------------------------------------------------------- //
 // Una fuente mínima con los dos canales que hacen falta para el caso real
@@ -133,6 +134,42 @@ class FuenteDePrueba implements FuenteDeDatos {
   }
 }
 
+/**
+ * `FuenteDePrueba` NO implementa `sugerirPerfil` a propósito, arriba: es el
+ * caso de las dos fuentes reales HOY (`datos/fuente.ts`, F5-11), y las
+ * pruebas que usan `montar()` sin overrides comprueban que eso sigue sin
+ * pintar nada nuevo. Esta subclase es la única que sí lo implementa, para
+ * poder probar `#proponerPerfilSugerido`/`#mostrarPropuestaPerfil`.
+ */
+class FuenteConSugerencia extends FuenteDePrueba {
+  constructor(private readonly sugerencia: SugerenciaDePerfil | null) {
+    super();
+  }
+
+  sugerirPerfil(): Promise<SugerenciaDePerfil | null> {
+    return Promise.resolve(this.sugerencia);
+  }
+}
+
+/** Doble de `localStorage`, con el contenido a la vista de la prueba (para `decision-guardada.ts`). */
+function almacenFalso(): NonNullable<EntornoApp["almacen"]> {
+  const contenido = new Map<string, string>();
+  return {
+    getItem: (c) => contenido.get(c) ?? null,
+    setItem: (c, v) => {
+      contenido.set(c, v);
+    },
+  };
+}
+
+const SUGERENCIA_PRUEBA: SugerenciaDePerfil = {
+  nombrePerfil: "Perfil de refrigerante",
+  disponibles: 1,
+  total: 2,
+  rolesDisponibles: ["coolant_temp"],
+  rolesFaltantes: ["oil_pressure"],
+};
+
 // --------------------------------------------------------------------------- //
 // Montaje
 // --------------------------------------------------------------------------- //
@@ -142,7 +179,15 @@ interface Montaje {
   readonly app: Aplicacion;
 }
 
-async function montar(): Promise<Montaje> {
+/**
+ * `fuente`/`almacen` son overrides opcionales (F5-11): las pruebas de la
+ * propuesta de perfil necesitan una `FuenteDeDatos` que SÍ implemente
+ * `sugerirPerfil` (`FuenteDePrueba` no lo hace, a propósito -- ver su
+ * cabecera) y un almacén de persistencia inspeccionable. El resto de
+ * pruebas de este fichero no pasa ninguno de los dos y se comporta
+ * exactamente igual que antes.
+ */
+async function montar(opciones: { fuente?: FuenteDeDatos; almacen?: EntornoApp["almacen"] } = {}): Promise<Montaje> {
   const documento = crearDocumentoFalso();
   const ventana = crearVentanaFalsa();
   const raiz = documento.createElement("div");
@@ -153,8 +198,9 @@ async function montar(): Promise<Montaje> {
     // esto: el doble de WebGL2 ya existía (`render/doble-gl.ts`), y es el
     // motivo por el que jsdom no habría servido — no implementa WebGL.
     crearRenderizador: () => new Renderizador(crearDobleGL()),
+    almacen: opciones.almacen,
   };
-  const app = new Aplicacion(raiz as unknown as HTMLElement, new FuenteDePrueba(), entorno);
+  const app = new Aplicacion(raiz as unknown as HTMLElement, opciones.fuente ?? new FuenteDePrueba(), entorno);
   await app.abrirLog("log-de-prueba");
   await asentar(ventana);
   // Node no calcula layout: sin geometria, `anchoContenidoPx()` es 0 y la
@@ -563,5 +609,98 @@ describe("renderizado progresivo (F2-14)", () => {
     expect(notaDeSilueta(raiz)).toBe("");
     const peticionesDelNivelBueno = fuente.pedidos.filter((p) => p.factor === 16);
     expect(peticionesDelNivelBueno).toHaveLength(1);
+  });
+});
+
+// --------------------------------------------------------------------------- //
+// Propuesta de perfil al abrir un log (F5-11, E9.6)
+// --------------------------------------------------------------------------- //
+describe("propuesta de perfil al abrir un log", () => {
+  it("una fuente que no sabe sugerir (las dos reales, hoy) no pinta ningún aviso nuevo", async () => {
+    // `FuenteDePrueba` no implementa `sugerirPerfil`: comportamiento de hoy,
+    // sin cambios, exactamente lo que pide la cabecera de `datos/fuente.ts`.
+    const { raiz } = await montar();
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil")).toBeNull();
+  });
+
+  it("sin sugerencia (null): avisa de que ningún perfil encajó, sin botones, y no toca la selección", async () => {
+    const { raiz } = await montar({ fuente: new FuenteConSugerencia(null) });
+    const texto = raiz.textoDelArbol();
+    expect(texto).toMatch(/ning[uú]n perfil/i);
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil__acciones")).toBeNull();
+    // El repliegue a protagonistas de siempre se queda tal cual: los dos
+    // canales siguen VISIBLES (un panel cada uno, comprobado por la tabla del
+    // cursor -- la lista de la izquierda los nombraría de todos modos, estén
+    // o no seleccionados, así que no basta para afirmar esto).
+    const claves = [...tablaDelCursor(raiz).keys()];
+    expect(claves.some((k) => k.startsWith("RPM"))).toBe(true);
+    expect(claves.some((k) => k.startsWith("Coolant Temperature"))).toBe(true);
+  });
+
+  it("con sugerencia: se propone (no se impone) y de entrada NO cambia la selección", async () => {
+    const { raiz } = await montar({ fuente: new FuenteConSugerencia(SUGERENCIA_PRUEBA) });
+    const texto = raiz.textoDelArbol();
+    expect(texto).toContain("Perfil de refrigerante");
+    expect(texto).toContain("oil_pressure");
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil__aceptar")).not.toBeNull();
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil__descartar")).not.toBeNull();
+    // Todavía no se ha decidido nada: la selección de protagonistas de
+    // siempre sigue mostrando los dos canales, VISIBLES de verdad.
+    const claves = [...tablaDelCursor(raiz).keys()];
+    expect(claves.some((k) => k.startsWith("RPM"))).toBe(true);
+    expect(claves.some((k) => k.startsWith("Coolant Temperature"))).toBe(true);
+  });
+
+  it("aceptar aplica la selección del perfil y no vuelve a preguntar al reabrir el mismo log", async () => {
+    const almacen = almacenFalso();
+    const { raiz, ventana, app } = await montar({
+      fuente: new FuenteConSugerencia(SUGERENCIA_PRUEBA),
+      almacen,
+    });
+
+    raiz.buscarPorClase("dlv-propuesta-perfil__aceptar")?.disparar("click");
+    await asentar(ventana);
+
+    // Solo el rol disponible del perfil (coolant_temp) se queda seleccionado;
+    // RPM (engine_speed) no está entre `rolesDisponibles` de la sugerencia.
+    // Se mira la TABLA DEL CURSOR (un panel por canal VISIBLE) y no el árbol
+    // entero: la lista de canales de la izquierda enseña "RPM" siempre, esté
+    // o no seleccionado -- por eso `tablaDelCursor` existe (ver su cabecera).
+    let tabla = tablaDelCursor(raiz);
+    expect([...tabla.keys()].some((k) => k.startsWith("Coolant Temperature"))).toBe(true);
+    expect([...tabla.keys()].some((k) => k.startsWith("RPM"))).toBe(false);
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil__acciones")).toBeNull();
+
+    // Reabrir el MISMO log (misma referencia): la decisión ya se guardó, así
+    // que no se vuelve a preguntar -- se reaplica la misma selección directamente.
+    await app.abrirLog("log-de-prueba");
+    await asentar(ventana);
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil__acciones")).toBeNull();
+    tabla = tablaDelCursor(raiz);
+    expect([...tabla.keys()].some((k) => k.startsWith("Coolant Temperature"))).toBe(true);
+    expect([...tabla.keys()].some((k) => k.startsWith("RPM"))).toBe(false);
+  });
+
+  it("descartar no toca la selección y no vuelve a preguntar al reabrir el mismo log", async () => {
+    const almacen = almacenFalso();
+    const { raiz, ventana, app } = await montar({
+      fuente: new FuenteConSugerencia(SUGERENCIA_PRUEBA),
+      almacen,
+    });
+
+    raiz.buscarPorClase("dlv-propuesta-perfil__descartar")?.disparar("click");
+    await asentar(ventana);
+
+    // La selección de protagonistas de siempre no se toca al descartar.
+    const claves = [...tablaDelCursor(raiz).keys()];
+    expect(claves.some((k) => k.startsWith("RPM"))).toBe(true);
+    expect(claves.some((k) => k.startsWith("Coolant Temperature"))).toBe(true);
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil")).toBeNull();
+
+    await app.abrirLog("log-de-prueba");
+    await asentar(ventana);
+    // Ni el aviso "sin botones" ni la propuesta con botones: se preguntó una
+    // vez, se contestó que no, y no se vuelve a preguntar.
+    expect(raiz.buscarPorClase("dlv-propuesta-perfil")).toBeNull();
   });
 });
