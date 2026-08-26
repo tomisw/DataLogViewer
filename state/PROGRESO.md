@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 12:32:10Z
+Actualizado: 2026-08-26 14:05:37Z
 
 **414 / 775 pts cerrados (53.4 %)** · 180 pts esperando revisión humana → 76.6 % entregado
 
@@ -14,10 +14,10 @@ Actualizado: 2026-08-26 12:32:10Z
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 9 | 12 | 5 | 54 | 0 | 80 |
-| F3 | 52 | 48 | 0 | 15 | 3 | 118 |
+| F3 | 52 | 48 | 5 | 10 | 3 | 118 |
 | F4 | 37 | 4 | 0 | 22 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
-| F5 | 36 | 5 | 0 | 35 | 0 | 76 |
+| F5 | 36 | 5 | 3 | 32 | 0 | 76 |
 
 ## Requieren atención
 
@@ -53,10 +53,12 @@ Actualizado: 2026-08-26 12:32:10Z
 | `F3-07` Detectores D1–D18 por rol, como configuració | revision_humana | Opus 5 | G1 | YA ESTABA HECHA. No la he entregado yo: el libro de estado la tenia co |
 | `F3-08` Desactivación de detectores críticos cuando  | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) LA POLITICA REAL AFECTA A CUAT |
 | `F3-10` Topes de alerta: aviso, crítico, banda y cur | revision_humana | Opus 5 | G1 | REVISAR, por orden de consecuencia: (1) FUERA DEL RANGO DE UNA TABLA S |
+| `F3-14` Decodificación de máscaras de bits en carril | en_curso | Opus 5 | G1 | — |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
 | `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
+| `F5-11` Onboarding: propuesta de perfil en lugar de  | en_curso | Sonnet 5 | G3 | — |
 
 ## F0 — 54/54 pts
 
@@ -190,7 +192,7 @@ Actualizado: 2026-08-26 12:32:10Z
 | ✔  | `F3-11` | Dibujo de límites y bandas sobre los paneles, en la unidad act | Sonnet 5 | 4 | F3-10, F1-25 | G3 | `1765d14` |
 | ✔  | `F3-12` | Panel de incidencias por severidad con salto al instante | Sonnet 5 | 5 | F3-07 | G3 | `6c07905` |
 | ✔  | `F3-13` | Carriles de estado para canales enumerados | Sonnet 5 | 5 | F1-10, F0-11 | G3 | `c9bd9ac` |
-| ·  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
+| ▶  | `F3-14` | Decodificación de máscaras de bits en carriles apilados | Opus 5 | 5 | F3-13 | G1 | — |
 | ✖  | `F3-15` | Ampliar `enums.toml` con los códigos deducidos de las muestras | Haiku 4.5 | 3 | F0-11 | G3 | — |
 | ✔  | `F3-16` | Segmentación automática: WOT, ralentí, arranque, deceleración, | Opus 5 | 8 | F3-06 | G2 | `24909a3` |
 | ·  | `F3-17` | Panel de tiradas con resumen y superposición entre tiradas | Sonnet 5 | 5 | F3-16, F2-12 | G3 | — |
@@ -248,7 +250,7 @@ Actualizado: 2026-08-26 12:32:10Z
 | ·  | `F5-08` | Anotaciones y marcadores exportables | Sonnet 5 | 4 | F5-07 | G3 | — |
 | ✔  | `F5-09` | Paleta de comandos | Sonnet 5 | 3 | F1-33 | G3 | `c6104cf` |
 | ✔  | `F5-10` | i18n ES/EN: extracción de cadenas y catálogos | Haiku 4.5 | 4 | F1-32 | G4 | `32d6875` |
-| ·  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
+| ▶  | `F5-11` | Onboarding: propuesta de perfil en lugar de lienzo vacío | Sonnet 5 | 3 | F3-04 | G3 | — |
 | ✔  | `F5-12` | Pruebas de regresión visual del renderizador (obligatorias por | Sonnet 5 | 4 | F1-23 | G3 | `0a990f9`, `712d3a3` |
 | ·  | `F5-13` | Revisión de seguridad: rutas, deserialización, evaluador de ex | Opus 5 | 6 | F3-18, F5-07 | G1 | — |
 | ·  | `F5-14` | Auditoría final contra los presupuestos de §2.6, incluidos tam | Opus 5 | 5 | todo | G1 | — |
