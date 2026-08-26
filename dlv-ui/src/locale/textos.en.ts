@@ -31,6 +31,11 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "canales.ocultosPrefijo": "{n} channel(s) hidden",
   "canales.ocultosSufijo": "Enable it with “show inactive”.",
 
+  "mascaraBits.etiquetaBit": "bit {n}",
+  "mascaraBits.mostrarInactivos": "show inactive bits",
+  "mascaraBits.ocultosPrefijo": "{n} of {total} bits hidden: never active in this log.",
+  "mascaraBits.ocultosSufijo": "Enable it with “show inactive bits”.",
+
   "unidades.global": "Global",
   "unidades.heredarDelPreset": "— inherit from preset —",
   "unidades.heredar": "— inherit —",

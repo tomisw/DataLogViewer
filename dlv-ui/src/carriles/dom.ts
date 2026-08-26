@@ -32,11 +32,20 @@ export interface ElementoSvg {
   textContent: string;
 }
 
-/** Las tres etiquetas SVG que construye el carril de estado. Ni una más. */
+/**
+ * Las etiquetas SVG que construyen los carriles. `crearSvg` se añadió en
+ * F3-14: un carril de máscara de bits apila hasta 32 mini-carriles, y cada
+ * uno se pinta con `pintarCarril` (F3-13) SIN modificarlo -- un `<svg>`
+ * anidado, posicionado con `x`/`y`, le da a cada bit su propio viewport
+ * dentro del carril apilado (`mascara-bits.ts`), que es exactamente lo que
+ * permite reutilizar `pintarCarril` entero en vez de duplicar su lógica de
+ * bandas y transiciones para el caso "apilado".
+ */
 export interface FabricaSvg {
   crearG(): ElementoSvg;
   crearRect(): ElementoSvg;
   crearText(): ElementoSvg;
+  crearSvg(): ElementoSvg;
 }
 
 /**
@@ -56,6 +65,7 @@ export function fabricaSvgDesdeDocumento(documento: Pick<Document, "createElemen
     crearG: () => documento.createElementNS(NS_SVG, "g") as unknown as ElementoSvg,
     crearRect: () => documento.createElementNS(NS_SVG, "rect") as unknown as ElementoSvg,
     crearText: () => documento.createElementNS(NS_SVG, "text") as unknown as ElementoSvg,
+    crearSvg: () => documento.createElementNS(NS_SVG, "svg") as unknown as ElementoSvg,
   };
 }
 

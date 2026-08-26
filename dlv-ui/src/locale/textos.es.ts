@@ -37,6 +37,11 @@ export const TEXTOS_ES = {
   "canales.ocultosPrefijo": "{n} canal(es) oculto(s)",
   "canales.ocultosSufijo": "Actívalo con «mostrar inactivos».",
 
+  "mascaraBits.etiquetaBit": "bit {n}",
+  "mascaraBits.mostrarInactivos": "mostrar bits inactivos",
+  "mascaraBits.ocultosPrefijo": "{n} de {total} bits ocultos: nunca se activaron en este log.",
+  "mascaraBits.ocultosSufijo": "Actívalo con «mostrar bits inactivos».",
+
   "unidades.global": "Global",
   "unidades.heredarDelPreset": "— heredar del preset —",
   "unidades.heredar": "— heredar —",

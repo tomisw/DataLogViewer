@@ -54,6 +54,7 @@ export function crearFabricaSvgFalsa(): FabricaSvg {
     crearG: () => nodoBase("g"),
     crearRect: () => nodoBase("rect"),
     crearText: () => nodoBase("text"),
+    crearSvg: () => nodoBase("svg"),
   };
 }
 
