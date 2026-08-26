@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 23:42:03Z"
+    "actualizado": "2026-08-26 23:55:11Z"
   },
   "tareas": [
     {
@@ -2494,10 +2494,16 @@
       ],
       "dep_todo": false,
       "gate": "G2",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-26 23:55:11Z",
+          "texto": "dlv_core/anclaje.py (640 lineas) + 20 pruebas. CLAVE: un segmento sin el ancla NO entra en el eje. ancla_por_evento devuelve InformeDeAnclaje con eje construido solo con los que la tienen, y el resto en sin_ancla con MotivoSinAncla.EVENTO_NO_OCURRIDO; si ninguno la tiene, eje es None, no un eje vacio. Nada queda superpuesto con desfase 0 fingiendo estar alineado. La prueba usa el hecho MEDIDO de data/umbrales.toml:383 (Log2768/2769, mariposa maxima 0,558 y 0,569, nunca llegan a WOT). Cero umbrales nuevos: corte hereda de [detectores.D14].umbral_min, maximo_de_eventos de [motor_de_deteccion], y WOT reutiliza los objetos UmbralesDeSegmentacion/Permanencia que ya construye quien segmenta. PRIMER_WOT llama a segmentacion.segmentar y toma el primer Segmento de clase WOT, sin redefinir nada. Confianza DIFUSA tratada POR SEGMENTO (Mapping[str, frozenset[str]]), no global, porque la confianza de un rol es propiedad de cada log. PARA REVISAR: (1) lanzamiento_activo_min queda SIN PROCEDENCIA y sin valor por omision -- docs/01 §1.10 solo da el rango del canal (-101..1), ningun log de samples/real trae launch_state y ningun documento dice que codigo es 'activo'; pedir LANZAMIENTO sin ese valor lanza ErrorDeAnclaje en vez de adivinar. Si el propietario sabe el codigo, es una linea. (2) El ancla cae en x = 0, no en el minimo normalizado como los otros modos; documentado en la cabecera, cambio de una linea si se prefiere otra convencion."
+        }
+      ],
+      "base": "6e07fb5"
     },
     {
       "id": "F2-08",
