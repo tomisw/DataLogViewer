@@ -333,6 +333,27 @@ siguen en verde; la documentación del usuario afectada está actualizada; y una
 persona ha revisado el diff (ver puertas de revisión en
 `05-backlog-y-asignacion-modelos.md`).
 
+### Y que se pueda llegar a ello desde la aplicación
+
+Faltaba un criterio, y su ausencia salió cara. Medido el 2026-08-26 sobre
+`dlv-ui/src`: `app/` importaba 15 de los 28 módulos. Los otros 13 —`carriles`,
+`comparacion`, `encendido`, `exportar`, `importacion`, `incidencias`,
+`informe`, `knock`, `lambda`, `malla`, `paralela`, `perfiles`, `topes`— sumaban
+**14 677 líneas construidas, probadas y en verde que la aplicación no podía
+alcanzar**, contra 2 351 líneas en `app/`: seis veces más código inalcanzable
+que alcanzable. Tres de ellos (`carriles`, `incidencias`, `malla`) parecían
+enlazados, pero sus únicos consumidores eran otros módulos de la misma isla.
+
+No fue culpa de los módulos. Cada uno declaró honestamente que el cableado era
+de otro; `incidencias/panel-incidencias.ts` lo dice literalmente: «cablear esto
+a la navegación real es tarea de quien monte el panel en `app/aplicacion.ts` —
+fuera de mi carril». Todos tenían razón por separado y nadie lo montó.
+
+Por eso, a partir de ahora, una tarea de interfaz **no está terminada mientras
+haya que escribir código nuevo para verla funcionar**. Si el cableado
+pertenece de verdad a otra tarea, esa tarea se abre en el momento de cerrar
+esta y se nombra en la nota — no basta con avisarlo en un comentario.
+
 ## 2.11 Preparación para v2 sin coste en v1
 
 Cuatro decisiones baratas ahora que evitan una reescritura después:
