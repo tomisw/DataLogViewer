@@ -51,6 +51,23 @@ export function direccionDe(anterior: Vista, nueva: Vista): Direccion {
   return deltaCentro > 0 ? 1 : -1;
 }
 
+/**
+ * Recentra el eje temporal de `vista` en `tCentro`, conservando su ancho y su
+ * eje de valores tal cual.
+ *
+ * Es la aritmética de "saltar a un instante" (conmutador de vistas, panel de incidencias):
+ * a diferencia de `desplazar` -que mueve por un DELTA- esta función lleva el
+ * centro a un instante ABSOLUTO, que es lo que pide
+ * `incidencias/panel-incidencias.ts#OpcionesPanelIncidencias.alSaltarAInstante`.
+ * No toca `v0`/`v1` por el mismo motivo que la rueda no toca el eje de
+ * valores (`controlador.ts`, cabecera): esta función no sabe de autoescala,
+ * solo de encuadre temporal.
+ */
+export function centrarEnT(vista: Vista, tCentro: number): Vista {
+  const ancho = vista.t1 - vista.t0;
+  return { ...vista, t0: tCentro - ancho / 2, t1: tCentro + ancho / 2 };
+}
+
 /** Desplaza la vista por deltas ya expresados en unidades de datos. */
 export function desplazar(vista: Vista, deltaT: number, deltaV: number): Vista {
   return {

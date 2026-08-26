@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { desplazar, desplazarPx, direccionDe, zoomEnPunto } from "./aritmetica.ts";
+import { centrarEnT, desplazar, desplazarPx, direccionDe, zoomEnPunto } from "./aritmetica.ts";
 import type { Vista } from "../render/tipos.ts";
 
 describe("zoomEnPunto", () => {
@@ -108,6 +108,29 @@ describe("desplazar / desplazarPx", () => {
     const vista: Vista = { t0: 0, t1: 10, v0: 0, v1: 5 };
     const nueva = desplazarPx(vista, 100, 100, 0, 0);
     expect(nueva).toEqual(vista);
+  });
+});
+
+describe("centrarEnT", () => {
+  it("recentra el eje temporal sin tocar el ancho ni el eje de valores", () => {
+    const vista: Vista = { t0: 100, t1: 300, v0: -5, v1: 40 };
+    const nueva = centrarEnT(vista, 1000);
+    expect(nueva.t1 - nueva.t0).toBeCloseTo(vista.t1 - vista.t0, 9);
+    expect((nueva.t0 + nueva.t1) / 2).toBeCloseTo(1000, 9);
+    expect(nueva.v0).toBe(vista.v0);
+    expect(nueva.v1).toBe(vista.v1);
+  });
+
+  it("centrar en el centro actual es un no-op", () => {
+    const vista: Vista = { t0: 0, t1: 20, v0: 0, v1: 1 };
+    expect(centrarEnT(vista, 10)).toEqual(vista);
+  });
+
+  it("acepta un instante fuera del rango actual: saltar lejos no se recorta aquí", () => {
+    const vista: Vista = { t0: 0, t1: 10, v0: 0, v1: 1 };
+    const nueva = centrarEnT(vista, 10_000);
+    expect(nueva.t0).toBeCloseTo(9995, 9);
+    expect(nueva.t1).toBeCloseTo(10_005, 9);
   });
 });
 

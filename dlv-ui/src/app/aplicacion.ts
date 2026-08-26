@@ -129,6 +129,18 @@ export interface EntornoApp {
   readonly ventana: {
     readonly devicePixelRatio: number;
     addEventListener(tipo: string, manejador: (evento: unknown) => void): void;
+    /**
+     * Añadido para el conmutador de vistas (docs/02 §2.10, `app/vistas.ts`): `destruir()`
+     * la usa para retirar los oyentes de `resize`/`keydown` que el
+     * constructor puso sobre ESTA `ventana`. Sin esto, montar y desmontar
+     * `Aplicacion` en cada conmutación de vista dejaba un oyente muerto
+     * colgado de `window` por cada ciclo — la instancia destruida nunca se
+     * podía recolectar porque `window` seguía teniendo una referencia viva a
+     * su cierre. El ciclo de montar/desmontar/volver a montar tiene que ser
+     * estable (docs/02 §2.10); esto es la mitad de esa estabilidad que no es
+     * el contexto WebGL.
+     */
+    removeEventListener(tipo: string, manejador: (evento: unknown) => void): void;
     requestAnimationFrame(callback: () => void): number;
     cancelAnimationFrame(id: number): void;
   };
@@ -159,6 +171,8 @@ export const ENTORNO_REAL: EntornoApp = {
       },
       addEventListener: (tipo: string, manejador: (evento: unknown) => void): void =>
         window.addEventListener(tipo, manejador as EventListener),
+      removeEventListener: (tipo: string, manejador: (evento: unknown) => void): void =>
+        window.removeEventListener(tipo, manejador as EventListener),
       requestAnimationFrame: (cb: () => void): number => window.requestAnimationFrame(cb),
       cancelAnimationFrame: (id: number): void => window.cancelAnimationFrame(id),
     };
@@ -357,6 +371,24 @@ export class Aplicacion {
 
   readonly #entorno: EntornoApp;
 
+  /**
+   * Los dos oyentes que el constructor cuelga de `entorno.ventana` (no de un
+   * elemento propio): guardados como campos, y no como funciones anónimas en
+   * la llamada a `addEventListener`, porque `destruir()` necesita la MISMA
+   * referencia de función para poder retirarlos con `removeEventListener`.
+   * Ver la nota de `EntornoApp.ventana.removeEventListener`: sin esto, cada
+   * ciclo de montar/desmontar de `app/vistas.ts` dejaba un oyente vivo
+   * colgado de `window` para siempre.
+   */
+  readonly #alRedimensionar = (): void => {
+    this.#paneles?.redimensionarContenedor();
+    for (const estado of this.#porPanel.values()) this.#reajustarLienzo(estado);
+    this.#dispararRedibujado();
+  };
+  readonly #alTeclaGlobal = (evento: unknown): void => {
+    this.#paleta?.manejarAtajoGlobal(evento as KeyboardEvent);
+  };
+
   constructor(raiz: HTMLElement, fuente: FuenteDeDatos, entorno: EntornoApp = ENTORNO_REAL) {
     this.#entorno = entorno;
     const { documento, ventana } = entorno;
@@ -451,11 +483,7 @@ export class Aplicacion {
       obtenerComandos: () => this.#comandos.todos(),
     });
 
-    ventana.addEventListener("resize", () => {
-      this.#paneles?.redimensionarContenedor();
-      for (const estado of this.#porPanel.values()) this.#reajustarLienzo(estado);
-      this.#dispararRedibujado();
-    });
+    ventana.addEventListener("resize", this.#alRedimensionar);
 
     // El atajo de la paleta (F5-09) tiene que funcionar desde cualquier punto
     // de la ventana -- incluso con el foco dentro de la entrada de búsqueda
@@ -463,9 +491,7 @@ export class Aplicacion {
     // (`entorno.ventana`, no un elemento concreto) y no dentro de la propia
     // paleta. `PaletaComandos.manejarAtajoGlobal` decide si la tecla es la
     // suya (Ctrl/⌘K); cualquier otra se ignora sin efecto.
-    ventana.addEventListener("keydown", (evento) => {
-      this.#paleta?.manejarAtajoGlobal(evento as KeyboardEvent);
-    });
+    ventana.addEventListener("keydown", this.#alTeclaGlobal);
 
     this.#iniciarCicloCursor();
   }
@@ -1574,9 +1600,36 @@ export class Aplicacion {
     if (this.#barraDelta.textContent !== nuevo) this.#barraDelta.textContent = nuevo;
   }
 
+  /**
+   * El instante (segundos absolutos, `render/tipos.ts#Vista`) al que apunta
+   * ahora mismo la navegación, o `null` si todavía no hay ninguna montada
+   * (ningún panel visible). PUNTO DE EXTENSIÓN usado por `app/vistas.ts` y
+   * sus pruebas para comprobar `irAInstante` desde fuera sin tener que leer
+   * el DOM.
+   */
+  get vistaActual(): Vista | null {
+    return this.#nav?.vista ?? null;
+  }
+
+  /**
+   * Lleva la vista de series al instante dado, conservando el zoom actual.
+   * PUNTO DE EXTENSIÓN: es lo que cablea el botón «Saltar» de
+   * `incidencias/panel-incidencias.ts` a la navegación real, a través de
+   * `app/vista-incidencias.ts` (ver la cabecera de `app/vistas.ts`).
+   *
+   * No-op si todavía no hay navegación montada: sin panel visible no hay eje
+   * de tiempo al que saltar, y quedarse callado es preferible a fingir un
+   * salto que no dibuja nada.
+   */
+  irAInstante(instanteS: number): void {
+    this.#nav?.irA(instanteS);
+  }
+
   /** Libera temporizadores y listeners globales. Útil para pruebas manuales en la consola. */
   destruir(): void {
     if (this.#idFrameCursor !== null) this.#entorno.ventana.cancelAnimationFrame(this.#idFrameCursor);
+    this.#entorno.ventana.removeEventListener("resize", this.#alRedimensionar);
+    this.#entorno.ventana.removeEventListener("keydown", this.#alTeclaGlobal);
     this.#paleta?.destruir();
     this.#ocultarPropuestaPerfil();
     this.#reconstruir(null);

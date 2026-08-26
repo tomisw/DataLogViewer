@@ -351,6 +351,16 @@ export function crearDocumentoFalso(): DocumentoFalso {
 export interface VentanaFalsa {
   devicePixelRatio: number;
   addEventListener(tipo: string, manejador: (evento: unknown) => void): void;
+  /**
+   * Añadido para el conmutador de vistas (docs/02 §2.10, `app/vistas.ts`): montar y
+   * desmontar `Aplicacion` en cada conmutación exige poder retirar los
+   * oyentes de `resize`/`keydown` que puso sobre ESTA `ventana` -- sin esto,
+   * cada ciclo de montar/desmontar dejaba un oyente muerto colgado (una
+   * `Aplicacion` que ya nadie mira, pero que `window` seguía referenciando
+   * para siempre, así que nunca se recolectaba). Aditivo: nada que ya usara
+   * este doble deja de compilar.
+   */
+  removeEventListener(tipo: string, manejador: (evento: unknown) => void): void;
   requestAnimationFrame(callback: () => void): number;
   cancelAnimationFrame(id: number): void;
   /**
@@ -362,6 +372,8 @@ export interface VentanaFalsa {
    */
   correrFotogramas(cuantos?: number): void;
   disparar(tipo: string, evento?: unknown): void;
+  /** Cuántos oyentes de `tipo` siguen enganchados. Solo para aserciones (docs/02 §2.10: probar que `destruir()` no acumula). */
+  numeroDeOyentes(tipo: string): number;
 }
 
 export function crearVentanaFalsa(): VentanaFalsa {
@@ -377,6 +389,12 @@ export function crearVentanaFalsa(): VentanaFalsa {
       const lista = manejadores.get(tipo) ?? [];
       lista.push(manejador);
       manejadores.set(tipo, lista);
+    },
+    removeEventListener: (tipo, manejador) => {
+      const lista = manejadores.get(tipo);
+      if (lista === undefined) return;
+      const i = lista.indexOf(manejador);
+      if (i >= 0) lista.splice(i, 1);
     },
     requestAnimationFrame: (callback) => {
       const id = siguienteId++;
@@ -401,5 +419,6 @@ export function crearVentanaFalsa(): VentanaFalsa {
     disparar: (tipo, evento) => {
       for (const m of manejadores.get(tipo) ?? []) m(evento ?? {});
     },
+    numeroDeOyentes: (tipo) => manejadores.get(tipo)?.length ?? 0,
   };
 }

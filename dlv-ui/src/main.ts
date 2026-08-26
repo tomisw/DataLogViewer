@@ -1,7 +1,10 @@
 /**
- * Punto de entrada de dlv-ui: monta `Aplicacion` (`app/aplicacion.ts`) sobre
- * `#app` con `FuenteSintetica` (`datos/fuente-sintetica.ts`) como fuente de
- * datos.
+ * Punto de entrada de dlv-ui: monta el `ConmutadorDeVistas` (`app/vistas.ts`)
+ * sobre `#app`, con la vista de series (`app/vista-series.ts`, que a su vez
+ * envuelve `Aplicacion`) y la de incidencias (`app/vista-incidencias.ts`)
+ * registradas. Antes de esta tarea este fichero montaba `Aplicacion`
+ * directamente sobre `#app`: la conmutación de vistas es la costura que
+ * `docs/02` §2.10 pedía y que ninguna interfaz ofrecía todavía.
  *
  * POR QUÉ `FuenteSintetica` Y NO `FuenteApi` AQUÍ
  * =================================================
@@ -12,14 +15,17 @@
  * exista, cablear la real es sustituir esta única línea —
  * `new FuenteSintetica()` por `new FuenteApi({urlBase, tokenSesion})`, leídos
  * de `?puerto_api=` y de lo que `dlv-app` pase por la URL (ADR-007) — sin
- * tocar `app/aplicacion.ts`, que solo conoce la interfaz `FuenteDeDatos`.
+ * tocar `app/vista-series.ts` ni `app/aplicacion.ts`, que solo conocen la
+ * interfaz `FuenteDeDatos`.
  *
  * Sin librerías de gráficos (ADR-006): el lienzo WebGL2 y las capas SVG que
  * antes se limitaban al «hola, dlv-api» de F0-02 ahora los monta
  * `Aplicacion` sobre DOM directo, igual que el resto de `dlv-ui`.
  */
 
-import { Aplicacion } from "./app/aplicacion.ts";
+import { ConmutadorDeVistas, type DefinicionVista } from "./app/vistas.ts";
+import { crearVistaSeries } from "./app/vista-series.ts";
+import { crearVistaIncidencias } from "./app/vista-incidencias.ts";
 import { FuenteApi } from "./datos/fuente-api.ts";
 import type { FuenteDeDatos } from "./datos/fuente.ts";
 import { FuenteSintetica } from "./datos/fuente-sintetica.ts";
@@ -74,19 +80,26 @@ function elegirFuente(): { fuente: FuenteDeDatos; referencia: string } {
   return { fuente: new FuenteSintetica(), referencia: "autolog-sintetico" };
 }
 
-async function iniciar(): Promise<void> {
-  inicializarTema();
-  const { fuente, referencia } = elegirFuente();
-  const aplicacion = new Aplicacion(contenedorApp(), fuente);
-  try {
-    await aplicacion.abrirLog(referencia);
-  } catch (error) {
-    // Un fallo al abrir no puede dejar la ventana en blanco sin explicación:
-    // es el síntoma que no se puede diagnosticar. E1.7 pide decir qué pasó.
-    contenedorApp().textContent =
-      `No se pudo abrir «${referencia}» con la fuente ${fuente.nombre}: ` +
-      (error instanceof Error ? error.message : String(error));
-  }
+/**
+ * Con qué vistas arranca la aplicación, en el orden en que aparecen sus
+ * pestañas. Añadir una vista nueva (docs/02 §2.10, `app/vistas.ts`) es
+ * añadir una entrada aquí -nada más de este fichero necesita cambiar.
+ */
+function crearVistas(fuente: FuenteDeDatos, referencia: string): readonly DefinicionVista[] {
+  return [crearVistaSeries(fuente, referencia), crearVistaIncidencias(document)];
 }
 
-void iniciar();
+/**
+ * Ya no es `async`: antes esperaba `aplicacion.abrirLog(referencia)` para
+ * poder atrapar su fallo aquí mismo. Ahora `abrirLog` la lanza
+ * `crearVistaSeries#montar` -síncrono, por contrato de `DefinicionVista`- y
+ * es ese módulo quien atrapa el fallo (ver su cabecera). Nada queda por
+ * esperar en este punto de entrada.
+ */
+function iniciar(): void {
+  inicializarTema();
+  const { fuente, referencia } = elegirFuente();
+  new ConmutadorDeVistas(contenedorApp(), document, crearVistas(fuente, referencia));
+}
+
+iniciar();

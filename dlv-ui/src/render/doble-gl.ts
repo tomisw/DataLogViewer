@@ -39,6 +39,15 @@ export interface DobleGL extends ContextoGL {
   fallarCompilacion: boolean;
   fallarEnlace: boolean;
   /**
+   * Cuántas veces se llamó a `loseContext()` de `WEBGL_lose_context` sobre
+   * ESTE contexto. Es lo que prueba que conmutar de vista (`app/vistas.ts`)
+   * libera de verdad lo que reservó, sin GPU: cada `Aplicacion.destruir()` /
+   * `#reconstruir(null)` tiene que dejar este contador en 1, nunca en 0
+   * (fuga) y el ciclo de montar/desmontar repetido nunca debería volver a
+   * subir sobre el MISMO doble (cada vista nueva trae un doble nuevo).
+   */
+  contextosPerdidos: number;
+  /**
    * Solo `"WEBGL_lose_context"` (F5-11): `app/aplicacion.ts#reconstruir`
    * la pide sobre CADA canvas que destruye, para liberar el contexto antes de
    * agotar el puñado que un navegador garantiza vivos a la vez (16 en
@@ -49,6 +58,10 @@ export interface DobleGL extends ContextoGL {
    * no la declaraba: `Renderizador` nunca la necesita) estaba sin avisar.
    * Cualquier otro nombre de extensión devuelve `null`, como el navegador real
    * cuando no la reconoce.
+   *
+   * Ojo con el `?.` de esa línea: protege el OBJETO devuelto por `getContext`,
+   * NO un método que ese objeto no tenga. Mientras el doble no implementaba
+   * esto, la llamada lanzaba `TypeError` bajo prueba.
    */
   getExtension(nombre: string): { loseContext(): void } | null;
 }
@@ -89,6 +102,7 @@ export function crearDobleGL(): DobleGL {
     llamadas,
     fallarCompilacion: false,
     fallarEnlace: false,
+    contextosPerdidos: 0,
     cuenta: (nombre) => llamadas.filter((l) => l.nombre === nombre).length,
     olvidar: () => {
       llamadas.length = 0;
@@ -96,7 +110,12 @@ export function crearDobleGL(): DobleGL {
     getExtension: (nombre) => {
       registrar("getExtension", nombre);
       if (nombre !== "WEBGL_lose_context") return null;
-      return { loseContext: () => registrar("loseContext") };
+      return {
+        loseContext: () => {
+          registrar("loseContext");
+          doble.contextosPerdidos += 1;
+        },
+      };
     },
 
     createShader: (tipo) => {

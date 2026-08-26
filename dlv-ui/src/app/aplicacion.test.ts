@@ -374,6 +374,92 @@ describe("la aplicación montada de extremo a extremo", () => {
 });
 
 // --------------------------------------------------------------------------- //
+// docs/02 §2.10 — `irAInstante`/`vistaActual`: el cable hacia el conmutador de vistas
+// (`app/vistas.ts`, `app/vista-incidencias.ts`). Sin panel de incidencias de
+// por medio: esto prueba solo el extremo que vive en `Aplicacion`.
+// --------------------------------------------------------------------------- //
+describe("irAInstante / vistaActual", () => {
+  it("centra la vista de series en el instante pedido, conservando el zoom", async () => {
+    const { app } = await montar();
+    const antes = app.vistaActual;
+    expect(antes).not.toBeNull();
+    const ancho = antes!.t1 - antes!.t0;
+
+    app.irAInstante(2);
+
+    const despues = app.vistaActual;
+    expect(despues).not.toBeNull();
+    expect(despues!.t1 - despues!.t0).toBeCloseTo(ancho, 9);
+    expect((despues!.t0 + despues!.t1) / 2).toBeCloseTo(2, 9);
+  });
+
+  it("sin ningún panel montado (log sin abrir) es un no-op, no una excepción", () => {
+    const documento = crearDocumentoFalso();
+    const ventana = crearVentanaFalsa();
+    const raiz = documento.createElement("div");
+    const app = new Aplicacion(raiz as unknown as HTMLElement, new FuenteDePrueba(), {
+      documento: documento as unknown as Pick<Document, "createElement" | "createElementNS">,
+      ventana,
+      crearRenderizador: () => new Renderizador(crearDobleGL()),
+    });
+    expect(app.vistaActual).toBeNull();
+    expect(() => app.irAInstante(10)).not.toThrow();
+  });
+});
+
+// --------------------------------------------------------------------------- //
+// docs/02 §2.10 — el ciclo montar/desmontar de `app/vistas.ts` reconstruye
+// `Aplicacion` en cada conmutación de vista: `destruir()` tiene que dejar
+// CERO oyentes vivos sobre `entorno.ventana`, o cada conmutación acumularía
+// uno más para siempre (el "no puede ir acumulando contextos" de docs/02
+// §2.10 no es solo de WebGL).
+// --------------------------------------------------------------------------- //
+describe("destruir() no deja oyentes de ventana colgados", () => {
+  it("destruir() retira los DOS oyentes que puso el constructor (resize, keydown)", async () => {
+    const { app, ventana, raiz } = await montar();
+    expect(ventana.numeroDeOyentes("resize")).toBe(1);
+    expect(ventana.numeroDeOyentes("keydown")).toBe(1);
+
+    app.destruir();
+    // `destruir()` YA cambia el árbol por su cuenta (`#reconstruir(null)`
+    // vacía los paneles): lo que importa aquí es capturarlo DESPUÉS de
+    // destruir y comprobar que un evento fantasma no lo mueve más.
+    const textoTrasDestruir = raiz.textoDelArbol();
+
+    expect(ventana.numeroDeOyentes("resize")).toBe(0);
+    expect(ventana.numeroDeOyentes("keydown")).toBe(0);
+    // Y por si acaso algo quedara enganchado: dispararlos no debe tocar ya la
+    // aplicación destruida ni cambiar lo que hay en pantalla.
+    expect(() => ventana.disparar("resize")).not.toThrow();
+    expect(() => ventana.disparar("keydown", { key: "k", ctrlKey: true })).not.toThrow();
+    expect(raiz.textoDelArbol()).toBe(textoTrasDestruir);
+  });
+
+  it("montar/destruir varias veces con la MISMA ventana no acumula oyentes (el ciclo de app/vistas.ts)", async () => {
+    const documento = crearDocumentoFalso();
+    const ventana = crearVentanaFalsa();
+    const entorno: EntornoApp = {
+      documento: documento as unknown as Pick<Document, "createElement" | "createElementNS">,
+      ventana,
+      crearRenderizador: () => new Renderizador(crearDobleGL()),
+    };
+
+    for (let i = 0; i < 5; i += 1) {
+      const raiz = documento.createElement("div");
+      const app = new Aplicacion(raiz as unknown as HTMLElement, new FuenteDePrueba(), entorno);
+      await app.abrirLog("log-de-prueba");
+      await asentar(ventana);
+      // Nunca más de uno mientras está montada: si un ciclo anterior hubiera
+      // dejado el suyo enganchado, este sería 2, 3...
+      expect(ventana.numeroDeOyentes("resize")).toBe(1);
+      app.destruir();
+      expect(ventana.numeroDeOyentes("resize")).toBe(0);
+      expect(ventana.numeroDeOyentes("keydown")).toBe(0);
+    }
+  });
+});
+
+// --------------------------------------------------------------------------- //
 // F2-14 — renderizado progresivo: silueta inmediata, refinamiento de fondo
 // --------------------------------------------------------------------------- //
 // Aquí no basta con montar: hay que CONDUCIR un gesto (rueda) y retener la

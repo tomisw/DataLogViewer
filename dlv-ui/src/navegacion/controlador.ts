@@ -30,7 +30,7 @@
  * compite con una autoescala futura del modo en que ampliar sí lo haría.
  */
 
-import { desplazar, desplazarPx, direccionDe, zoomEnPunto, type Direccion } from "./aritmetica.ts";
+import { centrarEnT, desplazar, desplazarPx, direccionDe, zoomEnPunto, type Direccion } from "./aritmetica.ts";
 import type { ElementoNavegable, OyenteDeEvento } from "./elemento.ts";
 import { HistorialDeVista } from "./historial.ts";
 import type { Vista } from "../render/tipos.ts";
@@ -177,6 +177,23 @@ export class ControladorDeNavegacion {
   verTodo(): void {
     if (this.#limites === undefined) return;
     this.#aplicarNueva(this.#limites);
+  }
+
+  /**
+   * Centra el eje temporal en `tCentro` (segundos absolutos), conservando el
+   * ancho de vista actual y el eje de valores. Abre un paso de historial
+   * como cualquier otro cambio (`deshacer()` vuelve a lo que había antes del
+   * salto) — es el mismo tratamiento que ya reciben la rueda y el teclado,
+   * no un camino aparte.
+   *
+   * Es el cable de "saltar al instante" de
+   * `incidencias/panel-incidencias.ts` hacia la vista de series
+   * (`app/aplicacion.ts#irAInstante`, `app/vistas.ts`). Sin límites propios:
+   * igual que `desplazar`/`zoomEnPunto`, no recorta contra `#limites` — ese
+   * recorte es cosa de `verTodo()`, no de este método.
+   */
+  irA(tCentro: number): void {
+    this.#aplicarNueva(centrarEnT(this.#vista, tCentro));
   }
 
   deshacer(): void {

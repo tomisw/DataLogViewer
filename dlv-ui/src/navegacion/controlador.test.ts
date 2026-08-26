@@ -251,6 +251,33 @@ describe("teclado", () => {
   });
 });
 
+describe("irA (salto al instante desde el panel de incidencias)", () => {
+  it("centra el eje temporal en el instante pedido, conservando el ancho y el eje de valores", () => {
+    const { fotograma, cambios, controlador } = crearControlador();
+    controlador.irA(500);
+    fotograma.ejecutarUno();
+    expect(cambios).toHaveLength(1);
+    const nueva = cambios[0]!.vista;
+    expect(nueva.t1 - nueva.t0).toBeCloseTo(VISTA_INICIAL.t1 - VISTA_INICIAL.t0, 9);
+    expect((nueva.t0 + nueva.t1) / 2).toBeCloseTo(500, 9);
+    expect(nueva.v0).toBe(VISTA_INICIAL.v0);
+    expect(nueva.v1).toBe(VISTA_INICIAL.v1);
+    // Y de verdad quedó como la vista vigente, no solo notificada.
+    expect(controlador.vista).toEqual(nueva);
+  });
+
+  it("abre un paso de historial: Ctrl+Z deshace el salto", () => {
+    const { falso, fotograma, cambios, controlador } = crearControlador();
+    controlador.irA(700);
+    fotograma.ejecutarUno();
+    expect(cambios.at(-1)!.vista.t0).not.toBe(VISTA_INICIAL.t0);
+
+    falso.disparar("keydown", { key: "z", ctrlKey: true });
+    fotograma.ejecutarUno();
+    expect(cambios.at(-1)!.vista).toEqual(VISTA_INICIAL);
+  });
+});
+
 describe("destruir", () => {
   it("retira los oyentes y cancela el fotograma pendiente", () => {
     const { falso, fotograma, controlador } = crearControlador();
