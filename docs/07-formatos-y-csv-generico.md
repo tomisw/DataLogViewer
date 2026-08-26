@@ -127,6 +127,15 @@ Un rol es un identificador estable, con **dimensión esperada** y **rango
 plausible**, que los perfiles y detectores usan en lugar de un ID de fabricante.
 Los roles con `[n]` admiten índice (banco, cilindro, sensor, rueda).
 
+**Hasta dónde llega la cobertura.** Este catálogo equaliza los canales
+ESTÁNDAR entre fabricantes; no aspira a cubrirlos todos. Un log de 475 canales
+con 155 asignados y 320 sin rol es un resultado bueno, y un canal sin rol se
+resuelve con un perfil a `id_nativo`, no añadiendo roles. El razonamiento
+completo y sus tres consecuencias prácticas están en
+[`04-perfiles-motorsport.md`](04-perfiles-motorsport.md) «Hasta dónde llega la
+cobertura por rol»; se anota aquí porque esta es la sección que se lee al
+implementar la asignación, y es donde se decide gastar esfuerzo de más.
+
 | Grupo | Roles |
 |---|---|
 | Motor | `engine_speed`, `engine_load`, `throttle_position`, `throttle_pedal`, `manifold_pressure`, `manifold_temp`, `baro_pressure`, `air_mass_flow` |
