@@ -129,4 +129,26 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "app.mensajeVacio": "Select channels on the left to see them here.",
   "app.dobleCursorTitulo":
     "Dual cursor: click on the panels to set the anchor, and click again to remove it.",
+
+  "perfiles.origenFabrica": "factory",
+  "perfiles.origenUsuario": "yours",
+  "perfiles.avisoFabrica":
+    "This is a factory profile: it can't be edited directly. Duplicate it to customize it — your changes will survive the next update.",
+  "perfiles.nombre": "Name",
+  "perfiles.descripcion": "Description",
+  "perfiles.duplicar": "Duplicate",
+  "perfiles.duplicarParaEditar": "Duplicate to edit",
+  "perfiles.limites": "Alert limits",
+  "perfiles.sinLimites": "This profile declares no alert limits.",
+  "perfiles.limiteAviso": "warning",
+  "perfiles.limiteCritico": "critical",
+  "perfiles.limiteBandaCentro": "center",
+  "perfiles.limiteBandaSemiancho": "± width",
+  "perfiles.limiteBandaMinimo": "minimum",
+  "perfiles.limiteBandaMaximo": "maximum",
+  "perfiles.limiteCurvaNoEditable": "curve as a function of “{rol}”: not editable here",
+  "perfiles.importarBoton": "Load",
+  "perfiles.importarError": "Can't import: {mensaje}",
+  "perfiles.exportar": "Export",
+  "perfiles.exportarEtiqueta": "The .dlvprofile text (copy it or save it as a standalone file)",
 };

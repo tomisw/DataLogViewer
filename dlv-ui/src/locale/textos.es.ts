@@ -135,4 +135,26 @@ export const TEXTOS_ES = {
   "app.mensajeVacio": "Selecciona canales en la izquierda para verlos aquí.",
   "app.dobleCursorTitulo":
     "Doble cursor: haz clic sobre los paneles para fijar el ancla, y otro clic para quitarla.",
+
+  "perfiles.origenFabrica": "de fábrica",
+  "perfiles.origenUsuario": "tuyo",
+  "perfiles.avisoFabrica":
+    "Este perfil es de fábrica: no se puede editar directamente. Duplícalo para personalizarlo — tus cambios sobrevivirán a la próxima actualización.",
+  "perfiles.nombre": "Nombre",
+  "perfiles.descripcion": "Descripción",
+  "perfiles.duplicar": "Duplicar",
+  "perfiles.duplicarParaEditar": "Duplicar para editar",
+  "perfiles.limites": "Límites de alerta",
+  "perfiles.sinLimites": "Este perfil no declara límites de alerta.",
+  "perfiles.limiteAviso": "aviso",
+  "perfiles.limiteCritico": "crítico",
+  "perfiles.limiteBandaCentro": "centro",
+  "perfiles.limiteBandaSemiancho": "± ancho",
+  "perfiles.limiteBandaMinimo": "mínimo",
+  "perfiles.limiteBandaMaximo": "máximo",
+  "perfiles.limiteCurvaNoEditable": "curva en función de «{rol}»: no editable aquí",
+  "perfiles.importarBoton": "Cargar",
+  "perfiles.importarError": "No se puede importar: {mensaje}",
+  "perfiles.exportar": "Exportar",
+  "perfiles.exportarEtiqueta": "Texto del .dlvprofile (cópialo o guárdalo como fichero suelto)",
 } as const;
