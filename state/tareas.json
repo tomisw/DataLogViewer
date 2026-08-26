@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 23:37:48Z"
+    "actualizado": "2026-08-26 23:42:03Z"
   },
   "tareas": [
     {
@@ -2442,10 +2442,16 @@
       ],
       "dep_todo": false,
       "gate": "G3",
-      "estado": "en_curso",
+      "estado": "hecho",
       "agente": "sonnet",
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-26 23:42:03Z",
+          "texto": "dlv_core/alineacion.py, 142 lineas, puerta estrecha sobre tiempo.py. HALLAZGO: F2-01 ya implementaba entera la aritmetica que pedia F2-05 -- desfase_efectivo/_desfases_por_reloj ya exigen FiabilidadReloj.FIABLE en todos los segmentos y lanzan ErrorDeTiempo nombrando a los culpables. Verificado en tiempo.py lineas 130, 346, 391. El agente no la duplico. Lo nuevo y legitimo: alinear() rechaza MANUAL/POR_EVENTO/CORRELACION citando F2-06/F2-07/F2-08 aunque tiempo.py sepa calcular alguno, y disponibilidad() devuelve Disponibilidad(disponible, motivo) SIN lanzar, con el motivo literalmente el mismo texto que lanzaria alinear, para que la interfaz decida si ofrecer 'reloj absoluto' sin intentarlo y capturar. Pedir reloj absoluto con reloj no fiable propaga el error, nunca se repliega a relativo: probado con el caso real Log2768 DESCONOCIDA + Log2769 NO_FIABLE. 13 pruebas nuevas, 2075 en total. NOTA para quien lea tipos.ts de dlv-ui: su comentario y la nota de F2-04 daban F2-05 por sin hacer sin saber que la logica ya vivia en tiempo.py."
+        }
+      ],
+      "base": "74ae5f9"
     },
     {
       "id": "F2-06",
