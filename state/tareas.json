@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 17:08:03Z"
+    "actualizado": "2026-08-26 17:13:21Z"
   },
   "tareas": [
     {
@@ -3058,13 +3058,19 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": "subagente Sonnet (2o intento)",
-      "commits": [],
+      "commits": [
+        "903b3ac"
+      ],
       "notas": [
         {
           "fecha": "2026-08-26 16:47:37Z",
           "texto": "Sin empezar: el agente murio por limite de sesion en su fase de lectura, sin escribir ni un fichero. Se desmarca para que no aparezca como trabajo en curso que no existe."
+        },
+        {
+          "fecha": "2026-08-26 17:13:21Z",
+          "texto": "Decodifica y pinta, pero NO nombra: el carril dice «bit 3», nunca «fallo de sincronizacion» -- eso es F3-15 y sigue bloqueada sin documentacion del fabricante. ancho_de_bits DERIVA la anchura de rango.max y LANZA si no es 2**n-1, en vez de adivinar con .bit_length(). Un bit que nunca se activo se oculta pero se CUENTA (ResultadoFiltroBits.ocultos), mismo criterio que el selector de canales. Reutiliza pintarCarril de F3-13 entero anidando un <svg> por bit; no duplica bandas ni transiciones."
         }
       ]
     },
