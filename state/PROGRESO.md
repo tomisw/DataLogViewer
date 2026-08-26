@@ -4,9 +4,9 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 17:37:34Z
+Actualizado: 2026-08-26 22:59:22Z
 
-**427 / 775 pts cerrados (55.1 %)** · 185 pts esperando revisión humana → 79.0 % entregado
+**427 / 775 pts cerrados (55.1 %)** · 193 pts esperando revisión humana → 80.0 % entregado
 
 | Fase | Hecho | En revisión | En curso | Pendiente | Bloqueado | Total |
 |---|---|---|---|---|---|---|
@@ -15,7 +15,7 @@ Actualizado: 2026-08-26 17:37:34Z
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
 | F2 | 19 | 12 | 0 | 49 | 0 | 80 |
 | F3 | 52 | 53 | 0 | 10 | 3 | 118 |
-| F4 | 37 | 4 | 8 | 14 | 0 | 63 |
+| F4 | 37 | 12 | 0 | 14 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
 | F5 | 39 | 5 | 0 | 32 | 0 | 76 |
 
@@ -55,7 +55,7 @@ Actualizado: 2026-08-26 17:37:34Z
 | `F3-14` Decodificación de máscaras de bits en carril | revision_humana | Opus 5 | G1 | Decodifica y pinta, pero NO nombra: el carril dice «bit 3», nunca «fal |
 | `F3-15` Ampliar `enums.toml` con los códigos deducid | bloqueado | Haiku 4.5 | G3 | Intentado por un agente Haiku en segundo plano; RECHAZADO por el orque |
 | `F3-19` Biblioteca de fórmulas de §4.5, cada una con | revision_humana | Sonnet 5 | G1 | data/formulas.toml con las 7 formulas puntuales de docs/04 SS4.5 + 55  |
-| `F4-03` Filtros de exclusión: transitorio, corte, pr | en_curso | Opus 5 | G1 | — |
+| `F4-03` Filtros de exclusión: transitorio, corte, pr | revision_humana | Opus 5 | G1 | Modulo dlv_core/exclusion.py + 450 lineas de pruebas. Cuatro motivos ( |
 | `F4-10` Estadísticas con la clase de magnitud correc | revision_humana | Opus 5 | G1 | PUERTA G1. Termina SIN cambio de comportamiento: la auditoria no encon |
 | `F5-02` Modo portable con `portable.txt`: cero escri | revision_humana | Opus 5 | G1 | PUERTA G1: revisar (1) carpeta de solo lectura -> hoy falla con aviso  |
 
@@ -200,13 +200,13 @@ Actualizado: 2026-08-26 17:37:34Z
 | ✔  | `F3-20` | Detección de marcha por agrupación de velocidad/rpm | Opus 5 | 5 | F3-18 | G2 | `468251b` |
 | ✔  | `F3-21` | Modo oscuro y modo alto contraste | Haiku 4.5 | 3 | F1-25 | G4 | `13f6d99` |
 
-## F4 — 41/63 pts
+## F4 — 49/63 pts
 
 | | ID | Tarea | Modelo | Pts | Deps | Puerta | Commits |
 |---|---|---|---|---|---|---|---|
 | ✔  | `F4-01` | Malla RPM×MAP configurable, con los ejes mostrados en la unida | Sonnet 5 | 4 | F1-05 | G3 | `eea3de7` |
 | ✔  | `F4-02` | Agregación por celda: media, desviación, mín, máx, número de m | Opus 5 | 5 | F4-01 | G2 | `7912ef1` |
-| ▶  | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
+| ⏳ | `F4-03` | Filtros de exclusión: transitorio, corte, protección de motor, | Opus 5 | 8 | F4-02, F3-16 | G1 | — |
 | ✔  | `F4-04` | Mapa de calor de λ error con detalle por celda | Sonnet 5 | 5 | F4-02 | G3 | `e7afb45` |
 | ·  | `F4-05` | Tabla de corrección de combustible, con celdas de confianza in | Opus 5 | 8 | F4-03 | G1 | — |
 | ·  | `F4-06` | Exportación de tabla a CSV y portapapeles como malla pegable | Sonnet 5 | 3 | F4-05 | G3 | — |

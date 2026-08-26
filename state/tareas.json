@@ -2,7 +2,7 @@
   "meta": {
     "version": 1,
     "plan_rev": 2,
-    "actualizado": "2026-08-26 17:37:34Z"
+    "actualizado": "2026-08-26 22:59:22Z"
   },
   "tareas": [
     {
@@ -3374,10 +3374,16 @@
       ],
       "dep_todo": false,
       "gate": "G1",
-      "estado": "en_curso",
+      "estado": "revision_humana",
       "agente": null,
       "commits": [],
-      "notas": []
+      "notas": [
+        {
+          "fecha": "2026-08-26 22:59:22Z",
+          "texto": "Modulo dlv_core/exclusion.py + 450 lineas de pruebas. Cuatro motivos (TRANSITORIO, CORTE, PROTECCION_MOTOR, RETARDO_TRANSPORTE_LAMBDA) combinados con OR. Un solo umbral nuevo, [exclusion].retardo_transporte_lambda_ms = 150, cita literal de docs/04 §4.6 linea 319; los otros tres heredan de D15/D14/D13 y [segmentacion] en vez de duplicar el numero. QUE REVISAR, por consecuencia: (1) CORTE y PROTECCION_MOTOR excluyen una muestra aislada sin exigir la permanencia minima que si piden D14/D13 -- cambia cuantas muestras se descartan del agregado; (2) RETARDO_TRANSPORTE_LAMBDA se dispara con la derivada de mariposa porque §4.6 no dice que es un 'cambio brusco de carga' -- si eran MAP, hay que cambiarlo; (3) CORTE ignora a proposito el matiz 'fuera del limitador esperado' de D14: para un promedio da igual por que hay corte; (4) los cuatro motivos no tienen prioridad entre si; (5) la suite usa NumPy real en vez del protocolo Vectorial de las otras suites."
+        }
+      ],
+      "base": "5befb0e"
     },
     {
       "id": "F4-04",
