@@ -4,7 +4,7 @@
 > es `state/tareas.json`. Protocolo de reanudación en
 > [`docs/08-ejecucion-y-reanudacion.md`](../docs/08-ejecucion-y-reanudacion.md).
 
-Actualizado: 2026-08-26 23:55:11Z
+Actualizado: 2026-08-27 14:29:57Z
 
 **438 / 775 pts cerrados (56.5 %)** · 193 pts esperando revisión humana → 81.4 % entregado
 
@@ -13,7 +13,7 @@ Actualizado: 2026-08-26 23:55:11Z
 | F0 | 35 | 19 | 0 | 0 | 0 | 54 |
 | F1 | 190 | 44 | 0 | 0 | 0 | 234 |
 | FG | 46 | 48 | 0 | 4 | 0 | 98 |
-| F2 | 30 | 12 | 0 | 38 | 0 | 80 |
+| F2 | 30 | 12 | 16 | 22 | 0 | 80 |
 | F3 | 52 | 53 | 0 | 10 | 3 | 118 |
 | F4 | 37 | 12 | 0 | 14 | 0 | 63 |
 | FE | 9 | 0 | 0 | 43 | 0 | 52 |
@@ -45,6 +45,8 @@ Actualizado: 2026-08-26 23:55:11Z
 | `FG-09` Asignación automática de roles por sinónimos | revision_humana | Opus 5 | G1 | REVISAR (G1, ordenado por consecuencia): (1) LO QUE MAS IMPORTA: asign |
 | `FG-10` Informe de plausibilidad por rango declarado | revision_humana | Opus 5 | G1 | dlv_core/plausibilidad.py + 46 pruebas. Contrasta los valores REALES d |
 | `F2-02` Identidad de canal en capas (rol → `(formato | revision_humana | Opus 5 | G1 | dlv_core/identidad.py: las cuatro capas de SS7.11 (manual > rol > (for |
+| `F2-08` Autoalineación por correlación cruzada en L4 | en_curso | Opus 5 | G2 | — |
+| `F2-12` Eje X alternativo (RPM, velocidad, distancia | en_curso | Opus 5 | G2 | — |
 | `F2-13` Conflictos: mismo rol con unidades de origen | revision_humana | Opus 5 | G1 | Entregada por un agente Opus, revisada e integrada por Opus. dlv-core/ |
 | `F3-01` Modelo de perfil `.dlvprofile` por rol, con  | revision_humana | Opus 5 | G1 | PUERTA G1. Revisar por consecuencia: (1) el corte requerido/opcional e |
 | `F3-03` Los 10 perfiles de fábrica de `04-perfiles-m | revision_humana | Sonnet 5 | G1 | PUERTA G1: son DATOS, cada numero es una afirmacion sobre un motor. Re |
@@ -164,11 +166,11 @@ Actualizado: 2026-08-26 23:55:11Z
 | ✔  | `F2-05` | Alineación por reloj absoluto y por relativo | Sonnet 5 | 3 | F2-01, F1-04 | G3 | — |
 | ✔  | `F2-06` | Desfase manual arrastrando el segmento | Sonnet 5 | 3 | F2-04 | G3 | — |
 | ✔  | `F2-07` | Anclaje por evento (primer WOT, primer corte, launch) | Opus 5 | 5 | F2-01 | G2 | — |
-| ·  | `F2-08` | Autoalineación por correlación cruzada en L4–L6 con refinamien | Opus 5 | 8 | F2-01, F1-09 | G2 | — |
+| ▶  | `F2-08` | Autoalineación por correlación cruzada en L4–L6 con refinamien | Opus 5 | 8 | F2-01, F1-09 | G2 | — |
 | ·  | `F2-09` | Vista concatenada: unión por identidad, fronteras visibles, si | Opus 5 | 8 | F2-02 | G1 | — |
 | ·  | `F2-10` | Orden por `Log Number` con desfase editable y auditable | Sonnet 5 | 4 | F2-09 | G3 | — |
 | ·  | `F2-11` | Estadísticas y detectores que respetan las fronteras de segmen | Opus 5 | 5 | F2-09 | G2 | — |
-| ·  | `F2-12` | Eje X alternativo (RPM, velocidad, distancia) con monotonía po | Opus 5 | 8 | F2-01 | G2 | — |
+| ▶  | `F2-12` | Eje X alternativo (RPM, velocidad, distancia) con monotonía po | Opus 5 | 8 | F2-01 | G2 | — |
 | ⏳ | `F2-13` | Conflictos: mismo rol con unidades de origen distintas → canón | Opus 5 | 4 | F2-02, F1-13 | G1 | `e717ffa` |
 | ✔  | `F2-14` | Renderizado progresivo: silueta inmediata, refinamiento de fon | Opus 5 | 5 | F1-23 | G2 | `4a34148` |
 | ·  | `F2-15` | Banco del caso peor: 8 logs × 30 min, incluido cambio de unida | Sonnet 5 | 3 | F2-04 | G3 | — |
