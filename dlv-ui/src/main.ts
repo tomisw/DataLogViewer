@@ -27,6 +27,7 @@ import { ConmutadorDeVistas, type DefinicionVista } from "./app/vistas.ts";
 import { crearVistaSeries } from "./app/vista-series.ts";
 import { crearVistaIncidencias } from "./app/vista-incidencias.ts";
 import { crearVistaPerfiles } from "./app/vista-perfiles.ts";
+import { crearVistaImportacion } from "./app/vista-importacion.ts";
 import { FuenteApi } from "./datos/fuente-api.ts";
 import type { FuenteDeDatos } from "./datos/fuente.ts";
 import { FuenteSintetica } from "./datos/fuente-sintetica.ts";
@@ -87,7 +88,12 @@ function elegirFuente(): { fuente: FuenteDeDatos; referencia: string } {
  * añadir una entrada aquí -nada más de este fichero necesita cambiar.
  */
 function crearVistas(fuente: FuenteDeDatos, referencia: string): readonly DefinicionVista[] {
-  return [crearVistaSeries(fuente, referencia), crearVistaIncidencias(document), crearVistaPerfiles(document)];
+  return [
+    crearVistaSeries(fuente, referencia),
+    crearVistaIncidencias(document),
+    crearVistaPerfiles(document),
+    crearVistaImportacion(fuente, document),
+  ];
 }
 
 /**
