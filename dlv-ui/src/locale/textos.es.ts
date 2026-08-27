@@ -162,6 +162,8 @@ export const TEXTOS_ES = {
   "perfiles.importarError": "No se puede importar: {mensaje}",
   "perfiles.exportar": "Exportar",
   "perfiles.exportarEtiqueta": "Texto del .dlvprofile (cópialo o guárdalo como fichero suelto)",
+  "perfiles.avisoSinGuardar":
+    "Esta pestaña no guarda nada por su cuenta: dlv-api todavía no expone un punto para persistir un perfil (falta /comandos/perfil*). Usa «Exportar» para copiar el .dlvprofile resultante y guardarlo tú mismo como fichero; cualquier cambio no exportado se pierde al cambiar de pestaña o cerrar la aplicación.",
 
   "onboarding.propuestaAviso": "Perfil sugerido: «{perfil}» — {disponibles} de {total} roles disponibles.",
   "onboarding.propuestaFaltan": "Faltan: {roles}.",

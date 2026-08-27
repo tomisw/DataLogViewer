@@ -156,6 +156,8 @@ export const TEXTOS_EN: Record<keyof typeof TEXTOS_ES, string> = {
   "perfiles.importarError": "Can't import: {mensaje}",
   "perfiles.exportar": "Export",
   "perfiles.exportarEtiqueta": "The .dlvprofile text (copy it or save it as a standalone file)",
+  "perfiles.avisoSinGuardar":
+    "This tab doesn't save anything on its own: dlv-api doesn't expose an endpoint to persist a profile yet (/comandos/perfil* is missing). Use “Export” to copy the resulting .dlvprofile and save it yourself as a file; any change you don't export is lost when you switch tabs or close the app.",
 
   "onboarding.propuestaAviso": "Suggested profile: “{perfil}” — {disponibles} of {total} roles available.",
   "onboarding.propuestaFaltan": "Missing: {roles}.",
